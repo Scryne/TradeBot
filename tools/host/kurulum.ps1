@@ -70,12 +70,26 @@ $sshDurum = if (-not $sshd -or $sshd.Status -ne 'Running') { 'EKSIK' } elseif ($
 Kayit 'ssh' $sshDurum ("sshd {0}; parola girişi {1}" -f $(if ($sshd) { $sshd.Status } else { 'yok' }), $(if ($parolaKapali) { 'kapalı' } else { 'AÇIK (anahtar doğrulanınca -SadeceAnahtar)' }))
 
 # --- WSL2 ---------------------------------------------------------------------------------------
-$wslVar = $false
-try { $wslCikti = (wsl.exe --status 2>&1 | Out-String) -replace "`0", ''; $wslVar = $LASTEXITCODE -eq 0 } catch { $wslCikti = '' }
-if (-not $wslVar) {
-    if ($Uygula) { wsl.exe --install --no-distribution | Out-Null; Kayit 'wsl' 'YENIDEN_BASLAT' 'WSL kuruldu; bilgisayar yeniden başlatılmalı, sonra betik tekrar çalıştırılır' }
-    else { Kayit 'wsl' 'EKSIK' 'WSL2 kurulu değil' }
-} else { Kayit 'wsl' 'OK' 'WSL kurulu' }
+# Not: `wsl --status` kurulu değilken de 0 döndürüyor ve `wsl --install` SSH oturumunda sessizce hiçbir şey
+# yapmıyor (host'ta ölçüldü). Bu yüzden Windows bileşenleri DISM ile, WSL paketi GitHub'daki resmî MSI ile kurulur.
+$bilesenler = 'Microsoft-Windows-Subsystem-Linux', 'VirtualMachinePlatform'
+$durumlar = $bilesenler | ForEach-Object { (Get-WindowsOptionalFeature -Online -FeatureName $_).State.ToString() }
+$paket = Test-Path "$env:ProgramFiles\WSL\wsl.exe"
+if ($Uygula) {
+    foreach ($b in $bilesenler) { dism.exe /online /enable-feature /featurename:$b /all /norestart | Out-Null }
+    if (-not $paket) {
+        $r = Invoke-RestMethod 'https://api.github.com/repos/microsoft/WSL/releases/latest' -UseBasicParsing
+        $a = $r.assets | Where-Object name -match 'x64\.msi$' | Select-Object -First 1
+        $m = Join-Path $env:TEMP $a.name; Indir $a.browser_download_url $m
+        Start-Process msiexec.exe -ArgumentList '/i', $m, '/quiet', '/norestart' -Wait
+        $paket = Test-Path "$env:ProgramFiles\WSL\wsl.exe"
+    }
+    $durumlar = $bilesenler | ForEach-Object { (Get-WindowsOptionalFeature -Online -FeatureName $_).State.ToString() }
+}
+$wslVar = $paket -and -not ($durumlar | Where-Object { $_ -ne 'Enabled' })
+if ($wslVar) { Kayit 'wsl' 'OK' 'WSL bileşenleri açık, paket kurulu' }
+elseif ($paket -and -not ($durumlar | Where-Object { $_ -notin 'Enabled', 'EnablePending' })) { Kayit 'wsl' 'YENIDEN_BASLAT' 'WSL kuruldu; bilgisayar yeniden başlatılmalı' }
+else { Kayit 'wsl' 'EKSIK' ("bileşenler: {0}; paket: {1}" -f ($durumlar -join ', '), $paket) }
 
 # --- Docker Desktop ------------------------------------------------------------------------------
 $dockerYollari = @("$env:ProgramFiles\Docker\Docker\Docker Desktop.exe") + (Get-ChildItem 'C:\Users\*\AppData\Local\Programs\DockerDesktop\Docker Desktop.exe' -ErrorAction SilentlyContinue | ForEach-Object FullName)
