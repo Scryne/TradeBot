@@ -78,7 +78,11 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
       konteyner DNS 1.1.1.1, log döndürme); 13 test + ruff temiz.
     - Bu makinede sağlık kontrolü saat kaymasını yakaladı: +1,2–1,4 sn, Windows saati hiç senkron değil.
   - (b) host kurulumu 🔄: `tools/host/` (baslangic, kurulum [Kontrol/-Uygula/-SadeceAnahtar], guncelle) ve
-    `docs/host/Kurulum.md` hazır. Scryne'ın ev bilgisayarında `baslangic.ps1` çalıştırması bekleniyor.
+    `docs/host/Kurulum.md` hazır.
+    - Host (192.168.1.4, Windows 11, 15,8 GB, C: 471 GB boş): anahtarla SSH ✅, uyku kapalı ✅, Windows Update
+      yeniden başlatma kontrolü ✅, `C:\TradeBot` ✅.
+    - NTP: kaynak Cloudflare. Yüksek doğruluk ayarlarıyla fark −720 ms'den ±0,3 ms'ye indi ✅.
+    - WSL kuruldu (yeniden başlatma bekliyor), Tailscale kuruldu (giriş bekliyor). Docker, WSL'den sonra kurulacak.
 
 ### Faz 2: Veri platformu (ilk dalga)
 - **İşler:** İdempotent indiriciler; Nautilus Parquet kataloğu; ham veri hash'leri; enstrüman kaydı

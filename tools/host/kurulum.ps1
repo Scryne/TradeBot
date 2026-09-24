@@ -40,7 +40,15 @@ $ntpKaynak = (w32tm /query /source 2>$null | Out-String).Trim()
 if ($Uygula) {
     Set-Service W32Time -StartupType Automatic; Start-Service W32Time -ErrorAction SilentlyContinue
     w32tm /config /manualpeerlist:"time.cloudflare.com,0x9 time.google.com,0x9 pool.ntp.org,0x9" /syncfromflags:manual /reliable:yes /update | Out-Null
-    Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Services\W32Time\TimeProviders\NtpClient' -Name SpecialPollInterval -Value 900 -Type DWord
+    # Yüksek doğruluk (Microsoft "1 sn altı" önerisi): sık yoklama, hızlı düzeltme; varsayılan ayarlar 1 sn altı
+    # farkı saatler içinde kapatıyor (host'ta −0,72 sn ölçüldü, bu ayarlarla ±0,3 ms'ye indi).
+    $w = 'HKLM:\SYSTEM\CurrentControlSet\Services\W32Time'
+    Set-ItemProperty "$w\Config" -Name UpdateInterval -Value 100 -Type DWord
+    Set-ItemProperty "$w\Config" -Name MinPollInterval -Value 6 -Type DWord
+    Set-ItemProperty "$w\Config" -Name MaxPollInterval -Value 6 -Type DWord
+    Set-ItemProperty "$w\Config" -Name MaxAllowedPhaseOffset -Value 0 -Type DWord
+    Set-ItemProperty "$w\TimeProviders\NtpClient" -Name SpecialPollInterval -Value 64 -Type DWord
+    w32tm /config /update | Out-Null
     Restart-Service W32Time; Start-Sleep 2; w32tm /resync /force | Out-Null; Start-Sleep 3
     $ntpKaynak = (w32tm /query /source 2>$null | Out-String).Trim()
 }
