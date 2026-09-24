@@ -1,0 +1,62 @@
+# TradeBot servisleri. Kullanım: `docker compose up -d --build` (ayrıntı: docs/host/Kurulum.md)
+# Tüm servislerde konteyner DNS'i public çözümleyicidir: ev router'ının DNS'i IPv6'sız adlarda 5–15 sn
+# gecikiyor ve Nautilus'un 5 sn WebSocket zaman aşımını aşıyor (Spike 02).
+name: tradebot
+
+x-ortak: &ortak
+  build: .
+  image: tradebot:yerel
+  dns: [1.1.1.1, 8.8.8.8]
+  restart: unless-stopped
+  env_file: .env
+  environment:
+    TRADEBOT_ORTAM: ${TRADEBOT_ORTAM:-host}
+    TRADEBOT_VERITABANI_URL: postgresql+psycopg://tradebot:${POSTGRES_PASSWORD}@postgres:5432/tradebot
+    TRADEBOT_LOG_DIZINI: /app/log
+    TRADEBOT_VERI_DIZINI: /app/data
+  volumes:
+    - veri:/app/data
+    - log:/app/log
+  logging:
+    driver: json-file
+    options: { max-size: "20m", max-file: "5" }
+
+services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tradebot
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env içinde tanımlı olmalı}
+      POSTGRES_DB: tradebot
+      TZ: UTC
+    volumes:
+      - pg:/var/lib/postgresql/data
+    # Port dışarı açılmaz: yalnız konteynerler erişir (host'taki başka servislerle çakışma yok).
+    # Elle erişim: docker compose exec postgres psql -U tradebot
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tradebot -d tradebot"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }
+
+  goc:
+    <<: *ortak
+    command: ["tradebot", "db", "yukselt"]
+    restart: "no"
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  saglik:
+    <<: *ortak
+    command: ["tradebot", "saglik", "--dongu", "300"]
+    depends_on:
+      goc: { condition: service_completed_successfully }
+
+volumes:
+  pg:
+  veri:
+  log:

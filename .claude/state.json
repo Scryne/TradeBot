@@ -1,7 +1,7 @@
 {
   "proje_adi": "TradeBot",
-  "asama": "finalizasyon",
+  "asama": "uygulama",
   "guncellendi": "2026-09-25",
   "roadmap": "docs/Roadmap.md",
-  "not": "Faz 0 tamam (2026-09-25): Nautilus v2 kesinlesti (1 dk yurutme verisiyle parity %0,0000; konteyner DNS 1.1.1.1; NTP); ucretsiz veri kaynaklari calisiyor (indirici kurallari docs/spikes/03); Jev vetosu Binance 46/46, KAP 44/44, yanlis veto 0; paper yurutme Nautilus sandbox. Final Dokuman Scryne onayi bekliyor; onaylaninca asama uygulama, Faz 1. Scryne'dan: NVIDIA_API_KEY, Alpaca paper, MT5 demo (acil degil)."
+  "not": "Final Dokuman onaylandi (2026-09-25). Faz 0 tamam. Faz 1 (altyapi ve host) devam ediyor: (a) repo iskeleti bu makinede, (b) ev bilgisayari kurulumu Scryne ile."
 }

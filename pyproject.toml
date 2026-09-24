@@ -1,0 +1,42 @@
+[project]
+name = "tradebot"
+version = "0.1.0"
+description = "Kurumsal, çok piyasalı, otonom trade sistemi (Scryne)"
+readme = "README.md"
+authors = [
+    { name = "Scryne", email = "218348029+Scryne@users.noreply.github.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.20.0",
+    "psycopg[binary]>=3",
+    "pydantic-settings>=2",
+    "sqlalchemy>=2",
+    "structlog>=26.1.0",
+    "typer>=0.27.2",
+]
+
+[project.scripts]
+tradebot = "tradebot:main"
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.16.9",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["research"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]

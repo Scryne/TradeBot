@@ -16,7 +16,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | Faz | Adı | Durum | Bitti Kriteri |
 | --- | --- | --- | --- |
 | 0 | Riskli kararların spike'ları | ✅ Tamamlandı | Spike 02–05 raporları `docs/spikes/` altında; Final Doküman'daki ⚑ kararlar kesinleşti ya da yedek plana geçildi |
-| 1 | Altyapı ve host | ⏳ Bekliyor | Host (WSL2 + Docker + Tailscale + SSH, 7/24 ayarları) hazır; `uv` projesi, Compose iskeleti, PostgreSQL, sır yönetimi, log düzeni; testler yeşil |
+| 1 | Altyapı ve host | 🔄 Devam Ediyor | Host (WSL2 + Docker + Tailscale + SSH, 7/24 ayarları) hazır; `uv` projesi, Compose iskeleti, PostgreSQL, sır yönetimi, log düzeni; testler yeşil |
 | 2 | Veri platformu (ilk dalga) | ⏳ Bekliyor | Kripto, Dukascopy, ABD ETF, BIST günlük verileri katalogda; enstrüman kaydı + takvimler + kurumsal işlemler; PIT evren; kaynak başına kalite raporu |
 | 3 | Araştırma motoru | ⏳ Bekliyor | Saf karar çekirdeği; piyasa başına maliyet modelleri; vektörel tarama; walk-forward + plato + DSR; deneme defteri; vektörel ↔ Nautilus parity testi geçiyor |
 | 4 | Risk motoru ve boyutlandırma | ⏳ Bekliyor | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
@@ -70,6 +70,15 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   yönetimi, yapılandırılmış log, pytest ve temel CI (yerel).
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
+  - 2026-09-25 (a) repo tarafı ✅:
+    - `tradebot` paketi: ayar/sır (SecretStr), JSON log + sır maskeleme, hash zincirli denetim izi.
+      PostgreSQL'de UPDATE/DELETE tetikleyiciyle reddediliyor, gerçek PG 17'de doğrulandı.
+    - Sağlık komutu: DNS, NTP + Binance saat kayması, veritabanı, disk, sırlar.
+    - Alembic 0001; Dockerfile (uv, root olmayan kullanıcı); compose (postgres 17, göç, sağlık izleyici,
+      konteyner DNS 1.1.1.1, log döndürme); 13 test + ruff temiz.
+    - Bu makinede sağlık kontrolü saat kaymasını yakaladı: +1,2–1,4 sn, Windows saati hiç senkron değil.
+  - (b) host kurulumu 🔄: `tools/host/` (baslangic, kurulum [Kontrol/-Uygula/-SadeceAnahtar], guncelle) ve
+    `docs/host/Kurulum.md` hazır. Scryne'ın ev bilgisayarında `baslangic.ps1` çalıştırması bekleniyor.
 
 ### Faz 2: Veri platformu (ilk dalga)
 - **İşler:** İdempotent indiriciler; Nautilus Parquet kataloğu; ham veri hash'leri; enstrüman kaydı

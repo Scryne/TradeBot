@@ -2,9 +2,9 @@
 proje: TradeBot
 created: 2026-09-24
 type: final-dokuman
-status: taslak — Faz 0 spike'ları işlendi (02, 03, 04-A, 05); onay bekliyor
+status: onaylandı (2026-09-25, Scryne: "eğer bir eksik kalmadıysa faz 1'e geçebiliriz")
 ---
-# TradeBot — Final Doküman (taslak)
+# TradeBot — Final Doküman
 
 > Bu taslak Scryne ile 2026-09-24'teki karar konuşmalarının sonucudur. "⚑ spike" işaretli kararlar Faz 0'da
 > doğrulanır. Sonuç farklı çıkarsa burada güncellenir ve gerekçesi yazılır.
