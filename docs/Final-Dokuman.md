@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-09-24
 type: final-dokuman
-status: taslak — Faz 0 spike sonuçlarıyla kesinleşir (Spike 02 işlendi)
+status: taslak — Faz 0 spike'ları işlendi (02, 03, 04-A, 05); onay bekliyor
 ---
 # TradeBot — Final Doküman (taslak)
 
@@ -98,15 +98,17 @@ katmanı. İlk aşama tamamen paper'dır.
 | Piyasa | Tarihsel | Canlı (paper) | Metin (Jev) |
 | --- | --- | --- | --- |
 | Kripto | Binance public data (1 dk'dan itibaren, funding) | Binance public akış | Binance duyuruları, RSS, CryptoPanic |
-| FX, metaller, emtia, endeks CFD | Dukascopy tick + spread (2006→) | MT5 demo (köprü) ⚑ | Merkez bankası metinleri, GDELT |
-| ABD ETF'leri | Tiingo / Massive / Alpaca | Alpaca paper ya da gecikmeli ⚑ | SEC EDGAR |
-| BIST (günlük) | borsapy / Yahoo (.IS) | Gecikmeli, simüle dolum | KAP (MKK VYK API) |
+| FX, metaller, emtia, endeks CFD | Dukascopy: saatlik (aylık dosya) 20 yıl, dakikalık son 2–3 yıl; nazik indirici (Spike 03) | MT5 demo + Windows köprü servisi (Spike 05) | Merkez bankası metinleri, GDELT (dosya dökümü) |
+| ABD ETF'leri | Yahoo günlük (`period1/period2`; SPY 1993→) | Alpaca paper IEX akışı, kendi istemcimiz (Spike 05) | SEC EDGAR |
+| BIST (günlük) | Yahoo (.IS) + borsapy yedek; bedelsiz = Yahoo split + KAP (B1) | Yahoo/borsapy gecikmeli, kendi istemcimiz, sandbox dolum | KAP (borsapy üzerinden, HTML'den metin) |
 
 **Sonraki dalgalar (ölçüm fırsat gösterirse, ayrı kararla):** ABD tek hisseleri (batmış hisseleri de
 içeren ücretli veri), CME vadelileri (Databento; 125 $ kredi, Nautilus'ta yerleşik bağlantı), VİOP
 (aracı kurum hesabı).
 
 **Kurallar:**
+- İndirici kuralları `docs/spikes/03-veri.md` §3'tedir (zaman birimi tespiti, Yahoo `range=max` yasağı,
+  Dukascopy hız sınırı, PIT evren, ilk yayın zamanı, canlılık testi, yedek kaynak).
 - Ham veri değişmez, hash'i kimliğidir.
 - Point-in-time evren.
 - Metinlerde zaman ilk yayın zamanıdır.
@@ -180,6 +182,15 @@ raporlanır.
   Yükseltme modeli spike'ta ölçümle seçilir ve sürümü sabitlenir. Yedek zinciri vardır.
 - **Kalibrasyon:** Her rolün eşiği gerçek örneklerle seçilir. Vetoda kaçırılan olay, yanlış alarmdan daha
   pahalıdır.
+- **Spike 04 ölçümü (A1/A2/B1):**
+  - Binance 46/46, KAP 44/44 doğru; tuzaklar dahil.
+  - Veto yanlış alarmı Jev'de 0, anahtar kelime kuralında 30.
+  - Gecikme 0,25 sn.
+- **Karar Choice'a dayanır, Score'a değil:** aciliyet skoru yalnız alarm önceliği içindir, veto koşulu olmaz.
+- **Başlangıç eşiği:** veto yönünde güven ≥ 0,5. Altı yükseltmeye gider. Belirsizlikte veto kategorisi en
+  olası iki seçenekten biriyse riski azalt. İlk ay gölge modda kalibre edilir.
+- **Rol eklerken önce tuzak listesi yazılır**, sonra her seçeneğin `not_for` tanımı bu tuzaklara göre
+  yazılır.
 - **Backtest'te canlı çağrı yok:** Yargılar dondurulur. Eğitim kesimi öncesi metinler `sızıntı riski`
   işareti taşır.
 - **Yasak:** yön, fiyat, boyut, kaldıraç, hesap, emir kararı.
@@ -209,9 +220,9 @@ gösterir.
 | --- | --- | --- |
 | Yüksek kaldıraç hesabı sıfırlar | Spike 01: BTC/ETH Donchian 1–20x | ✅ Doğrulandı: ≥ 5x 12/12 iflas → 3x tavan, yarım Kelly |
 | Nautilus v2 sürüm adayı kararlı mı; Windows/WSL2; özel bağlantı yazılabilir mi | Spike 02 | ✅ Geçti (koşullarla): kurulum, parity, özel Python istemci, canlı paper; koşullar: 1 dk yürütme verisi, sürüm sabitleme, konteyner DNS'i, NTP |
-| Ücretsiz veri yeterli mi (kalite, kapsam, hız); BIST gün içi | Spike 03 | ⏳ |
-| Jev A1/A2 eşikleri; NVIDIA yükseltme modeli seçimi | Spike 04 | ⏳ |
-| Paper canlı bağlantılar: ABD ETF paper hesabı Türkiye'den; MT5 köprüsü | Spike 05 | ⏳ |
+| Ücretsiz veri yeterli mi (kalite, kapsam, hız); BIST gün içi | Spike 03 | ✅ Geçti: tüm ilk dalga kaynakları çalışıyor; tuzaklar (µs zaman damgası, Yahoo aylık, Dukascopy hız sınırı) indirici kurallarına bağlandı; BIST gün içi yalnız son günler (günlük strateji için yeterli) |
+| Jev A1/A2 eşikleri; NVIDIA yükseltme modeli seçimi | Spike 04 | ✅ A: 90/90, yanlış veto 0 (anahtar kelime: 30) · ⏳ B: NVIDIA anahtarı bekliyor (Faz 6'nın ilk işi) |
+| Paper canlı bağlantılar: ABD ETF paper hesabı Türkiye'den; MT5 köprüsü | Spike 05 | ✅ Yol belli: Alpaca paper (herkese açık) + kendi istemcimiz; MT5 demo + Windows köprü; BIST Yahoo/borsapy; yürütme her yerde Nautilus sandbox |
 | Maliyet varsayımlarının gerçekliği (maker dolum, spread) | Paper ölçümü (Faz 11) | ⏳ |
 | Turnuvada aşırı uyum | Deneme defteri + DSR + walk-forward + paper | Tasarımda |
 | Otonom sistemin sessiz arızası | Bağımsız gözetmen + mutabakat + Telegram | Tasarımda |

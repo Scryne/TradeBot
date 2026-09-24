@@ -15,7 +15,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 
 | Faz | Adı | Durum | Bitti Kriteri |
 | --- | --- | --- | --- |
-| 0 | Riskli kararların spike'ları | 🔄 Devam Ediyor | Spike 02–05 raporları `docs/spikes/` altında; Final Doküman'daki ⚑ kararlar kesinleşti ya da yedek plana geçildi |
+| 0 | Riskli kararların spike'ları | ✅ Tamamlandı | Spike 02–05 raporları `docs/spikes/` altında; Final Doküman'daki ⚑ kararlar kesinleşti ya da yedek plana geçildi |
 | 1 | Altyapı ve host | ⏳ Bekliyor | Host (WSL2 + Docker + Tailscale + SSH, 7/24 ayarları) hazır; `uv` projesi, Compose iskeleti, PostgreSQL, sır yönetimi, log düzeni; testler yeşil |
 | 2 | Veri platformu (ilk dalga) | ⏳ Bekliyor | Kripto, Dukascopy, ABD ETF, BIST günlük verileri katalogda; enstrüman kaydı + takvimler + kurumsal işlemler; PIT evren; kaynak başına kalite raporu |
 | 3 | Araştırma motoru | ⏳ Bekliyor | Saf karar çekirdeği; piyasa başına maliyet modelleri; vektörel tarama; walk-forward + plato + DSR; deneme defteri; vektörel ↔ Nautilus parity testi geçiyor |
@@ -51,6 +51,17 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
       doğrulaması 1 dk yürütme verisiyle yapılır (Faz 2'de 1 dk veri indirme, Faz 3'te kalıcı parity testi).
     - Konteyner DNS'i 1.1.1.1 ve NTP senkronu Faz 1 host işlerine eklendi.
     - Rapor: `docs/spikes/02-nautilus.md`.
+  - Spike 03 ✅ (2026-09-25): tüm ilk dalga veri kaynakları ücretsiz çalışıyor.
+    - İndirici kuralları → Faz 2 şartnamesi: µs/ms tespiti, Yahoo `period1/period2`, Dukascopy ≥ 3 sn ve
+      aylık saatlik dosyalar, PIT evren, ilk yayın zamanı.
+    - Stooq elendi. Rapor: `docs/spikes/03-veri.md`.
+  - Spike 04-A ✅ (2026-09-25): Jev vetosu Binance 46/46, KAP 44/44.
+    - Yanlış veto 0 (anahtar kelime kuralında 30). Karar Choice'a dayanır, Score'a değil.
+    - 04-B (NVIDIA model seçimi) anahtar beklediği için Faz 6'nın ilk işine taşındı.
+    - Rapor: `docs/spikes/04-jev.md`.
+  - Spike 05 ✅ (2026-09-25): paper yürütme her piyasada Nautilus sandbox.
+    - Canlı veri: Alpaca paper (ABD), MT5 demo + Windows köprü (FX/emtia/endeks), Yahoo/borsapy (BIST).
+    - Rapor: `docs/spikes/05-paper-baglanti.md`.
 
 ### Faz 1: Altyapı ve host
 - **İşler:** Host kurulumu: WSL2, Docker Desktop, Tailscale, SSH, uyku kapalı, Windows Update
@@ -89,7 +100,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 - **Notlar:**
 
 ### Faz 6: Zekâ katmanı (Jev)
-- **İşler:** Metin toplayıcılar (ilk yayın zamanıyla); tek Jev servisi (uzun ömürlü istemci, kayıt,
+- **İşler:** Spike 04-B: NVIDIA yükseltme modelinin seçimi (anahtar gelince). Metin toplayıcılar (ilk yayın zamanıyla); tek Jev servisi (uzun ömürlü istemci, kayıt,
   dondurma, maliyet/gecikme izleme); OpenAI uyumlu yükseltme istemcisi (NVIDIA) + yedek zinciri; A1–A6,
   B1–B4, D1–D4 rolleri; olay mesajlarının motora ve backtest'e bağlanması; C1–C4 özelliklerinin
   dondurulmuş ölçümü (sızıntı riski işaretli).
