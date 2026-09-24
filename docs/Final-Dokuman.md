@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-09-24
 type: final-dokuman
-status: taslak — Faz 0 spike sonuçlarıyla kesinleşir
+status: taslak — Faz 0 spike sonuçlarıyla kesinleşir (Spike 02 işlendi)
 ---
 # TradeBot — Final Doküman (taslak)
 
@@ -24,13 +24,13 @@ katmanı. İlk aşama tamamen paper'dır.
 | Katman | Seçim | Gerekçe |
 | --- | --- | --- |
 | Dil / paket | Python 3.12, `uv` | Ekosistem: Nautilus, TypeSafe SDK, veri araçları |
-| İşlem motoru | **NautilusTrader v2** ⚑ spike | Emir yönetimi, risk, çoklu para birimli muhasebe, mutabakat hazır; backtest = canlı; 22 kararlı bağlantı (IB, Binance…) |
-| Yedek motor | QuantConnect LEAN | Spike başarısız olursa |
+| İşlem motoru | **NautilusTrader v2** (`==2.0.0rc5` sabit) ✅ Spike 02 | Emir yönetimi, risk, çoklu para birimli muhasebe, mutabakat hazır; 22 kararlı bağlantı; Python ile özel bağlantı yazılabiliyor; parity %0,0000 (1 dk yürütme) |
+| Yedek motor | QuantConnect LEAN | Gerek kalmadı (Spike 02 geçti); kayıt için duruyor |
 | Hızlı araştırma | polars + numpy (vektörel) | Binlerce kol × parametre taraması |
 | Tarihsel veri deposu | Parquet (Nautilus veri kataloğu) | Sütunlu, hızlı; dosya hash'i = veri kimliği |
 | Defter / denetim | PostgreSQL (Docker) | Deneme defteri, turnuva sonuçları, Jev kayıtları, denetim izi |
 | Zekâ katmanı | TypeSafe SDK (Jev, `jev-1.13.0` sabit) + OpenAI uyumlu istemci (NVIDIA build.nvidia.com) | Jev yargılar; belirsiz durum ücretsiz yükseltme modeline gider |
-| Paketleme | Docker Compose (WSL2 üzerinde) | Tek komutla ayağa kalkar, çökünce yeniden başlar |
+| Paketleme | Docker Compose (WSL2 üzerinde), konteyner DNS'i `1.1.1.1` / `8.8.8.8` | Tek komutla ayağa kalkar; ev router'ının DNS'i IPv6'sız adlarda 5–15 sn gecikiyor (Spike 02) |
 | Bildirim | Telegram bot | Kritik / uyarı / bilgi seviyeleri |
 | Pano | FastAPI + web arayüzü (DESIGN.md) | Tailscale üzerinden telefondan erişim, internete kapalı |
 | Uzaktan erişim | Tailscale + SSH | Şifreli özel ağ |
@@ -78,8 +78,18 @@ katmanı. İlk aşama tamamen paper'dır.
 5. **Otomasyon asimetriktir.** Riski azaltan her şey otomatiktir: veto, fren, kol durdurma, acil durdurma.
    İzni artıran şeyler (acil durdurma sonrası yeniden başlatma, gerçek paraya geçiş, tavan değişikliği)
    Scryne'ın onayını ister. Paper'da kol terfisi otomatiktir.
-6. **Zaman UTC**, nanosaniye epoch (Nautilus). Bar zaman damgası açılış zamanıdır. Piyasa takvimleri
-   enstrüman kaydındadır.
+6. **Zaman UTC**, nanosaniye epoch (Nautilus). Bizim verimizde bar zaman damgası açılış zamanıdır;
+   Nautilus'a verilirken `ts_event` = kapanış zamanıdır (bar ancak kapanınca bilinir). Piyasa takvimleri
+   enstrüman kaydındadır. Host saati NTP ile senkron tutulur (Spike 02'de 1 sn kayma ölçüldü).
+7. **Yürütme verisi politikası (Spike 02).** Nautilus'ta sonraki bar açılışında dolum modu yok; bar verisiyle
+   emir sinyal barının kapanışından dolar (seanslı piyasada iyimser: SPY'da %3,2 fark). Bu yüzden:
+   - **Turnuva metrikleri kendi vektörel motorumuzdan gelir** (dolum sonraki barın açılışında, bağlayıcı).
+   - **Nautilus doğrulaması 1 dk yürütme verisiyle yapılır** (günlük karar iç barla, dolum sinyalden sonraki
+     ilk dakikada, 1 ms gecikme modeli). Parity testi kalıcıdır: karar birebir, özkaynak farkı ≈ 0.
+   - 1 dk verisi olmayan piyasada Nautilus backtest'i metrik üretmez; o piyasa paper'da Nautilus'la yaşar.
+8. **Sürüm sabitleme ve ince sarmalayıcı.** Nautilus sürümü tam sabittir; yükseltme parity testi geçerek
+   verilen ayrı bir karardır. Strateji mantığı saf çekirdektedir, Nautilus'a dokunan kod ince
+   sarmalayıcılarda toplanır (v2 API'si rc'ler arasında değişiyor).
 
 ## Veri
 
@@ -198,7 +208,7 @@ gösterir.
 | Risk | Doğrulama | Durum |
 | --- | --- | --- |
 | Yüksek kaldıraç hesabı sıfırlar | Spike 01: BTC/ETH Donchian 1–20x | ✅ Doğrulandı: ≥ 5x 12/12 iflas → 3x tavan, yarım Kelly |
-| Nautilus v2 sürüm adayı kararlı mı; Windows/WSL2; özel bağlantı yazılabilir mi | Spike 02 | ⏳ |
+| Nautilus v2 sürüm adayı kararlı mı; Windows/WSL2; özel bağlantı yazılabilir mi | Spike 02 | ✅ Geçti (koşullarla): kurulum, parity, özel Python istemci, canlı paper; koşullar: 1 dk yürütme verisi, sürüm sabitleme, konteyner DNS'i, NTP |
 | Ücretsiz veri yeterli mi (kalite, kapsam, hız); BIST gün içi | Spike 03 | ⏳ |
 | Jev A1/A2 eşikleri; NVIDIA yükseltme modeli seçimi | Spike 04 | ⏳ |
 | Paper canlı bağlantılar: ABD ETF paper hesabı Türkiye'den; MT5 köprüsü | Spike 05 | ⏳ |

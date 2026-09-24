@@ -46,10 +46,16 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     MT5 demo köprüsü seçenekleri (resmi Python paketi + Windows tarafı servis).
 - **Bitti Kriteri:** her spike için kısa rapor ve Final Doküman'a işlenen karar.
 - **Notlar:** Spike 01 araştırma sırasında yapıldı, kaldıraç politikasının dayanağı.
+  - Spike 02 ✅ (2026-09-25): Nautilus v2 kesinleşti.
+    - Bar verisiyle "sonraki açılışta dolum" modu yok → turnuva metrikleri vektörel motordan, Nautilus
+      doğrulaması 1 dk yürütme verisiyle yapılır (Faz 2'de 1 dk veri indirme, Faz 3'te kalıcı parity testi).
+    - Konteyner DNS'i 1.1.1.1 ve NTP senkronu Faz 1 host işlerine eklendi.
+    - Rapor: `docs/spikes/02-nautilus.md`.
 
 ### Faz 1: Altyapı ve host
 - **İşler:** Host kurulumu: WSL2, Docker Desktop, Tailscale, SSH, uyku kapalı, Windows Update
-  kontrolü, elektrik gelince açılış. Repo yapısı, `uv`, Compose iskeleti, PostgreSQL, `.env` / sır
+  kontrolü, elektrik gelince açılış, **NTP saat senkronu**, **konteyner DNS'i (1.1.1.1 / 8.8.8.8)** ve host'ta
+  DNS gecikmesi ölçümü. Repo yapısı, `uv`, Compose iskeleti, PostgreSQL, `.env` / sır
   yönetimi, yapılandırılmış log, pytest ve temel CI (yerel).
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**

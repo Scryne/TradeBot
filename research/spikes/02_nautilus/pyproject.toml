@@ -1,0 +1,23 @@
+[project]
+name = "spike-nautilus"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Scryne", email = "218348029+Scryne@users.noreply.github.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "nautilus-trader==2.0.0rc5",
+    "numpy>=2.5.3",
+    "pandas>=3.0.6",
+    "polars>=1.44.2",
+    "pyarrow>=25.0.1",
+]
+
+[project.scripts]
+spike-nautilus = "spike_nautilus:main"
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13.0"]
+build-backend = "uv_build"
