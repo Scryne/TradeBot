@@ -1,94 +1,132 @@
 ---
 proje: TradeBot
 created: 2026-09-24
+updated: 2026-09-24
 type: roadmap
-status: taslak (Final Doküman onaylanınca kesinleşir)
+status: aktif (sürüm 2 — kurumsal, çok piyasalı)
 ---
 # TradeBot — Roadmap
 
 Durum sütunu session-start hook'u tarafından otomatik okunur — format bozulmasın:
 ⏳ Bekliyor / 🔄 Devam Ediyor / ✅ Tamamlandı.
 
+Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlara işlenir. Karar gerekçeleri
+`docs/Final-Dokuman.md`'de.
+
 | Faz | Adı | Durum | Bitti Kriteri |
 | --- | --- | --- | --- |
-| 0 | Riskli kararların spike'ları | ⏳ Bekliyor | Jev haber vetosu, veri+CCXT bağlantısı ve çekirdek kıyası spike raporları `docs/spikes/` altında; Final Doküman kararları bunlara dayanıyor |
-| 1 | Temel ve veri katmanı | ⏳ Bekliyor | `uv` projesi, testler yeşil; BTC/ETH + top-20 için 1h/4h/1d veri, funding ve PIT evren indirilebiliyor; kalite raporu |
-| 2 | Backtest motoru | ⏳ Bekliyor | Tek karar fonksiyonu, sonraki bar dolumu, aleyhte maliyet; look-ahead bozma ve determinizm testleri geçiyor; walk-forward + Deflated Sharpe raporu |
-| 3 | Boyutlandırma ve risk motoru | ⏳ Bekliyor | Oynaklık hedefi, yarım Kelly kaldıraç, 3x sabit tavan, ≥5x imkânsız (testli); kayıp frenleri ve kill switch testli |
-| 4 | Strateji turnuvası (backtest) | ⏳ Bekliyor | Aday aileler 1h/4h/1d'de maliyet dahil ölçüldü; deneme sayısı kayıtlı; paper'a girecek adaylar yazılı ölçütle seçildi |
-| 5 | Paper canlı altyapı | ⏳ Bekliyor | Seçilen adaylar paper'da 7/24 koşuyor; mutabakat, çökme sonrası toparlanma, Telegram alarmları çalışıyor; canlı ↔ backtest kararları birebir |
-| 6 | Jev katmanı | ⏳ Bekliyor | Haber vetosu gölgede → aktif; log triyajı çalışıyor; olay özellikleri dondurulmuş veriyle ölçüldü (değer katıyor/katmıyor raporu) |
-| 7 | Web pano | ⏳ Bekliyor | DESIGN.md dolu; PnL, pozisyon, strateji karnesi, sağlık ve veto geçmişi görünüyor |
-| 8 | Mikro gerçek para (koşullu) | ⏳ Bekliyor | Borsa kararı + API anahtarı (çekim kapalı, IP kısıtlı) + Scryne onayı; sabit tavanlı küçük sermayeyle gerçek emir; ücret/kayma ölçüldü |
-| 9 | Ölçekleme ve kaldıraç (koşullu) | ⏳ Bekliyor | Önceden yazılmış ölçütle sermaye artışı; gerçek parada kaldıraç yalnız hukuki netlik + ölçülmüş Kelly ile |
+| 0 | Riskli kararların spike'ları | 🔄 Devam Ediyor | Spike 02–05 raporları `docs/spikes/` altında; Final Doküman'daki ⚑ kararlar kesinleşti ya da yedek plana geçildi |
+| 1 | Altyapı ve host | ⏳ Bekliyor | Host (WSL2 + Docker + Tailscale + SSH, 7/24 ayarları) hazır; `uv` projesi, Compose iskeleti, PostgreSQL, sır yönetimi, log düzeni; testler yeşil |
+| 2 | Veri platformu (ilk dalga) | ⏳ Bekliyor | Kripto, Dukascopy, ABD ETF, BIST günlük verileri katalogda; enstrüman kaydı + takvimler + kurumsal işlemler; PIT evren; kaynak başına kalite raporu |
+| 3 | Araştırma motoru | ⏳ Bekliyor | Saf karar çekirdeği; piyasa başına maliyet modelleri; vektörel tarama; walk-forward + plato + DSR; deneme defteri; vektörel ↔ Nautilus parity testi geçiyor |
+| 4 | Risk motoru ve boyutlandırma | ⏳ Bekliyor | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
+| 5 | Turnuva — backtest dalgası 1 | ⏳ Bekliyor | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
+| 6 | Zekâ katmanı (Jev) | ⏳ Bekliyor | Toplayıcılar (KAP, SEC, Binance, RSS, merkez bankaları, GDELT); Jev servisi + NVIDIA yükseltme; A, B, D rolleri çalışıyor; yargılar dondurulabiliyor; C özellikleri ölçüldü |
+| 7 | Paper canlı — kripto + ABD ETF | ⏳ Bekliyor | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
+| 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | ⏳ Bekliyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
+| 9 | Operasyon: gözetmen, Telegram, raporlar | ⏳ Bekliyor | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
+| 10 | Web pano | ⏳ Bekliyor | DESIGN.md dolu; PnL, pozisyon, turnuva tablosu, veto geçmişi, sağlık; Tailscale üzerinden telefondan erişim |
+| 11 | Paper turnuvası — 12 hafta | ⏳ Bekliyor | 12 hafta kesintisiz paper; kademeli sermaye çalıştı; hangi kolların kapıyı geçtiği ve Jev katkısı raporlandı; maliyet varsayımları ölçüldü |
+| 12 | Gerçek para (koşullu) | ⏳ Bekliyor | Scryne'ın kararı + aracı kurum/borsa + anahtar (çekim kapalı, IP kısıtlı) + vergi netliği; sabit tavanlı mikro sermaye; ilk emir Scryne onayıyla |
+| 13 | Sonraki dalgalar (koşullu) | ⏳ Bekliyor | Ölçüm fırsat gösterirse: ABD tek hisseleri (ücretli veri), CME vadelileri (Databento), VİOP; her biri ayrı kararla |
 
 ## Faz Detayları
 
 ### Faz 0: Riskli kararların spike'ları
 - **İşler:**
-  - `01_kaldirac_kirilim` ✅ (araştırma sırasında yapıldı: ≥ 5x her yapılandırmada iflas).
-  - `02_jev_haber_vetosu`: 20–50 gerçek Binance duyurusu ve kripto haberiyle `ts.py` üzerinden soru seti
-    (varlık, olay tipi, resmi kaynak, doğrulanmış olay, ciddiyet). Güven–doğruluk tablosu ve eşik önerisi.
-  - `03_veri_ccxt`: Binance public data indirme hızı ve boyutu; CCXT ile Binance ve BtcTurk public uçları
-    (fiyat, emir defteri, ücret bilgisi); Binance TR API erişimi doğrulaması.
-  - `04_cekirdek_kiyas`: aynı basit trend stratejisi Freqtrade'de ve ince kendi çekirdekte. Kurulum süresi,
-    portföy ağırlığı desteği, Jev ve dondurulmuş özellik entegrasyonu.
-- **Bitti Kriteri:** her spike için kısa rapor ve Final Doküman'a giden karar.
-- **Notlar:**
+  - `01_kaldirac_kirilim` ✅: BTC/ETH günlük Donchian, 1–20x; ≥ 5x 12/12 iflas (Araştırma §5.11).
+  - `02_nautilus`: v2 sürüm adayını Windows + WSL2'de kur; kripto ve ABD ETF verisiyle backtest; aynı saf
+    karar fonksiyonunu vektörel ve Nautilus'ta çalıştır (birebir aynı karar); BIST günlük verisi için özel
+    veri bağlantısı iskeleti; Binance testnet/public ile kısa canlı döngü. Başarısızsa LEAN ile aynı adımlar.
+  - `03_veri`: Binance public data, Dukascopy, Tiingo/Massive/Alpaca, borsapy/Yahoo, KAP (MKK VYK), SEC
+    EDGAR. Erişim, hız, boyut, kalite ve kapsam. BIST gün içi verisi mümkün mü?
+  - `04_jev`: 20–50 gerçek Binance duyurusu + KAP bildirimi ile A1/A2 soru setleri; güven–doğruluk
+    tablosu, eşik önerisi; belirsiz örneklerde 2–3 NVIDIA modelinin karşılaştırması, model seçimi.
+  - `05_paper_baglanti`: ABD ETF paper hesabı (Alpaca ya da alternatifi) Türkiye'den açılabiliyor mu?
+    MT5 demo köprüsü seçenekleri (resmi Python paketi + Windows tarafı servis).
+- **Bitti Kriteri:** her spike için kısa rapor ve Final Doküman'a işlenen karar.
+- **Notlar:** Spike 01 araştırma sırasında yapıldı, kaldıraç politikasının dayanağı.
 
-### Faz 1: Temel ve veri katmanı
-- **İşler:** Python 3.12 + `uv`, proje yapısı, pytest; veri indirici (idempotent), Parquet deposu, kalite
-  kontrolleri (eksik bar, sıçrama, zaman damgası), funding geçmişi, listeleme tarihiyle PIT evren.
+### Faz 1: Altyapı ve host
+- **İşler:** Host kurulumu: WSL2, Docker Desktop, Tailscale, SSH, uyku kapalı, Windows Update
+  kontrolü, elektrik gelince açılış. Repo yapısı, `uv`, Compose iskeleti, PostgreSQL, `.env` / sır
+  yönetimi, yapılandırılmış log, pytest ve temel CI (yerel).
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
 
-### Faz 2: Backtest motoru
-- **İşler:** vektörel araştırma yolu + olay tabanlı doğrulama yolu aynı karar fonksiyonunu çağırır; ücret,
-  spread, kayma, funding modeli; walk-forward çerçevesi; deneme defteri (her backtest koşusu sayılır);
-  Deflated Sharpe.
+### Faz 2: Veri platformu (ilk dalga)
+- **İşler:** İdempotent indiriciler; Nautilus Parquet kataloğu; ham veri hash'leri; enstrüman kaydı
+  (lot, fiyat adımı, çarpan, para birimi, vade); piyasa takvimleri (BIST, NYSE, FX 24/5, kripto 7/24,
+  tatiller, yaz saati); kurumsal işlemler (bölünme, bedelsiz, temettü) ve düzeltilmiş seri üretimi; PIT
+  evren; kalite raporları.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
 
-### Faz 3: Boyutlandırma ve risk motoru
-- **İşler:** oynaklık hedefli ağırlık; strateji başına Kelly tahmini ve yarısı; kaldıraç tavanı (3x) kodda
-  sabit ve testli; günlük/haftalık kayıp freni, maksimum düşüş kill switch'i, likidasyon mesafesi bekçisi;
-  riski azaltan otomatik, izni artıran onaylı.
+### Faz 3: Araştırma motoru
+- **İşler:** Saf karar çekirdeği arayüzü; look-ahead bozma testi; piyasa başına maliyet modelleri
+  (ücret, spread, kayma, swap, funding, BSMV); vektörel tarama; walk-forward, plato, rejim ayrımı, Deflated
+  Sharpe; deneme defteri (PostgreSQL); Nautilus sarmalayıcısı ve parity testi; puan + kapı hesabı.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
 
-### Faz 4: Strateji turnuvası (backtest)
-- **İşler:** aday aileler: kırılım (Donchian/Bollinger), oynaklık hedefli trend, kesitsel momentum, kısa
-  vadeli dönüş (maker varsayımıyla ve olmadan), funding carry. Zaman dilimleri 1h/4h/1d. Evren BTC/ETH →
-  top-20. Her aile için önce bir satırlık test planı, sonra koşu.
+### Faz 4: Risk motoru ve boyutlandırma
+- **İşler:** Katman 1–4 (Nautilus risk motoru + bizim kontrollerimiz); oynaklık hedefli boyut; kol ve
+  portföy seviyesinde yarım Kelly; 3x kod tavanı; frenler; acil durdurma ve onaylı yeniden başlatma;
+  likidasyon mesafesi bekçisi.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
 
-### Faz 5: Paper canlı altyapı
-- **İşler:** zamanlayıcı döngü; paper aracı (gerçek fiyat/spread, aleyhte dolum); idempotent emir arayüzü;
-  mutabakat; durumun yeniden kurulması; Telegram bildirimleri; 7/24 çalışma (Açık Soru 3).
+### Faz 5: Turnuva — backtest dalgası 1
+- **İşler:** Yedi ailenin ilk dalga piyasalardaki kolları; her aile için önce test planı; aşama 1–3;
+  puan tablosu; paper'a giriş listesi.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
 
-### Faz 6: Jev katmanı
-- **İşler:** haber toplayıcı; tek uzun ömürlü TypeSafe istemcisi; veto kuralı (kodda eşik); gölge modda
-  kayıt → aktif; log triyajı; tarihsel haberlerin dondurulmuş yargıları (model sürümü + hash) ve olay
-  özelliklerinin backtest ölçümü (eğitim kesimi sızıntısı işaretli).
+### Faz 6: Zekâ katmanı (Jev)
+- **İşler:** Metin toplayıcılar (ilk yayın zamanıyla); tek Jev servisi (uzun ömürlü istemci, kayıt,
+  dondurma, maliyet/gecikme izleme); OpenAI uyumlu yükseltme istemcisi (NVIDIA) + yedek zinciri; A1–A6,
+  B1–B4, D1–D4 rolleri; olay mesajlarının motora ve backtest'e bağlanması; C1–C4 özelliklerinin
+  dondurulmuş ölçümü (sızıntı riski işaretli).
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
 
-### Faz 7: Web pano
-- **İşler:** `DESIGN.md` (create-design-md + ui-ux-pro-max), FastAPI + web arayüzü, yalnız yerel ağ.
+### Faz 7: Paper canlı — kripto + ABD ETF
+- **İşler:** Nautilus canlı düğümleri (paper); sermaye dağıtıcı (haftalık); Jev'li ve Jev'siz kol çiftleri;
+  agresif gözlem kolu (ayrı defter); mutabakat; çökme sonrası yeniden kurulum.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
 
-### Faz 8: Mikro gerçek para (koşullu)
-- **İşler:** borsa kararı; alt hesap; yalnız işlem izni olan, çekimi kapalı, IP kısıtlı anahtar; sabit
-  sermaye ve kayıp tavanı; ilk emir Scryne'ın açık onayıyla; gerçek ücret ve kaymanın paper ile kıyası.
+### Faz 8: Özel bağlantılar — MT5 + BIST
+- **İşler:** MT5 demo köprüsü (Windows tarafı; veri + simüle ya da demo emir); BIST gecikmeli veri
+  bağlantısı ve simüle dolum; bu piyasaların takvim/maliyet modelleriyle paper kolları.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
 
-### Faz 9: Ölçekleme ve kaldıraç (koşullu)
-- **İşler:** önceden yazılmış ölçütle sermaye artışı; gerçek parada kaldıraç (≤ yarım Kelly, ≤ 3x);
-  gerekirse yeni piyasalar (BIST/Algolab).
+### Faz 9: Operasyon
+- **İşler:** Bağımsız gözetmen (kalp atışı, özkaynak, pozisyon; motor donarsa kapatma); Telegram bot (3
+  seviye, sessiz saat, D4 salt-okuma sorguları); günlük özet + haftalık turnuva raporu (D2 doğrulamalı);
+  log triyajı (D1); yedekler; arıza tatbikatları.
+- **Bitti Kriteri:** tablodaki gibi.
+- **Notlar:**
+
+### Faz 10: Web pano
+- **İşler:** `DESIGN.md` (create-design-md + ui-ux-pro-max); FastAPI + arayüz; frontend denetim pasları.
+- **Bitti Kriteri:** tablodaki gibi.
+- **Notlar:**
+
+### Faz 11: Paper turnuvası — 12 hafta
+- **İşler:** Sistem kendi başına çalışır; haftalık raporlar okunur; arızalar düzeltilir; kademeli sermaye
+  (4/8/12 hafta); gerçek maliyet (spread, maker dolum oranı) ölçülür; Jev katkısı raporlanır.
+- **Bitti Kriteri:** tablodaki gibi.
+- **Notlar:**
+
+### Faz 12: Gerçek para (koşullu)
+- **İşler:** Scryne kararı; aracı kurum/borsa seçimi; anahtar güvenliği; vergi; sabit tavanlı mikro
+  sermaye; paper ↔ gerçek sapma ölçümü; otonomi seviyesinin yeniden konuşulması.
+- **Bitti Kriteri:** tablodaki gibi.
+- **Notlar:**
+
+### Faz 13: Sonraki dalgalar (koşullu)
+- **İşler:** Ücretli veriyle ABD tek hisseleri; Databento ile CME vadelileri; VİOP; gerekirse IB bağlantısı.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**

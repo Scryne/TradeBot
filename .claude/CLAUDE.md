@@ -34,26 +34,37 @@ Taban disiplin ve araç sırası global `~/.claude/CLAUDE.md`'de (burada tekrarl
 
 ## TradeBot'a özel — değişmez kurallar
 
-Bu proje gerçek parayla temas edecek. Aşağıdakiler tercih değil, kısıttır. Gerekçeler `docs/Arastirma.md`.
+Kurumsal, çok piyasalı, tamamen otonom bir trade sistemi (Scryne'ın kendi hesabı). İlk aşama yalnız paper.
+Aşağıdakiler tercih değil, kısıttır. Bir görev bunlardan birini ihlal ediyorsa görev yanlıştır.
+Gerekçeler: `docs/Final-Dokuman.md` ve `docs/Arastirma.md`.
 
 1. **Sıfırdan.** ScryneQuant projesine bakılmaz. Kararları, kodu ve ölçümleri taşınmaz (Scryne, 2026-09-24).
-2. **Backtest = canlı.** Karar fonksiyonu tektir. Karar kapanmış barla verilir, dolum sonraki barın
-   açılışında olur. Kayma ve maliyet hep aleyhte varsayılır. Strateji t anından sonraki veriyi göremez
-   (bozma testiyle korunur).
-3. **Sinyal risk motorunu atlayamaz.** Emre giden tek yol risk motorunun onayıdır.
-4. **Kaldıraç:** ölçülen Kelly'nin yarısı. Kodda sabit 3x tavanı var. **≥ 5x hiçbir modda yok.** Gerçek
-   parada kaldıraç yalnız borsa ve hukuk kararından sonra açılır. Martingale ve kayıpta pozisyon büyütme yok.
-5. **Otomasyon asimetriktir.** Riski azaltan her şey otomatik olabilir. İzni artıran her şey (canlıya alma,
-   sermaye artırma, limit gevşetme) Scryne'ın açık onayını ister.
-6. **Jev yargılar, kod uygular.** Jev çıktısı tek başına alım üretmez. Backtest içinde canlı Jev çağrısı
-   yapılmaz, yargılar dondurulur (model sürümü + hash). Jev'e yön ya da fiyat sorulmaz.
-7. **Deneme sayılır.** Her backtest koşusu deftere girer. Sonuca bakıp kural değiştirmek yeni bir denemedir.
-8. **Sırlar:** API anahtarları `.env`'de ya da kullanıcı ortamında durur, git'e, loga ve panoya girmez.
-   Borsa anahtarında çekim izni kapalıdır.
-9. **Zaman UTC.** Bar zaman damgası açılış zamanıdır.
-10. **Kendi hesabı, kendi parası.** Başkası adına işlem ya da sinyal paylaşımı yoktur.
+2. **Önce konuş, sonra yap.** Yön ya da kapsam değiştiren her şey Scryne'la konuşulup karara bağlanmadan
+   dokümana ya da koda girmez.
+3. **Saf karar çekirdeği.** Strateji mantığı I/O yapmaz, yalnız t anına kadar kesilmiş veriyi görür (bozma
+   testiyle korunur). Vektörel tarama ve Nautilus aynı fonksiyonu çağırır (parity testi).
+4. **Gerçekçi yürütme.** Karar kapanmış barla verilir, dolum sonraki barın açılışında olur. Kayma ve maliyet
+   hep aleyhte varsayılır. Maliyet modeli piyasa başınadır.
+5. **Sinyal risk motorunu atlayamaz.** Emre giden tek yol risk onayıdır. Engelleyen katman risk motorunun
+   dışında olabilir, izin veren katman olamaz.
+6. **Kaldıraç:** yarım Kelly. Kodda sabit 3x tavan vardır. **≥ 5x hiçbir modda yok** (agresif gözlem kolu
+   dahil). Martingale ve kayıpta pozisyon büyütme yoktur.
+7. **Otomasyon asimetriktir.** Riski azaltan her şey otomatiktir (veto, fren, kol durdurma, acil durdurma).
+   Acil durdurma sonrası yeniden başlatma, gerçek paraya geçiş ve tavan değişikliği Scryne'ın açık onayını
+   ister.
+8. **Jev yargılar, kod uygular.** Jev ve yükseltme modeli (NVIDIA) yalnız riski azaltabilir. Yön, fiyat,
+   boyut ve emir kararı verdirilmez. Backtest içinde canlı model çağrısı yapılmaz, yargılar dondurulur
+   (model sürümü + soru hash'i + girdi hash'i). Belirsiz durumda: riski azalt ve alarm ver.
+9. **Veri:** ham veri değişmez, hash'i kimliğidir. Evren point-in-time tutulur. Metinlerde zaman ilk yayın
+   zamanıdır. Kurumsal işlem düzeltmeleri hamdan yeniden üretilir.
+10. **Deneme sayılır.** Her tarama ya da backtest koşusu deneme defterine girer. Sonuca bakıp kural
+    değiştirmek yeni bir denemedir.
+11. **Zaman UTC.** Bar zaman damgası açılış zamanıdır. Piyasa takvimleri enstrüman kaydındadır.
+12. **Sırlar** yalnız host'ta tutulur: git'e, log'a ve panoya girmez. Borsa anahtarında çekim izni kapalıdır.
+13. **Kendi hesabı, kendi parası.** Başkası adına işlem, sinyal paylaşımı ya da ürünleştirme yoktur.
 
 ## Dosyalar (ek)
 
-- `docs/Arastirma.md` — kapsamlı araştırma (strateji kanıtı, mevzuat, maliyet, Jev, kaldıraç sınaması)
+- `docs/Final-Dokuman.md` — bağlayıcı kararlar (⚑ işaretliler Faz 0 spike'larıyla kesinleşir)
+- `docs/Arastirma.md` — kapsamlı araştırma (strateji kanıtı, mevzuat, maliyet, Jev, kaldıraç, çok piyasa eki)
 - `research/spikes/` — spike betikleri; raporları `docs/spikes/`

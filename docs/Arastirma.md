@@ -692,6 +692,10 @@ sormak. Aritmetik, boyutlandırma ve kural kontrolü kodda kalır. Jev çıktıs
 
 ## 12. Planlama için sonuç ve açık kararlar
 
+> **Güncelleme (2026-09-24):** Bu bölüm kripto odaklı ilk taslak içindi. Scryne aynı gün yönü
+> değiştirdi: kurumsal, çok piyasalı, tamamen otonom. Bağlayıcı kararlar artık `docs/Final-Dokuman.md`'de.
+> Çok piyasalı ek araştırma §13'te.
+
 ### 12.1 Önerilen yön
 
 1. **Faz A — Temel ve veri:** proje iskeleti, veri indirici (Binance public data, PIT evren), kalite
@@ -723,6 +727,58 @@ sormak. Aritmetik, boyutlandırma ve kural kontrolü kodda kalır. Jev çıktıs
 | 9 | Arayüz | Yalnız Telegram · web pano · ikisi | İkisi (pano sonra) |
 
 ---
+
+## 13. Ek: çok piyasalı genişleme (2026-09-24)
+
+### 13.1 Türkiye'den piyasa erişimi
+
+| Piyasa | Nasıl girilir | Engel |
+| --- | --- | --- |
+| Kripto | Binance / yerli borsa API'si | Düşük |
+| BIST pay + VİOP | Aracı kurum API'si (ör. Deniz Yatırım Algolab) | Aracı kurum hesabı |
+| ABD hisse, ETF, vadeli, opsiyon | Yurt dışı aracı kurum (Interactive Brokers vb.) | Hesap, vergi, hukuki durum (doğrulanmalı) |
+| Forex/CFD | Yerli lisanslı kurum (MT5/API) | En az 50.000 TL teminat, en fazla 1:10 |
+
+### 13.2 Motor karşılaştırması
+
+| | NautilusTrader | QuantConnect LEAN | Kendi çekirdek |
+| --- | --- | --- | --- |
+| Çekirdek | Rust + Python kontrol düzlemi | C# + Python köprüsü | Python |
+| Backtest = canlı | ✅ aynı çalışma ortamı ve zaman modeli | ✅ | Bizim sorumluluğumuzda |
+| Bağlantılar | 22 kararlı: IB, Binance, Coinbase, Bybit, OKX, Kraken, Databento, Tardis… | IB, OANDA, Binance, Kraken, Coinbase, Tradier… | CCXT |
+| BIST / MT5 | Yok (kendimiz yazarız) | Yok | Yok |
+| Durum | v1.231.0 (Ağustos 2026) son v1. v2 (Rust + PyO3) sürüm adayı | Olgun | — |
+| Karar | **Seçildi** (Faz 0 spike koşuluyla) | Yedek | Elendi (kurumsal parçalar aylarca iş) |
+
+### 13.3 Ücretsiz veri kaynakları
+
+| Kaynak | Kapsam | Not |
+| --- | --- | --- |
+| Binance public data | Kripto, 1 dk'dan itibaren, funding | Anahtarsız |
+| Dukascopy | FX, metaller, emtia, endeks CFD; tick + spread, 2006→ | Anahtarsız, hesapsız HTTP; Python indiricileri var |
+| Tiingo | ABD günlük, onlarca yıl | Ücretsiz katman |
+| Massive (Polygon, Ekim 2025'te ad değişti) | ABD; ücretsiz: dakikada 5 çağrı, 2 yıl, gün sonu + 15 dk gecikmeli | Canlı için yetersiz |
+| Alpaca | ABD; ücretsiz planda IEX akışı | Paper hesap erişimi Türkiye'den doğrulanmalı |
+| borsapy / Yahoo (.IS) | BIST günlük, KAP bildirimleri | Gün içi veri zor |
+| KAP (MKK VYK API) | BIST resmi bildirimler | `pykap`, `borsapy`, `kapmcp` sarmalayıcıları |
+| SEC EDGAR | ABD resmi bildirimler (8-K) | Ücretsiz resmi API |
+| Databento | ABD hisse, CME vadelileri, opsiyon | 125 $ ücretsiz kredi, Nautilus'ta yerleşik bağlantı |
+| Ücretli (sonraki dalga) | Batmış ABD hisseleri (EODHD, Norgate…) | Hayatta kalma yanlılığını çözer |
+
+**Uyarı:** ücretsiz ABD tek hisse verisi çoğunlukla batmış hisseleri içermez. Bu yüzden ilk dalgada ABD
+tarafı ETF'lerle sınırlı. Batmış hisseleri içermeyen veriyle yapılan backtest geçmişi olduğundan parlak
+gösterir.
+
+### 13.4 Yükseltme modeli: NVIDIA build.nvidia.com
+
+- Barındırılan katalog, NVIDIA Developer Program üzerinden prototipleme için ücretsiz. Kredi kartı
+  gerekmez.
+- Varsayılan dakikada ~40 istek, başvuruyla 200'e çıkarılabilir. Kota ve şartlar hesaba göre değişebilir.
+- API OpenAI uyumlu.
+- Güçlü modeller (Eylül 2026 kataloğu): GLM-5 (753B MoE), Kimi K3, Nemotron-3 Ultra (550B), Nemotron-3
+  Super (120B), Gemma-4-31B.
+- Üretim için garanti yok. Gerçek para fazında şartlar yeniden değerlendirilir. Model seçimi Spike 04'te
+  ölçümle yapılır.
 
 ## Kaynaklar
 
@@ -792,3 +848,12 @@ sormak. Aritmetik, boyutlandırma ve kural kontrolü kodda kalır. Jev çıktıs
 - [Spykoninho/trading-bot-jev](https://github.com/Spykoninho/trading-bot-jev) · [yasdelayu/jev-crypto-scout](https://github.com/yasdelayu/jev-crypto-scout) · [zadescoxp/Jev-Trades](https://github.com/zadescoxp/Jev-Trades)
 - [Bitcoin.com News — Crypto traders putting Jev to work](https://news.bitcoin.com/technology/this-ai-cant-chat-but-crypto-traders-are-already-putting-it-to-work/)
 - Global not: ScryneOS `🧠 500-Knowledge/TypeSafe.md` (Jev ölçümleri ve kullanım kuralları)
+
+**Çok piyasalı ek (§13)**
+- [NautilusTrader bağlantıları](https://nautilustrader.io/docs/latest/integrations/) · [NautilusTrader 1.231.0 (v2 geçişi)](https://github.com/nautechsystems/nautilus_trader/releases/tag/v1.231.0) · [NautilusTrader GitHub](https://github.com/nautechsystems/nautilus_trader)
+- [LEAN GitHub](https://github.com/QuantConnect/Lean) · [LEAN motoru](https://www.lean.io/) · [LEAN CLI – Interactive Brokers](https://www.quantconnect.com/docs/v2/lean-cli/live-trading/brokerages/interactive-brokers)
+- [Dukascopy tarihsel veri](https://www.dukascopy.com/swiss/english/marketwatch/historical/) · [duka-data](https://github.com/dela-99/duka-data)
+- [Massive (Polygon) fiyatlandırma](https://qveris.ai/guides/polygon-pricing-optimized/) · [Tiingo vs Massive](https://pickuma.com/for-dev/tiingo-vs-polygon-market-data-apis-indie-quant-2026/) · [Alpaca tarihsel veri](https://docs.alpaca.markets/us/docs/historical-stock-data-1)
+- [EODHD — hayatta kalma yanlılığı](https://eodhd.com/financial-academy/financial-faq/survivorship-bias-free-financial-analysis) · [Databento fiyatlandırma](https://databento.com/pricing)
+- [borsapy](https://github.com/saidsurucu/borsapy) · [pykap](https://github.com/cemsinano/pykap) · [kapmcp (MKK VYK API)](https://github.com/hasancagrigungor/kapmcp)
+- [NVIDIA NIM fiyat/limit rehberi](https://decodethefuture.org/en/nvidia-nim-api-pricing-limits-guide/) · [NVIDIA Build ücretsiz API](https://yangmao.ai/en/providers/nvidia-build/free-api/) · [build.nvidia.com modeller](https://build.nvidia.com/models)
