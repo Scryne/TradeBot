@@ -1,0 +1,772 @@
+{
+ "model": "jev-1.13.0",
+ "kayit": [
+  {
+   "i": 0,
+   "sembol": "KCHOL",
+   "baslik": "Özel Durum Açıklaması (Genel)",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 1.0,
+   "aciliyet": 0.56,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2107
+  },
+  {
+   "i": 1,
+   "sembol": "ASELS",
+   "baslik": "Pay Bazında Devre Kesici Bildirimi",
+   "altin": "gecici_durdurma",
+   "kabul": [
+    "gecici_durdurma"
+   ],
+   "jev": "gecici_durdurma",
+   "guven": 1.0,
+   "aciliyet": 1.99,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "girdi_token": 1895
+  },
+  {
+   "i": 2,
+   "sembol": "SASA",
+   "baslik": "SPK İşlem Yasağı Nedeniyle Pay Duyurusu",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 0.95,
+   "aciliyet": 3.46,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "girdi_token": 3569
+  },
+  {
+   "i": 3,
+   "sembol": "THYAO",
+   "baslik": "Temerrüt İşlemi",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 0.98,
+   "aciliyet": 2.55,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "girdi_token": 2497
+  },
+  {
+   "i": 4,
+   "sembol": "KONTR",
+   "baslik": "Kar Payı Dağıtım İşlemlerine İlişkin Bildirim",
+   "altin": "kurumsal_islem",
+   "kabul": [
+    "kurumsal_islem",
+    "rutin"
+   ],
+   "jev": "kurumsal_islem",
+   "guven": 0.78,
+   "aciliyet": 1.53,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 3249
+  },
+  {
+   "i": 5,
+   "sembol": "AKBNK",
+   "baslik": "Özel Durum Açıklaması (Genel)",
+   "altin": "rutin",
+   "kabul": [
+    "olumlu_esasli",
+    "rutin"
+   ],
+   "jev": "olumlu_esasli",
+   "guven": 0.64,
+   "aciliyet": 1.02,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2215
+  },
+  {
+   "i": 6,
+   "sembol": "ASELS",
+   "baslik": "Özel Durum Açıklaması (Genel)",
+   "altin": "olumlu_esasli",
+   "kabul": [
+    "olumlu_esasli"
+   ],
+   "jev": "olumlu_esasli",
+   "guven": 1.0,
+   "aciliyet": 1.13,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2125
+  },
+  {
+   "i": 7,
+   "sembol": "THYAO",
+   "baslik": "Temerrüt İşlemi",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 0.98,
+   "aciliyet": 2.56,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "girdi_token": 2497
+  },
+  {
+   "i": 8,
+   "sembol": "HEKTS",
+   "baslik": "Pay Bazında Devre Kesici Bildirimi",
+   "altin": "gecici_durdurma",
+   "kabul": [
+    "gecici_durdurma"
+   ],
+   "jev": "gecici_durdurma",
+   "guven": 0.99,
+   "aciliyet": 2.01,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "girdi_token": 1817
+  },
+  {
+   "i": 9,
+   "sembol": "KCHOL",
+   "baslik": "Pay Alım Satım Bildirimi",
+   "altin": "rutin",
+   "kabul": [
+    "olumlu_esasli",
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 0.97,
+   "aciliyet": 1.74,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2782
+  },
+  {
+   "i": 10,
+   "sembol": "TUPRS",
+   "baslik": "Özel Durum Açıklaması (Genel)",
+   "altin": "rutin",
+   "kabul": [
+    "olumlu_esasli",
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 0.94,
+   "aciliyet": 1.4,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2441
+  },
+  {
+   "i": 11,
+   "sembol": "HEKTS",
+   "baslik": "Özel Durum Açıklaması (Genel)",
+   "altin": "olumsuz_esasli",
+   "kabul": [
+    "olumsuz_esasli",
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 0.69,
+   "aciliyet": 1.59,
+   "dogru": true,
+   "veto_altin": true,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2428
+  },
+  {
+   "i": 12,
+   "sembol": "SISE",
+   "baslik": "SPK İşlem Yasağı Nedeniyle Pay Duyurusu",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 0.95,
+   "aciliyet": 3.8,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "girdi_token": 3586
+  },
+  {
+   "i": 13,
+   "sembol": "EREGL",
+   "baslik": "SPK İşlem Yasağı Nedeniyle Pay Duyurusu",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 0.96,
+   "aciliyet": 3.73,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "girdi_token": 3586
+  },
+  {
+   "i": 14,
+   "sembol": "EREGL",
+   "baslik": "Pay Bazında Devre Kesici Bildirimi",
+   "altin": "gecici_durdurma",
+   "kabul": [
+    "gecici_durdurma"
+   ],
+   "jev": "gecici_durdurma",
+   "guven": 1.0,
+   "aciliyet": 1.97,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "girdi_token": 1794
+  },
+  {
+   "i": 15,
+   "sembol": "BIMAS",
+   "baslik": "Payların Geri Alınmasına İlişkin Bildirim",
+   "altin": "olumlu_esasli",
+   "kabul": [
+    "olumlu_esasli",
+    "rutin"
+   ],
+   "jev": "olumlu_esasli",
+   "guven": 0.94,
+   "aciliyet": 1.47,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2544
+  },
+  {
+   "i": 16,
+   "sembol": "SISE",
+   "baslik": "Kredi Derecelendirmesi",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 0.48,
+   "aciliyet": 1.18,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 1874
+  },
+  {
+   "i": 17,
+   "sembol": "ASELS",
+   "baslik": "Yeni İş İlişkisi",
+   "altin": "olumlu_esasli",
+   "kabul": [
+    "olumlu_esasli"
+   ],
+   "jev": "olumlu_esasli",
+   "guven": 1.0,
+   "aciliyet": 1.61,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2303
+  },
+  {
+   "i": 18,
+   "sembol": "BIMAS",
+   "baslik": "Payların Geri Alınmasına İlişkin Bildirim",
+   "altin": "olumlu_esasli",
+   "kabul": [
+    "olumlu_esasli",
+    "rutin"
+   ],
+   "jev": "olumlu_esasli",
+   "guven": 0.96,
+   "aciliyet": 1.45,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2718
+  },
+  {
+   "i": 19,
+   "sembol": "ASTOR",
+   "baslik": "Pay Alım Satım Bildirimi",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 1.0,
+   "aciliyet": 1.13,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 1716
+  },
+  {
+   "i": 20,
+   "sembol": "BIMAS",
+   "baslik": "Özel Durum Açıklaması (Genel)",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 1.0,
+   "aciliyet": 0.45,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2008
+  },
+  {
+   "i": 21,
+   "sembol": "ASTOR",
+   "baslik": "Borsada İşlem Gören Tipe Dönüşüm Duyurusu",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 1.0,
+   "aciliyet": 1.8,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 3144
+  },
+  {
+   "i": 22,
+   "sembol": "SASA",
+   "baslik": "Sermaye Artırımı - Azaltımı İşlemlerine İlişkin Bildirim",
+   "altin": "kurumsal_islem",
+   "kabul": [
+    "kurumsal_islem"
+   ],
+   "jev": "kurumsal_islem",
+   "guven": 1.0,
+   "aciliyet": 2.15,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 3102
+  },
+  {
+   "i": 23,
+   "sembol": "KONTR",
+   "baslik": "Özel Durum Açıklaması (Genel)",
+   "altin": "olumsuz_esasli",
+   "kabul": [
+    "olumsuz_esasli"
+   ],
+   "jev": "olumsuz_esasli",
+   "guven": 0.97,
+   "aciliyet": 2.95,
+   "dogru": true,
+   "veto_altin": true,
+   "veto_jev": true,
+   "veto_kelime": true,
+   "girdi_token": 2888
+  },
+  {
+   "i": 24,
+   "sembol": "ASTOR",
+   "baslik": "Yeni İş İlişkisi",
+   "altin": "olumlu_esasli",
+   "kabul": [
+    "olumlu_esasli"
+   ],
+   "jev": "olumlu_esasli",
+   "guven": 1.0,
+   "aciliyet": 1.67,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2688
+  },
+  {
+   "i": 25,
+   "sembol": "SISE",
+   "baslik": "Kredi Derecelendirmesi",
+   "altin": "rutin",
+   "kabul": [
+    "olumlu_esasli",
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 0.85,
+   "aciliyet": 0.89,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2236
+  },
+  {
+   "i": 26,
+   "sembol": "FROTO",
+   "baslik": "Temerrüt İşlemi",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 0.98,
+   "aciliyet": 1.4,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "girdi_token": 1896
+  },
+  {
+   "i": 27,
+   "sembol": "SASA",
+   "baslik": "Sermaye Artırımı - Azaltımı İşlemlerine İlişkin Bildirim",
+   "altin": "kurumsal_islem",
+   "kabul": [
+    "kurumsal_islem"
+   ],
+   "jev": "kurumsal_islem",
+   "guven": 1.0,
+   "aciliyet": 2.17,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2543
+  },
+  {
+   "i": 28,
+   "sembol": "EREGL",
+   "baslik": "Borsada İşlem Gören Tipe Dönüşüm Duyurusu",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 0.99,
+   "aciliyet": 1.74,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 3321
+  },
+  {
+   "i": 29,
+   "sembol": "AKBNK",
+   "baslik": "Pay Dışında Sermaye Piyasası Aracı İşlemlerine İlişkin Bildirim (Faiz İçeren)",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 1.0,
+   "aciliyet": 0.46,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2446
+  },
+  {
+   "i": 30,
+   "sembol": "SISE",
+   "baslik": "Özel Durum Açıklaması (Genel)",
+   "altin": "olumlu_esasli",
+   "kabul": [
+    "olumlu_esasli",
+    "rutin"
+   ],
+   "jev": "olumlu_esasli",
+   "guven": 0.92,
+   "aciliyet": 0.87,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2195
+  },
+  {
+   "i": 31,
+   "sembol": "THYAO",
+   "baslik": "Özel Durum Açıklaması (Genel)",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 1.0,
+   "aciliyet": 0.43,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 1895
+  },
+  {
+   "i": 32,
+   "sembol": "AKBNK",
+   "baslik": "Özel Durum Açıklaması (Genel)",
+   "altin": "rutin",
+   "kabul": [
+    "olumlu_esasli",
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 0.87,
+   "aciliyet": 1.38,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2156
+  },
+  {
+   "i": 33,
+   "sembol": "KONTR",
+   "baslik": "Kar Payı Dağıtım İşlemlerine İlişkin Bildirim",
+   "altin": "kurumsal_islem",
+   "kabul": [
+    "kurumsal_islem",
+    "olumsuz_esasli",
+    "rutin"
+   ],
+   "jev": "kurumsal_islem",
+   "guven": 0.61,
+   "aciliyet": 1.82,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 3287
+  },
+  {
+   "i": 34,
+   "sembol": "THYAO",
+   "baslik": "Özel Durum Açıklaması (Genel)",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 1.0,
+   "aciliyet": 0.45,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 1900
+  },
+  {
+   "i": 35,
+   "sembol": "THYAO",
+   "baslik": "Özel Durum Açıklaması (Genel)",
+   "altin": "rutin",
+   "kabul": [
+    "rutin"
+   ],
+   "jev": "rutin",
+   "guven": 1.0,
+   "aciliyet": 0.54,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2038
+  },
+  {
+   "i": 36,
+   "sembol": "BIMAS",
+   "baslik": "Payların Geri Alınmasına İlişkin Bildirim",
+   "altin": "olumlu_esasli",
+   "kabul": [
+    "olumlu_esasli",
+    "rutin"
+   ],
+   "jev": "olumlu_esasli",
+   "guven": 0.95,
+   "aciliyet": 1.41,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2628
+  },
+  {
+   "i": 37,
+   "sembol": "KCHOL",
+   "baslik": "Finansal Duran Varlık Edinimi",
+   "altin": "olumlu_esasli",
+   "kabul": [
+    "olumlu_esasli",
+    "rutin"
+   ],
+   "jev": "olumlu_esasli",
+   "guven": 0.47,
+   "aciliyet": 1.37,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2871
+  },
+  {
+   "i": 38,
+   "sembol": "ASTOR",
+   "baslik": "Yeni İş İlişkisi",
+   "altin": "olumlu_esasli",
+   "kabul": [
+    "olumlu_esasli"
+   ],
+   "jev": "olumlu_esasli",
+   "guven": 1.0,
+   "aciliyet": 1.61,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2664
+  },
+  {
+   "i": 39,
+   "sembol": "HEKTS",
+   "baslik": "Sermaye Artırımı - Azaltımı İşlemlerine İlişkin Bildirim",
+   "altin": "kurumsal_islem",
+   "kabul": [
+    "kurumsal_islem",
+    "rutin"
+   ],
+   "jev": "kurumsal_islem",
+   "guven": 0.99,
+   "aciliyet": 1.48,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2412
+  },
+  {
+   "i": 40,
+   "sembol": "KONTR",
+   "baslik": "Endeks Şirketlerinde Değişiklik",
+   "altin": "pazar_tedbiri",
+   "kabul": [
+    "pazar_tedbiri"
+   ],
+   "jev": "pazar_tedbiri",
+   "guven": 0.75,
+   "aciliyet": 2.9,
+   "dogru": true,
+   "veto_altin": true,
+   "veto_jev": true,
+   "veto_kelime": false,
+   "girdi_token": 3304
+  },
+  {
+   "i": 41,
+   "sembol": "KCHOL",
+   "baslik": "Finansal Duran Varlık Edinimi",
+   "altin": "olumlu_esasli",
+   "kabul": [
+    "olumlu_esasli",
+    "rutin"
+   ],
+   "jev": "olumlu_esasli",
+   "guven": 0.66,
+   "aciliyet": 1.45,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 2904
+  },
+  {
+   "i": 42,
+   "sembol": "BIMAS",
+   "baslik": "Hak Kullanımı",
+   "altin": "kurumsal_islem",
+   "kabul": [
+    "kurumsal_islem",
+    "rutin"
+   ],
+   "jev": "kurumsal_islem",
+   "guven": 0.99,
+   "aciliyet": 2.08,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "girdi_token": 1704
+  },
+  {
+   "i": 43,
+   "sembol": "KONTR",
+   "baslik": "Endeks Şirketlerinde Değişiklik",
+   "altin": "olumsuz_esasli",
+   "kabul": [
+    "olumsuz_esasli",
+    "pazar_tedbiri",
+    "rutin"
+   ],
+   "jev": "olumsuz_esasli",
+   "guven": 0.99,
+   "aciliyet": 1.64,
+   "dogru": true,
+   "veto_altin": true,
+   "veto_jev": true,
+   "veto_kelime": false,
+   "girdi_token": 2098
+  }
+ ]
+}

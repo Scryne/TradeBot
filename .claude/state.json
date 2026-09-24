@@ -1,7 +1,7 @@
 {
   "proje_adi": "TradeBot",
   "asama": "finalizasyon",
-  "guncellendi": "2026-09-24",
+  "guncellendi": "2026-09-25",
   "roadmap": "docs/Roadmap.md",
-  "not": "Yon degisti (2026-09-24): kurumsal, cok piyasali, tamamen otonom, once paper. Karar konusmalari bitti; Proje-Fikri v2, Final-Dokuman taslagi, Roadmap v2 (Faz 0-13) yazildi. Final Dokuman'daki isaretli kararlar Faz 0 spike'lariyla kesinlesir: 02 NautilusTrader v2, 03 veri kaynaklari, 04 Jev + NVIDIA yukseltme, 05 paper baglantilari (Alpaca TR, MT5 kopru). Host: evdeki ikinci Windows PC (16GB, 1TB, kablolu)."
+  "not": "Faz 0 tamam (2026-09-25): Nautilus v2 kesinlesti (1 dk yurutme verisiyle parity %0,0000; konteyner DNS 1.1.1.1; NTP); ucretsiz veri kaynaklari calisiyor (indirici kurallari docs/spikes/03); Jev vetosu Binance 46/46, KAP 44/44, yanlis veto 0; paper yurutme Nautilus sandbox. Final Dokuman Scryne onayi bekliyor; onaylaninca asama uygulama, Faz 1. Scryne'dan: NVIDIA_API_KEY, Alpaca paper, MT5 demo (acil degil)."
 }

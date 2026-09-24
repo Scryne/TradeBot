@@ -1,0 +1,1299 @@
+{
+ "model": "jev-1.13.0",
+ "soru_hash": "8c5f2fe109d6a3f0",
+ "kayit": [
+  {
+   "i": 1,
+   "varlik": "SSV",
+   "baslik": "Notice of Removal of Margin Trading Pairs - 2026-09-25",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 0.99,
+   "p": {
+    "transfers_suspended": 0.0,
+    "not_about_asset": 0.0,
+    "token_delist": 0.0,
+    "positive_or_neutral": 0.01,
+    "other_pairs_or_products_removed": 0.99,
+    "token_conversion": 0.0,
+    "usdt_pair_removed": 0.0
+   },
+   "aciliyet": 0.8,
+   "aciliyet_guven": 0.33,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1718
+  },
+  {
+   "i": 1,
+   "varlik": "MANTA",
+   "baslik": "Notice of Removal of Margin Trading Pairs - 2026-09-25",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 0.99,
+   "p": {
+    "not_about_asset": 0.0,
+    "token_conversion": 0.0,
+    "usdt_pair_removed": 0.0,
+    "positive_or_neutral": 0.01,
+    "other_pairs_or_products_removed": 0.99,
+    "token_delist": 0.0,
+    "transfers_suspended": 0.0
+   },
+   "aciliyet": 0.89,
+   "aciliyet_guven": 0.25,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1718
+  },
+  {
+   "i": 2,
+   "varlik": "ENJ",
+   "baslik": "Notice of Removal of Spot Trading Pairs - 2026-09-25",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 1.0,
+   "p": {
+    "positive_or_neutral": 0.0,
+    "usdt_pair_removed": 0.0,
+    "transfers_suspended": 0.0,
+    "other_pairs_or_products_removed": 1.0,
+    "token_conversion": 0.0,
+    "not_about_asset": 0.0,
+    "token_delist": 0.0
+   },
+   "aciliyet": 1.0,
+   "aciliyet_guven": 0.17,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1457
+  },
+  {
+   "i": 2,
+   "varlik": "AIXBT",
+   "baslik": "Notice of Removal of Spot Trading Pairs - 2026-09-25",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 0.99,
+   "p": {
+    "token_conversion": 0.0,
+    "usdt_pair_removed": 0.0,
+    "not_about_asset": 0.0,
+    "token_delist": 0.0,
+    "other_pairs_or_products_removed": 1.0,
+    "transfers_suspended": 0.0,
+    "positive_or_neutral": 0.0
+   },
+   "aciliyet": 1.27,
+   "aciliyet_guven": 0.25,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1458
+  },
+  {
+   "i": 2,
+   "varlik": "TNSR",
+   "baslik": "Notice of Removal of Spot Trading Pairs - 2026-09-25",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 1.0,
+   "p": {
+    "transfers_suspended": 0.0,
+    "positive_or_neutral": 0.0,
+    "not_about_asset": 0.0,
+    "token_conversion": 0.0,
+    "other_pairs_or_products_removed": 1.0,
+    "token_delist": 0.0,
+    "usdt_pair_removed": 0.0
+   },
+   "aciliyet": 1.26,
+   "aciliyet_guven": 0.2,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1458
+  },
+  {
+   "i": 3,
+   "varlik": "QNT",
+   "baslik": "Notice of Removal of Spot Trading Pairs - 2026-09-18",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 1.0,
+   "p": {
+    "token_conversion": 0.0,
+    "positive_or_neutral": 0.0,
+    "other_pairs_or_products_removed": 1.0,
+    "not_about_asset": 0.0,
+    "transfers_suspended": 0.0,
+    "usdt_pair_removed": 0.0,
+    "token_delist": 0.0
+   },
+   "aciliyet": 0.85,
+   "aciliyet_guven": 0.29,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1434
+  },
+  {
+   "i": 3,
+   "varlik": "COOKIE",
+   "baslik": "Notice of Removal of Spot Trading Pairs - 2026-09-18",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 1.0,
+   "p": {
+    "transfers_suspended": 0.0,
+    "other_pairs_or_products_removed": 1.0,
+    "token_delist": 0.0,
+    "usdt_pair_removed": 0.0,
+    "positive_or_neutral": 0.0,
+    "not_about_asset": 0.0,
+    "token_conversion": 0.0
+   },
+   "aciliyet": 0.98,
+   "aciliyet_guven": 0.18,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1433
+  },
+  {
+   "i": 4,
+   "varlik": "VANA",
+   "baslik": "Notice of Removal of Margin Trading Pairs - 2026-09-18",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 0.99,
+   "p": {
+    "token_delist": 0.0,
+    "positive_or_neutral": 0.01,
+    "transfers_suspended": 0.0,
+    "token_conversion": 0.0,
+    "usdt_pair_removed": 0.0,
+    "not_about_asset": 0.0,
+    "other_pairs_or_products_removed": 0.99
+   },
+   "aciliyet": 0.85,
+   "aciliyet_guven": 0.29,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1680
+  },
+  {
+   "i": 5,
+   "varlik": "USDP",
+   "baslik": "Binance Will Delist USDP on 2026-09-24",
+   "altin": "token_delist",
+   "kabul": [
+    "token_delist"
+   ],
+   "jev": "token_delist",
+   "guven": 0.99,
+   "p": {
+    "transfers_suspended": 0.0,
+    "usdt_pair_removed": 0.01,
+    "other_pairs_or_products_removed": 0.0,
+    "token_delist": 0.99,
+    "positive_or_neutral": 0.0,
+    "not_about_asset": 0.0,
+    "token_conversion": 0.0
+   },
+   "aciliyet": 1.01,
+   "aciliyet_guven": 0.16,
+   "dogru": true,
+   "veto_altin": true,
+   "veto_jev": true,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1929
+  },
+  {
+   "i": 6,
+   "varlik": "API3",
+   "baslik": "Notice of Removal of Margin Trading Pairs and Collateral - 2026-09-11",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 0.98,
+   "p": {
+    "other_pairs_or_products_removed": 0.99,
+    "positive_or_neutral": 0.01,
+    "transfers_suspended": 0.0,
+    "token_delist": 0.0,
+    "usdt_pair_removed": 0.0,
+    "not_about_asset": 0.0,
+    "token_conversion": 0.0
+   },
+   "aciliyet": 0.62,
+   "aciliyet_guven": 0.49,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1722
+  },
+  {
+   "i": 7,
+   "varlik": "SAGA",
+   "baslik": "Notice of Removal of Spot Trading Pairs - 2026-09-11",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 1.0,
+   "p": {
+    "usdt_pair_removed": 0.0,
+    "not_about_asset": 0.0,
+    "positive_or_neutral": 0.0,
+    "transfers_suspended": 0.0,
+    "token_delist": 0.0,
+    "other_pairs_or_products_removed": 1.0,
+    "token_conversion": 0.0
+   },
+   "aciliyet": 1.15,
+   "aciliyet_guven": 0.27,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1430
+  },
+  {
+   "i": 8,
+   "varlik": "BDXN",
+   "baslik": "Binance Alpha Will Remove MTP, BDXN, TALE, BOS, MAIGA, TIMI, SAROS, U (Union), S",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 0.82,
+   "p": {
+    "token_conversion": 0.0,
+    "positive_or_neutral": 0.12,
+    "other_pairs_or_products_removed": 0.84,
+    "not_about_asset": 0.01,
+    "transfers_suspended": 0.0,
+    "usdt_pair_removed": 0.0,
+    "token_delist": 0.03
+   },
+   "aciliyet": 1.44,
+   "aciliyet_guven": 0.0,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1842
+  },
+  {
+   "i": 10,
+   "varlik": "ICX",
+   "baslik": "Binance Will Delist ICX, SCRT, STORJ on 2026-09-03",
+   "altin": "token_delist",
+   "kabul": [
+    "token_delist"
+   ],
+   "jev": "token_delist",
+   "guven": 0.98,
+   "p": {
+    "not_about_asset": 0.0,
+    "positive_or_neutral": 0.0,
+    "token_delist": 0.99,
+    "usdt_pair_removed": 0.01,
+    "other_pairs_or_products_removed": 0.0,
+    "token_conversion": 0.0,
+    "transfers_suspended": 0.0
+   },
+   "aciliyet": 2.99,
+   "aciliyet_guven": 0.99,
+   "dogru": true,
+   "veto_altin": true,
+   "veto_jev": true,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1948
+  },
+  {
+   "i": 10,
+   "varlik": "STORJ",
+   "baslik": "Binance Will Delist ICX, SCRT, STORJ on 2026-09-03",
+   "altin": "token_delist",
+   "kabul": [
+    "token_delist"
+   ],
+   "jev": "token_delist",
+   "guven": 0.98,
+   "p": {
+    "other_pairs_or_products_removed": 0.0,
+    "token_conversion": 0.0,
+    "token_delist": 0.98,
+    "positive_or_neutral": 0.0,
+    "usdt_pair_removed": 0.02,
+    "transfers_suspended": 0.0,
+    "not_about_asset": 0.0
+   },
+   "aciliyet": 2.99,
+   "aciliyet_guven": 0.99,
+   "dogru": true,
+   "veto_altin": true,
+   "veto_jev": true,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1949
+  },
+  {
+   "i": 10,
+   "varlik": "SCRT",
+   "baslik": "Binance Will Delist ICX, SCRT, STORJ on 2026-09-03",
+   "altin": "token_delist",
+   "kabul": [
+    "token_delist"
+   ],
+   "jev": "token_delist",
+   "guven": 0.98,
+   "p": {
+    "usdt_pair_removed": 0.02,
+    "token_conversion": 0.0,
+    "transfers_suspended": 0.0,
+    "token_delist": 0.98,
+    "positive_or_neutral": 0.0,
+    "not_about_asset": 0.0,
+    "other_pairs_or_products_removed": 0.0
+   },
+   "aciliyet": 2.99,
+   "aciliyet_guven": 0.99,
+   "dogru": true,
+   "veto_altin": true,
+   "veto_jev": true,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1948
+  },
+  {
+   "i": 11,
+   "varlik": "LTC",
+   "baslik": "Notice of Removal of Spot Trading Pairs - 2026-08-21",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 1.0,
+   "p": {
+    "positive_or_neutral": 0.0,
+    "token_delist": 0.0,
+    "other_pairs_or_products_removed": 1.0,
+    "not_about_asset": 0.0,
+    "usdt_pair_removed": 0.0,
+    "token_conversion": 0.0,
+    "transfers_suspended": 0.0
+   },
+   "aciliyet": 0.62,
+   "aciliyet_guven": 0.48,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1452
+  },
+  {
+   "i": 11,
+   "varlik": "SUI",
+   "baslik": "Notice of Removal of Spot Trading Pairs - 2026-08-21",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 1.0,
+   "p": {
+    "usdt_pair_removed": 0.0,
+    "transfers_suspended": 0.0,
+    "not_about_asset": 0.0,
+    "other_pairs_or_products_removed": 1.0,
+    "token_delist": 0.0,
+    "positive_or_neutral": 0.0,
+    "token_conversion": 0.0
+   },
+   "aciliyet": 0.87,
+   "aciliyet_guven": 0.28,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1452
+  },
+  {
+   "i": 13,
+   "varlik": "APT",
+   "baslik": "Notice of Removal of Spot Trading Pairs - 2026-08-14",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 0.99,
+   "p": {
+    "token_conversion": 0.0,
+    "positive_or_neutral": 0.0,
+    "token_delist": 0.0,
+    "other_pairs_or_products_removed": 1.0,
+    "not_about_asset": 0.0,
+    "usdt_pair_removed": 0.0,
+    "transfers_suspended": 0.0
+   },
+   "aciliyet": 0.82,
+   "aciliyet_guven": 0.32,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1461
+  },
+  {
+   "i": 14,
+   "varlik": "BTTC",
+   "baslik": "Binance Margin And Loan Will Delist BTTC & POWR on 2026-08-14",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 0.99,
+   "p": {
+    "token_delist": 0.0,
+    "other_pairs_or_products_removed": 0.99,
+    "token_conversion": 0.0,
+    "positive_or_neutral": 0.01,
+    "transfers_suspended": 0.0,
+    "usdt_pair_removed": 0.0,
+    "not_about_asset": 0.0
+   },
+   "aciliyet": 1.03,
+   "aciliyet_guven": 0.14,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1934
+  },
+  {
+   "i": 15,
+   "varlik": "SKL",
+   "baslik": "Notice of Removal of Spot Trading Pairs - 2026-08-07",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 1.0,
+   "p": {
+    "other_pairs_or_products_removed": 1.0,
+    "transfers_suspended": 0.0,
+    "usdt_pair_removed": 0.0,
+    "not_about_asset": 0.0,
+    "token_conversion": 0.0,
+    "positive_or_neutral": 0.0,
+    "token_delist": 0.0
+   },
+   "aciliyet": 0.97,
+   "aciliyet_guven": 0.19,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1434
+  },
+  {
+   "i": 16,
+   "varlik": "ACX",
+   "baslik": "Binance Will Delist ACX, HFT, PIVX, PYR, VANRY, VIC on 2026-08-17",
+   "altin": "token_delist",
+   "kabul": [
+    "token_delist"
+   ],
+   "jev": "token_delist",
+   "guven": 0.97,
+   "p": {
+    "token_delist": 0.97,
+    "transfers_suspended": 0.0,
+    "positive_or_neutral": 0.0,
+    "token_conversion": 0.0,
+    "other_pairs_or_products_removed": 0.0,
+    "usdt_pair_removed": 0.03,
+    "not_about_asset": 0.0
+   },
+   "aciliyet": 3.0,
+   "aciliyet_guven": 0.99,
+   "dogru": true,
+   "veto_altin": true,
+   "veto_jev": true,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1973
+  },
+  {
+   "i": 16,
+   "varlik": "VIC",
+   "baslik": "Binance Will Delist ACX, HFT, PIVX, PYR, VANRY, VIC on 2026-08-17",
+   "altin": "token_delist",
+   "kabul": [
+    "token_delist"
+   ],
+   "jev": "token_delist",
+   "guven": 0.97,
+   "p": {
+    "transfers_suspended": 0.0,
+    "token_delist": 0.98,
+    "positive_or_neutral": 0.0,
+    "usdt_pair_removed": 0.02,
+    "token_conversion": 0.0,
+    "not_about_asset": 0.0,
+    "other_pairs_or_products_removed": 0.0
+   },
+   "aciliyet": 2.99,
+   "aciliyet_guven": 0.99,
+   "dogru": true,
+   "veto_altin": true,
+   "veto_jev": true,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1973
+  },
+  {
+   "i": 16,
+   "varlik": "PYR",
+   "baslik": "Binance Will Delist ACX, HFT, PIVX, PYR, VANRY, VIC on 2026-08-17",
+   "altin": "token_delist",
+   "kabul": [
+    "token_delist"
+   ],
+   "jev": "token_delist",
+   "guven": 0.97,
+   "p": {
+    "other_pairs_or_products_removed": 0.0,
+    "transfers_suspended": 0.0,
+    "not_about_asset": 0.0,
+    "usdt_pair_removed": 0.02,
+    "token_conversion": 0.0,
+    "positive_or_neutral": 0.0,
+    "token_delist": 0.98
+   },
+   "aciliyet": 2.99,
+   "aciliyet_guven": 0.99,
+   "dogru": true,
+   "veto_altin": true,
+   "veto_jev": true,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1973
+  },
+  {
+   "i": 17,
+   "varlik": "AEUR",
+   "baslik": "Notice Regarding the Removal of AEUR and Conversion of AEUR to EUR",
+   "altin": "token_delist",
+   "kabul": [
+    "token_conversion",
+    "token_delist"
+   ],
+   "jev": "token_conversion",
+   "guven": 0.68,
+   "p": {
+    "usdt_pair_removed": 0.13,
+    "positive_or_neutral": 0.0,
+    "not_about_asset": 0.0,
+    "other_pairs_or_products_removed": 0.0,
+    "transfers_suspended": 0.0,
+    "token_conversion": 0.73,
+    "token_delist": 0.14
+   },
+   "aciliyet": 3.05,
+   "aciliyet_guven": 0.95,
+   "dogru": true,
+   "veto_altin": true,
+   "veto_jev": true,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1962
+  },
+  {
+   "i": 18,
+   "varlik": "MOVE",
+   "baslik": "Notice of Removal of Spot Trading Pairs - 2026-07-31",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 0.99,
+   "p": {
+    "not_about_asset": 0.0,
+    "positive_or_neutral": 0.0,
+    "token_delist": 0.0,
+    "usdt_pair_removed": 0.0,
+    "other_pairs_or_products_removed": 1.0,
+    "token_conversion": 0.0,
+    "transfers_suspended": 0.0
+   },
+   "aciliyet": 0.81,
+   "aciliyet_guven": 0.33,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1467
+  },
+  {
+   "i": 18,
+   "varlik": "POL",
+   "baslik": "Notice of Removal of Spot Trading Pairs - 2026-07-31",
+   "altin": "other_pairs_or_products_removed",
+   "kabul": [
+    "other_pairs_or_products_removed"
+   ],
+   "jev": "other_pairs_or_products_removed",
+   "guven": 1.0,
+   "p": {
+    "usdt_pair_removed": 0.0,
+    "other_pairs_or_products_removed": 1.0,
+    "token_delist": 0.0,
+    "positive_or_neutral": 0.0,
+    "transfers_suspended": 0.0,
+    "not_about_asset": 0.0,
+    "token_conversion": 0.0
+   },
+   "aciliyet": 0.86,
+   "aciliyet_guven": 0.28,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1467
+  },
+  {
+   "i": 21,
+   "varlik": "INJ",
+   "baslik": "Binance Will Support the Injective (INJ) Network Upgrade & Hard Fork - 2026-09-2",
+   "altin": "transfers_suspended",
+   "kabul": [
+    "transfers_suspended"
+   ],
+   "jev": "transfers_suspended",
+   "guven": 1.0,
+   "p": {
+    "not_about_asset": 0.0,
+    "token_conversion": 0.0,
+    "usdt_pair_removed": 0.0,
+    "positive_or_neutral": 0.0,
+    "other_pairs_or_products_removed": 0.0,
+    "token_delist": 0.0,
+    "transfers_suspended": 1.0
+   },
+   "aciliyet": 1.01,
+   "aciliyet_guven": 0.99,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 1376
+  },
+  {
+   "i": 22,
+   "varlik": "ZIL",
+   "baslik": "Binance Will Support the Zilliqa (ZIL) Network Migration",
+   "altin": "transfers_suspended",
+   "kabul": [
+    "transfers_suspended"
+   ],
+   "jev": "transfers_suspended",
+   "guven": 1.0,
+   "p": {
+    "usdt_pair_removed": 0.0,
+    "not_about_asset": 0.0,
+    "positive_or_neutral": 0.0,
+    "transfers_suspended": 1.0,
+    "token_delist": 0.0,
+    "other_pairs_or_products_removed": 0.0,
+    "token_conversion": 0.0
+   },
+   "aciliyet": 1.05,
+   "aciliyet_guven": 0.94,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 1388
+  },
+  {
+   "i": 23,
+   "varlik": "LUNA",
+   "baslik": "Binance Will Support the Terra (LUNA) Network Upgrade - 2026-09-21",
+   "altin": "transfers_suspended",
+   "kabul": [
+    "transfers_suspended"
+   ],
+   "jev": "transfers_suspended",
+   "guven": 1.0,
+   "p": {
+    "positive_or_neutral": 0.0,
+    "other_pairs_or_products_removed": 0.0,
+    "token_delist": 0.0,
+    "not_about_asset": 0.0,
+    "usdt_pair_removed": 0.0,
+    "token_conversion": 0.0,
+    "transfers_suspended": 1.0
+   },
+   "aciliyet": 1.01,
+   "aciliyet_guven": 0.98,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 1362
+  },
+  {
+   "i": 25,
+   "varlik": "STG",
+   "baslik": "Binance Will Support the Stargate Finance (STG) Token Merge to LayerZero (ZRO)",
+   "altin": "token_conversion",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "jev": "token_conversion",
+   "guven": 0.96,
+   "p": {
+    "token_delist": 0.01,
+    "transfers_suspended": 0.0,
+    "not_about_asset": 0.0,
+    "token_conversion": 0.97,
+    "other_pairs_or_products_removed": 0.0,
+    "usdt_pair_removed": 0.02,
+    "positive_or_neutral": 0.0
+   },
+   "aciliyet": 3.0,
+   "aciliyet_guven": 0.99,
+   "dogru": true,
+   "veto_altin": true,
+   "veto_jev": true,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1947
+  },
+  {
+   "i": 25,
+   "varlik": "ZRO",
+   "baslik": "Binance Will Support the Stargate Finance (STG) Token Merge to LayerZero (ZRO)",
+   "altin": "positive_or_neutral",
+   "kabul": [
+    "not_about_asset",
+    "positive_or_neutral"
+   ],
+   "jev": "not_about_asset",
+   "guven": 0.38,
+   "p": {
+    "token_delist": 0.0,
+    "not_about_asset": 0.48,
+    "positive_or_neutral": 0.31,
+    "other_pairs_or_products_removed": 0.05,
+    "token_conversion": 0.15,
+    "transfers_suspended": 0.0,
+    "usdt_pair_removed": 0.01
+   },
+   "aciliyet": 0.84,
+   "aciliyet_guven": 0.3,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1947
+  },
+  {
+   "i": 28,
+   "varlik": "VANA",
+   "baslik": "Binance Will Support the Vana (VANA) Network Upgrade & Hard Fork - 2026-09-21",
+   "altin": "transfers_suspended",
+   "kabul": [
+    "transfers_suspended"
+   ],
+   "jev": "transfers_suspended",
+   "guven": 1.0,
+   "p": {
+    "usdt_pair_removed": 0.0,
+    "other_pairs_or_products_removed": 0.0,
+    "token_delist": 0.0,
+    "not_about_asset": 0.0,
+    "token_conversion": 0.0,
+    "positive_or_neutral": 0.0,
+    "transfers_suspended": 1.0
+   },
+   "aciliyet": 1.02,
+   "aciliyet_guven": 0.98,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 1373
+  },
+  {
+   "i": 32,
+   "varlik": "VET",
+   "baslik": "Binance Will Support the Vechain (VET) Network Upgrade & Hard Fork - 2026-09-16",
+   "altin": "transfers_suspended",
+   "kabul": [
+    "transfers_suspended"
+   ],
+   "jev": "transfers_suspended",
+   "guven": 1.0,
+   "p": {
+    "token_delist": 0.0,
+    "transfers_suspended": 1.0,
+    "not_about_asset": 0.0,
+    "token_conversion": 0.0,
+    "other_pairs_or_products_removed": 0.0,
+    "usdt_pair_removed": 0.0,
+    "positive_or_neutral": 0.0
+   },
+   "aciliyet": 1.01,
+   "aciliyet_guven": 0.98,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 1375
+  },
+  {
+   "i": 34,
+   "varlik": "AVA",
+   "baslik": "Binance Will Cease Support for Deposits and Withdrawals of Tokens on Selected Ne",
+   "altin": "transfers_suspended",
+   "kabul": [
+    "transfers_suspended"
+   ],
+   "jev": "transfers_suspended",
+   "guven": 1.0,
+   "p": {
+    "token_conversion": 0.0,
+    "transfers_suspended": 1.0,
+    "positive_or_neutral": 0.0,
+    "token_delist": 0.0,
+    "usdt_pair_removed": 0.0,
+    "not_about_asset": 0.0,
+    "other_pairs_or_products_removed": 0.0
+   },
+   "aciliyet": 1.09,
+   "aciliyet_guven": 0.87,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 1376
+  },
+  {
+   "i": 36,
+   "varlik": "BB",
+   "baslik": "Binance Will Discontinue Mainnet Support of BounceBit (BB)",
+   "altin": "transfers_suspended",
+   "kabul": [
+    "transfers_suspended"
+   ],
+   "jev": "transfers_suspended",
+   "guven": 0.97,
+   "p": {
+    "token_conversion": 0.02,
+    "usdt_pair_removed": 0.0,
+    "not_about_asset": 0.0,
+    "token_delist": 0.0,
+    "other_pairs_or_products_removed": 0.0,
+    "transfers_suspended": 0.98,
+    "positive_or_neutral": 0.0
+   },
+   "aciliyet": 1.23,
+   "aciliyet_guven": 0.76,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 1455
+  },
+  {
+   "i": 39,
+   "varlik": "CFX",
+   "baslik": "Binance Will Support the Conflux Network (CFX) Network Upgrade & Hard Fork - 202",
+   "altin": "transfers_suspended",
+   "kabul": [
+    "transfers_suspended"
+   ],
+   "jev": "transfers_suspended",
+   "guven": 1.0,
+   "p": {
+    "token_delist": 0.0,
+    "usdt_pair_removed": 0.0,
+    "token_conversion": 0.0,
+    "not_about_asset": 0.0,
+    "other_pairs_or_products_removed": 0.0,
+    "positive_or_neutral": 0.0,
+    "transfers_suspended": 1.0
+   },
+   "aciliyet": 1.01,
+   "aciliyet_guven": 0.98,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 1357
+  },
+  {
+   "i": 40,
+   "varlik": "HYPE",
+   "baslik": "Binance Will Add Hyperliquid (HYPE) on Earn, Buy Crypto, Convert, VIP Loan & Mar",
+   "altin": "positive_or_neutral",
+   "kabul": [
+    "positive_or_neutral"
+   ],
+   "jev": "positive_or_neutral",
+   "guven": 1.0,
+   "p": {
+    "not_about_asset": 0.0,
+    "token_conversion": 0.0,
+    "usdt_pair_removed": 0.0,
+    "positive_or_neutral": 1.0,
+    "other_pairs_or_products_removed": 0.0,
+    "token_delist": 0.0,
+    "transfers_suspended": 0.0
+   },
+   "aciliyet": 0.48,
+   "aciliyet_guven": 0.6,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 1729
+  },
+  {
+   "i": 45,
+   "varlik": "COAI",
+   "baslik": "Binance Alpha Trading Competition: Trade ChainOpera AI (COAI) and Share $200K Wo",
+   "altin": "positive_or_neutral",
+   "kabul": [
+    "positive_or_neutral"
+   ],
+   "jev": "positive_or_neutral",
+   "guven": 1.0,
+   "p": {
+    "other_pairs_or_products_removed": 0.0,
+    "transfers_suspended": 0.0,
+    "positive_or_neutral": 1.0,
+    "usdt_pair_removed": 0.0,
+    "token_delist": 0.0,
+    "not_about_asset": 0.0,
+    "token_conversion": 0.0
+   },
+   "aciliyet": 0.24,
+   "aciliyet_guven": 0.8,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 2394
+  },
+  {
+   "i": 46,
+   "varlik": "PLUME",
+   "baslik": "Binance Earn: Subscribe to PLUME Flexible Products to Share 70 BNB in APR Boost ",
+   "altin": "positive_or_neutral",
+   "kabul": [
+    "positive_or_neutral"
+   ],
+   "jev": "positive_or_neutral",
+   "guven": 1.0,
+   "p": {
+    "token_conversion": 0.0,
+    "positive_or_neutral": 1.0,
+    "token_delist": 0.0,
+    "not_about_asset": 0.0,
+    "other_pairs_or_products_removed": 0.0,
+    "transfers_suspended": 0.0,
+    "usdt_pair_removed": 0.0
+   },
+   "aciliyet": 0.3,
+   "aciliyet_guven": 0.75,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 1965
+  },
+  {
+   "i": 49,
+   "varlik": "APT",
+   "baslik": "Updates on Tick Size for Spot Trading Pairs (2026-09-23)",
+   "altin": "positive_or_neutral",
+   "kabul": [
+    "positive_or_neutral"
+   ],
+   "jev": "positive_or_neutral",
+   "guven": 1.0,
+   "p": {
+    "transfers_suspended": 0.0,
+    "token_delist": 0.0,
+    "positive_or_neutral": 1.0,
+    "usdt_pair_removed": 0.0,
+    "not_about_asset": 0.0,
+    "token_conversion": 0.0,
+    "other_pairs_or_products_removed": 0.0
+   },
+   "aciliyet": 1.67,
+   "aciliyet_guven": 0.73,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 2083
+  },
+  {
+   "i": 53,
+   "varlik": "PROVE",
+   "baslik": "PROVE Trading Tournament: Trade to Share Up to 1,500,000 PROVE Token Vouchers",
+   "altin": "positive_or_neutral",
+   "kabul": [
+    "positive_or_neutral"
+   ],
+   "jev": "positive_or_neutral",
+   "guven": 1.0,
+   "p": {
+    "token_delist": 0.0,
+    "token_conversion": 0.0,
+    "not_about_asset": 0.0,
+    "other_pairs_or_products_removed": 0.0,
+    "positive_or_neutral": 1.0,
+    "transfers_suspended": 0.0,
+    "usdt_pair_removed": 0.0
+   },
+   "aciliyet": 0.24,
+   "aciliyet_guven": 0.8,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 2215
+  },
+  {
+   "i": 10,
+   "varlik": "ETH",
+   "baslik": "Binance Will Delist ICX, SCRT, STORJ on 2026-09-03",
+   "altin": "not_about_asset",
+   "kabul": [
+    "not_about_asset"
+   ],
+   "jev": "not_about_asset",
+   "guven": 1.0,
+   "p": {
+    "other_pairs_or_products_removed": 0.0,
+    "not_about_asset": 1.0,
+    "usdt_pair_removed": 0.0,
+    "transfers_suspended": 0.0,
+    "token_delist": 0.0,
+    "positive_or_neutral": 0.0,
+    "token_conversion": 0.0
+   },
+   "aciliyet": 0.02,
+   "aciliyet_guven": 0.98,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1947
+  },
+  {
+   "i": 21,
+   "varlik": "BTC",
+   "baslik": "Binance Will Support the Injective (INJ) Network Upgrade & Hard Fork - 2026-09-2",
+   "altin": "not_about_asset",
+   "kabul": [
+    "not_about_asset"
+   ],
+   "jev": "not_about_asset",
+   "guven": 0.99,
+   "p": {
+    "token_conversion": 0.0,
+    "positive_or_neutral": 0.0,
+    "not_about_asset": 0.99,
+    "transfers_suspended": 0.01,
+    "other_pairs_or_products_removed": 0.0,
+    "token_delist": 0.0,
+    "usdt_pair_removed": 0.0
+   },
+   "aciliyet": 0.2,
+   "aciliyet_guven": 0.83,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 1375
+  },
+  {
+   "i": 2,
+   "varlik": "DOGE",
+   "baslik": "Notice of Removal of Spot Trading Pairs - 2026-09-25",
+   "altin": "not_about_asset",
+   "kabul": [
+    "not_about_asset"
+   ],
+   "jev": "not_about_asset",
+   "guven": 0.97,
+   "p": {
+    "usdt_pair_removed": 0.0,
+    "token_conversion": 0.0,
+    "not_about_asset": 0.98,
+    "other_pairs_or_products_removed": 0.02,
+    "positive_or_neutral": 0.0,
+    "transfers_suspended": 0.0,
+    "token_delist": 0.0
+   },
+   "aciliyet": 0.03,
+   "aciliyet_guven": 0.98,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 1457
+  },
+  {
+   "i": 40,
+   "varlik": "XRP",
+   "baslik": "Binance Will Add Hyperliquid (HYPE) on Earn, Buy Crypto, Convert, VIP Loan & Mar",
+   "altin": "not_about_asset",
+   "kabul": [
+    "not_about_asset"
+   ],
+   "jev": "not_about_asset",
+   "guven": 0.99,
+   "p": {
+    "other_pairs_or_products_removed": 0.0,
+    "not_about_asset": 0.99,
+    "usdt_pair_removed": 0.0,
+    "transfers_suspended": 0.0,
+    "token_conversion": 0.0,
+    "positive_or_neutral": 0.01,
+    "token_delist": 0.0
+   },
+   "aciliyet": 0.04,
+   "aciliyet_guven": 0.96,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": false,
+   "model": "jev-1.13.0",
+   "girdi_token": 1729
+  },
+  {
+   "i": 25,
+   "varlik": "SOL",
+   "baslik": "Binance Will Support the Stargate Finance (STG) Token Merge to LayerZero (ZRO)",
+   "altin": "not_about_asset",
+   "kabul": [
+    "not_about_asset",
+    "positive_or_neutral"
+   ],
+   "jev": "not_about_asset",
+   "guven": 0.99,
+   "p": {
+    "not_about_asset": 1.0,
+    "token_conversion": 0.0,
+    "usdt_pair_removed": 0.0,
+    "positive_or_neutral": 0.0,
+    "transfers_suspended": 0.0,
+    "other_pairs_or_products_removed": 0.0,
+    "token_delist": 0.0
+   },
+   "aciliyet": 0.07,
+   "aciliyet_guven": 0.94,
+   "dogru": true,
+   "veto_altin": false,
+   "veto_jev": false,
+   "veto_kelime": true,
+   "model": "jev-1.13.0",
+   "girdi_token": 1946
+  }
+ ]
+}
