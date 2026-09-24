@@ -1,0 +1,7 @@
+{
+  "proje_adi": "TradeBot",
+  "asama": "denetim",
+  "guncellendi": "2026-09-24",
+  "roadmap": "docs/Roadmap.md",
+  "not": "Arastirma tamam (docs/Arastirma.md). Proje-Fikri taslagi Scryne kararlariyla yazildi: hedef kisa vadeli maks kazanc = en hizli bilesik buyume; borsa ertelendi; kaldirac yarim Kelly, 3x tavan, >=5x yok; Jev: haber vetosu, olay ozellikleri, log triyaji. Sirada: Scryne'in fikir dokumanini gozden gecirmesi, Faz 0 spike'lari."
+}

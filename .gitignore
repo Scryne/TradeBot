@@ -1,0 +1,29 @@
+# Bağımlılıklar / derleme çıktıları
+node_modules/
+dist/
+build/
+.next/
+.turbo/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Hook'ların ürettiği çalışma-anı durumu — makineye özel, koda ait değil
+.claude/.sync-lock.json
+.claude/sync-health.json
+
+# Ortam / sır dosyaları
+.env
+.env.local
+.env.*.local
+
+# Log / OS / editör
+*.log
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+
+# Piyasa verisi ve koşu çıktıları (büyük, yeniden üretilebilir)
+data/
+runs/
