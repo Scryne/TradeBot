@@ -36,6 +36,16 @@ Betikler: `tools/host/baslangic.ps1` (bir kez, elle), `tools/host/kurulum.ps1` (
 - yeniden başlatmadan sonra (oturum açılınca) servisler kendiliğinden dönüyor,
 - ana bilgisayardan parolasız SSH, telefondan Tailscale erişimi.
 
+## Kurulumda öğrenilenler (2026-09-25)
+
+- `wsl --status` WSL kurulu değilken de 0 döndürüyor, `wsl --install` SSH oturumunda sessizce hiçbir şey yapmıyor.
+  Bu yüzden `kurulum.ps1` WSL'yi DISM (bileşenler) ve GitHub'daki resmî MSI (paket) ile kurar.
+- Windows OpenSSH'ın varsayılan cmd kabuğu, git'in tek tırnaklı uzak yolunu bozuyor (`git push` çalışmıyor).
+  Bu yüzden kod `git bundle` ile taşınıyor (`guncelle.ps1`).
+- Windows saat servisi varsayılan olarak 1 sn altı farkı saatler içinde kapatıyor. Yüksek doğruluk ayarlarıyla
+  (UpdateInterval 100, poll 64 sn, MaxAllowedPhaseOffset 0) fark −720 ms'den ±0,3 ms'ye indi.
+- Host: 192.168.1.4 (yerel), Tailscale 100.83.56.99. SSH takma adı `tradebot-host`.
+
 ## Güvenlik notları
 
 - SSH yalnız "Özel" (ev) ağ profilinden ve yerel alt ağdan açık. İnternete port yönlendirmesi **yapılmaz**.
