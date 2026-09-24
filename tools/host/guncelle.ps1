@@ -23,7 +23,7 @@ if ($LASTEXITCODE -ne 0) { throw 'bundle oluşturulamadı' }
 scp -q $bundle "${Hedef}:C:/TradeBot/tradebot.bundle"
 if ($LASTEXITCODE -ne 0) { throw 'bundle gönderilemedi' }
 Remove-Item $bundle -Force
-Uzak 'git bundle verify -q C:\TradeBot\tradebot.bundle'
+if (-not $Ilk) { Uzak 'cd /d C:\TradeBot\app && git bundle verify -q C:\TradeBot\tradebot.bundle' }  # depo içinde çalışır
 $surum = (git -C $kok rev-parse --short HEAD).Trim()
 
 if ($Ilk) {
