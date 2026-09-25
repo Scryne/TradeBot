@@ -33,27 +33,35 @@ class Sonuc:
 
 
 def calistir(t: np.ndarray, fiyat: np.ndarray, sinyal: np.ndarray, mm: MaliyetModeli,
-             yari_spread_bps: np.ndarray | None = None, bar_ms: int | None = None) -> Sonuc:
+             yari_spread_bps: np.ndarray | None = None, bar_ms: int | None = None, bant: float = 0.0) -> Sonuc:
+    """`bant`: yeniden dengeleme bandı. Hedef değişmedikçe ağırlık fiyatla kayar; kayan ağırlık hedeften `bant`'tan fazla
+    saparsa hedefe döndürülür. 0 = her bar hedefe dengele (sabit ağırlık); büyük bant = adedi tut (yalnız sinyal
+    değişince işlem; Nautilus'taki emir mantığıyla aynı)."""
     n = len(fiyat)
     if n < 3 or len(sinyal) != n or len(t) != n:
         raise ValueError("fiyat, sinyal ve t aynı uzunlukta ve ≥ 3 olmalı")
     fiyat = np.asarray(fiyat, dtype=float)
     hedef = np.r_[0.0, np.asarray(sinyal, dtype=float)[:-1]]  # bar i'de tutulacak = sinyal[i-1]
     r = fiyat[1:] / fiyat[:-1] - 1.0                           # bar i getirisi, i = 0..n-2
-    w = hedef[:-1]
-    # kayma: bar i sonunda ağırlık w·(1+r)/(1+w·r); bar i+1 başında hedefe getirme devri
-    kaymis = np.zeros(n - 1)
-    payda = 1.0 + w * r
-    np.divide(w * (1.0 + r), payda, out=kaymis, where=np.abs(payda) > 1e-12)
-    onceki = np.r_[0.0, kaymis[:-1]]
-    devir = np.abs(w - onceki)
     ys = np.full(n - 1, mm.yari_spread_bps) if (yari_spread_bps is None or not mm.spread_veriden) \
         else np.nan_to_num(np.asarray(yari_spread_bps, dtype=float)[:-1], nan=mm.yari_spread_bps)
     taraf = (mm.ucret_bps * (1 + mm.ucret_vergisi) + ys + mm.kayma_bps) / 1e4
-    islem = devir * taraf
     sure = np.diff(np.asarray(t, dtype=np.int64)) if bar_ms is None else np.full(n - 1, bar_ms)
-    finansman = np.abs(w) * mm.finansman_yillik * sure / YIL_MS
+    fin_oran = mm.finansman_yillik * sure / YIL_MS
+    w, devir = np.empty(n - 1), np.empty(n - 1)
+    islem, finansman, net = np.empty(n - 1), np.empty(n - 1), np.empty(n - 1)
+    kaymis = 0.0
+    for i in range(n - 1):  # kayma bir önceki GERÇEK ağırlığa ve maliyete bağlı → döngü
+        degisti = i == 0 or hedef[i] != hedef[i - 1]
+        if degisti or abs(hedef[i] - kaymis) > bant:
+            w[i], devir[i] = hedef[i], abs(hedef[i] - kaymis)
+        else:
+            w[i], devir[i] = kaymis, 0.0
+        islem[i] = devir[i] * taraf[i]
+        finansman[i] = abs(w[i]) * fin_oran[i]
+        net[i] = w[i] * r[i] - islem[i] - finansman[i]
+        # bar sonunda pozisyon değeri w·(1+r), özkaynak (1+net): maliyet özkaynağı düşürdüğü için paydada
+        kaymis = w[i] * (1.0 + r[i]) / (1.0 + net[i]) if abs(1.0 + net[i]) > 1e-12 else 0.0
     brut = w * r
-    net = brut - islem - finansman
     return Sonuc(t=np.asarray(t[:-1]), pozisyon=w, brut=brut, maliyet=islem + finansman, net=net, devir=devir,
                  ozkaynak=np.cumprod(1.0 + net))

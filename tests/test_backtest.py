@@ -29,9 +29,10 @@ def test_sinyal_sonraki_bar_uygulanir_elle_hesap():
 def test_maliyet_giris_ve_cikis():
     fiyat = np.array([100.0, 100.0, 100.0, 100.0, 100.0])
     mm = MaliyetModeli("m", ucret_bps=10, yari_spread_bps=1, kayma_bps=2)  # taraf 13 bps
-    s = calistir(_t(5), fiyat, np.array([1.0, 1.0, 0.0, 0.0, 0.0]), mm)
-    np.testing.assert_allclose(s.maliyet, [0.0, 0.0013, 0.0, 0.0013], atol=1e-12)
-    assert s.islem_sayisi == 2 and s.ozkaynak[-1] == pytest.approx((1 - 0.0013) ** 2)
+    # bant 0,01: girişten sonra komisyon yüzünden ağırlık 1,0013'e kayar; bu küçük fark için işlem yapılmaz
+    s = calistir(_t(5), fiyat, np.array([1.0, 1.0, 0.0, 0.0, 0.0]), mm, bant=0.01)
+    np.testing.assert_allclose(s.maliyet, [0.0, 0.0013, 0.0, 0.0013 / (1 - 0.0013)], atol=1e-12)
+    assert s.islem_sayisi == 2 and s.ozkaynak[-1] == pytest.approx((1 - 0.0013) - 0.0013)
 
 
 def test_kayma_devri_sabit_agirlikta_yeniden_dengeleme():
@@ -79,3 +80,13 @@ def test_model_secimi():
     assert model("BIST", "hisse").ucret_vergisi == 0.05
     with pytest.raises(KeyError):
         model("YOK", "x")
+
+
+def test_bant_adet_tutma_ve_esik():
+    fiyat = np.array([100.0, 100.0, 200.0, 200.0, 200.0])
+    sabit = calistir(_t(5), fiyat, np.full(5, 0.5), SIFIR, bant=0.0)
+    tut = calistir(_t(5), fiyat, np.full(5, 0.5), SIFIR, bant=1.0)
+    assert sabit.islem_sayisi == 2 and tut.islem_sayisi == 1           # tut: yalnız giriş
+    assert tut.pozisyon[2] == pytest.approx(2 / 3)                     # ağırlık fiyatla kaydı
+    esik = calistir(_t(5), fiyat, np.full(5, 0.5), SIFIR, bant=0.1)    # 2/3 − 0,5 = 0,167 > 0,1 → dengele
+    assert esik.islem_sayisi == 2
