@@ -26,6 +26,7 @@ class Sonuc:
     net: np.ndarray         # net bar getirisi
     devir: np.ndarray       # bar başındaki |Δağırlık|
     ozkaynak: np.ndarray    # 1'den başlayan birikimli özkaynak (net)
+    durum: np.ndarray | None = None  # risk durumu (0 normal, 1 günlük fren, 2 haftalık fren, 3 acil durdurma)
 
     @property
     def islem_sayisi(self) -> int:
@@ -33,10 +34,14 @@ class Sonuc:
 
 
 def calistir(t: np.ndarray, fiyat: np.ndarray, sinyal: np.ndarray, mm: MaliyetModeli,
-             yari_spread_bps: np.ndarray | None = None, bar_ms: int | None = None, bant: float = 0.0) -> Sonuc:
+             yari_spread_bps: np.ndarray | None = None, bar_ms: int | None = None, bant: float = 0.0,
+             izleyici=None) -> Sonuc:
     """`bant`: yeniden dengeleme bandı. Hedef değişmedikçe ağırlık fiyatla kayar; kayan ağırlık hedeften `bant`'tan fazla
     saparsa hedefe döndürülür. 0 = her bar hedefe dengele (sabit ağırlık); büyük bant = adedi tut (yalnız sinyal
-    değişince işlem; Nautilus'taki emir mantığıyla aynı)."""
+    değişince işlem; Nautilus'taki emir mantığıyla aynı).
+
+    `izleyici`: `risk.motor.PortfoyIzleyici`. Verilirse her bar başında özkaynakla güncellenir: fren → yeni risk yok
+    (pozisyon küçülebilir, büyüyemez); acil durdurma → pozisyon 0 ve öyle kalır (onaysız yeniden başlama yok)."""
     n = len(fiyat)
     if n < 3 or len(sinyal) != n or len(t) != n:
         raise ValueError("fiyat, sinyal ve t aynı uzunlukta ve ≥ 3 olmalı")
@@ -50,11 +55,21 @@ def calistir(t: np.ndarray, fiyat: np.ndarray, sinyal: np.ndarray, mm: MaliyetMo
     fin_oran = mm.finansman_yillik * sure / YIL_MS
     w, devir = np.empty(n - 1), np.empty(n - 1)
     islem, finansman, net = np.empty(n - 1), np.empty(n - 1), np.empty(n - 1)
-    kaymis = 0.0
+    kaymis, oz, onceki_h = 0.0, 1.0, 0.0
+    durumlar = np.zeros(n - 1, dtype=np.int8)
     for i in range(n - 1):  # kayma bir önceki GERÇEK ağırlığa ve maliyete bağlı → döngü
-        degisti = i == 0 or hedef[i] != hedef[i - 1]
-        if degisti or abs(hedef[i] - kaymis) > bant:
-            w[i], devir[i] = hedef[i], abs(hedef[i] - kaymis)
+        h = hedef[i]
+        if izleyici is not None:
+            d = izleyici.guncelle(oz, int(t[i]))
+            durumlar[i] = ("normal", "fren_gunluk", "fren_haftalik", "acil_durdurma").index(d.value)
+            if d.value == "acil_durdurma":
+                h = 0.0
+            elif d.value != "normal" and abs(h) > abs(kaymis):
+                h = kaymis  # fren: yeni risk yok
+        degisti = i == 0 or h != onceki_h  # etkin hedef değişti mi (sinyal ya da fren)
+        onceki_h = h
+        if degisti or abs(h - kaymis) > bant:
+            w[i], devir[i] = h, abs(h - kaymis)
         else:
             w[i], devir[i] = kaymis, 0.0
         islem[i] = devir[i] * taraf[i]
@@ -62,6 +77,7 @@ def calistir(t: np.ndarray, fiyat: np.ndarray, sinyal: np.ndarray, mm: MaliyetMo
         net[i] = w[i] * r[i] - islem[i] - finansman[i]
         # bar sonunda pozisyon değeri w·(1+r), özkaynak (1+net): maliyet özkaynağı düşürdüğü için paydada
         kaymis = w[i] * (1.0 + r[i]) / (1.0 + net[i]) if abs(1.0 + net[i]) > 1e-12 else 0.0
+        oz *= 1.0 + net[i]
     brut = w * r
     return Sonuc(t=np.asarray(t[:-1]), pozisyon=w, brut=brut, maliyet=islem + finansman, net=net, devir=devir,
-                 ozkaynak=np.cumprod(1.0 + net))
+                 ozkaynak=np.cumprod(1.0 + net), durum=durumlar if izleyici is not None else None)
