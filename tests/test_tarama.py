@@ -41,3 +41,15 @@ def test_tara_uctan_uca(ortam):
     assert 0 <= r["dsr"]["dsr"] <= 1 and r["dsr"]["deneme"] == 4
     assert r["walk_forward"]["pencere"] == 1 and r["plato"]["komsu_sayisi"] == 2
     assert set(r["yillik"]) >= {2020, 2024}
+
+
+def test_tara_boyut_ve_frenler(ortam):
+    defter, d = ortam
+    defter.plan_ac("p2", "trend", "boyutlu", {"hizli": [5], "yavas": [30]}, ["BINANCE:TESTUSDT"], "x")
+    r = tara(defter, d, "p2", "sma_kesisim", "BINANCE:TESTUSDT", "BINANCE", "kripto", "1d", {"hizli": [5], "yavas": [30]},
+             hedef_vol=0.2, kaldirac=1.0, frenler=True)
+    e = r["en_iyi"]
+    assert "hedef_vol=0.2" in e["strateji"] and "fren_bar" in e and 0.0 <= e["yarim_kelly"] <= 3.0
+    with pytest.raises(Exception, match="yasak"):
+        tara(defter, d, "p2", "sma_kesisim", "BINANCE:TESTUSDT", "BINANCE", "kripto", "1d", {"hizli": [5], "yavas": [30]},
+             hedef_vol=0.2, kaldirac=5.0)

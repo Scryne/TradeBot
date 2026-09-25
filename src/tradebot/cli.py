@@ -189,6 +189,9 @@ def arastirma_tara(
     plan: str = typer.Option(...), strateji: str = typer.Option(..., help="sma_kesisim | donchian | tsmom"),
     enstruman: str = typer.Option(..., help="ör. BINANCE:BTCUSDT"), zd: str = typer.Option("1d"),
     izgara: str = typer.Option(...), yon: str = typer.Option("long"), bant: float = typer.Option(0.0),
+    hedef_vol: float = typer.Option(0.0, help="Yıllık oynaklık hedefi (0 = boyutlandırma yok)"),
+    kaldirac: float = typer.Option(1.0, help="Brüt maruziyet tavanı (≤ 3; ≥ 5 yasak)"),
+    frenler: bool = typer.Option(False, help="Günlük/haftalık fren ve acil durdurmayı backtest'te uygula"),
     json_cikti: bool = typer.Option(False, "--json"),
 ) -> None:
     """Izgara taraması + DSR + plato + walk-forward + yıllık kırılım; her kombinasyon deftere yazılır."""
@@ -202,11 +205,13 @@ def arastirma_tara(
     if kayit is None:
         raise typer.BadParameter(f"enstrüman kaydı yok: {enstruman}")
     r = tara(Defter(m), BarDepo(a.veri_dizini), plan, strateji, enstruman, kayit["piyasa"], kayit["sinif"], zd,
-             json.loads(izgara), yon=yon, bant=bant)
+             json.loads(izgara), yon=yon, bant=bant, hedef_vol=hedef_vol or None, kaldirac=kaldirac, frenler=frenler,
+             takvim_adi=kayit["takvim"])
     if json_cikti:
         _yazdir(r)
         return
     typer.echo(f"{r['enstruman']} {r['zd']} · {r['bar']} bar · maliyet {r['maliyet']} · veri {r['veri_hash']}")
+    typer.echo(f"boyut: {r['boyut']} · frenler: {'açık' if r['frenler'] else 'kapalı'}")
     typer.echo(f"{'strateji':<42}{'puan%/hf':>9}{'yıllık':>8}{'Sharpe':>7}{'DD':>7}{'kötü hf':>8}{'işlem':>6}{'kapı':>5}")
     for s in r["satirlar"]:
         typer.echo(f"{s['strateji'][:41]:<42}{s['puan'] * 100:>9.3f}{s['yillik_bilesik'] * 100:>7.1f}%{s['sharpe']:>7.2f}"
@@ -217,7 +222,9 @@ def arastirma_tara(
                f"{at['en_kotu_dusus'] * 100:>6.0f}%{at['en_kotu_hafta'] * 100:>7.1f}%")
     d, p, w = r["dsr"], r["plato"], r["walk_forward"]
     typer.echo("")
-    typer.echo(f"en iyi: {r['en_iyi']['strateji']}")
+    e = r["en_iyi"]
+    typer.echo(f"en iyi: {e['strateji']} · yarım Kelly {e['yarim_kelly']:.2f}x · fren bar {e['fren_bar']}"
+               f"{' · ACİL DURDURMA tetiklendi' if e['acil_durdurma'] else ''}")
     typer.echo(f"DSR {d.get('dsr', float('nan')):.3f} (aile deneme {d.get('deneme')}, SR* {d.get('sr_esik', 0):.3f}) · "
                f"plato oranı {p['plato_orani']:.2f} ({'var' if p['plato_var'] else 'YOK'})")
     if w.get("pencere"):
