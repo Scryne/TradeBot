@@ -48,6 +48,10 @@ if ($Ilk) {
 
 Uzak 'cd /d C:\TradeBot\app && git pull -q --ff-only C:\TradeBot\tradebot.bundle main && git log --oneline -1'
 if ($Kurma) { return }
-Uzak 'cd /d C:\TradeBot\app && docker compose up -d --build && docker compose ps'
-ssh $Hedef 'cd /d C:\TradeBot\app && docker compose run --rm --no-deps saglik tradebot saglik'
+# SSH oturumunda Windows Credential Manager yok ("Belirtilen oturum yok"): TradeBot komutları kimlik deposu olmayan
+# ayrı bir Docker yapılandırmasıyla çalışır (imajlar herkese açık). Kullanıcının kendi Docker ayarına dokunulmaz.
+$dk = 'set DOCKER_CONFIG=C:\TradeBot\docker-config&& cd /d C:\TradeBot\app &&'
+Uzak 'if not exist C:\TradeBot\docker-config mkdir C:\TradeBot\docker-config & if not exist C:\TradeBot\docker-config\config.json (echo {}> C:\TradeBot\docker-config\config.json)'
+Uzak "$dk docker compose up -d --build && docker compose ps"
+ssh $Hedef "$dk docker compose run --rm --no-deps saglik tradebot saglik"
 Write-Host "Host güncel: $surum" -ForegroundColor Green
