@@ -1,0 +1,35 @@
+# Turnuva dalga 1c: gün içi kırılım (açılış aralığı). ÖN KAYIT (koşudan önce commit edilir, koşu sırasında değişmez).
+# Veri: Dukascopy USA500 CFD dakikalık (yalnız son ~3 yıl) → walk-forward IS 1,5 yıl / OOS 0,5 yıl.
+# Gerekçe: docs/turnuva/Dalga-1.md (§Bu dalgaya girmeyenler).
+
+dalga: 1c
+veri_bitis: "2026-09-01"
+frenler: true
+boyut:
+  hedef_vol: 0.20                # kol, günün yalnız ~6 saatinde pozisyonda: gerçekleşen oynaklık hedefin altında kalır
+  kaldirac: 3.0
+  vol_pencere_gun: 30
+  bant: 0.25
+walk_forward: { is_yil: 1.5, oos_yil: 0.5 }
+olcut: { dsr_a: 0.95, dsr_b: 0.80, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0 }
+
+planlar:
+  gun_ici_kirilim:
+    kimlik: 2026-09-25-d1c-orb
+    hipotez: >-
+      S&P 500 CFD'de NY seansının ilk 15-60 dakikalık aralığının kırılımı, günün kalanında (stop karşı uçta, kapanıştan
+      15 dk önce çıkış) maliyet sonrası pozitif getiri verir.
+
+gruplar:
+  dk_usa500_dakika:
+    kimlikler: [DUKASCOPY:USA500IDXUSD]
+    asgari_gecmis_gun: 30
+    seans: XNYS                  # tatil ve yarım günler borsa takviminden
+    yon: long_short
+    zd: [5m, 15m]
+
+kollar:
+  - strateji: acilis_araligi
+    gruplar: [dk_usa500_dakika]
+    zd: [5m, 15m]
+    izgara: { aralik_dk: [15, 30, 60], cikis_dk: [15] }

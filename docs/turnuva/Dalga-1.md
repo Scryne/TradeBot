@@ -87,9 +87,9 @@ planında yazılacak.
 
 | Aile | Neden sonra | Ne zaman |
 | --- | --- | --- |
-| Carry (kripto funding) | Getiri fiyattan değil fundingten gelir; ayrı getiri modeli gerekir | Dalga 1b, bu dalganın ardından |
+| Carry (kripto funding) | Getiri fiyattan değil fundingten gelir; ayrı getiri modeli gerekir | Dalga 1b: `config/turnuva/dalga1b.yaml` (ön kayıt f2252c0; en fazla B, baz riski modellenmiyor) |
 | Carry (FX swap) | Ücretsiz swap/faiz verisi yok | Veri bulununca (dalga 2) |
-| Gün içi kırılım (açılış aralığı) | Dukascopy dakikalık verisi (son 3 yıl) henüz iniyor | Dakikalık veri tamamlanınca (dalga 1c) |
+| Gün içi kırılım (açılış aralığı) | Dukascopy dakikalık verisi (son 3 yıl) henüz iniyor | Dalga 1c: `config/turnuva/dalga1c.yaml` (USA500 CFD, 5m/15m, XNYS seansı; WF 1,5 yıl/0,5 yıl) |
 | Olay tabanlı (KAP/SEC) | Metin toplayıcılar ve Jev servisi Faz 6'da kuruluyor | Faz 6'dan sonra |
 | Çift ticareti (pairs) | Eşbütünleşme seçimi kendi başına bir denemedir; ayrı plan gerekir | Dalga 2 |
 | Jev'li ↔ Jev'siz A/B | Veto verisi Faz 6'da oluşur | Faz 6–7 |

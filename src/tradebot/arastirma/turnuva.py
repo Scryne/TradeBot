@@ -55,6 +55,7 @@ STRATEJILER = {
     "rsi_donus": ("ortalamaya_donus", al.rsi_donus, "tek"),
     "ay_donumu": ("takvim", al.ay_donumu, "tek"),
     "kesitsel_momentum": ("kesitsel_momentum", al.kesitsel_momentum, "panel"),
+    "acilis_araligi": ("gun_ici_kirilim", al.acilis_araligi_kirilim, "tek"),
 }
 
 
@@ -124,7 +125,8 @@ class HazirGrup:
 
 
 def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bit_ms: int | None = None) -> HazirGrup:
-    """`tanim`: dalga planındaki grup (kimlikler listesi ya da `dinamik: kripto|bist` + ilk_n; `kur`: USD'ye çevirme)."""
+    """`tanim`: dalga planındaki grup (kimlikler listesi ya da `dinamik: kripto|bist` + ilk_n; `kur`: USD'ye çevirme;
+    `seans`: pozisyon yalnız bu borsa takviminin seansında)."""
     if tanim.get("dinamik") == "kripto":
         adaylar = sorted(k for k, v in kayit.items() if v["piyasa"] == "BINANCE" and not kripto_dislanir_mi(k))
     elif tanim.get("dinamik") == "bist":
@@ -139,6 +141,10 @@ def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bi
         adaylar = [k for j, k in enumerate(gd.kimlikler) if e[:, j].any()]
     g = grup_yukle(depo, adaylar, zd, bit_ms=bit_ms)
     evrende, lik = evren_maskesi(g, **ev)  # likidite yerel para cinsinden (sıralama için yeterli)
+    if tanim.get("seans"):  # yalnız borsa seansında pozisyon (tatil, yarım gün dahil; çekirdek dışı takvim)
+        from tradebot.veri.takvim import takvim
+
+        evrende &= takvim(tanim["seans"]).acik_maske(g.t)[:, None]
     if tanim.get("kur"):
         g = kur_cevir(g, depo, tanim["kur"])
     modeller = [model(kayit[k]["piyasa"], kayit[k]["sinif"]) for k in g.kimlikler]

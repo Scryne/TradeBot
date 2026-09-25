@@ -193,3 +193,65 @@ def panel_nedensellik_testi(fonk, p: Panel, deneme: int = 10, tohum: int = 0, **
         yeni = fonk(Panel(p.t, c, p.evrende), **param)
         if not np.array_equal(yeni[: t + 1], temel[: t + 1]):
             raise AssertionError(f"{getattr(fonk, '__name__', fonk)} geleceği görüyor (t={t})")
+
+
+# ---------------------------------------------------------------- gün içi kırılım
+def abd_yaz_saati(gun: np.ndarray) -> np.ndarray:
+    """ABD yaz saati (2007 sonrası kural): Mart'ın 2. Pazarı ≤ gün < Kasım'ın 1. Pazarı. `gun`: datetime64[D]."""
+    g = np.asarray(gun, dtype="datetime64[D]")
+    yil = g.astype("datetime64[Y]")
+    mart = (yil + np.timedelta64(2, "M")).astype("datetime64[D]")
+    kasim = (yil + np.timedelta64(10, "M")).astype("datetime64[D]")
+
+    def pazar(d):  # d'den itibaren ilk Pazar (1970-01-01 Perşembe → Pazartesi=0 için +3)
+        hg = (d.astype(np.int64) + 3) % 7
+        return d + ((6 - hg) % 7).astype("timedelta64[D]")
+
+    return (g >= pazar(mart) + np.timedelta64(7, "D")) & (g < pazar(kasim))
+
+
+def ny_seans(t_ms: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Bar açılışının UTC gününde NYSE normal seansının (09:30–16:00 NY) UTC açılış ve kapanışı (ms). Tatil/yarım gün
+    burada bilinmez; çekirdek dışında borsa takvimi maskesiyle (evrende) uygulanır."""
+    t = np.asarray(t_ms, dtype=np.int64)
+    gun0 = t // GUN_MS * GUN_MS
+    yaz = abd_yaz_saati(gun0.astype("datetime64[ms]").astype("datetime64[D]"))
+    acilis = gun0 + np.where(yaz, 13 * 3_600_000 + 30 * 60_000, 14 * 3_600_000 + 30 * 60_000)
+    return acilis, acilis + 390 * 60_000
+
+
+def acilis_araligi_kirilim(b: Barlar, aralik_dk: int = 30, cikis_dk: int = 15) -> np.ndarray:
+    """NY seansının ilk `aralik_dk` dakikasının tepesi/dibi (açılış aralığı). Aralık kapandıktan sonra kapanış tepeyi
+    aşarsa +1, dibi kırarsa −1 (günde en fazla bir giriş). Stop: karşı uç (kapanışla). Kapanıştan `cikis_dk` önce 0.
+    Bar süresi zaman damgalarından (en küçük aralık). Karar bar kapanışında; dolum sonraki barda (motor)."""
+    n = len(b)
+    out = np.zeros(n)
+    if n < 2:
+        return out
+    bar_ms = int(np.min(np.diff(b.t)))
+    acilis, kapanis = ny_seans(b.t)
+    bitis = np.asarray(b.t, dtype=np.int64) + bar_ms  # bar kapanış anı
+    gun = np.asarray(b.t, dtype=np.int64) // GUN_MS
+    aralik_ms, cikis_ms = aralik_dk * 60_000, cikis_dk * 60_000
+    poz, son_gun, ust, alt, girdi = 0.0, -1, -np.inf, np.inf, False
+    for i in range(n):
+        if gun[i] != son_gun:
+            son_gun, poz, ust, alt, girdi = gun[i], 0.0, -np.inf, np.inf, False
+        t, a = int(b.t[i]), int(acilis[i])
+        if a <= t < a + aralik_ms:  # aralık barı
+            ust, alt = max(ust, b.high[i]), min(alt, b.low[i])
+        tamam = bitis[i] >= a + aralik_ms and np.isfinite(ust)
+        acik = bitis[i] < kapanis[i] - cikis_ms and t >= a
+        if not acik:
+            poz = 0.0
+        elif tamam:
+            c = b.close[i]
+            if poz > 0 and c < alt or poz < 0 and c > ust:
+                poz = 0.0  # stop: karşı uç
+            elif poz == 0.0 and not girdi:
+                if c > ust:
+                    poz, girdi = 1.0, True
+                elif c < alt:
+                    poz, girdi = -1.0, True
+        out[i] = poz
+    return out

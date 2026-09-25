@@ -389,3 +389,82 @@ def test_portfoy_birlestirme_cesitlendirme_ve_tavan():
     # eksik haftalar: kol yokken ağırlık 0
     s2 = seriler | {"yeni": {"hafta": h[200:].tolist(), "log": [0.01] * 100}}
     assert pf.birlestir(s2, {})["son_agirlik"]["yeni"] == 0.0  # sıfır oynaklık → ağırlık yok
+
+
+# ------------------------------------------------------------------ gün içi kırılım (dalga 1c)
+def test_abd_yaz_saati_bilinen_tarihler():
+    g = np.array(["2024-03-09", "2024-03-10", "2024-11-02", "2024-11-03", "2025-03-09", "2023-03-12", "2023-11-05"],
+                 dtype="datetime64[D]")
+    np.testing.assert_array_equal(al.abd_yaz_saati(g), [False, True, True, False, True, True, False])
+
+
+def test_ny_seans_takvimle_ayni():
+    from tradebot.veri.takvim import takvim
+
+    t = np.array([np.datetime64(g, "ms").astype(np.int64) for g in ["2024-01-10", "2024-07-10", "2025-03-11", "2025-11-12"]])
+    acilis, kapanis = al.ny_seans(t)
+    for a, c, g in zip(acilis, kapanis, t, strict=True):
+        o, k = takvim("XNYS").seanslar(int(g), int(g))[1]  # aynı günün seansı (seanslar bir gün önceden başlar)
+        assert (a, c) == (o, k)
+
+
+def _dakika_gun(gun: str, yol: np.ndarray, bar_dk=5):
+    """gun 13:00 UTC'den 21:00'e bar_dk'lık barlar; fiyat yolu verilir."""
+    t0 = np.datetime64(gun, "ms").astype(np.int64) + 13 * 3_600_000
+    t = t0 + np.arange(len(yol), dtype=np.int64) * bar_dk * 60_000
+    o = np.r_[yol[0], yol[:-1]]
+    return Barlar(t, o, np.maximum(o, yol), np.minimum(o, yol), yol, np.ones(len(yol)))
+
+
+def test_acilis_araligi_kirilim_kurallari():
+    # 2024-07-10 (yaz saati): seans 13:30 UTC → bar 6 (13:30) ... aralık 30 dk = bar 6..11; 96 bar = 21:00'e kadar
+    yol = np.full(96, 100.0)
+    yol[6:12] = [100, 101, 99, 100, 100.5, 100]   # aralık: tepe ~101, dip ~99
+    yol[14] = 102                                  # kırılım yukarı
+    yol[15:] = 102
+    yol[40] = 98.5                                 # stop (dibin altı)
+    yol[41:] = 103                                 # yeniden kırılım: günde tek giriş → girmez
+    b = _dakika_gun("2024-07-10", yol)
+    s = al.acilis_araligi_kirilim(b, aralik_dk=30, cikis_dk=15)
+    assert s[:14].sum() == 0 and s[14] == 1 and s[39] == 1 and s[40] == 0 and s[41:].sum() == 0
+    # çıkış: kapanıştan 15 dk önce (20:00 − 15 dk = 19:45 UTC) pozisyon kapanır
+    yol2 = yol.copy()
+    yol2[40:] = 102
+    s2 = al.acilis_araligi_kirilim(_dakika_gun("2024-07-10", yol2), 30, 15)
+    kapanis_bari = (19 * 60 + 45 - 13 * 60) // 5  # kapanışı 19:45 olan bar = açılışı 19:40 → indeks 80
+    assert s2[kapanis_bari - 2] == 1 and s2[kapanis_bari - 1:].sum() == 0
+    # kış saati: seans 14:30 UTC → aynı yol bir saat geç işlenir
+    s3 = al.acilis_araligi_kirilim(_dakika_gun("2024-01-10", yol), 30, 15)
+    assert s3[:26].sum() == 0
+
+
+def test_acilis_araligi_kirilim_gelecegi_gormez():
+    rng = np.random.default_rng(0)
+    parca = [_dakika_gun(g, 100 * np.exp(np.cumsum(rng.normal(0, 0.002, 96))))
+             for g in ["2024-07-08", "2024-07-09", "2024-07-10", "2024-07-11"]]
+    b = Barlar(*(np.concatenate([getattr(p, k) for p in parca]) for k in ("t", "open", "high", "low", "close", "volume")))
+    nedensellik_testi(StratejiTanimi("orb", "gun_ici_kirilim", al.acilis_araligi_kirilim, {"aralik_dk": 30},
+                                     yon="long_short"), b, deneme=20)
+
+
+def test_gun_ici_kol_seans_maskesi(tmp_path):
+    d = BarDepo(tmp_path)
+    rng = np.random.default_rng(1)
+    t0 = np.datetime64("2024-07-01", "ms").astype(np.int64)
+    n = 12 * 24 * 12  # 12 gün, 5 dk (hafta sonu dahil; maske ayıklar)
+    t = t0 + np.arange(n, dtype=np.int64) * 300_000
+    c = 5000 * np.exp(np.cumsum(rng.normal(0, 0.0008, n)))
+    o = np.r_[c[0], c[:-1]]
+    d.yaz("DUKASCOPY:USA500IDXUSD", "5m", pl.DataFrame(
+        {"acilis_ms": t, "open": o, "high": np.maximum(o, c) * 1.0003, "low": np.minimum(o, c) * 0.9997, "close": c,
+         "volume": np.ones(n)}))
+    kayit = {"DUKASCOPY:USA500IDXUSD": {"piyasa": "DUKASCOPY", "sinif": "endeks", "takvim": "fx_24x5"}}
+    h = tv.grup_hazirla(d, kayit, {"kimlikler": list(kayit), "asgari_gecmis_gun": 1, "seans": "XNYS"}, "5m")
+    hedef = tv.hedef_uret(h, "acilis_araligi", {"aralik_dk": 30, "cikis_dk": 15}, "long_short", tv.Ayar(vol_pencere_gun=1))
+    from tradebot.veri.takvim import takvim
+
+    seans = takvim("XNYS").acik_maske(h.g.t)
+    assert np.abs(hedef).sum() > 0 and np.all(hedef[~seans] == 0)  # 4 Temmuz tatili ve hafta sonu dahil
+    tatil = (h.g.t >= np.datetime64("2024-07-04", "ms").astype(np.int64)) & (
+        h.g.t < np.datetime64("2024-07-05", "ms").astype(np.int64))
+    assert np.all(hedef[tatil] == 0)
