@@ -93,3 +93,15 @@ planında yazılacak.
 | Olay tabanlı (KAP/SEC) | Metin toplayıcılar ve Jev servisi Faz 6'da kuruluyor | Faz 6'dan sonra |
 | Çift ticareti (pairs) | Eşbütünleşme seçimi kendi başına bir denemedir; ayrı plan gerekir | Dalga 2 |
 | Jev'li ↔ Jev'siz A/B | Veto verisi Faz 6'da oluşur | Faz 6–7 |
+
+## Ekler (ön kayıttan sonra; yalnız sıkılaştırır)
+
+- **2026-09-25, ek 1: Nihai DSR.** Kolun DSR'ı koşu anında o ana kadarki deneme sayısıyla hesaplanıyordu. Bu yüzden
+  erken koşan kol daha düşük bir eşikle ölçülüyordu. Dalga bitince `tradebot arastirma sonlandir` her kolun DSR'ını
+  ailenin **nihai** deneme sayısı ve Sharpe varyansıyla yeniden hesaplar. Karar bu değerle verilir, koşu anındaki
+  değer `dsr_kosu`'da kalır.
+  - Bu ek, ilk 3 kolun (kripto_btc_eth 1d) sonucu görüldükten sonra yazıldı.
+  - Eşiği yalnız yükseltir, kararı gevşetemez.
+- **2026-09-25, hata kaydı.** d0625fa'da kol oynaklık ölçeği hatalıydı: nakitten sonra girişte kaldıraç patlıyordu.
+  470df3a'da düzeltildi. d0625fa ile koşulan 3 kolun denemeleri defterde sayılı kalır (DSR'ı sertleştirir).
+  Sonuçları `data/turnuva/dalga1/_hatali_d0625fa/` altında arşivlendi.

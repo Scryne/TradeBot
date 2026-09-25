@@ -319,3 +319,17 @@ def test_panel_oynaklik_hedefi_nakitten_giriste_patlamaz():
     w = panel_oynaklik_hedefi(s, c, np.ones((n, 1), bool), 0.2, 365, pencere=60, azami=3.0)
     assert w[:600].max() == 0
     assert 0.15 < w[600, 0] < 0.4  # ≈ 0.2 / 0.76, 3x tavan DEĞİL
+
+
+def test_dsr_sonlandir_nihai_deneme_sayisiyla(ortam):
+    defter, d, kayit = ortam
+    izgara = {"ufuk_gun": [20, 60]}
+    defter.plan_ac("p", "trend", "sentetik", izgara, ["kol:etf"], "x")
+    h = tv.grup_hazirla(d, kayit, {"kimlikler": list(kayit)}, "1d")
+    r = tv.kol_kos(defter, h, "p", "tsmom", "etf", izgara, "long", tv.Ayar())
+    assert r["dsr"]["deneme"] == 2
+    tv.kol_kos(defter, h, "p", "ma_yon", "etf", {"hizli_gun": [5, 10], "yavas_gun": [40, 80]}, "long", tv.Ayar())
+    s = tv.dsr_sonlandir(defter, r, tv.Olcut())
+    assert s["dsr"]["deneme"] == 6 and s["dsr"]["nihai"] and s["dsr_kosu"]["deneme"] == 2
+    assert s["dsr"]["sr_haftalik"] == r["dsr"]["sr_haftalik"]
+    assert tv.dsr_sonlandir(defter, s, tv.Olcut())["dsr"]["deneme"] == 6  # tekrar uygulanabilir (idempotent)

@@ -294,6 +294,23 @@ def arastirma_turnuva(
                    f"OOS {w.get('oos_yillik', float('nan')) * 100:+.1f}%/yıl")
 
 
+@arastirma_uygulama.command("sonlandir")
+def arastirma_sonlandir(dosya: str = typer.Option("config/turnuva/dalga1.yaml")) -> None:
+    """Dalga bitince: her kolun DSR'ını ailenin nihai deneme sayısıyla yeniden hesaplar ve kararı yeniler."""
+    from tradebot.arastirma import turnuva as tv
+    from tradebot.arastirma.defter import Defter
+
+    a, m = _veri_baglam()
+    d = tv.dalga_oku(Path(dosya))
+    defter = Defter(m)
+    dizin = Path(a.veri_dizini) / "turnuva" / f"dalga{d['dalga']}"
+    for p in sorted(dizin.glob("*.json")):
+        r = tv.dsr_sonlandir(defter, json.loads(p.read_text(encoding="utf-8")), d["_ayar"].olcut)
+        tv.sonuc_yaz(r, dizin)
+        typer.echo(f"{r['karar']:<6}{r['kol']:<44} DSR {r['dsr_kosu'].get('dsr', float('nan')):.3f} → "
+                   f"{r['dsr'].get('dsr', float('nan')):.3f} (deneme {r['dsr'].get('deneme')})")
+
+
 @arastirma_uygulama.command("rapor")
 def arastirma_rapor(
     dalga: int = typer.Option(1), md: str = typer.Option("", help="Markdown tablo çıktısı (ör. docs/turnuva/...)"),

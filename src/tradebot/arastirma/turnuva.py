@@ -346,3 +346,20 @@ def _json(x):
     if isinstance(x, np.ndarray):
         return x.tolist()
     return str(x)
+
+
+def dsr_sonlandir(defter: Defter, r: dict, o: Olcut) -> dict:
+    """Dalga sonunda: DSR'ı ailenin NİHAİ deneme sayısı ve Sharpe varyansıyla yeniden hesaplar, kararı yeniler.
+    Koşu anındaki DSR `dsr_kosu`'da kalır. (Koşu sırası sonucu etkilemesin: erken koşan kol daha az denemeyle
+    ölçülmüş olmasın. Yalnız sıkılaştırır: deneme sayısı koşudan sonra yalnız artar.)"""
+    d = r.get("dsr_kosu", r["dsr"])
+    if "sr_haftalik" not in d:
+        return r
+    n = defter.deneme_sayisi(r["aile"])
+    srs = [float(x) for x in _aile_haftalik_sr(defter, r["aile"])]
+    v = float(np.var(srs, ddof=1)) if len(srs) > 1 else 0.0
+    yeni = d | {"dsr": dg.dsr(d["sr_haftalik"], d["hafta"], max(n, 1), v, d["carpiklik"], d["basiklik"]),
+                "sr_esik": dg.beklenen_max_sr(n, v), "deneme": n, "nihai": True}
+    r = r | {"dsr_kosu": d, "dsr": yeni}
+    r["karar"] = karar(r, o)
+    return r
