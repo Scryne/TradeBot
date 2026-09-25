@@ -18,8 +18,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 0 | Riskli kararların spike'ları | ✅ Tamamlandı | Spike 02–05 raporları `docs/spikes/` altında; Final Doküman'daki ⚑ kararlar kesinleşti ya da yedek plana geçildi |
 | 1 | Altyapı ve host | ✅ Tamamlandı | Host (WSL2 + Docker + Tailscale + SSH, 7/24 ayarları) hazır; `uv` projesi, Compose iskeleti, PostgreSQL, sır yönetimi, log düzeni; testler yeşil |
 | 2 | Veri platformu (ilk dalga) | 🔄 Devam Ediyor | Kripto, Dukascopy, ABD ETF, BIST günlük verileri katalogda; enstrüman kaydı + takvimler + kurumsal işlemler; PIT evren; kaynak başına kalite raporu |
-| 3 | Araştırma motoru | ⏳ Bekliyor | Saf karar çekirdeği; piyasa başına maliyet modelleri; vektörel tarama; walk-forward + plato + DSR; deneme defteri; vektörel ↔ Nautilus parity testi geçiyor |
-| 4 | Risk motoru ve boyutlandırma | ⏳ Bekliyor | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
+| 3 | Araştırma motoru | ✅ Tamamlandı | Saf karar çekirdeği; piyasa başına maliyet modelleri; vektörel tarama; walk-forward + plato + DSR; deneme defteri; vektörel ↔ Nautilus parity testi geçiyor |
+| 4 | Risk motoru ve boyutlandırma | 🔄 Devam Ediyor | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
 | 5 | Turnuva — backtest dalgası 1 | ⏳ Bekliyor | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
 | 6 | Zekâ katmanı (Jev) | ⏳ Bekliyor | Toplayıcılar (KAP, SEC, Binance, RSS, merkez bankaları, GDELT); Jev servisi + NVIDIA yükseltme; A, B, D rolleri çalışıyor; yargılar dondurulabiliyor; C özellikleri ölçüldü |
 | 7 | Paper canlı — kripto + ABD ETF | ⏳ Bekliyor | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
@@ -127,6 +127,20 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   Sharpe; deneme defteri (PostgreSQL); Nautilus sarmalayıcısı ve parity testi; puan + kapı hesabı.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
+  - 2026-09-25 ✅ (74 test).
+    - `tradebot.cekirdek`: saf çekirdek. AST denetimiyle I/O yasak, gelecek-bozma testi.
+    - `tradebot.arastirma`: piyasa başına maliyet, vektörel motor (sonraki açılışta dolum, aleyhte maliyet,
+      dengeleme bandı), metrik ve kapılar.
+    - Deneme defteri: plansız ya da kirli kodla koşu yok, PG'de değiştirilemez.
+    - PSR/DSR (makale örneğiyle doğrulandı), walk-forward, plato, Nautilus köprüsü + kalıcı parity testi,
+      `tradebot arastirma plan|tara`.
+  - **Parity testi motorda gerçek bir hata yakaladı:** ağırlık kaymasının paydasında işlem maliyeti yoktu.
+    Düzeltildi; Nautilus ile özkaynak artık 1e-5.
+  - **İlk gerçek tarama** (plan 2026-09-25-trend-btc-gosterim, BTC 1d SMA 3×3, 9 deneme): önceden yazılmış
+    ölçüte göre **FAIL**.
+    - En iyi sma(10,100): +%32/yıl, DD −%69, en kötü hafta −%40 (kapılar geçmedi).
+    - DSR 0,981, plato var, WF OOS +%30/yıl. Al-tut +%39/yıl, DD −%83.
+    - Okuma: sinyal var, ama ya hep ya hiç boyut düşüşü olduğu gibi taşıyor → Faz 4 boyutlandırma.
 
 ### Faz 4: Risk motoru ve boyutlandırma
 - **İşler:** Katman 1–4 (Nautilus risk motoru + bizim kontrollerimiz); oynaklık hedefli boyut; kol ve

@@ -3,5 +3,5 @@
   "asama": "uygulama",
   "guncellendi": "2026-09-25",
   "roadmap": "docs/Roadmap.md",
-  "not": "Faz 1 tamam (2026-09-25): host 192.168.1.4 / Tailscale 100.83.56.99; servisler compose ile (postgres, goc, saglik, saat); yeniden baslatma testi gecti (otomatik oturum B, 57 sn). Guncelleme: tools/host/guncelle.ps1 (bundle + oturumdaki gorev). Sirada Faz 2 veri platformu (indirici kurallari docs/spikes/03-veri.md §3)."
+  "not": "Faz 0-3 tamam (2026-09-25). Faz 3: saf cekirdek, maliyet, vektorel motor, defter, DSR/WF/plato, Nautilus parity (hata yakaladi), ilk tarama BTC SMA FAIL (DD -69%, sinyal var boyut yok). Faz 2 ilk yukleme hostta suruyor. Sirada Faz 4 boyutlandirma ve risk motoru."
 }
