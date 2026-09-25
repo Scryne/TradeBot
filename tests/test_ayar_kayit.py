@@ -38,3 +38,10 @@ def test_log_satiri_json_ve_maskeli(tmp_path, monkeypatch, capsys):
     assert kayit["bilesen"] == "test" and kayit["level"] == "warning"
     assert kayit["zaman"].endswith("Z")  # UTC
     assert "nvapi-cokgizli-9999" not in satir
+
+
+def test_bos_sir_tanimsiz_sayilir(monkeypatch):
+    monkeypatch.setenv("NVIDIA_API_KEY", "")
+    monkeypatch.setenv("TRADEBOT_TELEGRAM_TOKEN", "   ")
+    a = Ayarlar(_env_file=None)
+    assert a.nvidia_api_key is None and a.telegram_token is None

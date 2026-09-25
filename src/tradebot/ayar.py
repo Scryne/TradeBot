@@ -9,7 +9,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 SIR_ALANLARI = ("veritabani_url", "typesafe_api_key", "nvidia_api_key", "telegram_token")
@@ -38,6 +38,14 @@ class Ayarlar(BaseSettings):
     saat_uyari_sn: float = 0.25
     saat_hata_sn: float = 0.5
     disk_uyari_gb: float = 50.0
+
+    @field_validator(*SIR_ALANLARI, mode="before")
+    @classmethod
+    def _bos_sir_yok(cls, v):
+        # `.env.example`'dan gelen `ANAHTAR=` satırları tanımsız sayılır (host'ta "tümü tanımlı" yanlış alarmı).
+        if v is None or (isinstance(v, str) and not v.strip()):
+            return None
+        return v
 
     def sir_degerleri(self) -> list[str]:
         """Log maskeleme için tanımlı sırların düz değerleri (boş olmayanlar)."""
