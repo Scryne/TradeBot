@@ -105,3 +105,15 @@ planında yazılacak.
 - **2026-09-25, hata kaydı.** d0625fa'da kol oynaklık ölçeği hatalıydı: nakitten sonra girişte kaldıraç patlıyordu.
   470df3a'da düzeltildi. d0625fa ile koşulan 3 kolun denemeleri defterde sayılı kalır (DSR'ı sertleştirir).
   Sonuçları `data/turnuva/dalga1/_hatali_d0625fa/` altında arşivlendi.
+- **2026-09-25, ek 2: Ölçüm düzeltmeleri.** İlk ABD ETF sonuçlarından sonra üç hata bulundu ve düzeltildi.
+  1. **Enstrüman tavanı yoktu.** Kol ağırlıkları risk motorunun enstrüman tavanını (0,5) uygulamıyordu. Eşit risk
+     ağırlığı, çok düşük oynaklıklı SHY'a özkaynağın katları kadar pozisyon veriyordu: brüt 2,5x, yılda 64 kat devir.
+     Backtest canlı risk motorundan gevşek olamaz (kural 5). Artık aynı tavan backtest'te de uygulanıyor.
+  2. **Temettü yoktu.** Yahoo fiyatları yalnız bölünmeye göre düzeltilmişti. Short, temettü günündeki düşüşten kâr
+     ediyor, long temettüyü almıyordu. Artık getiri toplam getiri olarak ölçülüyor (`adj_close / close`).
+  3. **`ay_donumu` parametre adları** `_gun` çevrim kuralına takıldı ve koşu durdu. Çekirdekteki parametre adları
+     değişti; dalga dosyası değişmedi (1d'de çevrim birebir).
+
+  Bu düzeltmeler ölçütü değiştirmez, ölçümü doğrular. Dalganın bütün kolları (kripto dahil) yeni kodla yeniden
+  koşulur; önceki koşuların denemeleri defterde sayılı kalır. Önceki sonuçlar `data/turnuva/dalga1/_v7df0fdd/`
+  altında arşivlendi.

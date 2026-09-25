@@ -45,7 +45,7 @@ def yaz(d: BarDepo, kimlik, b: Barlar, zd="1d"):
     StratejiTanimi("donchian_ls", "trend", al.donchian_ls, {"giris": 20, "cikis": 10}, yon="long_short"),
     StratejiTanimi("zskor", "ortalamaya_donus", al.zskor_donus, {"pencere": 20, "giris": 1.5, "cikis": 0.3}, yon="long_short"),
     StratejiTanimi("rsi", "ortalamaya_donus", al.rsi_donus, {"n": 2, "alt": 10, "trend": 50, "cikis_ma": 5}, yon="long_short"),
-    StratejiTanimi("ay", "takvim", al.ay_donumu, {"son_gun": 3, "ilk_gun": 2}),
+    StratejiTanimi("ay", "takvim", al.ay_donumu, {"son": 3, "ilk": 2}),
 ])
 def test_aileler_gelecegi_gormez_ve_islem_uretir(tanim):
     b = barlar()
@@ -65,7 +65,7 @@ def test_ay_donumu_pencere():
                   ["2024-01-26", "2024-01-27", "2024-01-31", "2024-02-01", "2024-02-02", "2024-02-03", "2024-02-15"]])
     b = Barlar(t, *(np.ones(len(t)) for _ in range(5)))
     # son_gun=4: 31 Ocak'a kalan ≤ 4 gün → 27 Ocak'tan itibaren; ilk_gun=3: ayın 1. ve 2. günü tutmaya devam
-    np.testing.assert_array_equal(al.ay_donumu(b, son_gun=4, ilk_gun=3), [0, 1, 1, 1, 1, 0, 0])
+    np.testing.assert_array_equal(al.ay_donumu(b, son=4, ilk=3), [0, 1, 1, 1, 1, 0, 0])
 
 
 def test_rsi_bilinen_deger():
@@ -468,3 +468,28 @@ def test_gun_ici_kol_seans_maskesi(tmp_path):
     tatil = (h.g.t >= np.datetime64("2024-07-04", "ms").astype(np.int64)) & (
         h.g.t < np.datetime64("2024-07-05", "ms").astype(np.int64))
     assert np.all(hedef[tatil] == 0)
+
+
+def test_toplam_getiri_temettu_dahil(depo):
+    # 100'de sabit fiyat; 5. günde 2'lik temettü (fiyat 98'e düşer). adj_close: temettüden önceki günler 0,98 çarpanlı
+    n = 10
+    t = T0 + np.arange(n, dtype=np.int64) * GUN
+    c = np.r_[np.full(5, 100.0), np.full(5, 98.0)]
+    adj = np.r_[np.full(5, 98.0), np.full(5, 98.0)]
+    depo.yaz("ARCA:DIV", "1d", pl.DataFrame({"acilis_ms": t, "open": c, "high": c, "low": c, "close": c,
+                                             "volume": np.ones(n), "adj_close": adj}))
+    g = grup_yukle(depo, ["ARCA:DIV"], "1d")
+    np.testing.assert_allclose(g.acilis[:, 0], 98.0)  # toplam getiri serisi düz: temettü düşüşü getiri değil
+    mm = MaliyetModeli("sifir", 0.0, 0.0, 0.0)
+    kisa = calistir_panel(g, np.full((n, 1), -0.5), taraf_matrisi(g, [mm]), [mm])
+    assert kisa.ozkaynak[-1] == pytest.approx(1.0)  # short temettü düşüşünden kâr ETMEZ
+
+
+def test_enstruman_tavani():
+    rng = np.random.default_rng(0)
+    n = 400
+    c = np.column_stack([100 * np.exp(np.cumsum(rng.normal(0, 0.001, n))),   # çok düşük oynaklık (SHY gibi)
+                         100 * np.exp(np.cumsum(rng.normal(0, 0.03, n)))])
+    w = panel_oynaklik_hedefi(np.ones((n, 2)), c, np.ones((n, 2), bool), 0.2, 252, pencere=30, azami=3.0,
+                              varlik_tavani=0.5)
+    assert np.abs(w).max() <= 0.5 + 1e-12 and w[100:, 0].max() == pytest.approx(0.5)

@@ -174,7 +174,8 @@ def hedef_uret(h: HazirGrup, strateji: str, p: dict, yon: str, ayar: Ayar, neden
         olcekle = False
     s = np.where(h.evrende, s, 0.0)
     return panel_oynaklik_hedefi(s, g.kapanis, h.evrende, ayar.hedef_vol, by, pencere=max(2, int(ayar.vol_pencere_gun * bg)),
-                                 azami=ayar.kaldirac, varlik_olcekle=olcekle)
+                                 azami=ayar.kaldirac, varlik_olcekle=olcekle,
+                                 varlik_tavani=RiskAyar(kaldirac=ayar.kaldirac).enstruman_tavani)
 
 
 def g_zd(g: GrupVerisi) -> str:

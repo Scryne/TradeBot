@@ -86,6 +86,7 @@ def grup_yukle(depo: BarDepo, kimlikler: list[str], zd: str, bas_ms: int | None 
             df = df.filter(pl.col("acilis_ms") >= bas_ms)
         if bit_ms is not None:
             df = df.filter(pl.col("acilis_ms") < bit_ms)
+        df = toplam_getiri(df)
         if len(df) < 3:
             continue
         dfs.append(df)
@@ -114,6 +115,18 @@ def grup_yukle(depo: BarDepo, kimlikler: list[str], zd: str, bas_ms: int | None 
     acilis, kapanis = _ileri_doldur(acilis), _ileri_doldur(kapanis)
     return GrupVerisi(adlar, t, acilis, kapanis, bar_var, bitti, ys if spread_var else None, barlar, konum,
                       hashlib.sha256("|".join(hashler).encode()).hexdigest(), ZAMAN_DILIMI_MS[zd])
+
+
+def toplam_getiri(df: pl.DataFrame) -> pl.DataFrame:
+    """`adj_close` varsa (Yahoo: bölünme + temettü düzeltmeli) OHLC'yi aynı günün `adj_close / close` çarpanıyla ölçekler:
+    getiri temettü dahil ölçülür (long temettüyü alır, short öder). Çarpan yalnız o günden SONRAKİ temettülere bağlı
+    sabittir; iki geçmiş gün arasındaki oran yalnız aralarındaki temettülere bağlıdır → oran tabanlı göstergeler
+    nedensel kalır. `adj_close` eksikse çarpan önceki günden taşınır."""
+    if "adj_close" not in df.columns:
+        return df
+    k = (pl.col("adj_close") / pl.col("close")).fill_nan(None).forward_fill().backward_fill().fill_null(1.0)
+    return df.with_columns(k.alias("_k")).with_columns(
+        *(pl.col(c) * pl.col("_k") for c in ("open", "high", "low", "close"))).drop("_k")
 
 
 def kur_cevir(g: GrupVerisi, depo: BarDepo, kur_kimlik: str) -> GrupVerisi:

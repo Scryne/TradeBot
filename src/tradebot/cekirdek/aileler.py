@@ -119,15 +119,16 @@ def _gun_bilgisi(t_ms: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return gun, uzunluk
 
 
-def ay_donumu(b: Barlar, son_gun: int = 4, ilk_gun: int = 3) -> np.ndarray:
-    """Ay dönümü etkisi: ayın son `son_gun` takvim günü ile ilk `ilk_gun` takvim günü boyunca tut.
+def ay_donumu(b: Barlar, son: int = 4, ilk: int = 3) -> np.ndarray:
+    """Ay dönümü etkisi: ayın son `son` takvim günü ile ilk `ilk` takvim günü boyunca tut. (Dalga dosyasında
+    `son_gun`/`ilk_gun` olarak yazılır; yalnız 1d'de koşar, gün → bar çevrimi birebirdir.)
 
     Karar bar t kapanışında: bar t'nin günü pencerenin hemen öncesindeyse ya da içindeyse (bir sonraki bar pencerede
     kalacak şekilde) +1. Takvim günü yaklaşımı (seans takvimi çekirdeğe girmez)."""
     gun, uzunluk = _gun_bilgisi(b.t)
     kalan = uzunluk - gun  # ay sonuna kalan takvim günü
-    giris = kalan <= son_gun            # ertesi bar ay sonu penceresine düşer
-    icinde = gun < ilk_gun              # ertesi bar hâlâ ayın ilk günlerinde
+    giris = kalan <= son                # ertesi bar ay sonu penceresine düşer
+    icinde = gun < ilk                  # ertesi bar hâlâ ayın ilk günlerinde
     return (giris | icinde).astype(float)
 
 

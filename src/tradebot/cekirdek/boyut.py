@@ -58,7 +58,8 @@ def yarim_kelly_tavani(donem_getirileri: np.ndarray, asgari_gozlem: int = 26) ->
 
 
 def panel_oynaklik_hedefi(sinyal: np.ndarray, close: np.ndarray, evrende: np.ndarray, hedef_yillik: float,
-                          bar_yil: float, pencere: int = 30, azami: float = 1.0, varlik_olcekle: bool = True) -> np.ndarray:
+                          bar_yil: float, pencere: int = 30, azami: float = 1.0, varlik_olcekle: bool = True,
+                          varlik_tavani: float | None = None) -> np.ndarray:
     """Kol ağırlıkları [n, k] (nedensel, iki adım).
 
     1. Varlık: ham_j = sinyal_j / σ_j / N_t (σ_j: j'nin gerçekleşen yıllık oynaklığı, N_t: t anında evrendeki enstrüman
@@ -66,7 +67,8 @@ def panel_oynaklik_hedefi(sinyal: np.ndarray, close: np.ndarray, evrende: np.nda
        ham = sinyal (kesitsel ağırlıklar gibi zaten toplamı belli sinyaller).
     2. Kol: BUGÜNKÜ ham ağırlıkların son `pencere` barın getirilerine uygulanmasıyla bulunan ileriye dönük (ex-ante)
        oynaklık hedefe ölçeklenir. (Portföyün kendi geçmiş getirisi kullanılmaz: strateji nakitteyken o oynaklık ~0
-       olur ve girişte ölçek patlar.) Brüt maruziyet `azami`'yi aşarsa orantılı küçültülür (≤ 3x, `kaldirac_dogrula`).
+       olur ve girişte ölçek patlar.) Tek enstrüman |ağırlık| ≤ `varlik_tavani` (risk motoru enstrüman tavanı; backtest canlı
+       risk motorundan gevşek olamaz), sonra brüt maruziyet `azami`'yi aşarsa orantılı küçültülür (≤ 3x).
     Isınmada (oynaklık tanımsız) ağırlık 0."""
     azami = kaldirac_dogrula(azami)
     s = np.asarray(sinyal, dtype=float)
@@ -99,6 +101,8 @@ def panel_oynaklik_hedefi(sinyal: np.ndarray, close: np.ndarray, evrende: np.nda
         sp = float(x.std(ddof=1)) * kok
         if sp > 0:
             w[t] = h * (hedef_yillik / sp)
+    if varlik_tavani is not None:
+        w = np.clip(w, -varlik_tavani, varlik_tavani)
     brut = np.abs(w).sum(axis=1)
     kirp = np.where(brut > azami, azami / np.where(brut > 0, brut, 1.0), 1.0)
     return w * kirp[:, None]
