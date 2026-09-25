@@ -160,7 +160,7 @@ raporlanır.
 | 1 Emir öncesi | Fiyat bandı, azami boyut, lot ve fiyat adımı, piyasa açık mı, veri bayat mı, veto listesi, **3x tavan (kod sabiti)**, emir hızı, çift emir | Ret + log + alarm |
 | 2 Pozisyon | Felaket stop'u (oynaklığa göre), likidasyon mesafesi, enstrüman/sektör/sınıf yoğunlaşması | Küçült / kapat |
 | 3 Kol | Beklenenin üstünde düşüş, canlı ↔ backtest sapması | Kol durur → 2 hafta sıfır sermayeyle gözlem → turnuvaya döner |
-| 4 Portföy | Günlük −%3, haftalık −%8, **acil durdurma −%25**, brüt/net maruziyet, korelasyon, tarihsel VaR izleme | Fren: yeni giriş yok · Acil durdurma: her şey kapanır, yeniden başlatma Scryne onayıyla |
+| 4 Portföy | Günlük −%3, haftalık −%8, **acil durdurma −%25**, brüt/net maruziyet, korelasyon, tarihsel VaR izleme | Fren: yeni giriş yok · Acil durdurma: her şey kapanır, yeniden başlatma Scryne onayıyla (canlı). **Araştırmada** (Faz 4 kararı): acil durdurma olay olarak sayılır ama kalıcı değildir (stratejinin tüm dönemi ölçülür); acil tetikleyen strateji kapıdan geçemez |
 | 5 Sistem | Bağımsız gözetmen, borsa sağlığı, saat senkronu, mutabakat farkı, Jev/haber servisi sağlığı | Motor donarsa kapat; mutabakat farkında dur; Jev yoksa "habere kör" mod (yeni giriş yarım boyut) |
 
 ## Zekâ katmanı (Jev)

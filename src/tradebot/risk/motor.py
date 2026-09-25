@@ -172,8 +172,14 @@ class RiskMotoru:
 class PortfoyIzleyici:
     """Özkaynak yolundan fren ve acil durdurma durumunu türetir (UTC gün/hafta)."""
 
-    def __init__(self, ayar: RiskAyar | None = None, baslangic_ozkaynak: float = 1.0, baslangic_ms: int = 0) -> None:
+    def __init__(self, ayar: RiskAyar | None = None, baslangic_ozkaynak: float = 1.0, baslangic_ms: int = 0,
+                 acil_kalici: bool = True) -> None:
+        """`acil_kalici=False` YALNIZ araştırma içindir: acil durdurma olay olarak sayılır (`acil_sayisi`) ama durum
+        kalıcı olmaz; stratejinin tüm dönemi ölçülür ve acil tetikleyen strateji kapıdan geçemez (tarama). Canlıda
+        her zaman True: acil durdurma yalnız Scryne'ın onayıyla kalkar."""
         self.ayar = ayar or RiskAyar()
+        self.acil_kalici = acil_kalici
+        self.acil_sayisi = 0
         self.tepe = baslangic_ozkaynak
         self.gun, self.hafta = self._gun(baslangic_ms), self._hafta(baslangic_ms)
         self.gun_bas = self.hafta_bas = self.son = baslangic_ozkaynak
@@ -203,6 +209,11 @@ class PortfoyIzleyici:
             return self.durum  # kendiliğinden kalkmaz
         a = self.ayar
         if ozkaynak / self.tepe - 1 <= a.acil_durdurma:
+            self.acil_sayisi += 1
+            if not self.acil_kalici:  # araştırma: olay kaydı + tepe yenilenir (inceleme sonrası devam varsayımı)
+                self.tepe = ozkaynak
+                self.durum = Durum.FREN_HAFTALIK
+                return Durum.ACIL_DURDURMA
             self.durum = Durum.ACIL_DURDURMA
         elif ozkaynak / self.hafta_bas - 1 <= a.haftalik_fren:
             self.durum = Durum.FREN_HAFTALIK

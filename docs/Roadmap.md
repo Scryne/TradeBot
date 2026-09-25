@@ -19,8 +19,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 1 | Altyapı ve host | ✅ Tamamlandı | Host (WSL2 + Docker + Tailscale + SSH, 7/24 ayarları) hazır; `uv` projesi, Compose iskeleti, PostgreSQL, sır yönetimi, log düzeni; testler yeşil |
 | 2 | Veri platformu (ilk dalga) | 🔄 Devam Ediyor | Kripto, Dukascopy, ABD ETF, BIST günlük verileri katalogda; enstrüman kaydı + takvimler + kurumsal işlemler; PIT evren; kaynak başına kalite raporu |
 | 3 | Araştırma motoru | ✅ Tamamlandı | Saf karar çekirdeği; piyasa başına maliyet modelleri; vektörel tarama; walk-forward + plato + DSR; deneme defteri; vektörel ↔ Nautilus parity testi geçiyor |
-| 4 | Risk motoru ve boyutlandırma | 🔄 Devam Ediyor | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
-| 5 | Turnuva — backtest dalgası 1 | ⏳ Bekliyor | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
+| 4 | Risk motoru ve boyutlandırma | ✅ Tamamlandı | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
+| 5 | Turnuva — backtest dalgası 1 | 🔄 Devam Ediyor | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
 | 6 | Zekâ katmanı (Jev) | ⏳ Bekliyor | Toplayıcılar (KAP, SEC, Binance, RSS, merkez bankaları, GDELT); Jev servisi + NVIDIA yükseltme; A, B, D rolleri çalışıyor; yargılar dondurulabiliyor; C özellikleri ölçüldü |
 | 7 | Paper canlı — kripto + ABD ETF | ⏳ Bekliyor | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
 | 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | ⏳ Bekliyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
@@ -148,6 +148,21 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   likidasyon mesafesi bekçisi.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
+  - 2026-09-25 ✅ (105 test).
+    - `cekirdek.boyut`: oynaklık hedefi (nedensel), yarım Kelly. `kaldirac_dogrula` her girişte: > 3x hata,
+      ≥ 5x ayrı "yasak" hatası.
+    - `risk.motor`: katman 1–4. Riski azaltan emir her durumda geçer; artıran emir tavanlara göre küçülür ya da
+      reddedilir.
+    - `PortfoyIzleyici`: fren UTC gün/hafta dönünce kalkar. Acil durdurma yalnız onayla kalkar (denetim izi, tepe
+      sıfırlanır). Backtest frenleri uygular.
+  - Testler iki hata yakaladı: dengeleme bandı değişim tespiti, lot yuvarlamasında kayan nokta.
+  - **Tarama 2** (plan 2026-09-25-trend-btc-oynaklik, %40 vol hedefi + frenler, aile 18 deneme): **FAIL**.
+    - Düşüş −%69 → −%25, ama acil durdurma 2019–20'de tetiklendi. Backtest sonrasını düz geçti (2020–26 +%0).
+    - En kötü hafta −%15,8; günlük fren bir bar gecikmeli.
+  - **Karar (araştırma modu):** acil durdurma araştırmada olay + kapı koşulu, kalıcı değil. Canlıda kalıcı
+    (Final Doküman risk tablosu).
+  - Onaylı yeniden başlatmanın CLI/Telegram yüzü canlı durum deposuyla birlikte Faz 7/9'da. Katman 5
+    (bağımsız gözetmen) Faz 9'da.
 
 ### Faz 5: Turnuva — backtest dalgası 1
 - **İşler:** Yedi ailenin ilk dalga piyasalardaki kolları; her aile için önce test planı; aşama 1–3;

@@ -3,5 +3,5 @@
   "asama": "uygulama",
   "guncellendi": "2026-09-25",
   "roadmap": "docs/Roadmap.md",
-  "not": "Faz 0-3 tamam (2026-09-25). Faz 3: saf cekirdek, maliyet, vektorel motor, defter, DSR/WF/plato, Nautilus parity (hata yakaladi), ilk tarama BTC SMA FAIL (DD -69%, sinyal var boyut yok). Faz 2 ilk yukleme hostta suruyor. Sirada Faz 4 boyutlandirma ve risk motoru."
+  "not": "Faz 0-4 tamam (2026-09-25). Faz 4: boyutlandirma (vol hedefi, yarim Kelly, 3x tavan/5x yasak), risk motoru katman 1-4, frenler + onayli acil durdurma; arastirmada acil = olay + kapi kosulu. BTC SMA iki tarama FAIL (aile trend 18 deneme). Sirada Faz 5 turnuva dalga 1."
 }

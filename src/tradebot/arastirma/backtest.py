@@ -63,7 +63,7 @@ def calistir(t: np.ndarray, fiyat: np.ndarray, sinyal: np.ndarray, mm: MaliyetMo
             d = izleyici.guncelle(oz, int(t[i]))
             durumlar[i] = ("normal", "fren_gunluk", "fren_haftalik", "acil_durdurma").index(d.value)
             if d.value == "acil_durdurma":
-                h = 0.0
+                h = 0.0  # canlı: kalıcı; araştırma (acil_kalici=False): yalnız o bar, sonra fren gibi devam
             elif d.value != "normal" and abs(h) > abs(kaymis):
                 h = kaymis  # fren: yeni risk yok
         degisti = i == 0 or h != onceki_h  # etkin hedef değişti mi (sinyal ya da fren)

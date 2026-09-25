@@ -180,3 +180,18 @@ def test_backtest_acil_durdurma_sonrasi_duz():
     assert len(acil) and s.pozisyon[acil].max() == 0.0          # acil durdurmadan sonra pozisyon yok
     assert s.ozkaynak.min() > 0.72                               # −%25 civarında kesildi (tek bar gecikme payı)
     assert s.ozkaynak[-1] == pytest.approx(s.ozkaynak[acil[0]])  # sonraki yükseliş kaçırıldı (onaysız dönüş yok)
+
+
+def test_arastirma_modu_acil_olay_ama_kalici_degil():
+    fiyat = np.r_[np.full(10, 100.0), 100 * 0.97 ** np.arange(1, 40), np.full(30, 40.0) * 1.05 ** np.arange(30)]
+    n = len(fiyat)
+    t = T0 + np.arange(n, dtype=np.int64) * GUN
+    iz = PortfoyIzleyici(baslangic_ms=T0, acil_kalici=False)
+    s = calistir(t, fiyat, np.ones(n), MaliyetModeli("0", 0, 0, 0), izleyici=iz)
+    assert iz.acil_sayisi >= 1 and (s.durum == 3).any()
+    assert s.pozisyon[-5:].max() > 0            # sonradan yeniden pozisyon aldı: dönemin tamamı ölçülüyor
+    assert s.ozkaynak[-1] > s.ozkaynak[np.flatnonzero(s.durum == 3)[0]]
+
+
+def test_canli_varsayilan_kalici():
+    assert PortfoyIzleyici().acil_kalici is True

@@ -71,7 +71,8 @@ def tara(defter: Defter, depo: BarDepo, plan: str, strateji: str, kimlik: str, p
         return oynaklik_hedefi(s, bb.close, hedef_vol, by, vol_pencere, azami=kaldirac) if hedef_vol else s
 
     def izleyici():
-        return PortfoyIzleyici(RiskAyar(kaldirac=kaldirac), baslangic_ms=int(b.t[0])) if frenler else None
+        # Araştırma modu: acil durdurma olay + kapı koşulu, kalıcı değil (Faz 4 kararı; canlıda kalıcı)
+        return PortfoyIzleyici(RiskAyar(kaldirac=kaldirac), baslangic_ms=int(b.t[0]), acil_kalici=False) if frenler else None
     kosular, puanlar, satirlar = {}, {}, []
     for p0 in dg.izgara(izgara):
         p = p0 | boyut
@@ -83,8 +84,10 @@ def tara(defter: Defter, depo: BarDepo, plan: str, strateji: str, kimlik: str, p
         hs = np.expm1(mt.haftalik_log(s.t, s.net))
         sr_h = float(hs.mean() / hs.std(ddof=1)) if len(hs) > 1 and hs.std(ddof=1) > 0 else 0.0
         durum = s.durum if s.durum is not None else np.zeros(0)
-        kayit = m.sozluk() | {"sharpe_haftalik": sr_h, "fren_bar": int((durum > 0).sum()),
-                              "acil_durdurma": bool((durum == 3).any()), "yarim_kelly": yarim_kelly_tavani(hs)}
+        acil = int((durum == 3).sum())
+        kayit = m.sozluk() | {"sharpe_haftalik": sr_h, "fren_bar": int((durum > 0).sum()), "acil_durdurma": acil > 0,
+                              "acil_sayisi": acil, "yarim_kelly": yarim_kelly_tavani(hs)}
+        kayit["kapilar_gecti"] = bool(kayit["kapilar_gecti"] and acil == 0)  # acil tetikleyen strateji geçemez
         defter.kaydet(plan, "tarama", tanim.kimlik(), aile, p, kimlik, zd, veri_hash, kayit, time.perf_counter() - t0,
                       izin_kirli=izin_kirli)
         kosular[tanim.kimlik()] = {"net": s.net, "pozisyon": s.pozisyon, "t": s.t}
