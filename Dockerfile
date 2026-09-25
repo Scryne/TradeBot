@@ -9,6 +9,7 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY src ./src
 COPY migrations ./migrations
 COPY alembic.ini ./
+COPY config ./config
 RUN uv sync --frozen --no-dev
 ENV PATH="/app/.venv/bin:$PATH"
 RUN useradd --create-home --uid 10001 tradebot && mkdir -p /app/data /app/log && chown -R tradebot /app
