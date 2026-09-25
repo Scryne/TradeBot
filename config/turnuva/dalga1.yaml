@@ -1,0 +1,132 @@
+# Turnuva dalga 1: ÖN KAYIT (Faz 5). Bu dosya koşudan ÖNCE commit edilir ve koşu sırasında değişmez.
+# Değişiklik = yeni dalga dosyası + yeni plan kimlikleri (değişmez kural 10: sonuca bakıp kural değiştirmek yeni denemedir).
+# Gerekçe ve okuma rehberi: docs/turnuva/Dalga-1.md
+
+dalga: 1
+veri_bitis: "2026-09-01"         # bu tarihten sonraki barlar kullanılmaz (sonuçlar gece gelen veriyle değişmesin)
+frenler: true                    # günlük −%3, haftalık −%8, acil −%25 (araştırma modu: olay + kapı koşulu)
+
+boyut:
+  hedef_vol: 0.20                # kol düzeyinde yıllık oynaklık hedefi (kollar aynı riskte yarışır)
+  kaldirac: 3.0                  # brüt maruziyet tavanı = kod tavanı (≥ 5x imkânsız)
+  vol_pencere_gun: 30
+  bant: 0.25                     # oransal yeniden dengeleme bandı (|hedef − mevcut| > 0,25 × |hedef|)
+
+walk_forward: { is_yil: 3, oos_yil: 1 }
+
+# Geçme ölçütü (turnuva.karar ile birebir):
+#   Ortak: tam dönem kapıları (en kötü hafta ≥ −%10, düşüş ≥ −%30, ≥ 20 işlem, acil durdurma yok)
+#          + walk-forward OOS (en kötü hafta ≥ −%10, düşüş ≥ −%30, yıllık > 0)
+#          + tam yılların ≥ %60'ı pozitif + hiçbir rejimde t < −2 + stres (maliyet 2x ve 1 bar gecikme) puanı > 0
+#   A (paper, sermayeli):  ortak + DSR ≥ 0,95 + plato
+#   B (paper, sermayesiz gözlem): ortak + DSR ≥ 0,80
+#   DSR'ın deneme sayısı ailenin deneme defterindeki TÜM taramalarıdır (önceki planlar dahil).
+olcut: { dsr_a: 0.95, dsr_b: 0.80, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0 }
+
+planlar:
+  trend:
+    kimlik: 2026-09-25-d1-trend
+    hipotez: >-
+      Zaman serisi trendi (TSMOM, hareketli ortalama yönü, Donchian kırılımı) oynaklık hedefli ve çok enstrümanlı
+      kollarda, maliyet ve frenler sonrası pozitif haftalık log büyüme verir; en az bir piyasa grubunda ölçütü geçer.
+  kesitsel_momentum:
+    kimlik: 2026-09-25-d1-kesitsel
+    hipotez: >-
+      Göreli güç (son 1-6 ayın en iyi N enstrümanı, mutlak momentum filtresiyle) grup içinde nakit ve eşit ağırlığa
+      göre üstün haftalık log büyüme verir.
+  ortalamaya_donus:
+    kimlik: 2026-09-25-d1-donus
+    hipotez: >-
+      Düşük maliyetli piyasalarda (FX, endeks, ETF, BIST) kısa vadeli aşırılıklar (z-skor, trend yönünde RSI(2))
+      maliyet sonrası geri döner.
+  takvim:
+    kimlik: 2026-09-25-d1-takvim
+    hipotez: >-
+      Ay dönümü etkisi (ayın son ve ilk günleri) hisse endekslerinde maliyet sonrası pozitif getiri verir.
+
+# Piyasa grupları. dinamik: kripto → Binance USDT spot, kural dışlamaları (arastirma/panel.py KRIPTO_DISLA:
+# kaldıraçlı token, stabil/itibari para, sarılı varlık) + asgari oynaklık; ilk_n: likiditeye göre point-in-time ilk N.
+# dinamik: bist → kayıtlı BIST hisseleri (UYARI: bugünkü liste, hayatta kalma yanlılığı; sonuç bu uyarıyla okunur).
+gruplar:
+  kripto_ilk10:   { dinamik: kripto, ilk_n: 10, likidite_gun: 30, asgari_gecmis_gun: 60, asgari_oynaklik: 0.10, yon: long, zd: [1h, 4h, 1d] }
+  kripto_ilk30:   { dinamik: kripto, ilk_n: 30, likidite_gun: 30, asgari_gecmis_gun: 60, asgari_oynaklik: 0.10, yon: long, zd: [1h, 4h, 1d] }
+  kripto_btc_eth: { kimlikler: [BINANCE:BTCUSDT, BINANCE:ETHUSDT], asgari_gecmis_gun: 30, yon: long, zd: [1h, 4h, 1d] }
+  abd_etf:
+    kimlikler: [ARCA:SPY, ARCA:QQQ, ARCA:IWM, ARCA:DIA, ARCA:TLT, ARCA:IEF, ARCA:SHY, ARCA:GLD, ARCA:SLV, ARCA:USO,
+                ARCA:XLF, ARCA:XLK, ARCA:XLE, ARCA:XLV, ARCA:XLY, ARCA:XLP, ARCA:XLI, ARCA:XLU, ARCA:XLB, ARCA:XLRE,
+                ARCA:XLC, ARCA:EEM, ARCA:EFA, ARCA:VNQ, ARCA:HYG, ARCA:LQD]
+    asgari_gecmis_gun: 60
+    yon: long_short
+    zd: [1d]
+  abd_hisse_endeks: { kimlikler: [ARCA:SPY, ARCA:QQQ, ARCA:IWM, ARCA:DIA], asgari_gecmis_gun: 60, yon: long_short, zd: [1d] }
+  abd_sektor:
+    kimlikler: [ARCA:XLF, ARCA:XLK, ARCA:XLE, ARCA:XLV, ARCA:XLY, ARCA:XLP, ARCA:XLI, ARCA:XLU, ARCA:XLB, ARCA:XLRE, ARCA:XLC]
+    asgari_gecmis_gun: 60
+    yon: long
+    zd: [1d]
+  dk_fx:
+    kimlikler: [DUKASCOPY:EURUSD, DUKASCOPY:GBPUSD, DUKASCOPY:USDJPY, DUKASCOPY:AUDUSD, DUKASCOPY:USDCAD,
+                DUKASCOPY:USDCHF, DUKASCOPY:NZDUSD, DUKASCOPY:EURJPY, DUKASCOPY:EURGBP]
+    asgari_gecmis_gun: 60
+    yon: long_short
+    zd: [1h, 4h, 1d]
+  dk_endeks:
+    kimlikler: [DUKASCOPY:USA500IDXUSD, DUKASCOPY:USATECHIDXUSD, DUKASCOPY:USA30IDXUSD, DUKASCOPY:DEUIDXEUR,
+                DUKASCOPY:GBRIDXGBP, DUKASCOPY:JPNIDXJPY]
+    asgari_gecmis_gun: 60
+    yon: long_short
+    zd: [1h, 4h, 1d]
+  dk_emtia_metal:
+    kimlikler: [DUKASCOPY:XAUUSD, DUKASCOPY:XAGUSD, DUKASCOPY:BRENTCMDUSD, DUKASCOPY:LIGHTCMDUSD]
+    asgari_gecmis_gun: 60
+    yon: long_short
+    zd: [1h, 4h, 1d]
+  dk_hepsi:           # USDTRY hariç tüm Dukascopy (tek yönlü kur, asimetrik taşıma maliyeti)
+    kimlikler: [DUKASCOPY:EURUSD, DUKASCOPY:GBPUSD, DUKASCOPY:USDJPY, DUKASCOPY:AUDUSD, DUKASCOPY:USDCAD,
+                DUKASCOPY:USDCHF, DUKASCOPY:NZDUSD, DUKASCOPY:EURJPY, DUKASCOPY:EURGBP, DUKASCOPY:XAUUSD,
+                DUKASCOPY:XAGUSD, DUKASCOPY:BRENTCMDUSD, DUKASCOPY:LIGHTCMDUSD, DUKASCOPY:USA500IDXUSD,
+                DUKASCOPY:USATECHIDXUSD, DUKASCOPY:USA30IDXUSD, DUKASCOPY:DEUIDXEUR, DUKASCOPY:GBRIDXGBP,
+                DUKASCOPY:JPNIDXJPY]
+    asgari_gecmis_gun: 60
+    yon: long_short
+    zd: [1h, 4h, 1d]
+  # BIST: fiyatlar TRY; getiri USD ile ölçülür (kur: USDTRY, fiyat_usd = fiyat / kur). Sinyal yerel fiyattan.
+  bist_endeks: { kimlikler: [BIST:XU100], asgari_gecmis_gun: 60, kur: DUKASCOPY:USDTRY, yon: long, zd: [1d] }
+  bist_hisse:  { dinamik: bist, ilk_n: 30, likidite_gun: 30, asgari_gecmis_gun: 120, kur: DUKASCOPY:USDTRY, yon: long, zd: [1d], en_fazla: B }
+
+# Kollar: strateji × gruplar × zaman dilimleri; ızgara parametreleri *_gun ise işlem günüdür (bara çevrilir).
+kollar:
+  # --- trend
+  - strateji: tsmom
+    gruplar: [kripto_ilk10, kripto_ilk30, kripto_btc_eth, abd_etf, dk_hepsi, dk_fx, dk_endeks, dk_emtia_metal, bist_endeks, bist_hisse]
+    zd: [1h, 4h, 1d]
+    izgara: { ufuk_gun: [20, 60, 120, 250] }
+  - strateji: ma_yon
+    gruplar: [kripto_ilk10, kripto_ilk30, kripto_btc_eth, abd_etf, dk_hepsi, dk_fx, dk_endeks, dk_emtia_metal, bist_endeks, bist_hisse]
+    zd: [1h, 4h, 1d]
+    izgara: { hizli_gun: [10, 25], yavas_gun: [50, 100, 200] }
+  - strateji: donchian_ls
+    gruplar: [kripto_ilk10, kripto_ilk30, kripto_btc_eth, abd_etf, dk_hepsi, dk_fx, dk_endeks, dk_emtia_metal, bist_endeks, bist_hisse]
+    zd: [1h, 4h, 1d]
+    izgara: { giris_gun: [20, 55, 100], cikis_gun: [10, 20] }
+  # --- kesitsel momentum (haftalık yeniden sıralama, mutlak momentum filtresi, yalnız long)
+  - strateji: kesitsel_momentum
+    gruplar: [kripto_ilk30, abd_etf, abd_sektor, dk_hepsi, bist_hisse]
+    zd: [1d]
+    yon: long
+    izgara: { geriye_gun: [30, 90, 180], ust_n: [3, 5], mutlak: [true], haftalik: [true] }
+  # --- ortalamaya dönüş (yalnız düşük maliyetli piyasalar; parametreler bar cinsinden)
+  - strateji: zskor_donus
+    gruplar: [dk_fx, dk_endeks, abd_etf, abd_hisse_endeks, bist_hisse]
+    zd: [1h, 1d]
+    izgara: { pencere: [20, 50], giris: [1.5, 2.0, 2.5], cikis: [0.5] }
+  - strateji: rsi_donus
+    gruplar: [dk_fx, dk_endeks, abd_etf, abd_hisse_endeks, bist_hisse]
+    zd: [1h, 1d]
+    izgara: { n: [2], alt: [5, 10], trend: [100, 200], cikis_ma: [5] }
+  # --- takvim
+  - strateji: ay_donumu
+    gruplar: [abd_hisse_endeks, dk_endeks, bist_endeks]
+    zd: [1d]
+    yon: long
+    izgara: { son_gun: [2, 4], ilk_gun: [2, 3] }

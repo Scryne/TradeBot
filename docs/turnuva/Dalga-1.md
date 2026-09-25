@@ -1,0 +1,95 @@
+---
+proje: TradeBot
+created: 2026-09-25
+type: turnuva-plani
+durum: ön kayıt (koşudan önce commit edildi)
+---
+# Turnuva — Dalga 1 (ön kayıt)
+
+Bu doküman ve `config/turnuva/dalga1.yaml` koşudan **önce** commit edilir. Koşu sırasında değişmez. Bir şey
+değişecekse yeni dalga dosyası ve yeni plan kimlikleri açılır (değişmez kural 10).
+
+## Kol nedir
+
+**Kol = strateji × piyasa grubu × zaman dilimi.** Örnek: `tsmom@kripto_ilk10@4h`, yani kripto likidite ilk 10'unda
+4 saatlik zaman serisi momentumu.
+
+Tek enstrüman yerine grup seçilmesinin iki nedeni var:
+
+1. **Seçim yanlılığı azalır.** 26 ETF'nin en iyisini seçmek 26 deneme demektir; hepsini birlikte işlemek tek
+   denemedir.
+2. **Çeşitlendirme kolun kendi içinde olur.** Aynı riskte (yıllık %20 oynaklık) daha yüksek Sharpe, daha sığ en
+   kötü hafta. Sektör pratiği de budur (managed futures).
+
+Kol içinde her enstrüman eşit risk taşır (sinyal / gerçekleşen oynaklık / evren büyüklüğü). Kol toplamı hedef
+oynaklığa ölçeklenir ve brüt maruziyet 3x ile sınırlıdır. Kolun ağırlığı Faz 7'de sermaye dağıtıcıya kalır
+(yarım Kelly, korelasyon).
+
+## Gerçekçilik kuralları
+
+- Karar kapanmış barla verilir, dolum sonraki barın açılışında olur (tek enstrüman motoruyla birebir; test).
+- **Maliyet her zaman aleyhtedir:**
+  - Piyasa başına model.
+  - Kripto küçük coinlerde likiditeye bağlı ek kayma (günlük hacim < 100 M$ → +5 bps, < 20 M$ → +15 bps).
+  - ETF açığa satışında yıllık %1.
+  - CFD finansmanı.
+  - İşlemi biten (delist) enstrümandan zorla çıkış 3 kat maliyetle.
+- **Point-in-time evren:** Bir bar için yalnız o bar kapanmadan önce bitmiş günlerin hacmi kullanılır (test). Kripto
+  evreninden kural olarak dışlananlar:
+  - kaldıraçlı tokenlar,
+  - stabil ve itibari paralar,
+  - sarılı varlıklar,
+  - 30 günlük oynaklığı %10'un altında olanlar (sabitlenmiş).
+- **Veri sonu 2026-09-01.** Gece gelen veri sonuçları değiştirmez.
+- **Frenler açık:** günlük −%3, haftalık −%8, acil −%25. Araştırmada acil durdurma bir olaydır ve tetikleyen kol
+  kapıdan geçemez.
+- **Yön kısıtları:** Kripto spot ve BIST yalnız long; açığa satış yok. CFD ve ETF iki yönlü.
+- **BIST getirileri USD ile ölçülür.** Sinyal TRY fiyatından üretilir, getiri USD fiyatla ölçülür (TRY enflasyonu
+  kazanç sayılmaz).
+
+## Eleme hunisi ve geçme ölçütü
+
+| Aşama | Ne | Nerede |
+| --- | --- | --- |
+| 0 | Test planı (bu doküman + plan kimlikleri deneme defterinde) | `arastirma turnuva` planları açar |
+| 1 | Izgaradaki her varyant, maliyet + frenler + oynaklık hedefiyle; her biri deneme defterine | `turnuva.kol_kos` |
+| 2 | DSR (ailenin **tüm** denemeleri), plato, walk-forward (IS 3 yıl → OOS 1 yıl, IS'te seç), yıllık, rejim | aynı |
+| 3 | Yürütme stresi: maliyet 2 kat; dolum bir bar geç | aynı |
+
+Nautilus parity motor düzeyinde kalıcı testtir (`tests/test_nautilus_parity.py`). Kollar Nautilus'ta paper'da
+yaşar (Final Doküman §7).
+
+**Ortak koşullar (A ve B için):**
+- Tam dönem kapıları: en kötü hafta ≥ −%10, en kötü düşüş ≥ −%30, ≥ 20 işlem, acil durdurma yok.
+- Walk-forward OOS: en kötü hafta ≥ −%10, düşüş ≥ −%30, yıllık > 0.
+- Tam yılların ≥ %60'ı pozitif.
+- Hiçbir rejimde (grup endeksinin son 26 haftası yukarı/aşağı) t < −2 değil.
+- Stres testlerinin ikisinde de puan > 0.
+
+**Sınıflar:**
+- **A (paper, sermayeli):** ortak koşullar + DSR ≥ 0,95 + plato.
+- **B (paper, sermayesiz gözlem):** ortak koşullar + DSR ≥ 0,80.
+- **KALDI:** diğer her şey.
+
+**Paper'a giriş:** A kolları Faz 7'de paper sermayesi alır (kademeli; dağıtıcı korelasyonu yönetir). B kolları
+sermayesiz gözlemde sinyal üretir. En az 4 haftalık canlı kanıtla A'ya terfi edebilirler; terfi ölçütü Faz 7
+planında yazılacak.
+
+## Okuma notları
+
+- **DSR sert bir eşik.** Aile başına yüzlerce deneme var, eşik de ona göre yükselir. "Hiçbir kol A değil" sonucu
+  yanlış değil, bilgidir. Eşik sonuca bakılarak gevşetilmez.
+- **BIST hisse grubu bugünkü listeden kuruldu.** Geçmiş endeks üyeliği yok, yani hayatta kalma yanlılığı var.
+  BIST hisse kolları en fazla B olabilir; A için yanlılıksız veri gerekir.
+- **Puan (ortalama haftalık log büyüme) aynı riskte karşılaştırılır.** Kaldıraç kararı dağıtıcınındır.
+
+## Bu dalgaya girmeyenler (Faz 5 içinde sonra koşulacak)
+
+| Aile | Neden sonra | Ne zaman |
+| --- | --- | --- |
+| Carry (kripto funding) | Getiri fiyattan değil fundingten gelir; ayrı getiri modeli gerekir | Dalga 1b, bu dalganın ardından |
+| Carry (FX swap) | Ücretsiz swap/faiz verisi yok | Veri bulununca (dalga 2) |
+| Gün içi kırılım (açılış aralığı) | Dukascopy dakikalık verisi (son 3 yıl) henüz iniyor | Dakikalık veri tamamlanınca (dalga 1c) |
+| Olay tabanlı (KAP/SEC) | Metin toplayıcılar ve Jev servisi Faz 6'da kuruluyor | Faz 6'dan sonra |
+| Çift ticareti (pairs) | Eşbütünleşme seçimi kendi başına bir denemedir; ayrı plan gerekir | Dalga 2 |
+| Jev'li ↔ Jev'siz A/B | Veto verisi Faz 6'da oluşur | Faz 6–7 |

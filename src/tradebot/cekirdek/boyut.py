@@ -55,3 +55,37 @@ def yarim_kelly_tavani(donem_getirileri: np.ndarray, asgari_gozlem: int = 26) ->
     if len(g) < asgari_gozlem:
         return 1.0
     return float(min(max(0.5 * kelly(g.mean(), g.var(ddof=1)), 0.0), KALDIRAC_TAVANI))
+
+
+def panel_oynaklik_hedefi(sinyal: np.ndarray, close: np.ndarray, evrende: np.ndarray, hedef_yillik: float,
+                          bar_yil: float, pencere: int = 30, azami: float = 1.0, varlik_olcekle: bool = True) -> np.ndarray:
+    """Kol ağırlıkları [n, k] (nedensel, iki adım).
+
+    1. Varlık: ham_j = sinyal_j / σ_j / N_t (σ_j: j'nin gerçekleşen yıllık oynaklığı, N_t: t anında evrendeki enstrüman
+       sayısı). Her varlık eşit risk taşır; sinyali olmayan varlığın payı nakitte kalır. `varlik_olcekle=False` ise
+       ham = sinyal (kesitsel ağırlıklar gibi zaten toplamı belli sinyaller).
+    2. Kol: ham portföyün (tutulan ağırlık × sonraki bar getirisi) gerçekleşen oynaklığı hedefe ölçeklenir; brüt
+       maruziyet `azami`'yi aşarsa orantılı küçültülür (≤ 3x, `kaldirac_dogrula`).
+    Isınmada (oynaklık tanımsız) ağırlık 0."""
+    azami = kaldirac_dogrula(azami)
+    s = np.asarray(sinyal, dtype=float)
+    c = np.asarray(close, dtype=float)
+    n, k = s.shape
+    with np.errstate(invalid="ignore", divide="ignore"):
+        lr = np.vstack([np.full((1, k), np.nan), np.diff(np.log(c), axis=0)])
+    if varlik_olcekle:
+        sig = np.column_stack([kayan_std(lr[:, j], pencere) for j in range(k)]) * math.sqrt(bar_yil)
+        adet = np.maximum(np.asarray(evrende, dtype=bool).sum(axis=1), 1)[:, None]
+        with np.errstate(invalid="ignore", divide="ignore"):
+            ham = np.where(np.isfinite(sig) & (sig > 0), s / np.where(sig > 0, sig, 1.0) / adet, 0.0)
+    else:
+        ham = np.nan_to_num(s)
+    ham = np.where(np.asarray(evrende, dtype=bool), ham, 0.0)
+    r = np.nan_to_num(np.expm1(lr))
+    port = np.r_[0.0, (ham[:-1] * r[1:]).sum(axis=1)]  # port[t]: ham[t-1] ile tutulan portföyün bar t getirisi
+    ps = kayan_std(port, pencere) * math.sqrt(bar_yil)
+    olcek = np.where(np.isfinite(ps) & (ps > 0), hedef_yillik / np.where(ps > 0, ps, 1.0), 0.0)
+    w = ham * olcek[:, None]
+    brut = np.abs(w).sum(axis=1)
+    kirp = np.where(brut > azami, azami / np.where(brut > 0, brut, 1.0), 1.0)
+    return w * kirp[:, None]

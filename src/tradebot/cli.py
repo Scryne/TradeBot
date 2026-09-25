@@ -231,3 +231,92 @@ def arastirma_tara(
         typer.echo(f"walk-forward: {w['pencere']} pencere, OOS yıllık {w['oos_yillik'] * 100:.1f}%, "
                    f"Sharpe {w['oos_sharpe']:.2f}, DD {w['oos_en_kotu_dusus'] * 100:.0f}%, seçimler {w['secimler']}")
     typer.echo("yıllık: " + "  ".join(f"{y}:{v * 100:+.0f}%" for y, v in r["yillik"].items()))
+
+
+@arastirma_uygulama.command("turnuva")
+def arastirma_turnuva(
+    dosya: str = typer.Option("config/turnuva/dalga1.yaml", help="Dalga ön kayıt dosyası"),
+    grup: str = typer.Option("", help="Yalnız bu gruplar (virgüllü; boş = hepsi)"),
+    strateji: str = typer.Option("", help="Yalnız bu stratejiler (virgüllü)"),
+    zd: str = typer.Option("", help="Yalnız bu zaman dilimleri (virgüllü)"),
+    tekrar: bool = typer.Option(False, help="Sonucu olan kolu yeniden koş (YENİ deneme sayılır)"),
+) -> None:
+    """Dalga dosyasındaki kolları koşar: planlar yoksa açılır, her varyant deftere, kol sonucu data/turnuva/'ya."""
+    from datetime import UTC, datetime
+
+    from tradebot.arastirma import turnuva as tv
+    from tradebot.arastirma.defter import Defter
+    from tradebot.veri import enstruman as en
+    from tradebot.veri.depo import BarDepo
+
+    a, m = _veri_baglam()
+    kayitci = log("turnuva")
+    d = tv.dalga_oku(Path(dosya))
+    defter = Defter(m)
+    for aile, p in d["planlar"].items():
+        try:
+            defter.plan_ac(p["kimlik"], aile, " ".join(p["hipotez"].split()), {"dosya": str(dosya), "dalga": d["dalga"]},
+                           sorted(d["gruplar"]), f"{dosya} → olcut {d['olcut']} (A/B/KALDI, turnuva.karar)")
+            kayitci.info("plan_acildi", plan=p["kimlik"])
+        except ValueError:
+            pass  # plan zaten açık: aynı ön kayıtla devam
+    kayit = {k["kimlik"]: k for k in en.hepsi(m)}
+    depo = BarDepo(a.veri_dizini)
+    bit_ms = int(datetime.fromisoformat(d["veri_bitis"]).replace(tzinfo=UTC).timestamp() * 1000)
+    cikti = Path(a.veri_dizini) / "turnuva" / f"dalga{d['dalga']}"
+    sec = lambda s: {x.strip() for x in s.split(",") if x.strip()}  # noqa: E731
+    gs, ss, zs = sec(grup), sec(strateji), sec(zd)
+    hazir: dict = {}
+    for k in tv.kollar(d):
+        if (gs and k["grup"] not in gs) or (ss and k["strateji"] not in ss) or (zs and k["zd"] not in zs):
+            continue
+        kol = tv.kol_kimligi(k["strateji"], k["grup"], k["zd"])
+        if (cikti / f"{kol.replace('@', '__')}.json").exists() and not tekrar:
+            continue
+        anahtar = (k["grup"], k["zd"])
+        try:
+            if anahtar not in hazir:
+                hazir.clear()  # bellek: aynı anda tek grup
+                hazir[anahtar] = tv.grup_hazirla(depo, kayit, d["gruplar"][k["grup"]], k["zd"], bit_ms=bit_ms)
+            t0 = time.perf_counter()
+            r = tv.kol_kos(defter, hazir[anahtar], k["plan"], k["strateji"], k["grup"], k["izgara"], k["yon"], d["_ayar"],
+                           veri_etiketi=f"bitis {d['veri_bitis']}", en_fazla=k["en_fazla"])
+        except FileNotFoundError as ex:
+            kayitci.warning("kol_verisi_yok", kol=kol, hata=str(ex)[:200])
+            continue
+        tv.sonuc_yaz(r, cikti)
+        e, w = r["en_iyi"], r["walk_forward"]
+        kayitci.info("kol_bitti", kol=kol, karar=r["karar"], puan=round(e["puan"], 5), sharpe=round(e["sharpe"], 2),
+                     dd=round(e["en_kotu_dusus"], 3), dsr=round(r["dsr"].get("dsr", float("nan")), 3),
+                     oos_yillik=round(w.get("oos_yillik", float("nan")), 3), sn=round(time.perf_counter() - t0, 1))
+        typer.echo(f"{r['karar']:<6}{kol:<44} puan {e['puan'] * 100:+.3f}%/hf  Sharpe {e['sharpe']:.2f}  "
+                   f"DD {e['en_kotu_dusus'] * 100:.0f}%  DSR {r['dsr'].get('dsr', float('nan')):.2f}  "
+                   f"OOS {w.get('oos_yillik', float('nan')) * 100:+.1f}%/yıl")
+
+
+@arastirma_uygulama.command("rapor")
+def arastirma_rapor(
+    dalga: int = typer.Option(1), md: str = typer.Option("", help="Markdown tablo çıktısı (ör. docs/turnuva/...)"),
+) -> None:
+    """Dalganın kol sonuçlarından puan tablosu (karar, puan, Sharpe, DD, DSR, OOS, stres)."""
+    a = ayarlar()
+    dizin = Path(a.veri_dizini) / "turnuva" / f"dalga{dalga}"
+    satirlar = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(dizin.glob("*.json"))]
+    sira = {"A": 0, "B": 1, "KALDI": 2}
+    satirlar.sort(key=lambda r: (sira[r["karar"]], -r["en_iyi"]["puan"]))
+    bas = ("| Karar | Kol | En iyi varyant | Puan %/hf | Yıllık | Sharpe | DD | Kötü hf | DSR | Plato | OOS yıllık | "
+           "OOS DD | Yıl + | 2x maliyet | Gecikme |")
+    out = [bas, "|" + " --- |" * (bas.count("|") - 1)]
+    for r in satirlar:
+        e, w, s = r["en_iyi"], r["walk_forward"], r["stres"]
+        out.append(f"| {r['karar']} | {r['kol']} | {e['varyant'].split('/', 1)[1]} | {e['puan'] * 100:.3f} | "
+                   f"{e['yillik_bilesik'] * 100:.1f}% | {e['sharpe']:.2f} | {e['en_kotu_dusus'] * 100:.0f}% | "
+                   f"{e['en_kotu_hafta'] * 100:.1f}% | {r['dsr'].get('dsr', float('nan')):.2f} | "
+                   f"{'var' if r['plato']['plato_var'] else 'yok'} | {w.get('oos_yillik', float('nan')) * 100:.1f}% | "
+                   f"{w.get('oos_en_kotu_dusus', float('nan')) * 100:.0f}% | {r['yil_pozitif_orani'] * 100:.0f}% | "
+                   f"{s['maliyet_2x_yillik'] * 100:.1f}% | {s['gecikme_yillik'] * 100:.1f}% |")
+    metin = "\n".join(out)
+    if md:
+        md.parent.mkdir(parents=True, exist_ok=True)
+        md.write_text(metin + "\n", encoding="utf-8")
+    typer.echo(metin)

@@ -9,7 +9,7 @@ Varsayımlar (2026-09; paper aşamasında gerçek dolumlarla ölçülüp güncel
   likiditeye bağlı ek Faz 5'te).
 - Dukascopy (FX/CFD): komisyon 0,5 bps (doğrulanmamış, kötü yönde tahmin), spread veriden, kayma 0,5 bps; finansman
   yıllık FX %2, metal %4, emtia %4, endeks %6 (≈ gösterge faiz + aracı kurum payı).
-- ABD ETF: komisyon 1 bps, yarım spread 1 bps, kayma 1 bps.
+- ABD ETF: komisyon 1 bps, yarım spread 1 bps, kayma 1 bps; açığa satışta yıllık %1 ödünç maliyeti.
 - BIST hisse: komisyon 4 bps + BSMV (%5), yarım spread 5 bps, kayma 5 bps.
 """
 from __future__ import annotations
@@ -28,6 +28,7 @@ class MaliyetModeli:
     finansman_yillik: float = 0.0
     ucret_vergisi: float = 0.0
     spread_veriden: bool = False
+    aciga_satis_yillik: float = 0.0  # kısa pozisyonun ek yıllık maliyeti (ödünç alma; finansmana eklenir)
 
     def taraf_bps(self, yari_spread_bps: float | None = None) -> float:
         ys = self.yari_spread_bps if yari_spread_bps is None else yari_spread_bps
@@ -40,7 +41,7 @@ MODELLER = {
     "DUKASCOPY:metal": MaliyetModeli("cfd_metal", 0.5, 1.0, 0.5, finansman_yillik=0.04, spread_veriden=True),
     "DUKASCOPY:emtia": MaliyetModeli("cfd_emtia", 0.5, 1.5, 0.5, finansman_yillik=0.04, spread_veriden=True),
     "DUKASCOPY:endeks": MaliyetModeli("cfd_endeks", 0.5, 0.5, 0.5, finansman_yillik=0.06, spread_veriden=True),
-    "ARCA": MaliyetModeli("abd_etf", 1.0, 1.0, 1.0),
+    "ARCA": MaliyetModeli("abd_etf", 1.0, 1.0, 1.0, aciga_satis_yillik=0.01),
     "BIST:hisse": MaliyetModeli("bist_hisse", 4.0, 5.0, 5.0, ucret_vergisi=0.05),
     "BIST:endeks": MaliyetModeli("bist_endeks_vadeli_vekil", 2.0, 2.0, 2.0),  # endeks doğrudan alınamaz; VİOP vekili
 }
