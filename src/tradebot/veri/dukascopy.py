@@ -3,7 +3,10 @@
 Kurallar (Spike 03 + Faz 2 ölçümü):
 - Çok sıkı hız sınırı: 3 sn arayla bile isteklerin yarısı 503. İstekler arası ≥ 6 sn, 503'te üstel bekleme; iş zaman
   bütçesiyle çalışır ve kaldığı yerden devam eder (her dosya idempotent).
-- Saatlik mum: AY başına bir dosya (ay 0 tabanlı), zaman = ay başından saniye. Dakikalık: GÜN başına, zaman = gün başından.
+- Günlük mum: YIL başına bir dosya, zaman = yıl başından saniye (gün 00:00 UTC). Saatlik mum: AY başına bir dosya (ay 0
+  tabanlı), zaman = ay başından saniye. Dakikalık: GÜN başına, zaman = gün başından.
+- Sıra: önce günlük (sembol başına ~17 dosya; günlük kollar hızla koşabilsin), sonra saatlik, sonra dakikalık.
+  Ölçüm (2026-09-25): sunucu istek başına 15–30 sn yanıt veriyor, 503'ler sık → saatlik tam geçmiş ~2 gün sürer.
 - Kayıt 24 bayt: >5if = (saniye, open, close, low, high, hacim). Fiyat = tamsayı / ölçek. Ölçek: JPY çiftleri 1e3,
   diğer FX 1e5, metal/endeks/emtia 1e3 (Temmuz 2026 örneklerine göre doğrulandı).
 - Hafta sonu / kapalı saatler sıfır hacimli düz mumdur → ayıklanır (hacim 0 ve piyasa kapalı).
@@ -96,6 +99,23 @@ class Dukascopy:
             return None
         return bi5_coz(icerik, ms(datetime(y, a, 1, tzinfo=UTC)), olcek(e.sembol, e.sinif))
 
+    def gunluk(self, e: en.Enstruman, bas: str, bitis_zamani: float) -> dict:
+        """BID günlük mumlar, yıl başına bir dosya. Barlar "1d"'ye yazılır (saatlikten türetmeye göre önceliklidir)."""
+        bugun = date.today()
+        parca, yeni = [], 0
+        for y in range(int(bas[:4]), bugun.year + 1):
+            if time.monotonic() > bitis_zamani:
+                break
+            anahtar = f"{e.sembol}/BID/1d/{y}"
+            icerik = self._dosya(e.sembol, f"{y}/BID_candles_day_1.bi5", anahtar, y < bugun.year)
+            if icerik is None:
+                continue
+            parca.append(bi5_coz(icerik, ms(datetime(y, 1, 1, tzinfo=UTC)), olcek(e.sembol, e.sinif)))
+            yeni += 1
+        if parca:
+            self.bar.yaz(e.kimlik, "1d", kapali_ayikla(pl.concat(parca), e.takvim))
+        return {"kimlik": e.kimlik, "yeni_dosya": yeni}
+
     def dakikalik_gun(self, e: en.Enstruman, g: date) -> pl.DataFrame | None:
         tamamlanmis = g < date.today()
         anahtar = f"{e.sembol}/BID/1m/{g.isoformat()}"
@@ -166,6 +186,13 @@ class Dukascopy:
         en.kaydet(self.motor, liste)
         bitis = time.monotonic() + butce_dk * 60
         sonuc = []
+        for e in liste:  # önce günlük: günlük kollar saatlik geçmişi beklemesin
+            if time.monotonic() > bitis:
+                break
+            try:
+                sonuc.append(self.gunluk(e, d["baslangic"], bitis))
+            except Exception as ex:
+                _log.error("sembol_hatasi", kimlik=e.kimlik, hata=str(ex)[:200])
         for e in liste:
             if time.monotonic() > bitis:
                 break

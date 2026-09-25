@@ -33,3 +33,34 @@ def test_bos_dosya_ve_kapali_saat():
 def test_aylar():
     from datetime import date
     assert aylar("2025-11", date(2026, 2, 15)) == [(2025, 11), (2025, 12), (2026, 1), (2026, 2)]
+
+
+def test_gunluk_yillik_dosya(ayar):
+    import time as _t
+
+    from tradebot.db import metadata, motor
+    from tradebot.veri import enstruman as en
+    from tradebot.veri.dukascopy import Dukascopy
+
+    e = motor(ayar)
+    metadata.create_all(e)
+    d = Dukascopy(ayar.veri_dizini, e, evren={"dukascopy": {}}, aralik_sn=0)
+    istenen = []
+
+    def sahte_al(url, params=None):
+        istenen.append(url)
+        # 2024: Salı 2 Ocak ve Cumartesi 6 Ocak (hacimsiz → ayıklanır)
+        return _bi5([(86400, 110000, 110100, 109900, 110200, 5.0), (5 * 86400, 1, 1, 1, 1, 0.0)])
+
+    d.http.al = sahte_al
+    ens = en.Enstruman("DUKASCOPY", "EURUSD", "fx", "fx_24x5", "USD", "dukascopy")
+    r = d.gunluk(ens, "2024-01", _t.monotonic() + 60)
+    assert istenen[0].endswith("EURUSD/2024/BID_candles_day_1.bi5") and r["yeni_dosya"] == len(istenen)
+    df = d.bar.oku("DUKASCOPY:EURUSD", "1d")
+    assert df["acilis_ms"].to_list()[0] == ms(datetime(2024, 1, 2, tzinfo=UTC))
+    assert df["close"][0] == 1.101  # kayıt sırası: t, o, c, l, h, v
+    assert ms(datetime(2024, 1, 6, tzinfo=UTC)) not in df["acilis_ms"].to_list()
+    # tamamlanmış yıl yeniden istenmez
+    n = len(istenen)
+    d.gunluk(ens, "2024-01", _t.monotonic() + 60)
+    assert len(istenen) == n + 1  # yalnız içinde bulunulan yıl yeniden
