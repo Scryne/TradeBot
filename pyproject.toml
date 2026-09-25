@@ -9,8 +9,13 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.20.0",
+    "exchange-calendars>=4.13.2",
+    "httpx>=0.28.1",
+    "polars>=1.44.2",
     "psycopg[binary]>=3",
+    "pyarrow>=25.0.1",
     "pydantic-settings>=2",
+    "pyyaml>=6.0.3",
     "sqlalchemy>=2",
     "structlog>=26.1.0",
     "typer>=0.27.2",
@@ -34,7 +39,7 @@ testpaths = ["tests"]
 addopts = "-q"
 
 [tool.ruff]
-line-length = 120
+line-length = 130
 target-version = "py312"
 extend-exclude = ["research"]
 

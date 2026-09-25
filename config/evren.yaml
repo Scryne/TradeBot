@@ -1,0 +1,47 @@
+# İlk dalga evreni (Final Doküman §Veri). Enstrüman kimliği = "<PIYASA>:<SEMBOL>".
+# takvim: kripto_7x24 | fx_24x5 | XNYS | XIST     (borsa takvimleri exchange_calendars'tan)
+# Kripto evreni dinamiktir: Binance'teki tüm USDT spot çiftleri (tarihsel evren: ilk/son mum tarihiyle).
+# Yürütme doğrulaması (1 dk) yalnız `dakikalik: true` olanlar için indirilir (Spike 02: Nautilus parity).
+
+kripto:
+  piyasa: BINANCE
+  sinif: kripto
+  takvim: kripto_7x24
+  para_birimi: USDT
+  dinamik_evren: usdt_spot          # exchangeInfo'daki tüm USDT çiftleri (işlemde olmayanlar dahil, delist için)
+  temel_zaman_dilimi: 1h            # tüm evren için saatlik; 4h/1d buradan türetilir
+  dakikalik: [BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, XRPUSDT, DOGEUSDT, ADAUSDT, TRXUSDT, LINKUSDT, AVAXUSDT]
+  funding: [BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, XRPUSDT, DOGEUSDT, ADAUSDT, LINKUSDT, AVAXUSDT, LTCUSDT]
+
+dukascopy:
+  piyasa: DUKASCOPY
+  takvim: fx_24x5
+  baslangic: "2010-01"
+  temel_zaman_dilimi: 1h            # BID + ASK saatlik (aylık dosya); spread = ASK - BID
+  dakikalik_yil: 3                  # 1 dk BID+ASK yalnız son 3 yıl (gece işi, nazik indirme)
+  semboller:
+    fx:     { para: USD, liste: [EURUSD, GBPUSD, USDJPY, AUDUSD, USDCAD, USDCHF, NZDUSD, EURJPY, EURGBP, USDTRY] }
+    metal:  { para: USD, liste: [XAUUSD, XAGUSD] }
+    endeks: { liste: { USA500IDXUSD: USD, USATECHIDXUSD: USD, USA30IDXUSD: USD, DEUIDXEUR: EUR, GBRIDXGBP: GBP, JPNIDXJPY: JPY } }
+    emtia:  { para: USD, liste: [BRENTCMDUSD, LIGHTCMDUSD] }
+
+abd_etf:
+  piyasa: ARCA                      # kaynak Yahoo; kimlik piyasası birincil borsa gösterimi
+  sinif: etf
+  takvim: XNYS
+  para_birimi: USD
+  baslangic: "1993-01-01"
+  liste: [SPY, QQQ, IWM, DIA, TLT, IEF, SHY, GLD, SLV, USO, XLF, XLK, XLE, XLV, XLY, XLP, XLI, XLU, XLB, XLRE, XLC,
+          EEM, EFA, VNQ, HYG, LQD]
+
+bist:
+  piyasa: BIST
+  sinif: hisse
+  takvim: XIST
+  para_birimi: TRY
+  baslangic: "2000-01-01"
+  endeksler: [XU100, XU030]
+  # Hisse listesi: çalışma anında BIST 30 + BIST 100 bileşenleri (borsapy, BUGÜNKÜ liste).
+  # SINIR: ücretsiz kaynakta geçmiş endeks üyeliği yok → hayatta kalma yanlılığı. Kalite raporu bunu işaretler;
+  # turnuvada BIST kesitsel sonuçları bu uyarıyla okunur.
+  bilesen_endeksleri: [XU100]
