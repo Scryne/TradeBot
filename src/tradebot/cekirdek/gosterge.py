@@ -39,9 +39,20 @@ def log_getiri(close: np.ndarray) -> np.ndarray:
 
 
 def kayan_std(x: np.ndarray, n: int) -> np.ndarray:
-    from numpy.lib.stride_tricks import sliding_window_view
-
+    """Pencere içindeki tanımlı değerlerin örneklem std'si (ddof=1; NaN'ler atlanır, < 2 değerde NaN). O(len) kümülatif
+    toplamlarla; sayısal kararlılık için değerler önce ilk tanımlı değere göre ötelenir (std ötelemeden bağımsız)."""
+    x = np.asarray(x, dtype=float)
     out = np.full(len(x), np.nan)
-    if len(x) >= n:
-        out[n - 1:] = np.nanstd(sliding_window_view(x, n), axis=1, ddof=1)
+    if n < 2 or len(x) < n:
+        return out
+    ok = np.isfinite(x)
+    ref = x[ok][0] if ok.any() else 0.0
+    y = np.where(ok, x - ref, 0.0)
+    c1 = np.r_[0.0, np.cumsum(y)]
+    c2 = np.r_[0.0, np.cumsum(y * y)]
+    cn = np.r_[0, np.cumsum(ok)]
+    s1, s2, m = c1[n:] - c1[:-n], c2[n:] - c2[:-n], (cn[n:] - cn[:-n]).astype(float)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        var = (s2 - s1 * s1 / m) / (m - 1)
+    out[n - 1:] = np.where(m >= 2, np.sqrt(np.maximum(var, 0.0)), np.nan)
     return out

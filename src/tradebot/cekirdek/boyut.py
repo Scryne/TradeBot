@@ -64,28 +64,41 @@ def panel_oynaklik_hedefi(sinyal: np.ndarray, close: np.ndarray, evrende: np.nda
     1. Varlık: ham_j = sinyal_j / σ_j / N_t (σ_j: j'nin gerçekleşen yıllık oynaklığı, N_t: t anında evrendeki enstrüman
        sayısı). Her varlık eşit risk taşır; sinyali olmayan varlığın payı nakitte kalır. `varlik_olcekle=False` ise
        ham = sinyal (kesitsel ağırlıklar gibi zaten toplamı belli sinyaller).
-    2. Kol: ham portföyün (tutulan ağırlık × sonraki bar getirisi) gerçekleşen oynaklığı hedefe ölçeklenir; brüt
-       maruziyet `azami`'yi aşarsa orantılı küçültülür (≤ 3x, `kaldirac_dogrula`).
+    2. Kol: BUGÜNKÜ ham ağırlıkların son `pencere` barın getirilerine uygulanmasıyla bulunan ileriye dönük (ex-ante)
+       oynaklık hedefe ölçeklenir. (Portföyün kendi geçmiş getirisi kullanılmaz: strateji nakitteyken o oynaklık ~0
+       olur ve girişte ölçek patlar.) Brüt maruziyet `azami`'yi aşarsa orantılı küçültülür (≤ 3x, `kaldirac_dogrula`).
     Isınmada (oynaklık tanımsız) ağırlık 0."""
     azami = kaldirac_dogrula(azami)
     s = np.asarray(sinyal, dtype=float)
     c = np.asarray(close, dtype=float)
     n, k = s.shape
+    ev = np.asarray(evrende, dtype=bool)
     with np.errstate(invalid="ignore", divide="ignore"):
         lr = np.vstack([np.full((1, k), np.nan), np.diff(np.log(c), axis=0)])
     if varlik_olcekle:
         sig = np.column_stack([kayan_std(lr[:, j], pencere) for j in range(k)]) * math.sqrt(bar_yil)
-        adet = np.maximum(np.asarray(evrende, dtype=bool).sum(axis=1), 1)[:, None]
+        adet = np.maximum(ev.sum(axis=1), 1)[:, None]
         with np.errstate(invalid="ignore", divide="ignore"):
             ham = np.where(np.isfinite(sig) & (sig > 0), s / np.where(sig > 0, sig, 1.0) / adet, 0.0)
     else:
         ham = np.nan_to_num(s)
-    ham = np.where(np.asarray(evrende, dtype=bool), ham, 0.0)
+    ham = np.where(ev, ham, 0.0)
     r = np.nan_to_num(np.expm1(lr))
-    port = np.r_[0.0, (ham[:-1] * r[1:]).sum(axis=1)]  # port[t]: ham[t-1] ile tutulan portföyün bar t getirisi
-    ps = kayan_std(port, pencere) * math.sqrt(bar_yil)
-    olcek = np.where(np.isfinite(ps) & (ps > 0), hedef_yillik / np.where(ps > 0, ps, 1.0), 0.0)
-    w = ham * olcek[:, None]
+    tanimli = np.isfinite(lr)
+    w = np.zeros((n, k))
+    kok = math.sqrt(bar_yil)
+    for t in range(pencere, n):
+        h = ham[t]
+        aktif = h != 0
+        if not aktif.any():
+            continue
+        # aktif varlıkların pencere boyunca getirisi tanımlı olmalı (yoksa oynaklık eksik tahmin edilir)
+        if not tanimli[t - pencere + 1: t + 1, aktif].all():
+            continue
+        x = r[t - pencere + 1: t + 1, aktif] @ h[aktif]
+        sp = float(x.std(ddof=1)) * kok
+        if sp > 0:
+            w[t] = h * (hedef_yillik / sp)
     brut = np.abs(w).sum(axis=1)
     kirp = np.where(brut > azami, azami / np.where(brut > 0, brut, 1.0), 1.0)
     return w * kirp[:, None]

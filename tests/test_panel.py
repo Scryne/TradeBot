@@ -306,3 +306,16 @@ def test_dalga1_on_kayit_dosyasi_gecerli():
     assert all(k["zd"] == "1d" for k in ks if k["grup"].startswith(("abd", "bist")))  # borsalarda gün içi veri yok
     assert d["_ayar"].kaldirac <= 3.0 and d["_ayar"].olcut.dsr_a == 0.95
     assert all(k["en_fazla"] == "B" for k in ks if k["grup"] == "bist_hisse")
+
+
+def test_panel_oynaklik_hedefi_nakitten_giriste_patlamaz():
+    """Hata (d0625fa): kol ölçeği portföyün geçmiş getirisinden hesaplanınca, uzun nakit döneminden sonra girişte
+    ölçek patlıyor ve kaldıraç tavana vuruyordu. Ex-ante ölçekte giriş ağırlığı hedef / varlık oynaklığı olmalı."""
+    rng = np.random.default_rng(5)
+    n = 1000
+    c = 100 * np.exp(np.cumsum(rng.normal(0, 0.04, (n, 1)), axis=0))  # yıllık ~%76
+    s = np.zeros((n, 1))
+    s[600:] = 1.0  # 600 bar nakit, sonra long
+    w = panel_oynaklik_hedefi(s, c, np.ones((n, 1), bool), 0.2, 365, pencere=60, azami=3.0)
+    assert w[:600].max() == 0
+    assert 0.15 < w[600, 0] < 0.4  # ≈ 0.2 / 0.76, 3x tavan DEĞİL
