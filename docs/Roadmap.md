@@ -104,6 +104,22 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   evren; kalite raporları.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
+  - 2026-09-25 kod ✅ (41 test).
+    - `tradebot.veri`: enstrüman kaydı, takvimler (kripto 7/24, FX 24/5 NY 17:00, XNYS, XIST exchange_calendars),
+      ham depo (SHA-256, değişmez, sürümlü), bar depo (kanonik Parquet).
+    - İndiriciler: Binance, Yahoo, Dukascopy. Kalite raporu, PIT evren tablosu, `tradebot veri …` komutları,
+      compose `veri` servisi (01:30 UTC).
+  - **Binance:** evren S3 listesinden 735 USDT sembolü (kaldırılanlar dahil; bugün işlemde 496). Her dosya
+    yayınlanan SHA-256 ile doğrulanıyor. Saatlik tam geçmiş; dakikalık 10 büyük coin; funding.
+  - **Yahoo:** OHLC bölünmeye göre geriye dönük düzeltilmiş. Yeni bölünme/bedelsiz görülünce tam yenileme.
+    BIST evreni KAP şirket listesi (809; borsaistanbul.com bu ağdan erişilemiyor), geçmiş endeks üyeliği yok →
+    yalnız kaldırılmış hisse yanlılığı kalıyor, raporda işaretli.
+  - **Dukascopy:** 3 sn arayla bile 503 → 6 sn/istek + üstel bekleme, zaman bütçeli devam eden iş.
+    - BID saatlik tam, ASK 3 yıl (spread), dakikalık EURUSD/XAUUSD/US500.
+    - İçinde bulunulan ayın saatlik dosyası ay sonunda yayınlanıyor.
+  - **LUNAUSDT** gibi aynı sembolde farklı varlık: 30+ günlük boşluk "kimlik kırılması şüphesi"; evren bu
+    boşlukta enstrümanı dışarıda bırakır.
+  - İlk yükleme host'ta başladı (2026-09-25 15:12 UTC, ~3,8 dosya/sn).
 
 ### Faz 3: Araştırma motoru
 - **İşler:** Saf karar çekirdeği arayüzü; look-ahead bozma testi; piyasa başına maliyet modelleri

@@ -27,7 +27,7 @@ katmanı. İlk aşama tamamen paper'dır.
 | İşlem motoru | **NautilusTrader v2** (`==2.0.0rc5` sabit) ✅ Spike 02 | Emir yönetimi, risk, çoklu para birimli muhasebe, mutabakat hazır; 22 kararlı bağlantı; Python ile özel bağlantı yazılabiliyor; parity %0,0000 (1 dk yürütme) |
 | Yedek motor | QuantConnect LEAN | Gerek kalmadı (Spike 02 geçti); kayıt için duruyor |
 | Hızlı araştırma | polars + numpy (vektörel) | Binlerce kol × parametre taraması |
-| Tarihsel veri deposu | Parquet (Nautilus veri kataloğu) | Sütunlu, hızlı; dosya hash'i = veri kimliği |
+| Tarihsel veri deposu | Ham dosyalar (SHA-256 kimlikli, değişmez) + **kendi normalize Parquet bar depomuz** (kanonik). Nautilus kataloğu Faz 3'te bundan dışa aktarılır | Nautilus v2 API'si değişiyor (Spike 02): veri Nautilus sürümünden bağımsız kalır, katalog her zaman yeniden üretilebilir |
 | Defter / denetim | PostgreSQL (Docker) | Deneme defteri, turnuva sonuçları, Jev kayıtları, denetim izi |
 | Zekâ katmanı | TypeSafe SDK (Jev, `jev-1.13.0` sabit) + OpenAI uyumlu istemci (NVIDIA build.nvidia.com) | Jev yargılar; belirsiz durum ücretsiz yükseltme modeline gider |
 | Paketleme | Docker Compose (WSL2 üzerinde), konteyner DNS'i `1.1.1.1` / `8.8.8.8`, sanal makine saati için chrony servisi (`saat`, yalnız SYS_TIME) | Tek komutla ayağa kalkar; ev router'ının DNS'i IPv6'sız adlarda 5–15 sn gecikiyor (Spike 02) |

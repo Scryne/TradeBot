@@ -49,6 +49,9 @@ def kur(a: Ayarlar) -> None:
         Path(a.log_dizini).mkdir(parents=True, exist_ok=True)
         hedefler.append(logging.FileHandler(Path(a.log_dizini) / "tradebot.jsonl", encoding="utf-8"))
     logging.basicConfig(format="%(message)s", level=a.log_seviyesi, handlers=hedefler, force=True)
+    # HTTP kütüphaneleri her isteği INFO'da basıyor (ilk yüklemede on binlerce satır); yalnız uyarı ve üstü.
+    for gurultulu in ("httpx", "httpcore", "urllib3"):
+        logging.getLogger(gurultulu).setLevel(logging.WARNING)
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,
