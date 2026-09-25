@@ -267,7 +267,7 @@ def arastirma_turnuva(
     sec = lambda s: {x.strip() for x in s.split(",") if x.strip()}  # noqa: E731
     gs, ss, zs = sec(grup), sec(strateji), sec(zd)
     hazir: dict = {}
-    for k in tv.kollar(d):
+    for k in sorted(tv.kollar(d), key=lambda x: (x["grup"], x["zd"])):  # grup verisi bir kez yüklensin
         if (gs and k["grup"] not in gs) or (ss and k["strateji"] not in ss) or (zs and k["zd"] not in zs):
             continue
         kol = tv.kol_kimligi(k["strateji"], k["grup"], k["zd"])
