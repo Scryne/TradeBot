@@ -12,7 +12,9 @@ $log = Join-Path $logDizin 'guncelle.log'
 $son = Join-Path $logDizin 'guncelle.son'
 Remove-Item $son -ErrorAction SilentlyContinue
 Set-Location 'C:\TradeBot\app'
-"=== $(Get-Date -Format o) ===" | Out-File $log -Encoding utf8
+# Deneme defteri için kod sürümü (imajda git yok; compose TRADEBOT_KOD_SURUMU'na geçirir)
+$env:KOD_SURUMU = (git rev-parse --short HEAD).Trim()
+"=== $(Get-Date -Format o) · $($env:KOD_SURUMU) ===" | Out-File $log -Encoding utf8
 Calistir 'docker compose up -d --build' | Out-File $log -Append -Encoding utf8
 $kod = $LASTEXITCODE
 Calistir 'docker compose ps' | Out-File $log -Append -Encoding utf8
