@@ -98,6 +98,42 @@ kalite_raporu = Table(
     Index("ix_kalite_raporu_kimlik", "kimlik", "zaman_dilimi"),
 )
 
+# --- Faz 3: deneme defteri ---
+test_plani = Table(
+    "test_plani",
+    metadata,
+    Column("kimlik", String(128), primary_key=True),
+    Column("zaman", DateTime(timezone=True), nullable=False),
+    Column("aile", String(64), nullable=False),
+    Column("hipotez", String(2000), nullable=False),
+    Column("izgara", JSONT, nullable=False),
+    Column("piyasalar", JSONT, nullable=False),
+    Column("olcut", String(2000), nullable=False),
+    Column("kod_surumu", String(64), nullable=False),
+    Column("durum", String(16), nullable=False),  # acik | kapandi
+    Column("sonuc", String(4000)),
+)
+
+deneme = Table(
+    "deneme",
+    metadata,
+    Column("id", KIMLIK, primary_key=True, autoincrement=True),
+    Column("zaman", DateTime(timezone=True), nullable=False),
+    Column("plan", String(128), nullable=False),
+    Column("tur", String(16), nullable=False),  # tarama | walk_forward | nautilus | paper
+    Column("strateji", String(256), nullable=False),
+    Column("aile", String(64), nullable=False),
+    Column("parametreler", JSONT, nullable=False),
+    Column("enstruman", String(64), nullable=False),
+    Column("zaman_dilimi", String(8), nullable=False),
+    Column("veri_hash", String(64), nullable=False),
+    Column("kod_surumu", String(64), nullable=False),
+    Column("metrik", JSONT, nullable=False),
+    Column("sure_sn", Float, nullable=False),
+    Index("ix_deneme_aile_tur", "aile", "tur"),
+    Index("ix_deneme_plan", "plan"),
+)
+
 
 def motor(a: Ayarlar) -> Engine:
     if a.veritabani_url is None:
