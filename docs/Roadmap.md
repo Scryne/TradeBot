@@ -169,6 +169,13 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   puan tablosu; paper'a giriş listesi.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
+  - 2026-09-25: Ön kayıt `config/turnuva/dalga1.yaml` + `docs/turnuva/Dalga-1.md` (d0625fa).
+    - Kol = strateji × piyasa grubu × zaman dilimi (çok enstrümanlı, eşit risk, kol %20 oynaklık).
+    - 94 kol, A/B/KALDI ölçütü.
+  - Hata yakalandı: kol ölçeği nakitten girişte patlıyordu. Ex-ante ölçekle düzeltildi (470df3a).
+  - Ek: DSR dalga sonunda nihai deneme sayısıyla yeniden hesaplanır.
+  - Bu dalgada yok, sırası yazılı: carry (kripto funding) 1b, gün içi kırılım 1c (Dukascopy dakikalık), olay tabanlı
+    Faz 6 sonrası, pairs dalga 2.
 
 ### Faz 6: Zekâ katmanı (Jev)
 - **İşler:** Spike 04-B: NVIDIA yükseltme modelinin seçimi (anahtar gelince). Metin toplayıcılar (ilk yayın zamanıyla); tek Jev servisi (uzun ömürlü istemci, kayıt,

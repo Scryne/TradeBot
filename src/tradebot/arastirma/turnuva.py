@@ -252,13 +252,33 @@ def kol_kos(defter: Defter, h: HazirGrup, plan: str, strateji: str, grup: str, i
         puanlar[vk] = m["puan"]
         hedefler[vk] = hedef
         satirlar.append({"varyant": vk, **m})
+    def stres_fonk(vk: str) -> tuple[Sonuc, Sonuc]:
+        hedef = hedefler[vk]
+        gec = np.vstack([np.zeros((1, hedef.shape[1])), hedef[:-1]])
+        return kos(h, hedef, ayar, maliyet_carpani=ayar.olcut.stres_maliyet), kos(h, gec, ayar)
+
+    def rejim_fonk(ek: dict) -> dict:
+        return rejim_kirilimi(h, Sonuc(ek["t"], ek["pozisyon"], ek["net"], ek["net"] * 0, ek["net"], ek["net"] * 0,
+                                       np.cumprod(1 + ek["net"])))
+
+    r = {"kol": kol, "aile": aile, "strateji": strateji, "grup": grup, "zd": zd, "yon": yon, "plan": plan,
+         "enstruman": len(h.g.kimlikler), "bar": len(h.g.t), "veri_hash": h.g.veri_hash[:12], "veri": veri_etiketi,
+         "donem": [int(h.g.t[0]), int(h.g.t[-1])], "en_fazla": en_fazla}
+    r |= degerlendir(defter, aile, strateji, izgara, kosular, puanlar, satirlar, ayar, float(np.nanmean(h.taraf)),
+                     stres_fonk, rejim_fonk)
+    r["karar"] = karar(r, ayar.olcut)
+    return r
+
+
+def degerlendir(defter: Defter, aile: str, strateji: str, izgara: dict, kosular: dict, puanlar: dict, satirlar: list,
+                ayar: Ayar, ort_taraf: float, stres_fonk, rejim_fonk) -> dict:
+    """Aşama 2–3 (kol türünden bağımsız): en iyi varyant, DSR, plato, walk-forward, yıllık, rejim, stres."""
     en_iyi = max(satirlar, key=lambda r: r["puan"])
     vk = en_iyi["varyant"]
     ek = kosular[vk]
     aile_sr = [float(x) for x in _aile_haftalik_sr(defter, aile)]
     dsr = dg.haftalik_dsr(ek["t"], ek["net"], defter.deneme_sayisi(aile), aile_sr)
     plato = dg.plato(izgara, puanlar, lambda p: varyant_kimligi(aile, strateji, p))
-    ort_taraf = float(np.nanmean(h.taraf))
     wf = dg.walk_forward(ek["t"], kosular, int(ayar.is_yil * YIL_MS), int(ayar.oos_yil * YIL_MS),
                          puan=lambda t, n: float(np.mean(mt.haftalik_log(t, n))) if len(n) else -1.0,
                          taraf_maliyet=ort_taraf)
@@ -271,24 +291,14 @@ def kol_kos(defter: Defter, h: HazirGrup, plan: str, strateji: str, grup: str, i
                     "secimler": [x["secilen"] for x in wf["secimler"]]}
     yillik = dg.yillik_kirilim(ek["t"], ek["net"])
     tam_yillar = [v for y, v in yillik.items() if _tam_yil(ek["t"], y)]
-    # aşama 3: yürütme stresi
-    hedef = hedefler[vk]
-    s2 = kos(h, hedef, ayar, maliyet_carpani=ayar.olcut.stres_maliyet)
-    gec = np.vstack([np.zeros((1, hedef.shape[1])), hedef[:-1]])
-    s3 = kos(h, gec, ayar)
-    stres = {"maliyet_2x_puan": mt.hesapla(s2).puan, "maliyet_2x_yillik": mt.hesapla(s2).yillik_bilesik,
-             "gecikme_puan": mt.hesapla(s3).puan, "gecikme_yillik": mt.hesapla(s3).yillik_bilesik}
-    r = {"kol": kol, "aile": aile, "strateji": strateji, "grup": grup, "zd": zd, "yon": yon, "plan": plan,
-         "enstruman": len(h.g.kimlikler), "bar": len(h.g.t), "veri_hash": h.g.veri_hash[:12], "veri": veri_etiketi,
-         "donem": [int(h.g.t[0]), int(h.g.t[-1])],
-         "en_iyi": en_iyi, "satirlar": sorted(satirlar, key=lambda x: -x["puan"]), "dsr": dsr, "plato": plato,
-         "walk_forward": wf_ozet, "yillik": yillik,
-         "yil_pozitif_orani": float(np.mean([v > 0 for v in tam_yillar])) if tam_yillar else 0.0,
-         "rejim": rejim_kirilimi(h, Sonuc(ek["t"], ek["pozisyon"], ek["net"], ek["net"] * 0, ek["net"],
-                                          ek["net"] * 0, np.cumprod(1 + ek["net"]))),
-         "stres": stres, "en_fazla": en_fazla}
-    r["karar"] = karar(r, ayar.olcut)
-    return r
+    s2, s3 = stres_fonk(vk)
+    m2, m3 = mt.hesapla(s2), mt.hesapla(s3)
+    return {"en_iyi": en_iyi, "satirlar": sorted(satirlar, key=lambda x: -x["puan"]), "dsr": dsr, "plato": plato,
+            "walk_forward": wf_ozet, "yillik": yillik,
+            "yil_pozitif_orani": float(np.mean([v > 0 for v in tam_yillar])) if tam_yillar else 0.0,
+            "rejim": rejim_fonk(ek),
+            "stres": {"maliyet_2x_puan": m2.puan, "maliyet_2x_yillik": m2.yillik_bilesik,
+                      "gecikme_puan": m3.puan, "gecikme_yillik": m3.yillik_bilesik}}
 
 
 def _tam_yil(t: np.ndarray, yil: int) -> bool:
@@ -362,4 +372,42 @@ def dsr_sonlandir(defter: Defter, r: dict, o: Olcut) -> dict:
                 "sr_esik": dg.beklenen_max_sr(n, v), "deneme": n, "nihai": True}
     r = r | {"dsr_kosu": d, "dsr": yeni}
     r["karar"] = karar(r, o)
+    return r
+
+
+def carry_kol_kos(defter: Defter, plan: str, oranlar: dict, izgara: dict, ayar: Ayar, spot_taraf_bps: float,
+                  veri_hash: str, bit_ms: int | None = None, notional: float = 0.5, veri_etiketi: str = "",
+                  izin_kirli: bool = False) -> dict:
+    """Funding carry kolu (dalga 1b). Frenler uygulanmaz (yönden bağımsız, düşük oynaklık); baz riski modellenmediği
+    için en fazla B (arastirma/carry.py)."""
+    from tradebot.arastirma import carry as cr
+
+    aile, strateji, grup = "carry", "funding_carry", "kripto_funding"
+    t, o, adlar = cr.funding_izgarasi(oranlar, bit_ms)
+    kosular, puanlar, satirlar, sinyaller = {}, {}, [], {}
+    for p0 in dg.izgara(izgara):
+        vk = varyant_kimligi(aile, strateji, p0)
+        t0 = time.perf_counter()
+        s = cr.funding_sinyali(t, o, p0["pencere_gun"], p0["esik_yillik"])
+        son = cr.calistir_carry(t, o, s, spot_taraf_bps, notional)
+        m = olc(son)
+        defter.kaydet(plan, "tarama", vk, aile, p0 | {"notional": notional}, f"kol:{grup}", "funding", veri_hash,
+                      m | {"kol": f"{strateji}@{grup}", "enstruman_sayisi": len(adlar)}, time.perf_counter() - t0,
+                      izin_kirli=izin_kirli)
+        kosular[vk] = {"net": son.net, "pozisyon": son.pozisyon, "t": son.t}
+        puanlar[vk] = m["puan"]
+        sinyaller[vk] = s
+        satirlar.append({"varyant": vk, **m})
+
+    def stres_fonk(vk: str):
+        s = sinyaller[vk]
+        return (cr.calistir_carry(t, o, s, spot_taraf_bps, notional, maliyet_carpani=ayar.olcut.stres_maliyet),
+                cr.calistir_carry(t, o, s, spot_taraf_bps, notional, gecikme=1))
+
+    r = {"kol": f"{strateji}@{grup}@funding", "aile": aile, "strateji": strateji, "grup": grup, "zd": "funding",
+         "yon": "notr", "plan": plan, "enstruman": len(adlar), "bar": len(t), "veri_hash": veri_hash[:12],
+         "veri": veri_etiketi, "donem": [int(t[0]), int(t[-1])], "en_fazla": "B"}
+    r |= degerlendir(defter, aile, strateji, izgara, kosular, puanlar, satirlar, ayar,
+                     (spot_taraf_bps + cr.PERP_TARAF_BPS) / 1e4, stres_fonk, lambda ek: {})
+    r["karar"] = karar(r, ayar.olcut)
     return r

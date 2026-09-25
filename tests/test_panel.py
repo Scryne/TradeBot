@@ -333,3 +333,38 @@ def test_dsr_sonlandir_nihai_deneme_sayisiyla(ortam):
     assert s["dsr"]["deneme"] == 6 and s["dsr"]["nihai"] and s["dsr_kosu"]["deneme"] == 2
     assert s["dsr"]["sr_haftalik"] == r["dsr"]["sr_haftalik"]
     assert tv.dsr_sonlandir(defter, s, tv.Olcut())["dsr"]["deneme"] == 6  # tekrar uygulanabilir (idempotent)
+
+
+# ------------------------------------------------------------------ carry (dalga 1b)
+def _funding(n=3 * 365 * 5, tohum=0, ort=0.0001):
+    rng = np.random.default_rng(tohum)
+    t = T0 + np.arange(n, dtype=np.int64) * 8 * SAAT
+    rejim = np.sin(np.arange(n) / 200) > -0.3  # pozitif ve negatif funding dönemleri
+    o = np.where(rejim, ort, -ort) + rng.normal(0, 0.00005, n)
+    return pl.DataFrame({"zaman_ms": t, "oran": o})
+
+
+def test_carry_sinyali_nedensel_ve_getiri():
+    from tradebot.arastirma import carry as cr
+
+    t, o, _ = cr.funding_izgarasi({"A": _funding(tohum=1), "B": _funding(tohum=2)})
+    s = cr.funding_sinyali(t, o, 7, 0.05)
+    o2 = o.copy()
+    o2[2000:] *= -5
+    np.testing.assert_array_equal(cr.funding_sinyali(t, o2, 7, 0.05)[:2000], s[:2000])  # gelecek-bozma
+    assert s[:21].sum() == 0  # pencere dolmadan sinyal yok
+    son = cr.calistir_carry(t, o, s, 13.0, notional=0.5)
+    assert son.ozkaynak[-1] > 1.0 and son.pozisyon.max() <= 1.0 + 1e-12  # brüt = 2 × notional ≤ 1
+    # sinyal olay i'de → getiri olay i+1'den: ilk açık olayda getiri yok, yalnız maliyet
+    ilk = int(np.flatnonzero(s.any(axis=1))[0])
+    assert son.brut[ilk] == 0 and son.maliyet[ilk + 1] > 0
+    assert cr.calistir_carry(t, o, s, 13.0, maliyet_carpani=2).ozkaynak[-1] < son.ozkaynak[-1]
+
+
+def test_carry_kol_kos(ortam):
+    defter, _, _ = ortam
+    izgara = {"pencere_gun": [3, 7], "esik_yillik": [0.05, 0.1]}
+    defter.plan_ac("c", "carry", "sentetik", izgara, ["kol:kripto_funding"], "x")
+    r = tv.carry_kol_kos(defter, "c", {"A": _funding(tohum=1), "B": _funding(tohum=2)}, izgara, tv.Ayar(), 13.0, "h" * 64)
+    assert defter.deneme_sayisi("carry") == 4 and r["karar"] in {"B", "KALDI"} and r["rejim"] == {}
+    assert r["walk_forward"]["pencere"] >= 1

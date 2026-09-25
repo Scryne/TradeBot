@@ -1,0 +1,19 @@
+# Turnuva dalga 1b: kripto funding carry. ÖN KAYIT (koşudan önce commit edilir, koşu sırasında değişmez).
+# Model ve sınırları: src/tradebot/arastirma/carry.py. Gerekçe: docs/turnuva/Dalga-1.md (§Bu dalgaya girmeyenler).
+
+dalga: 1b
+veri_bitis: "2026-09-01"
+frenler: false                   # yönden bağımsız, düşük oynaklık; frenler fiyat riskine göre kurulu
+notional: 0.5                    # spot N + perp teminatı N (1x) ≤ özkaynak → N ≤ 0,5
+boyut: { hedef_vol: 0.20, kaldirac: 3.0, vol_pencere_gun: 30, bant: 0.25 }  # carry'de kullanılmaz (dalga_oku biçimi)
+walk_forward: { is_yil: 3, oos_yil: 1 }
+# Ölçüt dalga 1 ile aynı. Baz riski modellenmediği için carry kolu EN FAZLA B (paper gözlem).
+olcut: { dsr_a: 0.95, dsr_b: 0.80, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0 }
+planlar:
+  carry:
+    kimlik: 2026-09-25-d1b-carry
+    hipotez: >-
+      Son günlerin funding'i yüksek olan coinlerde spot long + perp short pozisyonu, iki bacağın maliyeti sonrası
+      pozitif ve düşük oynaklıklı haftalık getiri verir.
+semboller: [BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, XRPUSDT, DOGEUSDT, ADAUSDT, LINKUSDT, AVAXUSDT, LTCUSDT]
+izgara: { pencere_gun: [3, 7, 14], esik_yillik: [0.05, 0.10, 0.20] }

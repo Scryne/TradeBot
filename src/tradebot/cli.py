@@ -294,6 +294,44 @@ def arastirma_turnuva(
                    f"OOS {w.get('oos_yillik', float('nan')) * 100:+.1f}%/yıl")
 
 
+@arastirma_uygulama.command("carry")
+def arastirma_carry(dosya: str = typer.Option("config/turnuva/dalga1b.yaml")) -> None:
+    """Kripto funding carry kolu (dalga 1b)."""
+    import hashlib
+    from datetime import UTC, datetime
+
+    import polars as pl
+
+    from tradebot.arastirma import turnuva as tv
+    from tradebot.arastirma.defter import Defter
+    from tradebot.arastirma.maliyet import model
+
+    a, m = _veri_baglam()
+    d = tv.dalga_oku(Path(dosya))
+    defter = Defter(m)
+    p = d["planlar"]["carry"]
+    try:
+        defter.plan_ac(p["kimlik"], "carry", " ".join(p["hipotez"].split()), d["izgara"],
+                       [f"BINANCE-UM:{s}" for s in d["semboller"]], f"{dosya} → olcut {d['olcut']} (en fazla B)")
+    except ValueError:
+        pass
+    kok = Path(a.veri_dizini) / "funding"
+    yollar = {s: kok / f"{s}.parquet" for s in d["semboller"] if (kok / f"{s}.parquet").exists()}
+    if not yollar:
+        raise typer.BadParameter(f"funding verisi yok: {kok}")
+    h = hashlib.sha256("|".join(f"{s}:{hashlib.sha256(y.read_bytes()).hexdigest()}" for s, y in yollar.items())
+                       .encode()).hexdigest()
+    bit_ms = int(datetime.fromisoformat(d["veri_bitis"]).replace(tzinfo=UTC).timestamp() * 1000)
+    r = tv.carry_kol_kos(defter, p["kimlik"], {s: pl.read_parquet(y) for s, y in yollar.items()}, d["izgara"], d["_ayar"],
+                         model("BINANCE", "kripto").taraf_bps(), h, bit_ms=bit_ms, notional=d["notional"],
+                         veri_etiketi=f"bitis {d['veri_bitis']}")
+    tv.sonuc_yaz(r, Path(a.veri_dizini) / "turnuva" / f"dalga{d['dalga']}")
+    e, w = r["en_iyi"], r["walk_forward"]
+    typer.echo(f"{r['karar']:<6}{r['kol']:<44} puan {e['puan'] * 100:+.3f}%/hf  yıllık {e['yillik_bilesik'] * 100:.1f}%  "
+               f"Sharpe {e['sharpe']:.2f}  DD {e['en_kotu_dusus'] * 100:.0f}%  DSR {r['dsr'].get('dsr', float('nan')):.2f}  "
+               f"OOS {w.get('oos_yillik', float('nan')) * 100:+.1f}%/yıl  ({len(yollar)} coin)")
+
+
 @arastirma_uygulama.command("sonlandir")
 def arastirma_sonlandir(dosya: str = typer.Option("config/turnuva/dalga1.yaml")) -> None:
     """Dalga bitince: her kolun DSR'ını ailenin nihai deneme sayısıyla yeniden hesaplar ve kararı yeniler."""
