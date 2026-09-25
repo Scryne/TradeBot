@@ -75,3 +75,9 @@ def test_evren_gelecegi_gormez(tmp_path):
     d.yaz("X:A", "1h", bozuk, birlestir=False)
     sonra = ev.tablo_kur(d, ["X:A"], "1h", t0, t0 + 30 * GUN).filter(pl.col("gun") <= t0 + 15 * GUN)
     assert once.equals(sonra)
+
+
+def test_sonraki_calisma():
+    from tradebot.veri.is_akisi import sonraki_calisma
+    assert sonraki_calisma(datetime(2026, 9, 25, 0, 10, tzinfo=UTC), 1, 30) == datetime(2026, 9, 25, 1, 30, tzinfo=UTC)
+    assert sonraki_calisma(datetime(2026, 9, 25, 2, 0, tzinfo=UTC), 1, 30) == datetime(2026, 9, 26, 1, 30, tzinfo=UTC)

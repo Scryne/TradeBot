@@ -67,6 +67,13 @@ services:
     depends_on:
       goc: { condition: service_completed_successfully }
 
+  veri:
+    <<: *ortak
+    # Gece işi: her gün 01:30 UTC (04:30 TRT). --hemen: servis ilk kalktığında bir kez çalıştırır (ilk yükleme).
+    command: ["tradebot", "veri", "zamanla", "--saat", "01:30", "--hemen", "--dukascopy-butce-dk", "240"]
+    depends_on:
+      goc: { condition: service_completed_successfully }
+
 volumes:
   pg:
   veri:
