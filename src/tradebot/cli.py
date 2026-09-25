@@ -16,6 +16,8 @@ db_uygulama = typer.Typer(help="Veritabanı işlemleri", no_args_is_help=True)
 uygulama.add_typer(db_uygulama, name="db")
 veri_uygulama = typer.Typer(help="Veri platformu (Faz 2)", no_args_is_help=True)
 uygulama.add_typer(veri_uygulama, name="veri")
+arastirma_uygulama = typer.Typer(help="Araştırma motoru (Faz 3): test planı ve tarama", no_args_is_help=True)
+uygulama.add_typer(arastirma_uygulama, name="arastirma")
 
 _ISARET = {"OK": "✓", "UYARI": "!", "HATA": "✗"}
 
@@ -164,3 +166,61 @@ def veri_zamanla(
         kayitci.info("sonraki_gece_isi", zaman=hedef.isoformat())
         time.sleep(max(0.0, (hedef - datetime.now(UTC)).total_seconds()))
         is_akisi.gece(a, m, dukascopy_butce_dk)
+
+
+@arastirma_uygulama.command("plan")
+def arastirma_plan(
+    kimlik: str = typer.Option(..., help="Plan kimliği (ör. 2026-09-25-trend-btc)"),
+    aile: str = typer.Option(...), hipotez: str = typer.Option(...),
+    izgara: str = typer.Option(..., help='JSON, ör. {"hizli":[10,20],"yavas":[50,100]}'),
+    piyasalar: str = typer.Option(..., help="Virgülle enstrüman kimlikleri"),
+    olcut: str = typer.Option(..., help="Geçme ölçütü (koşudan ÖNCE yazılır)"),
+) -> None:
+    """Test planı açar (koşudan önce; plansız koşu deftere giremez)."""
+    from tradebot.arastirma.defter import Defter
+
+    _, m = _veri_baglam()
+    Defter(m).plan_ac(kimlik, aile, hipotez, json.loads(izgara), [x.strip() for x in piyasalar.split(",")], olcut)
+    typer.echo(f"plan açıldı: {kimlik}")
+
+
+@arastirma_uygulama.command("tara")
+def arastirma_tara(
+    plan: str = typer.Option(...), strateji: str = typer.Option(..., help="sma_kesisim | donchian | tsmom"),
+    enstruman: str = typer.Option(..., help="ör. BINANCE:BTCUSDT"), zd: str = typer.Option("1d"),
+    izgara: str = typer.Option(...), yon: str = typer.Option("long"), bant: float = typer.Option(0.0),
+    json_cikti: bool = typer.Option(False, "--json"),
+) -> None:
+    """Izgara taraması + DSR + plato + walk-forward + yıllık kırılım; her kombinasyon deftere yazılır."""
+    from tradebot.arastirma.defter import Defter
+    from tradebot.arastirma.tarama import tara
+    from tradebot.veri import enstruman as en
+    from tradebot.veri.depo import BarDepo
+
+    a, m = _veri_baglam()
+    kayit = next((k for k in en.hepsi(m) if k["kimlik"] == enstruman), None)
+    if kayit is None:
+        raise typer.BadParameter(f"enstrüman kaydı yok: {enstruman}")
+    r = tara(Defter(m), BarDepo(a.veri_dizini), plan, strateji, enstruman, kayit["piyasa"], kayit["sinif"], zd,
+             json.loads(izgara), yon=yon, bant=bant)
+    if json_cikti:
+        _yazdir(r)
+        return
+    typer.echo(f"{r['enstruman']} {r['zd']} · {r['bar']} bar · maliyet {r['maliyet']} · veri {r['veri_hash']}")
+    typer.echo(f"{'strateji':<42}{'puan%/hf':>9}{'yıllık':>8}{'Sharpe':>7}{'DD':>7}{'kötü hf':>8}{'işlem':>6}{'kapı':>5}")
+    for s in r["satirlar"]:
+        typer.echo(f"{s['strateji'][:41]:<42}{s['puan'] * 100:>9.3f}{s['yillik_bilesik'] * 100:>7.1f}%{s['sharpe']:>7.2f}"
+                   f"{s['en_kotu_dusus'] * 100:>6.0f}%{s['en_kotu_hafta'] * 100:>7.1f}%{s['islem']:>6}"
+                   f"{'✓' if s['kapilar_gecti'] else '✗':>5}")
+    at = r["al_tut"]
+    typer.echo(f"{'al-tut (kıyas)':<42}{at['puan'] * 100:>9.3f}{at['yillik_bilesik'] * 100:>7.1f}%{at['sharpe']:>7.2f}"
+               f"{at['en_kotu_dusus'] * 100:>6.0f}%{at['en_kotu_hafta'] * 100:>7.1f}%")
+    d, p, w = r["dsr"], r["plato"], r["walk_forward"]
+    typer.echo("")
+    typer.echo(f"en iyi: {r['en_iyi']['strateji']}")
+    typer.echo(f"DSR {d.get('dsr', float('nan')):.3f} (aile deneme {d.get('deneme')}, SR* {d.get('sr_esik', 0):.3f}) · "
+               f"plato oranı {p['plato_orani']:.2f} ({'var' if p['plato_var'] else 'YOK'})")
+    if w.get("pencere"):
+        typer.echo(f"walk-forward: {w['pencere']} pencere, OOS yıllık {w['oos_yillik'] * 100:.1f}%, "
+                   f"Sharpe {w['oos_sharpe']:.2f}, DD {w['oos_en_kotu_dusus'] * 100:.0f}%, seçimler {w['secimler']}")
+    typer.echo("yıllık: " + "  ".join(f"{y}:{v * 100:+.0f}%" for y, v in r["yillik"].items()))
