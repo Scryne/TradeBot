@@ -254,6 +254,9 @@ def test_kol_kos_uctan_uca(ortam, strateji, izgara):
     assert set(r["stres"]) >= {"maliyet_2x_puan", "gecikme_puan"} and set(r["rejim"]) == {"yukari", "asagi"}
     assert r["stres"]["maliyet_2x_puan"] <= r["en_iyi"]["puan"] + 1e-12
     assert r["en_iyi"]["yillik_oynaklik"] < 0.4  # oynaklık hedefi (%20) çalışıyor
+    hf = r["haftalik"]
+    assert len(hf["tam"]["hafta"]) == len(hf["tam"]["log"]) == r["en_iyi"]["hafta"] and len(hf["oos"]["log"]) > 0
+    assert sum(hf["tam"]["log"]) == pytest.approx(r["en_iyi"]["puan"] * r["en_iyi"]["hafta"], abs=1e-6 * r["en_iyi"]["hafta"])
 
 
 def test_cevir_ve_bar_gun():
@@ -368,3 +371,21 @@ def test_carry_kol_kos(ortam):
     r = tv.carry_kol_kos(defter, "c", {"A": _funding(tohum=1), "B": _funding(tohum=2)}, izgara, tv.Ayar(), 13.0, "h" * 64)
     assert defter.deneme_sayisi("carry") == 4 and r["karar"] in {"B", "KALDI"} and r["rejim"] == {}
     assert r["walk_forward"]["pencere"] >= 1
+
+
+def test_portfoy_birlestirme_cesitlendirme_ve_tavan():
+    from tradebot.arastirma import portfoy as pf
+
+    rng = np.random.default_rng(0)
+    h = np.arange(300)
+    seriler = {f"k{i}": {"hafta": h.tolist(), "log": np.log1p(rng.normal(0.003, 0.03, 300)).tolist()} for i in range(4)}
+    r = pf.birlestir(seriler, {f"k{i}": 0.5 for i in range(4)})
+    tek = pf.birlestir({"k0": seriler["k0"]}, {"k0": 0.5})
+    assert abs(r["ort_korelasyon"]) < 0.2
+    assert r["1x"]["sharpe"] > tek["1x"]["sharpe"]  # ilişkisiz kollar birleşince Sharpe artar
+    assert 0 <= r["kaldirac"] <= 3.0 and r["kaldirac"] <= r["brut_tavan_kaldirac"] + 1e-12
+    # brüt tavan: kolların maruziyeti 2x ise kaldıraç en fazla 1,5
+    assert pf.birlestir(seriler, {f"k{i}": 2.0 for i in range(4)})["kaldirac"] <= 1.5 + 1e-12
+    # eksik haftalar: kol yokken ağırlık 0
+    s2 = seriler | {"yeni": {"hafta": h[200:].tolist(), "log": [0.01] * 100}}
+    assert pf.birlestir(s2, {})["son_agirlik"]["yeni"] == 0.0  # sıfır oynaklık → ağırlık yok

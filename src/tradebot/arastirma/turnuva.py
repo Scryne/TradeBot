@@ -293,12 +293,22 @@ def degerlendir(defter: Defter, aile: str, strateji: str, izgara: dict, kosular:
     tam_yillar = [v for y, v in yillik.items() if _tam_yil(ek["t"], y)]
     s2, s3 = stres_fonk(vk)
     m2, m3 = mt.hesapla(s2), mt.hesapla(s3)
-    return {"en_iyi": en_iyi, "satirlar": sorted(satirlar, key=lambda x: -x["puan"]), "dsr": dsr, "plato": plato,
+    haftalik = {"tam": _haftalik_seri(ek["t"], ek["net"])}
+    if wf.get("pencere"):
+        haftalik["oos"] = _haftalik_seri(wf["t"], wf["net"])
+    return {"haftalik": haftalik,
+            "en_iyi": en_iyi, "satirlar": sorted(satirlar, key=lambda x: -x["puan"]), "dsr": dsr, "plato": plato,
             "walk_forward": wf_ozet, "yillik": yillik,
             "yil_pozitif_orani": float(np.mean([v > 0 for v in tam_yillar])) if tam_yillar else 0.0,
             "rejim": rejim_fonk(ek),
             "stres": {"maliyet_2x_puan": m2.puan, "maliyet_2x_yillik": m2.yillik_bilesik,
                       "gecikme_puan": m3.puan, "gecikme_yillik": m3.yillik_bilesik}}
+
+
+def _haftalik_seri(t: np.ndarray, net: np.ndarray) -> dict:
+    """Portföy birleştirme için: {hafta numarası (UTC Pazartesi), haftalık log büyüme}."""
+    h = (np.asarray(t, dtype=np.int64) - mt.PAZARTESI_KAYMA_MS) // mt.HAFTA_MS
+    return {"hafta": [int(x) for x in np.unique(h)], "log": [round(float(x), 8) for x in mt.haftalik_log(t, net)]}
 
 
 def _tam_yil(t: np.ndarray, yil: int) -> bool:

@@ -349,6 +349,32 @@ def arastirma_sonlandir(dosya: str = typer.Option("config/turnuva/dalga1.yaml"))
                    f"{r['dsr'].get('dsr', float('nan')):.3f} (deneme {r['dsr'].get('deneme')})")
 
 
+@arastirma_uygulama.command("portfoy")
+def arastirma_portfoy(
+    dalgalar: str = typer.Option("1,1b", help="Virgüllü dalga adları"),
+    kararlar: str = typer.Option("A,B", help="Birleştirilecek karar sınıfları"),
+    kollar: str = typer.Option("", help="Yalnız bu kollar (virgüllü; kararları ezer)"),
+) -> None:
+    """Seçilen kolların walk-forward OOS haftalık serilerini eşit riskle birleştirir (Faz 7 dağıtıcı önizlemesi)."""
+    from tradebot.arastirma import portfoy as pf
+
+    a = ayarlar()
+    secili = {x.strip() for x in kollar.split(",") if x.strip()}
+    ks = {x.strip() for x in kararlar.split(",") if x.strip()}
+    seriler, maruziyet = {}, {}
+    for dl in dalgalar.split(","):
+        for p in sorted((Path(a.veri_dizini) / "turnuva" / f"dalga{dl.strip()}").glob("*.json")):
+            r = json.loads(p.read_text(encoding="utf-8"))
+            if (secili and r["kol"] not in secili) or (not secili and r["karar"] not in ks):
+                continue
+            if "oos" in r.get("haftalik", {}):
+                seriler[r["kol"]] = r["haftalik"]["oos"]
+                maruziyet[r["kol"]] = r["en_iyi"]["maruziyet"]
+    if not seriler:
+        raise typer.BadParameter("seçime uyan (haftalık OOS serisi olan) kol yok")
+    _yazdir(pf.birlestir(seriler, maruziyet))
+
+
 @arastirma_uygulama.command("rapor")
 def arastirma_rapor(
     dalga: int = typer.Option(1), md: str = typer.Option("", help="Markdown tablo çıktısı (ör. docs/turnuva/...)"),
