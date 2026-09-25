@@ -30,7 +30,7 @@ katmanı. İlk aşama tamamen paper'dır.
 | Tarihsel veri deposu | Parquet (Nautilus veri kataloğu) | Sütunlu, hızlı; dosya hash'i = veri kimliği |
 | Defter / denetim | PostgreSQL (Docker) | Deneme defteri, turnuva sonuçları, Jev kayıtları, denetim izi |
 | Zekâ katmanı | TypeSafe SDK (Jev, `jev-1.13.0` sabit) + OpenAI uyumlu istemci (NVIDIA build.nvidia.com) | Jev yargılar; belirsiz durum ücretsiz yükseltme modeline gider |
-| Paketleme | Docker Compose (WSL2 üzerinde), konteyner DNS'i `1.1.1.1` / `8.8.8.8` | Tek komutla ayağa kalkar; ev router'ının DNS'i IPv6'sız adlarda 5–15 sn gecikiyor (Spike 02) |
+| Paketleme | Docker Compose (WSL2 üzerinde), konteyner DNS'i `1.1.1.1` / `8.8.8.8`, sanal makine saati için chrony servisi (`saat`, yalnız SYS_TIME) | Tek komutla ayağa kalkar; ev router'ının DNS'i IPv6'sız adlarda 5–15 sn gecikiyor (Spike 02) |
 | Bildirim | Telegram bot | Kritik / uyarı / bilgi seviyeleri |
 | Pano | FastAPI + web arayüzü (DESIGN.md) | Tailscale üzerinden telefondan erişim, internete kapalı |
 | Uzaktan erişim | Tailscale + SSH | Şifreli özel ağ |

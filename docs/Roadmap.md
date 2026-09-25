@@ -16,8 +16,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | Faz | Adı | Durum | Bitti Kriteri |
 | --- | --- | --- | --- |
 | 0 | Riskli kararların spike'ları | ✅ Tamamlandı | Spike 02–05 raporları `docs/spikes/` altında; Final Doküman'daki ⚑ kararlar kesinleşti ya da yedek plana geçildi |
-| 1 | Altyapı ve host | 🔄 Devam Ediyor | Host (WSL2 + Docker + Tailscale + SSH, 7/24 ayarları) hazır; `uv` projesi, Compose iskeleti, PostgreSQL, sır yönetimi, log düzeni; testler yeşil |
-| 2 | Veri platformu (ilk dalga) | ⏳ Bekliyor | Kripto, Dukascopy, ABD ETF, BIST günlük verileri katalogda; enstrüman kaydı + takvimler + kurumsal işlemler; PIT evren; kaynak başına kalite raporu |
+| 1 | Altyapı ve host | ✅ Tamamlandı | Host (WSL2 + Docker + Tailscale + SSH, 7/24 ayarları) hazır; `uv` projesi, Compose iskeleti, PostgreSQL, sır yönetimi, log düzeni; testler yeşil |
+| 2 | Veri platformu (ilk dalga) | 🔄 Devam Ediyor | Kripto, Dukascopy, ABD ETF, BIST günlük verileri katalogda; enstrüman kaydı + takvimler + kurumsal işlemler; PIT evren; kaynak başına kalite raporu |
 | 3 | Araştırma motoru | ⏳ Bekliyor | Saf karar çekirdeği; piyasa başına maliyet modelleri; vektörel tarama; walk-forward + plato + DSR; deneme defteri; vektörel ↔ Nautilus parity testi geçiyor |
 | 4 | Risk motoru ve boyutlandırma | ⏳ Bekliyor | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
 | 5 | Turnuva — backtest dalgası 1 | ⏳ Bekliyor | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
@@ -89,7 +89,13 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
       kullanıcı oturumundaki `TradeBot\Guncelle` görevinden yapılıyor (`host_guncelle.ps1`).
     - Host'ta `tradebot saglik`: dns 0,48 sn ✅, saat +0,09 sn ✅, PostgreSQL 17 + zincir ✅, disk 1.023 GB ✅,
       sırlar yalnız NVIDIA/Telegram eksik (beklenen). `kurulum.ps1` kontrolü: tümü OK.
-    - Kalan: yeniden başlatma dayanıklılık testi (Scryne onayıyla) ve otomatik oturum kararı.
+    - **Yeniden başlatma testi ✅ (2026-09-25):**
+      - Açılış → otomatik oturum → Docker → TradeBot servisleri kimse dokunmadan 57 sn'de geri geldi.
+      - Otomatik oturum: Scryne'ın kararı B (kilitsiz). Parola Sysinternals Autologon ile LSA'da, kayıt
+        defterinde düz metin yok. Windows Hello zorunluluğu kapatıldı.
+    - **Bulgu: WSL2 sanal makine saati.** Windows saati doğruyken sanal makine açılıştan sonra 335 ms geride ölçüldü;
+      chrony −3.643 ppm sapma raporladı. Çözüm: compose'a `saat` servisi (chrony, yalnız SYS_TIME). Sonrasında
+      Binance'e göre +0,10 sn.
 
 ### Faz 2: Veri platformu (ilk dalga)
 - **İşler:** İdempotent indiriciler; Nautilus Parquet kataloğu; ham veri hash'leri; enstrüman kaydı

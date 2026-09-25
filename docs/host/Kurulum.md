@@ -44,6 +44,13 @@ Betikler: `tools/host/baslangic.ps1` (bir kez, elle), `tools/host/kurulum.ps1` (
   Bu yüzden kod `git bundle` ile taşınıyor (`guncelle.ps1`).
 - Windows saat servisi varsayılan olarak 1 sn altı farkı saatler içinde kapatıyor. Yüksek doğruluk ayarlarıyla
   (UpdateInterval 100, poll 64 sn, MaxAllowedPhaseOffset 0) fark −720 ms'den ±0,3 ms'ye indi.
+- Docker Desktop'ın kimlik araması SSH oturumunda çalışmıyor ("Belirtilen oturum yok"). Servis kurulumu kullanıcı
+  oturumundaki `TradeBot\Guncelle` zamanlanmış görevinden yapılır (`host_guncelle.ps1`); SSH yalnız tetikler.
+- WSL2 sanal makinesinin saati Windows'tan kopuk kalabiliyor (açılıştan sonra 335 ms geride, −3.643 ppm sapma).
+  compose'daki `saat` servisi (chrony, yalnız `SYS_TIME` yetkisi) bunu sürekli düzeltir.
+- **Otomatik oturum (Scryne'ın kararı: B, kilitsiz):** Sysinternals Autologon ile, parola LSA'da (kayıt defterinde
+  düz metin yok). Microsoft hesabında "yalnız Windows Hello ile giriş" kapatıldı (`DevicePasswordLessBuildVersion=0`).
+  Yeniden başlatma testi: açılış → otomatik oturum → servisler 57 sn'de geri.
 - Host: 192.168.1.4 (yerel), Tailscale 100.83.56.99. SSH takma adı `tradebot-host`.
 
 ## Güvenlik notları

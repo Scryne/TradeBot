@@ -3,5 +3,5 @@
   "asama": "uygulama",
   "guncellendi": "2026-09-25",
   "roadmap": "docs/Roadmap.md",
-  "not": "Final Dokuman onaylandi (2026-09-25). Faz 0 tamam. Faz 1 (altyapi ve host) devam ediyor: (a) repo iskeleti bu makinede, (b) ev bilgisayari kurulumu Scryne ile."
+  "not": "Faz 1 tamam (2026-09-25): host 192.168.1.4 / Tailscale 100.83.56.99; servisler compose ile (postgres, goc, saglik, saat); yeniden baslatma testi gecti (otomatik oturum B, 57 sn). Guncelleme: tools/host/guncelle.ps1 (bundle + oturumdaki gorev). Sirada Faz 2 veri platformu (indirici kurallari docs/spikes/03-veri.md §3)."
 }
