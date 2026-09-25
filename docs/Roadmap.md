@@ -84,7 +84,12 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     - NTP: kaynak Cloudflare. Yüksek doğruluk ayarlarıyla fark −720 ms'den ±0,3 ms'ye indi ✅.
     - Tailscale ✅ (100.83.56.99). WSL 2.7.14 ✅ (DISM + MSI; `wsl --install` SSH'ta çalışmadı). Docker Desktop kuruldu.
     - Kod bundle ile host'ta (`C:\TradeBotpp`); `.env` rastgele PG parolası + Jev anahtarıyla hazır.
-    - Bekleyen: Docker Desktop'ın ekrandan ilk açılışı → `guncelle.ps1` → `tradebot saglik`.
+    - Docker Desktop 4.92 (oturum açılınca başlıyor) ✅.
+    - SSH oturumunda Docker kimlik araması çalışmıyor ("Belirtilen oturum yok"). Bu yüzden servis kurulumu
+      kullanıcı oturumundaki `TradeBot\Guncelle` görevinden yapılıyor (`host_guncelle.ps1`).
+    - Host'ta `tradebot saglik`: dns 0,48 sn ✅, saat +0,09 sn ✅, PostgreSQL 17 + zincir ✅, disk 1.023 GB ✅,
+      sırlar yalnız NVIDIA/Telegram eksik (beklenen). `kurulum.ps1` kontrolü: tümü OK.
+    - Kalan: yeniden başlatma dayanıklılık testi (Scryne onayıyla) ve otomatik oturum kararı.
 
 ### Faz 2: Veri platformu (ilk dalga)
 - **İşler:** İdempotent indiriciler; Nautilus Parquet kataloğu; ham veri hash'leri; enstrüman kaydı
