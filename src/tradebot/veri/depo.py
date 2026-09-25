@@ -50,20 +50,27 @@ class HamDepo:
         if beklenen_sha is not None and h != beklenen_sha.lower():
             raise ValueError(f"{kaynak}/{anahtar}: sağlama uyuşmuyor (beklenen {beklenen_sha[:12]}, gelen {h[:12]})")
         with self.motor.connect() as b:
-            onceki = b.execute(select(ham_dosya.c.yol).where(ham_dosya.c.sha256 == h)).scalar()
-        if onceki is not None:
-            return Path(onceki), h, False
-        son = self.var_mi(kaynak, anahtar)
-        ad = f"{anahtar}.{uzanti}" if son is None else f"{anahtar}.{h[:12]}.{uzanti}"
-        yol = self.kok / kaynak / ad
-        yol.parent.mkdir(parents=True, exist_ok=True)
-        gecici = yol.with_suffix(yol.suffix + ".yaziliyor")
-        gecici.write_bytes(icerik)
-        os.replace(gecici, yol)
+            ayni = b.execute(select(ham_dosya.c.yol).where(ham_dosya.c.kaynak == kaynak, ham_dosya.c.anahtar == anahtar,
+                                                            ham_dosya.c.sha256 == h)).scalar()
+            if ayni is not None:
+                return Path(ayni), h, False
+            # Aynı içerik başka anahtarla zaten varsa dosya tekrar yazılmaz, yalnız eşleme kaydı eklenir
+            # (ör. Dukascopy'de verisiz dönemlerin hepsi boş dosya: aynı hash, farklı anahtar).
+            mevcut_dosya = b.execute(select(ham_dosya.c.yol).where(ham_dosya.c.sha256 == h).limit(1)).scalar()
+        if mevcut_dosya is not None:
+            yol = Path(mevcut_dosya)
+        else:
+            son = self.var_mi(kaynak, anahtar)
+            ad = f"{anahtar}.{uzanti}" if son is None else f"{anahtar}.{h[:12]}.{uzanti}"
+            yol = self.kok / kaynak / ad
+            yol.parent.mkdir(parents=True, exist_ok=True)
+            gecici = yol.with_suffix(yol.suffix + ".yaziliyor")
+            gecici.write_bytes(icerik)
+            os.replace(gecici, yol)
         with self.motor.begin() as b:
             b.execute(insert(ham_dosya).values(kaynak=kaynak, anahtar=anahtar, yol=str(yol), sha256=h, boyut=len(icerik),
                                                indirildi=datetime.now(UTC)))
-        return yol, h, True
+        return yol, h, mevcut_dosya is None
 
     def dosyalar(self, kaynak: str, anahtar_on_eki: str = "") -> list[tuple[str, Path, str]]:
         """(anahtar, yol, sha) listesi; her anahtarın EN SON sürümü, anahtara göre sıralı."""

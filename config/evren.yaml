@@ -17,8 +17,11 @@ dukascopy:
   piyasa: DUKASCOPY
   takvim: fx_24x5
   baslangic: "2010-01"
-  temel_zaman_dilimi: 1h            # BID + ASK saatlik (aylık dosya); spread = ASK - BID
-  dakikalik_yil: 3                  # 1 dk BID+ASK yalnız son 3 yıl (gece işi, nazik indirme)
+  temel_zaman_dilimi: 1h            # BID saatlik tam geçmiş (aylık dosya); spread = ASK - BID
+  ask_yil: 3                        # ASK saatlik yalnız son 3 yıl (spread/maliyet modeli için)
+  # Dakikalık BID yalnız yürütme doğrulaması için (Spike 02), son 3 yıl. Dukascopy hız sınırı çok sıkı (≥ 6 sn/istek).
+  dakikalik: [EURUSD, XAUUSD, USA500IDXUSD]
+  dakikalik_yil: 3
   semboller:
     fx:     { para: USD, liste: [EURUSD, GBPUSD, USDJPY, AUDUSD, USDCAD, USDCHF, NZDUSD, EURJPY, EURGBP, USDTRY] }
     metal:  { para: USD, liste: [XAUUSD, XAGUSD] }

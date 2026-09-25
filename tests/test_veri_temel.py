@@ -114,3 +114,11 @@ def test_evren_ve_kayit(m):
     assert len(satirlar) == n
     spy = next(r for r in satirlar if r["kimlik"] == "ARCA:SPY")
     assert spy["ilk_bar_ms"] == 1 and spy["takvim"] == "XNYS"
+
+
+def test_ham_depo_ayni_icerik_farkli_anahtar(m, ayar):
+    d = HamDepo(ayar.veri_dizini, m)
+    y1, _, yeni1 = d.kaydet("dukascopy", "EURUSD/BID/1h/2010-01", b"", "bi5")
+    y2, _, yeni2 = d.kaydet("dukascopy", "EURUSD/BID/1h/2010-02", b"", "bi5")
+    assert yeni1 and not yeni2 and y1 == y2  # tek dosya
+    assert d.var_mi("dukascopy", "EURUSD/BID/1h/2010-02") is not None  # ama anahtar kayıtlı: tekrar indirilmez

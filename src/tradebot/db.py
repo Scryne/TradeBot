@@ -48,10 +48,12 @@ ham_dosya = Table(
     Column("kaynak", String(32), nullable=False),
     Column("anahtar", String(256), nullable=False),  # kaynağa özgü mantıksal ad (ör. spot/1h/BTCUSDT/2024-01)
     Column("yol", String(512), nullable=False),
-    Column("sha256", String(64), nullable=False, unique=True),
+    Column("sha256", String(64), nullable=False),
     Column("boyut", BigInteger, nullable=False),
     Column("indirildi", DateTime(timezone=True), nullable=False),
     Index("ix_ham_dosya_kaynak_anahtar", "kaynak", "anahtar"),
+    Index("ix_ham_dosya_sha256", "sha256"),
+    UniqueConstraint("kaynak", "anahtar", "sha256", name="uq_ham_dosya"),
 )
 
 enstruman = Table(

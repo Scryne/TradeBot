@@ -24,11 +24,13 @@ def upgrade() -> None:
         sa.Column("kaynak", sa.String(32), nullable=False),
         sa.Column("anahtar", sa.String(256), nullable=False),
         sa.Column("yol", sa.String(512), nullable=False),
-        sa.Column("sha256", sa.String(64), nullable=False, unique=True),
+        sa.Column("sha256", sa.String(64), nullable=False),
         sa.Column("boyut", sa.BigInteger, nullable=False),
         sa.Column("indirildi", sa.DateTime(timezone=True), nullable=False),
+        sa.UniqueConstraint("kaynak", "anahtar", "sha256", name="uq_ham_dosya"),
     )
     op.create_index("ix_ham_dosya_kaynak_anahtar", "ham_dosya", ["kaynak", "anahtar"])
+    op.create_index("ix_ham_dosya_sha256", "ham_dosya", ["sha256"])
     op.create_table(
         "enstruman",
         sa.Column("kimlik", sa.String(64), primary_key=True),
@@ -72,5 +74,6 @@ def downgrade() -> None:
     op.drop_table("kalite_raporu")
     op.drop_table("kurumsal_islem")
     op.drop_table("enstruman")
+    op.drop_index("ix_ham_dosya_sha256", table_name="ham_dosya")
     op.drop_index("ix_ham_dosya_kaynak_anahtar", table_name="ham_dosya")
     op.drop_table("ham_dosya")
