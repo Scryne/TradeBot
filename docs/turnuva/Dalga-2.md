@@ -33,3 +33,17 @@ Izgaralar dalga 1 ile aynı; yeni ayar araması yok. Denemeler trend ailesinin d
 
 - 4 grup; kripto grupları için 4h ve 1d, ETF ve karma için yalnız 1d.
 - Toplam 6 grup-zaman dilimi × 3 strateji = 18 kol, 288 deneme.
+
+## Sonuç (2026-09-26, kod 47096bf)
+
+**18 kol: 3 B, A yok.**
+
+- **90 günlük oynaklık, BTC+ETH'de düşüşü azalttı; Sharpe aynı kaldı ya da arttı.** 1d ve 4h kollarında düşüş
+  −%17 ile −%23 arası; dalga 1'de (30 gün) −%24 ile −%32. En iyi kol `donchian_ls@kripto_btc_eth@4h`: Sharpe 1,20,
+  DD −%17, OOS yıllık +%12,3.
+- **Karma sepet, çeşitlendirme beklentisini karşılamadı** (Sharpe 0,37–0,56). ETF'ler sepete hâkim; ETF trendi
+  zaten zayıf.
+- **Kripto büyük 5, BTC+ETH'den kötü** (Sharpe 0,62–0,85). Sepet genişledikçe kötüleşme örüntüsü sürüyor.
+- **ABD ETF'te 90 gün pencere fark yaratmadı** (Sharpe 0,29–0,51).
+
+Paper listesine eklenenler: `docs/turnuva/Paper-Listesi.md`.
