@@ -107,7 +107,7 @@ Aynı Choice tanımları, istem `tradebot.zeka.yukseltme.istem` ile birebir. Üc
 | Eski kural (belirsizde ilk iki seçenekte veto varsa veto) | — | 51/60 | 8 | 1 | — | — |
 | `z-ai/glm-5.3` | 43/90 (cevap verdiği 43/43) | — | 0 | 5* | 47 (hepsi zaman aşımı) | 112 sn / 164 sn |
 | `moonshotai/kimi-k3` | 60/90 | 56/60 | 0 | 4 | 30 (24 geçersiz çıktı) | 71–86 sn / 122–146 sn |
-| `deepseek-ai/deepseek-v4.1-flash` | sürüyor | — | | | | tek çağrı ~220 sn |
+| `deepseek-ai/deepseek-v4.1-flash` | durduruldu | — | | | | tek çağrı ~220 sn: 180 sn zaman aşımını aşar, yedek olamaz |
 
 \* Kaçırılanların hepsi zaman aşımı: cevap yokken veto yok sayıldı. Canlıda cevap yoksa belirsiz kuralı devreye girer.
 
