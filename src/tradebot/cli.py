@@ -18,6 +18,8 @@ veri_uygulama = typer.Typer(help="Veri platformu (Faz 2)", no_args_is_help=True)
 uygulama.add_typer(veri_uygulama, name="veri")
 arastirma_uygulama = typer.Typer(help="Araştırma motoru (Faz 3): test planı ve tarama", no_args_is_help=True)
 uygulama.add_typer(arastirma_uygulama, name="arastirma")
+zeka_uygulama = typer.Typer(help="Zekâ katmanı (Faz 6): toplayıcılar, Jev rolleri, olaylar", no_args_is_help=True)
+uygulama.add_typer(zeka_uygulama, name="zeka")
 
 _ISARET = {"OK": "✓", "UYARI": "!", "HATA": "✗"}
 
@@ -401,3 +403,47 @@ def arastirma_rapor(
         md.parent.mkdir(parents=True, exist_ok=True)
         md.write_text(metin + "\n", encoding="utf-8")
     typer.echo(metin)
+
+
+@zeka_uygulama.command("tur")
+def zeka_tur() -> None:
+    """Tek tur: yeni metinleri topla, rolleri çalıştır, olayları yaz."""
+    from tradebot.zeka.servis import kur as zeka_kur
+
+    a, m = _veri_baglam()
+    _yazdir(zeka_kur(m, a).tur())
+
+
+@zeka_uygulama.command("calis")
+def zeka_calis(dongu: int = typer.Option(0, help="Saniye; 0 ise config/zeka.yaml dongu_sn")) -> None:
+    """Servis döngüsü: her turda topla → yargıla → olay yaz. Bir turun hatası servisi durdurmaz."""
+    from tradebot.zeka.servis import kur as zeka_kur
+
+    a, m = _veri_baglam()
+    z = zeka_kur(m, a)
+    kayitci = log("zeka")
+    bekle = dongu or int(z.ayar.get("dongu_sn", 60))
+    while True:
+        try:
+            r = z.tur()
+            if r["yeni_metin"] or r["olay"]:
+                kayitci.info("zeka_turu", **r)
+        except Exception as e:  # noqa: BLE001 — servis ayakta kalır, hata log'a
+            kayitci.error("zeka_tur_hatasi", hata=f"{type(e).__name__}: {e}"[:300])
+        time.sleep(bekle)
+
+
+@zeka_uygulama.command("vetolar")
+def zeka_vetolar() -> None:
+    """Şu an geçerli veto listesi ve son olaylar."""
+    from sqlalchemy import select
+
+    from tradebot.db import olay as olay_t
+    from tradebot.zeka import olay
+
+    _, m = _veri_baglam()
+    simdi = int(time.time() * 1000)
+    typer.echo("aktif veto: " + ", ".join(sorted(olay.aktif_vetolar(m, simdi))))
+    with m.connect() as b:
+        for r in b.execute(select(olay_t).order_by(olay_t.c.id.desc()).limit(20)):
+            typer.echo(f"{r.id:>5} {r.tur:<6} {r.enstruman:<22} {r.neden[:110]}")

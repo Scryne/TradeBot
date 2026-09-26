@@ -15,6 +15,7 @@ from sqlalchemy import (
     MetaData,
     String,
     Table,
+    Text,
     UniqueConstraint,
     create_engine,
 )
@@ -134,6 +135,59 @@ deneme = Table(
     Index("ix_deneme_plan", "plan"),
 )
 
+
+# --- Faz 6: zekâ katmanı ---
+metin = Table(
+    "metin",
+    metadata,
+    Column("id", KIMLIK, primary_key=True, autoincrement=True),
+    Column("kaynak", String(32), nullable=False),        # binance_duyuru | kap | sec | rss:<ad> …
+    Column("dis_kimlik", String(128), nullable=False),   # kaynağın kimliği (Binance articleCode, KAP bildirim no …)
+    Column("katalog", String(64)),
+    Column("baslik", String(1000), nullable=False),
+    Column("govde", Text, nullable=False),
+    Column("yayin_ms", BigInteger, nullable=False),      # kaynağın beyan ettiği İLK yayın zamanı (kural 9)
+    Column("ilk_gorulme_ms", BigInteger, nullable=False),  # bizim ilk gördüğümüz an (canlı gecikme ölçümü)
+    Column("ham_sha", String(64), nullable=False),       # ham yanıtın hash'i (ham_dosya)
+    UniqueConstraint("kaynak", "dis_kimlik", name="uq_metin"),
+    Index("ix_metin_yayin", "yayin_ms"),
+)
+
+jev_yargi = Table(
+    "jev_yargi",
+    metadata,
+    Column("id", KIMLIK, primary_key=True, autoincrement=True),
+    Column("zaman", DateTime(timezone=True), nullable=False),
+    Column("rol", String(32), nullable=False),           # A1_binance, …
+    Column("saglayici", String(16), nullable=False),     # jev | nvidia
+    Column("model_istenen", String(128), nullable=False),
+    Column("model_cozulen", String(128)),
+    Column("soru_sha", String(64), nullable=False),      # soru tanımlarının hash'i (dondurma anahtarı)
+    Column("girdi_sha", String(64), nullable=False),     # state'in hash'i
+    Column("hedef", String(256), nullable=False),        # ör. metin:42|BINANCE:ICXUSDT
+    Column("cevap", JSONT),                              # {soru: {choice, confidence, probabilities} …}
+    Column("gecikme_ms", Float),
+    Column("girdi_token", Integer),
+    Column("hata", String(500)),
+    Index("ix_jev_yargi_anahtar", "soru_sha", "girdi_sha"),
+)
+
+olay = Table(
+    "olay",
+    metadata,
+    Column("id", KIMLIK, primary_key=True, autoincrement=True),
+    Column("zaman", DateTime(timezone=True), nullable=False),
+    Column("tur", String(16), nullable=False),           # veto | uyari
+    Column("enstruman", String(64), nullable=False),
+    Column("gecerli_ms", BigInteger, nullable=False),    # olayın motora/backtest'e görünür olduğu an (yayın + gecikme)
+    Column("bitis_ms", BigInteger),                      # boş: süresiz (ör. delist)
+    Column("neden", String(500), nullable=False),
+    Column("rol", String(32), nullable=False),
+    Column("metin_id", BigInteger),
+    Column("yargi_id", BigInteger),
+    Column("ayrinti", JSONT, nullable=False),
+    Index("ix_olay_enstruman", "enstruman", "gecerli_ms"),
+)
 
 def motor(a: Ayarlar) -> Engine:
     if a.veritabani_url is None:

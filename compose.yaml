@@ -76,6 +76,13 @@ services:
     depends_on:
       goc: { condition: service_completed_successfully }
 
+  zeka:
+    <<: *ortak
+    # Zekâ katmanı (Faz 6): Binance duyuruları → Jev (A1) → veto/uyarı olayları. Her 60 sn bir tur.
+    command: ["tradebot", "zeka", "calis"]
+    depends_on:
+      goc: { condition: service_completed_successfully }
+
 volumes:
   pg:
   veri:

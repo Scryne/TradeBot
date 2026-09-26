@@ -1,0 +1,10 @@
+# Zekâ katmanı (Faz 6). Model sürümleri sabittir; değişiklik ölçümle ve ayrı kararla yapılır.
+jev:
+  model: jev-1.13.0            # Spike 04-A ile ölçülen sürüm (ts.py kontrol ile yaşadığı doğrulanır)
+  esik: 0.5                    # güven < esik → yükseltme (Spike 04 dersi 4)
+yukseltme:
+  base_url: https://integrate.api.nvidia.com/v1
+  modeller: []                 # Spike 04-B sonucu ile doldurulur (sırayla denenen yedek zinciri)
+binance:
+  kataloglar: [161, 157, 49, 48]   # delist, bakım, haber, listeleme
+dongu_sn: 60
