@@ -425,10 +425,38 @@ def zeka_geri_doldur(
     sayfa: int = typer.Option(40, help="Katalog başına en çok sayfa (20 duyuru/sayfa; boş sayfada durur)"),
 ) -> None:
     """Geçmiş duyuruları toplar ve A1 ile yargılar. Olaylar yayın + 60 sn'de geçerli (point-in-time)."""
+    from tradebot.metin.binance_duyuru import BinanceDuyuru
+    from tradebot.veri.depo import HamDepo
     from tradebot.zeka.servis import kur as zeka_kur
 
     a, m = _veri_baglam()
-    _yazdir(zeka_kur(m, a).tur(sayfa_sayisi=sayfa, kataloglar=[int(x) for x in katalog.split(",")], metin_siniri=None))
+    yeni = BinanceDuyuru(HamDepo(a.veri_dizini, m), m).topla([int(x) for x in katalog.split(",")], sayfa)
+    _yazdir({"yeni_metin": len(yeni), "olay": zeka_kur(m, a).isle("binance_duyuru")})
+
+
+@zeka_uygulama.command("kap-geri-doldur")
+def zeka_kap_geri_doldur(
+    bas: str = typer.Option(..., help="İlk gün (YYYY-AA-GG, Türkiye takvimi)"),
+    bit: str = typer.Option("", help="Son gün (boş: bugün)"),
+    yargila: bool = typer.Option(True, help="Toplanan bildirimleri A2 ile yargıla"),
+) -> None:
+    """Geçmiş KAP bildirimlerini gün gün toplar (kaldığı yerden devam eder) ve A2 ile yargılar."""
+    from datetime import date, timedelta
+
+    from tradebot.metin.kap import KapBildirim
+    from tradebot.veri.depo import HamDepo
+    from tradebot.zeka.servis import kur as zeka_kur
+
+    a, m = _veri_baglam()
+    t = KapBildirim(HamDepo(a.veri_dizini, m), m)
+    g, son = date.fromisoformat(bas), (date.fromisoformat(bit) if bit else date.today())
+    kayitci, toplam = log("zeka.kap"), 0
+    while g <= son:
+        n = len(t.topla([g]))
+        toplam += n
+        kayitci.info("kap_gun", gun=g.isoformat(), yeni=n)
+        g += timedelta(days=1)
+    _yazdir({"yeni_metin": toplam, "olay": zeka_kur(m, a).isle("kap") if yargila else 0})
 
 
 @zeka_uygulama.command("belirsizleri-yukselt")

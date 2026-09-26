@@ -52,6 +52,8 @@ def govde_metni(govde_json: str) -> str:
 
 
 class BinanceDuyuru:
+    KAYNAK = "binance_duyuru"
+
     def __init__(self, ham: HamDepo, motor: Engine, http: NazikIstemci | None = None) -> None:
         self.ham, self.motor = ham, motor
         # Ölçüm (2026-09-26): 0,5 sn aralıkla ~120 detay isteğinden sonra 429 → 2 sn aralık, uzun geri çekilme
@@ -99,3 +101,7 @@ class BinanceDuyuru:
                 bilinen.add(m["code"])
                 _log.info("yeni_duyuru", katalog=satir["katalog"], baslik=satir["baslik"][:120])
         return [i for _, i in sorted(yeni)]
+
+    def canli(self, ayar: dict) -> list[int]:
+        """Servis turu: her kataloğun ilk sayfası."""
+        return self.topla(ayar["binance"]["kataloglar"], 1)

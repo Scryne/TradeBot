@@ -1,0 +1,637 @@
+[
+ {
+  "i": 0,
+  "id": "1643851",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 1645
+ },
+ {
+  "i": 1,
+  "id": "1630573",
+  "altin": "gecici_durdurma",
+  "kabul": [
+   "gecici_durdurma"
+  ],
+  "jev": "gecici_durdurma",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 975
+ },
+ {
+  "i": 2,
+  "id": "1666319",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 0.93,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 13114
+ },
+ {
+  "i": 3,
+  "id": "1666463",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 0.97,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 2985
+ },
+ {
+  "i": 4,
+  "id": "1627541",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "rutin"
+  ],
+  "jev": "kurumsal_islem",
+  "guven": 0.84,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 4686
+ },
+ {
+  "i": 5,
+  "id": "1661241",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "jev": "olumlu_esasli",
+  "guven": 0.76,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 2010
+ },
+ {
+  "i": 6,
+  "id": "1665180",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "jev": "olumlu_esasli",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 1866
+ },
+ {
+  "i": 7,
+  "id": "1666193",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 0.98,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 2985
+ },
+ {
+  "i": 8,
+  "id": "1663131",
+  "altin": "gecici_durdurma",
+  "kabul": [
+   "gecici_durdurma"
+  ],
+  "jev": "gecici_durdurma",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 719
+ },
+ {
+  "i": 9,
+  "id": "1656968",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 0.96,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 4716
+ },
+ {
+  "i": 10,
+  "id": "1656945",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 0.92,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 2490
+ },
+ {
+  "i": 11,
+  "id": "1655968",
+  "altin": "olumsuz_esasli",
+  "kabul": [
+   "olumsuz_esasli",
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 0.45,
+  "dogru": true,
+  "veto_altin": true,
+  "veto_jev": false,
+  "govde_uzunluk": 2663
+ },
+ {
+  "i": 12,
+  "id": "1650390",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 0.94,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 9743
+ },
+ {
+  "i": 13,
+  "id": "1650390",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 0.95,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 9743
+ },
+ {
+  "i": 14,
+  "id": "1663520",
+  "altin": "gecici_durdurma",
+  "kabul": [
+   "gecici_durdurma"
+  ],
+  "jev": "gecici_durdurma",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 617
+ },
+ {
+  "i": 15,
+  "id": "1636648",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "jev": "olumlu_esasli",
+  "guven": 0.97,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 1705
+ },
+ {
+  "i": 16,
+  "id": "1654183",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 0.71,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 715
+ },
+ {
+  "i": 17,
+  "id": "1666885",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "jev": "olumlu_esasli",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 2176
+ },
+ {
+  "i": 18,
+  "id": "1639831",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "jev": "olumlu_esasli",
+  "guven": 0.96,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 1919
+ },
+ {
+  "i": 19,
+  "id": "1657722",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 409
+ },
+ {
+  "i": 20,
+  "id": "1651664",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 1231
+ },
+ {
+  "i": 21,
+  "id": "1654502",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 3081
+ },
+ {
+  "i": 22,
+  "id": "1651300",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem"
+  ],
+  "jev": "kurumsal_islem",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 3755
+ },
+ {
+  "i": 23,
+  "id": "1617912",
+  "altin": "olumsuz_esasli",
+  "kabul": [
+   "olumsuz_esasli"
+  ],
+  "jev": "olumsuz_esasli",
+  "guven": 0.98,
+  "dogru": true,
+  "veto_altin": true,
+  "veto_jev": true,
+  "govde_uzunluk": 9713
+ },
+ {
+  "i": 24,
+  "id": "1656518",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "jev": "olumlu_esasli",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 3465
+ },
+ {
+  "i": 25,
+  "id": "1654241",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 0.89,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 1824
+ },
+ {
+  "i": 26,
+  "id": "1667028",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 0.98,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 836
+ },
+ {
+  "i": 27,
+  "id": "1654175",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem"
+  ],
+  "jev": "kurumsal_islem",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 2240
+ },
+ {
+  "i": 28,
+  "id": "1653533",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 3460
+ },
+ {
+  "i": 29,
+  "id": "1659886",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 0.99,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 1795
+ },
+ {
+  "i": 30,
+  "id": "1649847",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "jev": "olumlu_esasli",
+  "guven": 0.87,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 1955
+ },
+ {
+  "i": 31,
+  "id": "1645098",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 801
+ },
+ {
+  "i": 32,
+  "id": "1657223",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 0.77,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 1524
+ },
+ {
+  "i": 33,
+  "id": "1617913",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "olumsuz_esasli",
+   "rutin"
+  ],
+  "jev": "kurumsal_islem",
+  "guven": 0.8,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 4505
+ },
+ {
+  "i": 34,
+  "id": "1660523",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 805
+ },
+ {
+  "i": 35,
+  "id": "1643242",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "jev": "rutin",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 1185
+ },
+ {
+  "i": 36,
+  "id": "1637993",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "jev": "olumlu_esasli",
+  "guven": 0.95,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 1809
+ },
+ {
+  "i": 37,
+  "id": "1645518",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "jev": "olumlu_esasli",
+  "guven": 0.49,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 6152
+ },
+ {
+  "i": 38,
+  "id": "1666965",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "jev": "olumlu_esasli",
+  "guven": 1.0,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 3462
+ },
+ {
+  "i": 39,
+  "id": "1667943",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "rutin"
+  ],
+  "jev": "kurumsal_islem",
+  "guven": 0.99,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 1834
+ },
+ {
+  "i": 40,
+  "id": "1618229",
+  "altin": "pazar_tedbiri",
+  "kabul": [
+   "pazar_tedbiri"
+  ],
+  "jev": "pazar_tedbiri",
+  "guven": 0.83,
+  "dogru": true,
+  "veto_altin": true,
+  "veto_jev": true,
+  "govde_uzunluk": 3884
+ },
+ {
+  "i": 41,
+  "id": "1622206",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "jev": "olumlu_esasli",
+  "guven": 0.81,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 9060
+ },
+ {
+  "i": 42,
+  "id": "1663015",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "rutin"
+  ],
+  "jev": "kurumsal_islem",
+  "guven": 0.97,
+  "dogru": true,
+  "veto_altin": false,
+  "veto_jev": false,
+  "govde_uzunluk": 362
+ },
+ {
+  "i": 43,
+  "id": "1616894",
+  "altin": "olumsuz_esasli",
+  "kabul": [
+   "olumsuz_esasli",
+   "pazar_tedbiri",
+   "rutin"
+  ],
+  "jev": "olumsuz_esasli",
+  "guven": 0.98,
+  "dogru": true,
+  "veto_altin": true,
+  "veto_jev": true,
+  "govde_uzunluk": 1426
+ }
+]

@@ -10,6 +10,16 @@ yukseltme:
   # belirsiz 60'ta 4 kaçırılan veto (kaçırma, yanlış alarmdan pahalı).
   modeller: [nvidia/nemotron-3-ultra-550b-a55b, z-ai/glm-5.3]
   zaman_asimi_sn: 180          # ücretsiz katmanda p90 64 sn ölçüldü
+kaynaklar: [binance_duyuru, kap]  # servis turunda toplanan kaynaklar (rol: A1, A2)
 binance:
   kataloglar: [161, 157, 49, 48]   # delist, bakım, haber, listeleme
+kap:
+  # A2 vetosu kalıcı değil: tedbirin kalkışı ayrı bildirimdir, olumsuz gelişme delist değildir. Başlangıç değerleri
+  # (riski azaltan yönde, keyfi); A/B turnuvasında ölçülüp ayarlanır. Değişiklik = yeni deneme.
+  veto_gun:
+    pazar_tedbiri: 30
+    olumsuz_esasli: 20
+tarama:                            # servis turunda kaynak başına taranan son metin sayısı
+  binance_duyuru: 200
+  kap: 600                         # ~290 bildirim/gün
 dongu_sn: 60

@@ -4,11 +4,7 @@
 Soru: bu duyuru `varlik`/USDT spot pozisyonu tutan birini nasıl etkiliyor? (Choice `etki` + Score `aciliyet`.)
 Karar yalnız Choice'a dayanır (Spike 04 dersi 1); Score sıralama ve alarm önceliği içindir.
 
-Karar kuralı (`karar`):
-- Jev `etki` ∈ VETO ve güven ≥ eşik → veto.
-- Güven < eşik → yükseltme modeli; onun cevabı ∈ VETO → veto.
-- Yükseltme yoksa ya da başarısızsa: Jev'in en olası iki seçeneğinden biri VETO ise veto + uyarı (belirsizlikte riski
-  azalt, kural 8).
+Karar kuralı: `zeka.karar.karar` (A2 ile ortak).
 Soru tanımları Spike 04-A'nın birebir kopyasıdır; `SORU_SHA` testi değişikliği yakalar (değişiklik = yeni rol sürümü,
 yeni ölçüm).
 """
@@ -16,9 +12,16 @@ from __future__ import annotations
 
 import re
 
+from sqlalchemy import select
+from sqlalchemy.engine import Engine
 from typesafe_sdk import Choice, Score
 
+from tradebot.db import enstruman
+from tradebot.zeka.karar import karar as ortak_karar
+
 ROL = "A1_binance"
+KAYNAK = "binance_duyuru"
+ONEK = "A1"
 VETO = {"token_delist", "usdt_pair_removed", "token_conversion"}
 
 ETKI = Choice(
@@ -79,12 +82,28 @@ def state(baslik: str, govde: str, varlik: str) -> dict:
 
 def karar(secim: str | None, guven: float, olasiliklar: dict, yukseltme: str | None, yukseltme_denendi: bool,
           esik: float = 0.5) -> tuple[bool, str]:
-    """(veto mu, gerekçe). Saf fonksiyon: politika kodda, model yalnız metni yorumlar."""
-    if secim is not None and guven >= esik:
-        return secim in VETO, f"jev:{secim} ({guven:.2f})"
-    if yukseltme is not None:
-        return yukseltme in VETO, f"yukseltme:{yukseltme} (jev {secim} {guven:.2f})"
-    ilk_iki = sorted(olasiliklar.items(), key=lambda kv: -kv[1])[:2]
-    belirsiz_veto = any(k in VETO for k, _ in ilk_iki)
-    neden = "yukseltme_basarisiz" if yukseltme_denendi else "yukseltme_yok"
-    return belirsiz_veto, f"belirsiz:{secim} ({guven:.2f}), {neden}, ilk iki {[k for k, _ in ilk_iki]}"
+    return ortak_karar(secim, guven, olasiliklar, yukseltme, yukseltme_denendi, VETO, esik)
+
+
+# --- servis arayüzü (A2 ile ortak) ---
+def evren(motor: Engine) -> set[str]:
+    with motor.connect() as b:
+        return set(b.execute(select(enstruman.c.kimlik).where(enstruman.c.piyasa == "BINANCE",
+                                                              enstruman.c.kimlik.like("%USDT"))).scalars())
+
+
+def hedefler(m, evren_: set[str]) -> list[str]:
+    bazlar = {k.removeprefix("BINANCE:").removesuffix("USDT") for k in evren_}
+    return [f"BINANCE:{v}USDT" for v in adaylar(m.baslik, m.govde, bazlar)]
+
+
+def hedef_state(m, kimlik: str) -> dict:
+    return state(m.baslik, m.govde, kimlik.removeprefix("BINANCE:").removesuffix("USDT"))
+
+
+def veto_suresi_ms(secim: str | None, ayar: dict) -> int | None:
+    return None  # delist, USDT çifti kaldırma, dönüşüm: kalıcı
+
+
+def bilgi_olayi(secim: str | None) -> str | None:
+    return None

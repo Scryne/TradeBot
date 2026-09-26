@@ -1,6 +1,7 @@
 """Faz 6: zekâ katmanı (ağ ve model çağrıları sahte)."""
 import importlib.util
 import json
+from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -9,9 +10,11 @@ import pytest
 from sqlalchemy import func, insert, select
 
 from tradebot.db import enstruman, jev_yargi, metadata, metin, motor, olay
+from tradebot.metin import kap
 from tradebot.metin.binance_duyuru import BinanceDuyuru, govde_metni
 from tradebot.veri.depo import HamDepo
 from tradebot.zeka import a1_binance as a1
+from tradebot.zeka import a2_kap as a2
 from tradebot.zeka import olay as ol
 from tradebot.zeka.jev import JevIstemci, donmus, soru_sha
 from tradebot.zeka.servis import Zeka
@@ -85,7 +88,8 @@ class SahteJev:
         self.cagri += 1
         if self.hata:
             raise RuntimeError(self.hata)
-        secim, guven, p = self.cevaplar.get(state["varlik"], ("not_about_asset", 0.95, {"not_about_asset": 0.95}))
+        varsayilan = ("not_about_asset", 0.95, {"not_about_asset": 0.95})
+        secim, guven, p = self.cevaplar.get(state.get("varlik") or state.get("sembol"), varsayilan)
         return SimpleNamespace(model="jev-1.13.0", usage=SimpleNamespace(input_tokens=1500), answers={
             "etki": Cevap(type="choice", choice=secim, confidence=guven, probabilities=p),
             "aciliyet": Cevap(type="score", score=1.0, confidence=0.9)})
@@ -196,7 +200,7 @@ def test_zeka_turu_veto_ve_pit(m, ayar):
                     "SCRT": ("positive_or_neutral", 0.42, {"positive_or_neutral": 0.42, "token_delist": 0.40,
                                                            "not_about_asset": 0.18})})
     z = Zeka(m, JevIstemci(m, "jev-1.13.0", istemci=jev), Yukseltme(m, "u", [], None),
-             BinanceDuyuru(HamDepo(ayar.veri_dizini, m), m, http),
+             [BinanceDuyuru(HamDepo(ayar.veri_dizini, m), m, http)],
              {"jev": {"esik": 0.5}, "binance": {"kataloglar": [161]}})
     r = z.tur()
     assert r["yeni_metin"] == 1 and jev.cagri == 3  # ICX, SCRT, BTC
@@ -233,14 +237,14 @@ def test_belirsizleri_yukselt_yalniz_veto_ekler(m, ayar):
 
     top = BinanceDuyuru(HamDepo(ayar.veri_dizini, m), m, http)
     ayar_z = {"jev": {"esik": 0.5}, "binance": {"kataloglar": [161]}}
-    z = Zeka(m, JevIstemci(m, "jev-1.13.0", istemci=jev), Yukseltme(m, "u", [], None), top, ayar_z)
+    z = Zeka(m, JevIstemci(m, "jev-1.13.0", istemci=jev), Yukseltme(m, "u", [], None), [top], ayar_z)
     z.tur()
     gecerli = yayin + ol.GERIYE_DONUK_GECIKME_MS
     assert ol.aktif_vetolar(m, gecerli) == {"BINANCE:AAAUSDT"}
     assert z.belirsizleri_yukselt() == {"hazir": False}
 
     y = Yukseltme(m, "https://x/v1", ["c"], "k", http=httpx.Client(transport=httpx.MockTransport(isle)))
-    z2 = Zeka(m, JevIstemci(m, "jev-1.13.0", istemci=jev), y, top, ayar_z)
+    z2 = Zeka(m, JevIstemci(m, "jev-1.13.0", istemci=jev), y, [top], ayar_z)
     r = z2.belirsizleri_yukselt()
     assert r == {"hazir": True, "yukseltildi": 3, "yeni_veto": 1, "korunan_veto": 1, "basarisiz": 0}
     assert ol.aktif_vetolar(m, gecerli - 1) == set()  # yeni veto da point-in-time: uyarının anında
@@ -278,3 +282,92 @@ def test_toplayici_tek_duyuru_hatasinda_durmaz(m, ayar):
     assert len(t.topla([161])) == 1  # kötü atlandı, iyi yazıldı
     http.al = asil
     assert len(t.topla([161])) == 1  # sonraki turda kötü de gelir
+
+
+# ------------------------------------------------------------------ KAP (A2)
+def test_kap_zaman_ve_kodlar():
+    # Türkiye saati (UTC+3) → UTC; iki tarih biçimi
+    assert kap.tr_ms("25.09.2026 22:44:39") == kap.tr_ms("2026.09.25 22:44:39") == 1790365479000
+    assert kap.kodlar({"stockCodes": "GARAN, TGB", "relatedStocks": "TGB,THYAO"}) == ["GARAN", "TGB", "THYAO"]
+    assert kap.kodlar({"stockCodes": None, "relatedStocks": None}) == []
+
+
+def _kap_sayfasi(govde_html):
+    akis = f'2:{{"disclosureBody":["$30"]}}\n30:T{len(govde_html.encode()):x},{govde_html}'
+    return f'<script>self.__next_f.push([1,{json.dumps(akis)}])</script>'
+
+
+def test_kap_sayfa_govdesi():
+    h = ("<div><table><tr><td>oda_ExplanationTextBlock|</td><td>[CONSOLIDATION_METHOD]</td></tr>"
+         "<tr><td>Şirketimiz konkordato talebinde bulunmuştur.</td></tr></table>&amp; devamı</div>")
+    assert kap.sayfa_govdesi(_kap_sayfasi(h)) == "Şirketimiz konkordato talebinde bulunmuştur.\n& devamı"
+    assert kap.sayfa_govdesi("<html>akış yok</html>") == ""
+
+
+class SahteKapHttp:
+    def __init__(self, liste, govdeler):
+        self.liste_, self.govdeler, self.sayfa_istenen = liste, govdeler, []
+
+    def gonder(self, url, json_govde):
+        return json.dumps([k for k in self.liste_ if k["_gun"] == json_govde["fromDate"]]).encode()
+
+    def al(self, url, params=None):
+        no = int(url.rsplit("/", 1)[1])
+        self.sayfa_istenen.append(no)
+        return _kap_sayfasi(self.govdeler[no]).encode()
+
+
+def _kap_kaydi(no, gun, saat, konu, ozet, kod, ilgili=None):
+    return {"_gun": gun, "disclosureIndex": no, "publishDate": f"{gun[8:]}.{gun[5:7]}.{gun[:4]} {saat}", "subject": konu,
+            "summary": ozet, "stockCodes": kod, "relatedStocks": ilgili, "kapTitle": "ŞİRKET", "disclosureClass": "ODA",
+            "disclosureType": "ODA"}
+
+
+def test_kap_toplayici_atla_ve_tekrarsiz(m, ayar):
+    http = SahteKapHttp([
+        _kap_kaydi(10, "2026-09-25", "10:00:00", "Özel Durum Açıklaması (Genel)", "Konkordato", "AAA"),
+        _kap_kaydi(11, "2026-09-25", "10:05:00", "Pay Bazında Devre Kesici Bildirimi", "Devre kesici", "BBB"),
+    ], {10: "<p>Konkordato talebi.</p>"})
+    t = kap.KapBildirim(HamDepo(ayar.veri_dizini, m), m, http)
+    ids = t.topla([date(2026, 9, 25)])
+    assert len(ids) == 2 and http.sayfa_istenen == [10]  # atlanan konunun gövdesi indirilmez
+    with m.connect() as b:
+        r = {x.dis_kimlik: x for x in b.execute(select(metin).where(metin.c.kaynak == "kap"))}
+    assert r["10"].govde == "Özet Bilgi: Konkordato\nKonkordato talebi." and r["10"].meta["kodlar"] == ["AAA"]
+    assert r["11"].meta["atla"] is True and r["10"].yayin_ms == kap.tr_ms("25.09.2026 10:00:00")
+    assert t.topla([date(2026, 9, 25)]) == [] and http.sayfa_istenen == [10]
+
+
+def test_a2_sureli_veto_kurumsal_ve_atla(m, ayar):
+    with m.begin() as b:
+        for s in ("AAA", "BBB", "CCC"):
+            b.execute(insert(enstruman).values(kimlik=f"BIST:{s}", piyasa="BIST", sembol=s, sinif="hisse", takvim="XIST",
+                                               para_birimi="TRY", kaynak="yahoo", durum="aktif", meta={},
+                                               guncellendi=__import__("datetime").datetime.now()))
+    http = SahteKapHttp([
+        _kap_kaydi(20, "2024-03-01", "09:00:00", "Özel Durum Açıklaması (Genel)", "Konkordato", "AAA"),
+        _kap_kaydi(21, "2024-03-01", "09:30:00", "Sermaye Artırımı - Azaltımı İşlemlerine İlişkin Bildirim", "Bedelsiz", "CCC"),
+        _kap_kaydi(22, "2024-03-01", "10:00:00", "Pay Bazında Devre Kesici Bildirimi", "Devre kesici", "BBB"),
+        _kap_kaydi(23, "2024-03-01", "11:00:00", "Özel Durum Açıklaması (Genel)", "Yabancı", "ZZZ"),  # evrende yok
+    ], {20: "<p>Konkordato.</p>", 21: "<p>Bedelsiz.</p>", 23: "<p>x</p>"})
+    jev = SahteJev({"AAA": ("olumsuz_esasli", 0.95, {"olumsuz_esasli": 0.95}),
+                    "CCC": ("kurumsal_islem", 0.9, {"kurumsal_islem": 0.9})})
+    ayar_z = {"jev": {"esik": 0.5}, "kaynaklar": ["kap"], "kap": {"veto_gun": {"olumsuz_esasli": 20}}}
+    z = Zeka(m, JevIstemci(m, "jev-1.13.0", istemci=jev), Yukseltme(m, "u", [], None),
+             [kap.KapBildirim(HamDepo(ayar.veri_dizini, m), m, http)], ayar_z)
+    z.toplayicilar[0].topla([date(2024, 3, 1)])
+    z.isle("kap")
+    assert jev.cagri == 2  # atlanan konu ve evren dışı hisse sorulmaz
+    bas = kap.tr_ms("01.03.2024 09:00:00") + ol.GERIYE_DONUK_GECIKME_MS
+    assert ol.aktif_vetolar(m, bas) == {"BIST:AAA"} and ol.aktif_vetolar(m, bas + 20 * 86_400_000) == set()  # süreli
+    with m.connect() as b:
+        assert b.execute(select(olay.c.enstruman).where(olay.c.tur == "kurumsal")).scalars().all() == ["BIST:CCC"]
+
+
+def test_a2_soru_tanimlari_spike04_ile_birebir():
+    yol = KOK / "research" / "spikes" / "04_jev" / "veto_kap.py"
+    spec = importlib.util.spec_from_file_location("spike_veto_kap", yol)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert soru_sha(a2.SORULAR) == soru_sha({"etki": mod.ETKI, "aciliyet": mod.ACILIYET})
+    assert a2.VETO == mod.VETO

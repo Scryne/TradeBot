@@ -36,11 +36,18 @@ class NazikIstemci:
             self._son = time.monotonic()
 
     def al(self, url: str, params: dict | None = None) -> bytes:
+        return self._iste("GET", url, params=params)
+
+    def gonder(self, url: str, json_govde: dict) -> bytes:
+        """POST (JSON gövde); aynı aralık ve geri çekilme kuralları."""
+        return self._iste("POST", url, json=json_govde)
+
+    def _iste(self, yontem: str, url: str, **kw) -> bytes:
         son_hata: Exception | None = None
         for i in range(self.deneme):
             self._bekle()
             try:
-                r = self._c.get(url, params=params)
+                r = self._c.request(yontem, url, **kw)
                 if r.status_code == 404:
                     raise YokHatasi(url)
                 if r.status_code in (429, 500, 502, 503, 504):

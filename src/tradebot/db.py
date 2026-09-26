@@ -149,6 +149,7 @@ metin = Table(
     Column("yayin_ms", BigInteger, nullable=False),      # kaynağın beyan ettiği İLK yayın zamanı (kural 9)
     Column("ilk_gorulme_ms", BigInteger, nullable=False),  # bizim ilk gördüğümüz an (canlı gecikme ölçümü)
     Column("ham_sha", String(64), nullable=False),       # ham yanıtın hash'i (ham_dosya)
+    Column("meta", JSONT),                               # kaynağa özgü (KAP: hisseler, konu, sınıf)
     UniqueConstraint("kaynak", "dis_kimlik", name="uq_metin"),
     Index("ix_metin_yayin", "yayin_ms"),
 )
