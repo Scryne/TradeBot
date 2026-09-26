@@ -419,6 +419,18 @@ def zeka_tur() -> None:
     _yazdir(zeka_kur(m, a).tur())
 
 
+@zeka_uygulama.command("geri-doldur")
+def zeka_geri_doldur(
+    katalog: str = typer.Option("161", help="Virgüllü Binance katalogları (161 delist)"),
+    sayfa: int = typer.Option(40, help="Katalog başına en çok sayfa (20 duyuru/sayfa; boş sayfada durur)"),
+) -> None:
+    """Geçmiş duyuruları toplar ve A1 ile yargılar. Olaylar yayın + 60 sn'de geçerli (point-in-time)."""
+    from tradebot.zeka.servis import kur as zeka_kur
+
+    a, m = _veri_baglam()
+    _yazdir(zeka_kur(m, a).tur(sayfa_sayisi=sayfa, kataloglar=[int(x) for x in katalog.split(",")], metin_siniri=None))
+
+
 @zeka_uygulama.command("calis")
 def zeka_calis(dongu: int = typer.Option(0, help="Saniye; 0 ise config/zeka.yaml dongu_sn")) -> None:
     """Servis döngüsü: her turda topla → yargıla → olay yaz. Bir turun hatası servisi durdurmaz."""

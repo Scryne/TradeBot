@@ -56,8 +56,8 @@ class BinanceDuyuru:
         self.ham, self.motor = ham, motor
         self.http = http or NazikIstemci("binance_cms", aralik_sn=0.5, basliklar={"User-Agent": "Mozilla/5.0"})
 
-    def liste(self, katalog: int) -> list[dict]:
-        d = json.loads(self.http.al(LISTE, {"type": 1, "catalogId": katalog, "pageNo": 1, "pageSize": 20}))
+    def liste(self, katalog: int, sayfa: int = 1) -> list[dict]:
+        d = json.loads(self.http.al(LISTE, {"type": 1, "catalogId": katalog, "pageNo": sayfa, "pageSize": 20}))
         cats = d.get("data", {}).get("catalogs") or []
         return cats[0].get("articles", []) if cats else []
 
@@ -68,11 +68,14 @@ class BinanceDuyuru:
             return set(b.execute(select(metin.c.dis_kimlik).where(metin.c.kaynak == "binance_duyuru",
                                                                   metin.c.dis_kimlik.in_(kodlar))).scalars())
 
-    def topla(self, katalog_idleri: list[int] | None = None) -> list[int]:
-        """Yeni duyuruları indirip `metin`'e yazar. Döndürür: yeni metin id'leri (yayın zamanına göre sıralı)."""
+    def topla(self, katalog_idleri: list[int] | None = None, sayfa_sayisi: int = 1) -> list[int]:
+        """Yeni duyuruları indirip `metin`'e yazar. `sayfa_sayisi` > 1: geçmişi doldurur (boş sayfada durur).
+        Döndürür: yeni metin id'leri (yayın zamanına göre sıralı)."""
         yeni: list[tuple[int, int]] = []
-        for kid in katalog_idleri or list(KATALOGLAR):
-            makaleler = self.liste(kid)
+        for kid, sayfa in ((k, s) for k in (katalog_idleri or list(KATALOGLAR)) for s in range(1, sayfa_sayisi + 1)):
+            makaleler = self.liste(kid, sayfa)
+            if not makaleler:
+                continue
             bilinen = self.bilinen([m["code"] for m in makaleler])
             for m in makaleler:
                 if m["code"] in bilinen:

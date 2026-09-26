@@ -80,18 +80,18 @@ class Zeka:
                 _log.info("a1_veto", enstruman=kimlik, neden=neden, canli=canli)
         return olaylar
 
-    def son_metinler(self, sinir: int = 200) -> list:
+    def son_metinler(self, sinir: int | None = 200) -> list:
         """Son `sinir` Binance duyurusu; her turda taranır, yargısı olan (metin, varlık) çifti atlanır."""
         with self.motor.connect() as b:
-            return list(b.execute(select(metin).where(metin.c.kaynak == "binance_duyuru")
-                                  .order_by(metin.c.yayin_ms.desc()).limit(sinir)))
+            q = select(metin).where(metin.c.kaynak == "binance_duyuru").order_by(metin.c.yayin_ms.desc())
+            return list(b.execute(q.limit(sinir) if sinir else q))
 
-    def tur(self) -> dict:
-        yeni = self.top.topla(self.ayar["binance"]["kataloglar"])
+    def tur(self, sayfa_sayisi: int = 1, kataloglar: list[int] | None = None, metin_siniri: int | None = 200) -> dict:
+        yeni = self.top.topla(kataloglar or self.ayar["binance"]["kataloglar"], sayfa_sayisi)
         bazlar = binance_bazlari(self.motor)
         simdi = int(time.time() * 1000)
         olaylar = []
-        for m in reversed(self.son_metinler()):  # eskiden yeniye
+        for m in reversed(self.son_metinler(metin_siniri)):  # eskiden yeniye
             olaylar += self.a1_metin(m, bazlar, simdi)
         return {"yeni_metin": len(yeni), "olay": len(olaylar)}
 
