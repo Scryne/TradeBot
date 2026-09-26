@@ -1,0 +1,1736 @@
+[
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b1-SSV",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 128.22993234499882,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 299
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b1-MANTA",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 150.26386978800292,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 337
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b2-ENJ",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b2-AIXBT",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 164.00195494700165,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 162
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b2-TNSR",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 135.5620879939961,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 219
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b3-QNT",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 118.45777829099097,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 125
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b3-COOKIE",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 109.57684681999672,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 117
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b4-VANA",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 93.91758529399522,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 301
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b5-USDP",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 98.68826790100138,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 88
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b6-API3",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 84.39887465900392,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.98,
+  "tuzak": null,
+  "cikti_token": 422
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b7-SAGA",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 80.52582230299595,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 135
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b8-BDXN",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 80.2275663830078,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.82,
+  "tuzak": null,
+  "cikti_token": 227
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b10-ICX",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 87.42003590200329,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.98,
+  "tuzak": null,
+  "cikti_token": 161
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b10-STORJ",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 82.8144648669986,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.98,
+  "tuzak": null,
+  "cikti_token": 163
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b10-SCRT",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 130.3692041900067,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.98,
+  "tuzak": null,
+  "cikti_token": 111
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b11-LTC",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b11-SUI",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 80.49916246900102,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 203
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b13-APT",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 131.84069833700778,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 147
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b14-BTTC",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 97.96926726000675,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 132
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b15-SKL",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 108.90225218600244,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 208
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b16-ACX",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 59.012168578003184,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 146
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b16-VIC",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 83.88905914100178,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 173
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b16-PYR",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 102.41355982801178,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 189
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b17-AEUR",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_conversion",
+   "token_delist"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": true,
+  "veto_model": false,
+  "jev": "token_conversion",
+  "jev_guven": 0.68,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b18-MOVE",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 66.30272310299915,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 309
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b18-POL",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 63.443159334987286,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 182
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b21-INJ",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 119.92639203900762,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 132
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b22-ZIL",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 86.22950796100486,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 304
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b23-LUNA",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 76.70751203100372,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 89
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b25-STG",
+  "set": "binance",
+  "altin": "token_conversion",
+  "kabul": [
+   "token_conversion",
+   "token_delist",
+   "usdt_pair_removed"
+  ],
+  "etki": "token_conversion",
+  "dogru": true,
+  "sure": 82.61047630700341,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_conversion",
+  "jev_guven": 0.96,
+  "tuzak": null,
+  "cikti_token": 214
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b25-ZRO",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "not_about_asset",
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 123.77762775299198,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.38,
+  "tuzak": null,
+  "cikti_token": 1133
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b28-VANA",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 64.14601890400809,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 79
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b32-VET",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 94.95684177899966,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 88
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b34-AVA",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 111.84359502700681,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 280
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b36-BB",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 157.79504613899917,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 593
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b39-CFX",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 120.33095372701064,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 200
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b40-HYPE",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 125.05493432799994,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 122
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b45-COAI",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b46-PLUME",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 178.64057337401027,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 99
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b49-APT",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 152.60231084999396,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 152
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b53-PROVE",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 153.95531392599514,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 97
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b10-ETH",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset"
+  ],
+  "etki": "not_about_asset",
+  "dogru": true,
+  "sure": 170.89377585498733,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 72
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b21-BTC",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b2-DOGE",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b40-XRP",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "b25-SOL",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset",
+   "positive_or_neutral"
+  ],
+  "etki": "not_about_asset",
+  "dogru": true,
+  "sure": 165.32931562300655,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 266
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k0-KCHOL",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k1-ASELS",
+  "set": "kap",
+  "altin": "gecici_durdurma",
+  "kabul": [
+   "gecici_durdurma"
+  ],
+  "etki": "gecici_durdurma",
+  "dogru": true,
+  "sure": 154.17951216599613,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "gecici_durdurma",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 203
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k2-SASA",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.95,
+  "tuzak": "toplu SPK yasağı listesi",
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k3-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.98,
+  "tuzak": "temerrüt (yatırımcı)",
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k4-KONTR",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 0.78,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k5-AKBNK",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.64,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k6-ASELS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 134.42790318399784,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 162
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k7-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 151.38805297898944,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.98,
+  "tuzak": "temerrüt (yatırımcı)",
+  "cikti_token": 439
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k8-HEKTS",
+  "set": "kap",
+  "altin": "gecici_durdurma",
+  "kabul": [
+   "gecici_durdurma"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "gecici_durdurma",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k9-KCHOL",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k10-TUPRS",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.94,
+  "tuzak": "bağlı ortaklık SA",
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k11-HEKTS",
+  "set": "kap",
+  "altin": "olumsuz_esasli",
+  "kabul": [
+   "olumsuz_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": true,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.69,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k12-SISE",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.95,
+  "tuzak": "toplu SPK yasağı listesi",
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k13-EREGL",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.96,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k14-EREGL",
+  "set": "kap",
+  "altin": "gecici_durdurma",
+  "kabul": [
+   "gecici_durdurma"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "gecici_durdurma",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k15-BIMAS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.94,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k16-SISE",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.48,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k17-ASELS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k18-BIMAS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.96,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k19-ASTOR",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 170.19382191500335,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 157
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k20-BIMAS",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k21-ASTOR",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k22-SASA",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k23-KONTR",
+  "set": "kap",
+  "altin": "olumsuz_esasli",
+  "kabul": [
+   "olumsuz_esasli"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": true,
+  "veto_model": false,
+  "jev": "olumsuz_esasli",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k24-ASTOR",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k25-SISE",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.85,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k26-FROTO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.98,
+  "tuzak": "temerrüt (yatırımcı)",
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k27-SASA",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k28-EREGL",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k29-AKBNK",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k30-SISE",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.92,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k31-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k32-AKBNK",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.87,
+  "tuzak": "bağlı ortaklık SA",
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k33-KONTR",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "olumsuz_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 0.61,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k34-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k35-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k36-BIMAS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.95,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k37-KCHOL",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.47,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k38-ASTOR",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k39-HEKTS",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k40-KONTR",
+  "set": "kap",
+  "altin": "pazar_tedbiri",
+  "kabul": [
+   "pazar_tedbiri"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": true,
+  "veto_model": false,
+  "jev": "pazar_tedbiri",
+  "jev_guven": 0.75,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k41-KCHOL",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.66,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k42-BIMAS",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "z-ai/glm-5.3",
+  "id": "k43-KONTR",
+  "set": "kap",
+  "altin": "olumsuz_esasli",
+  "kabul": [
+   "olumsuz_esasli",
+   "pazar_tedbiri",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": true,
+  "veto_model": false,
+  "jev": "olumsuz_esasli",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": null
+ }
+]

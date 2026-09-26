@@ -143,6 +143,21 @@ def test_yukseltme_yedek_zinciri(m):
     assert Yukseltme(m, "https://x/v1", [], "k").sec(a1.ROL, "h", {}, {}) == (None, None)  # model yok → hazır değil
 
 
+def test_yukseltme_429_bekler_ve_tekrar_dener(m):
+    sayac = {"n": 0}
+
+    def isle(req: httpx.Request):
+        sayac["n"] += 1
+        if sayac["n"] < 3:
+            return httpx.Response(429)
+        return httpx.Response(200, json={"choices": [{"message": {"content": '{"etki": "token_delist"}'}}]})
+
+    y = Yukseltme(m, "https://x/v1", ["a"], "k", http=httpx.Client(transport=httpx.MockTransport(isle)), hiz_bekleme=(0, 0))
+    assert y.sec(a1.ROL, "h", a1.ETKI.model_dump(mode="json"), a1.state("t", "g", "ICX")) == ("token_delist", "a")
+    sayac["n"] = -10  # hep 429: bekleme tükenince sıradaki modele (yok) → None
+    assert y.sec(a1.ROL, "h", a1.ETKI.model_dump(mode="json"), a1.state("t", "g", "ICX")) == (None, None)
+
+
 # ------------------------------------------------------------------ A1 karar kuralı
 @pytest.mark.parametrize("secim,guven,p,yuk,denendi,veto,on_ek", [
     ("token_delist", 0.97, {}, None, False, True, "jev"),

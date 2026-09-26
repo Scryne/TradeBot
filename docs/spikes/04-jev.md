@@ -2,7 +2,7 @@
 spike: 04
 konu: Jev — haber/duyuru vetosu (A1), KAP sınıflandırma (A2), kurumsal işlem tespiti (B1); NVIDIA yükseltmesi
 tarih: 2026-09-25
-sonuc: A kısmı GEÇTİ (güçlü) · B kısmı GEÇTİ — nemotron-3-ultra birincil (yedek zinciri ölçümü sürüyor)
+sonuc: A kısmı GEÇTİ (güçlü) · B kısmı GEÇTİ — zincir nemotron-3-ultra → glm-5.3
 kod: research/spikes/04_jev/ (veto_binance.py, veto_kap.py; ham sonuçlar data/*_sonuc.json)
 model: jev-1.13.0 (typesafe-sdk 0.7.1)
 ---
@@ -105,7 +105,11 @@ Aynı Choice tanımları, istem `tradebot.zeka.yukseltme.istem` ile birebir. Üc
 | --- | --- | --- | --- | --- | --- | --- |
 | `nvidia/nemotron-3-ultra-550b-a55b` | 89/90 | **60/60** | 0 | 0 | 0 | 12–19 sn / 37–64 sn |
 | Eski kural (belirsizde ilk iki seçenekte veto varsa veto) | — | 51/60 | 8 | 1 | — | — |
-| `moonshotai/kimi-k3`, `z-ai/glm-5.3`, `deepseek-ai/deepseek-v4.1-flash` | sürüyor | sürüyor | | | | tek çağrı 55–220 sn |
+| `z-ai/glm-5.3` | 43/90 (cevap verdiği 43/43) | — | 0 | 5* | 47 (hepsi zaman aşımı) | 112 sn / 164 sn |
+| `moonshotai/kimi-k3` | 60/90 | 56/60 | 0 | 4 | 30 (24 geçersiz çıktı) | 71–86 sn / 122–146 sn |
+| `deepseek-ai/deepseek-v4.1-flash` | sürüyor | — | | | | tek çağrı ~220 sn |
+
+\* Kaçırılanların hepsi zaman aşımı: cevap yokken veto yok sayıldı. Canlıda cevap yoksa belirsiz kuralı devreye girer.
 
 - 90 örnekte nemotron'un tek hatası veto dışı (KAP `rutin` → `olumlu_esasli`). 04-A'daki "kaçırılan 2", kabul
   kümesinde `rutin` de olan iki KAP örneği, gerçek kaçırma değil.
@@ -116,5 +120,9 @@ Aynı Choice tanımları, istem `tradebot.zeka.yukseltme.istem` ile birebir. Üc
 - **Gecikme:** ücretsiz katmanda bekleme sırası baskın (üretilen token az, süre uzun). A1 için yeterli: delist duyuruları
   günler önceden gelir. Canlı istemcide zaman aşımı 180 sn.
 
-**Karar:** yükseltme zinciri `[nemotron-3-ultra]` (`config/zeka.yaml`). Yedek model diğer üçünün sonucuyla eklenir.
+**Karar:** yükseltme zinciri `[nemotron-3-ultra, glm-5.3]` (`config/zeka.yaml`).
+- glm yavaş ama cevap verdiğinde hep doğru. Zaman aşımında belirsiz kuralı (riski azalt) devreye girer.
+- kimi alınmadı: %27 geçersiz çıktı ve gerçek belirsiz vakalarda 4 kaçırılan veto. Kaçırma, yanlış alarmdan pahalı.
+- 429: modeller paralel ölçülürken üretimde 9 çağrı hız sınırına takıldı. İstemci artık 429'da 15 sn, sonra 60 sn
+  bekleyip aynı modeli yeniden dener.
 Sınır: etiketleri tek kişi (Claude) verdi.

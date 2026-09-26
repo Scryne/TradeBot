@@ -213,9 +213,12 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     kapanır (75b4ef8). Kaldırma riski artırır (kural 5/7): otomatik yol yok, yalnız onaylı `tradebot zeka veto-kaldir`.
     8 vetonun kaldırılması Scryne onayını bekliyor. `belirsizleri-yukselt` belirsiz kararları yükseltmeye sorar, yalnız
     veto ekler.
-  - Spike 04-B ✅ (`docs/spikes/04-jev.md` §6): `nemotron-3-ultra` birincil yükseltme modeli.
-    - 90 örnekte 89/90; 60 gerçek belirsiz vakada veto kararı 60/60. Gecikme medyan 12–19 sn (ücretsiz katman).
-    - Yedek model (kimi-k3 / glm-5.3 / deepseek-v4.1-flash) ölçümü sürüyor; bunlarda tek çağrı 55–220 sn.
+  - Spike 04-B ✅ (`docs/spikes/04-jev.md` §6): yükseltme zinciri `nemotron-3-ultra` → `glm-5.3`.
+    - nemotron: 90 örnekte 89/90; 60 gerçek belirsiz vakada veto kararı 60/60. Gecikme medyan 12–19 sn (ücretsiz katman).
+    - kimi-k3 alınmadı (geçersiz çıktı, kaçırılan veto).
+  - `zeka` servisi host'ta canlı (2026-09-26 16:19 UTC). Binance 4 katalog, dakikada bir.
+  - `belirsizleri-yukselt` (host): 51 yükseltildi, 1 yeni veto (ADAUP, kaçırılmış olan), 5 belirsiz veto yükseltmeye
+    göre gereksiz. 9 çağrı 429 (paralel spike yükü); 429'da bekle-yeniden-dene eklendi, yeniden koşulacak.
   - Jev /TUSD ile /USDT çiftini karıştırıyor. A1 sorusunun sonraki sürümüne aday (yeni ölçümle).
 
 ### Faz 7: Paper canlı — kripto + ABD ETF

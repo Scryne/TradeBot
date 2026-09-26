@@ -6,7 +6,9 @@ yukseltme:
   base_url: https://integrate.api.nvidia.com/v1
   # Spike 04-B (2026-09-26): nemotron-3-ultra 90 etiketli örnekte 89/90, 60 gerçek belirsiz vakada veto kararı 60/60
   # (yanlış veto 0, kaçırılan 0); gecikme medyan 12–19 sn, p90 37–64 sn (ücretsiz katman). Sırayla denenen yedek zinciri.
-  modeller: [nvidia/nemotron-3-ultra-550b-a55b]
+  # Yedek glm-5.3: cevap verdiği 43/43 doğru, ama 47/90 180 sn'de zaman aşımı. kimi-k3 alınmadı: %27 geçersiz çıktı,
+  # belirsiz 60'ta 4 kaçırılan veto (kaçırma, yanlış alarmdan pahalı).
+  modeller: [nvidia/nemotron-3-ultra-550b-a55b, z-ai/glm-5.3]
   zaman_asimi_sn: 180          # ücretsiz katmanda p90 64 sn ölçüldü
 binance:
   kataloglar: [161, 157, 49, 48]   # delist, bakım, haber, listeleme

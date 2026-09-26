@@ -1,0 +1,1736 @@
+[
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b1-SSV",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 73.19500554499973,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b1-MANTA",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b2-ENJ",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 59.00679706300434,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 34
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b2-AIXBT",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 149.04620767499728,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 35
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b2-TNSR",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 58.642670126006124,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 35
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b3-QNT",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 58.532096583003295,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 34
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b3-COOKIE",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 100.31435712199891,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 34
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b4-VANA",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 66.16228978100116,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 37
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b5-USDP",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 78.45818946500367,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": false,
+  "jev": "token_delist",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b6-API3",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 92.22581029499997,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.98,
+  "tuzak": null,
+  "cikti_token": 35
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b7-SAGA",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 38.695701901000575,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 36
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b8-BDXN",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 40.65879958998994,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.82,
+  "tuzak": null,
+  "cikti_token": 43
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b10-ICX",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 42.13677432600525,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": false,
+  "jev": "token_delist",
+  "jev_guven": 0.98,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b10-STORJ",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 148.73651156800042,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.98,
+  "tuzak": null,
+  "cikti_token": 29
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b10-SCRT",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 87.8478684300062,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.98,
+  "tuzak": null,
+  "cikti_token": 29
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b11-LTC",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 40.8086410130054,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 34
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b11-SUI",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 68.02844878500036,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 34
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b13-APT",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 41.068374741007574,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 33
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b14-BTTC",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 37.13394265799434,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 36
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b15-SKL",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 45.37748610498966,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 34
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b16-ACX",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 23.277525580997462,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": false,
+  "jev": "token_delist",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b16-VIC",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 28.54746813699603,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 29
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b16-PYR",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 39.98546023199742,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": false,
+  "jev": "token_delist",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b17-AEUR",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_conversion",
+   "token_delist"
+  ],
+  "etki": "token_conversion",
+  "dogru": true,
+  "sure": 29.834838984999806,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_conversion",
+  "jev_guven": 0.68,
+  "tuzak": null,
+  "cikti_token": 35
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b18-MOVE",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 25.547723598006996,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 37
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b18-POL",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 60.08816715799912,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b21-INJ",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 34.920964115008246,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 35
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b22-ZIL",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 35.43570927598921,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 47
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b23-LUNA",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 48.3010861609946,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b25-STG",
+  "set": "binance",
+  "altin": "token_conversion",
+  "kabul": [
+   "token_conversion",
+   "token_delist",
+   "usdt_pair_removed"
+  ],
+  "etki": "token_conversion",
+  "dogru": true,
+  "sure": 41.54234365800221,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_conversion",
+  "jev_guven": 0.96,
+  "tuzak": null,
+  "cikti_token": 34
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b25-ZRO",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "not_about_asset",
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 57.532920622994425,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.38,
+  "tuzak": null,
+  "cikti_token": 51
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b28-VANA",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 70.2457717310026,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b32-VET",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 37.50892984600796,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 35
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b34-AVA",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 39.83565332200669,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 37
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b36-BB",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 58.17505689000245,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 33
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b39-CFX",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 27.209144848995493,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 35
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b40-HYPE",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 36.41754656800185,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 37
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b45-COAI",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 79.35097282899369,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 37
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b46-PLUME",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 121.8434723209939,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 30
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b49-APT",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 71.09560844999214,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 33
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b53-PROVE",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 42.04459722500178,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 30
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b10-ETH",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset"
+  ],
+  "etki": "not_about_asset",
+  "dogru": true,
+  "sure": 71.04467897600261,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 49
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b21-BTC",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 82.04344502800086,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b2-DOGE",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset"
+  ],
+  "etki": "not_about_asset",
+  "dogru": true,
+  "sure": 82.97021025199501,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 27
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b40-XRP",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 62.64006989599147,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "b25-SOL",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset",
+   "positive_or_neutral"
+  ],
+  "etki": "not_about_asset",
+  "dogru": true,
+  "sure": 57.049761903996114,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 42
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k0-KCHOL",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 94.05652603199997,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k1-ASELS",
+  "set": "kap",
+  "altin": "gecici_durdurma",
+  "kabul": [
+   "gecici_durdurma"
+  ],
+  "etki": "gecici_durdurma",
+  "dogru": true,
+  "sure": 94.67767534899758,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "gecici_durdurma",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 43
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k2-SASA",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 90.4037664810021,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.95,
+  "tuzak": "toplu SPK yasağı listesi",
+  "cikti_token": 48
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k3-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 63.25828732700029,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.98,
+  "tuzak": "temerrüt (yatırımcı)",
+  "cikti_token": 39
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k4-KONTR",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "rutin"
+  ],
+  "etki": "kurumsal_islem",
+  "dogru": true,
+  "sure": 161.15350362300524,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 0.78,
+  "tuzak": null,
+  "cikti_token": 111
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k5-AKBNK",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.64,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k6-ASELS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 135.87880262099497,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 33
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k7-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 150.8201035069942,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.98,
+  "tuzak": "temerrüt (yatırımcı)",
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k8-HEKTS",
+  "set": "kap",
+  "altin": "gecici_durdurma",
+  "kabul": [
+   "gecici_durdurma"
+  ],
+  "etki": "gecici_durdurma",
+  "dogru": true,
+  "sure": 64.08198074299435,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "gecici_durdurma",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 43
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k9-KCHOL",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 73.14884819099098,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k10-TUPRS",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 97.92526952800108,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.94,
+  "tuzak": "bağlı ortaklık SA",
+  "cikti_token": 39
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k11-HEKTS",
+  "set": "kap",
+  "altin": "olumsuz_esasli",
+  "kabul": [
+   "olumsuz_esasli",
+   "rutin"
+  ],
+  "etki": "olumsuz_esasli",
+  "dogru": true,
+  "sure": 117.48645749600837,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "rutin",
+  "jev_guven": 0.69,
+  "tuzak": null,
+  "cikti_token": 132
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k12-SISE",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.95,
+  "tuzak": "toplu SPK yasağı listesi",
+  "cikti_token": null
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k13-EREGL",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 118.58254316399689,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.96,
+  "tuzak": null,
+  "cikti_token": 44
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k14-EREGL",
+  "set": "kap",
+  "altin": "gecici_durdurma",
+  "kabul": [
+   "gecici_durdurma"
+  ],
+  "etki": "gecici_durdurma",
+  "dogru": true,
+  "sure": 121.16877790399303,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "gecici_durdurma",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 43
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k15-BIMAS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 94.65083523500653,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.94,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k16-SISE",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 136.28519011099706,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.48,
+  "tuzak": null,
+  "cikti_token": 54
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k17-ASELS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 70.4073602349963,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 29
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k18-BIMAS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 145.94679592399916,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.96,
+  "tuzak": null,
+  "cikti_token": 35
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k19-ASTOR",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 51.984114667997346,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 30
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k20-BIMAS",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 73.71341410599416,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 33
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k21-ASTOR",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 84.94232267999905,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 35
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k22-SASA",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem"
+  ],
+  "etki": "kurumsal_islem",
+  "dogru": true,
+  "sure": 53.787783109000884,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 45
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k23-KONTR",
+  "set": "kap",
+  "altin": "olumsuz_esasli",
+  "kabul": [
+   "olumsuz_esasli"
+  ],
+  "etki": "olumsuz_esasli",
+  "dogru": true,
+  "sure": 71.34946910099825,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "olumsuz_esasli",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 41
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k24-ASTOR",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k25-SISE",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 91.09920663000958,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.85,
+  "tuzak": null,
+  "cikti_token": 29
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k26-FROTO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 56.85426956700394,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.98,
+  "tuzak": "temerrüt (yatırımcı)",
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k27-SASA",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem"
+  ],
+  "etki": "kurumsal_islem",
+  "dogru": true,
+  "sure": 90.05671399499988,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 45
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k28-EREGL",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 164.013180680995,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 42
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k29-AKBNK",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 115.1473184130009,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 31
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k30-SISE",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.92,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k31-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 85.67109370100661,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 28
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k32-AKBNK",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 120.40744991900283,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.87,
+  "tuzak": "bağlı ortaklık SA",
+  "cikti_token": 39
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k33-KONTR",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "olumsuz_esasli",
+   "rutin"
+  ],
+  "etki": "kurumsal_islem",
+  "dogru": true,
+  "sure": 122.35147997300373,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 0.61,
+  "tuzak": null,
+  "cikti_token": 102
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k34-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 97.64432004099945,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 33
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k35-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": NaN,
+  "hata": "The read operation timed out",
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": null
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k36-BIMAS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 100.51946748499176,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.95,
+  "tuzak": null,
+  "cikti_token": 35
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k37-KCHOL",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 78.32179990800796,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.47,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k38-ASTOR",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 70.6884769499884,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 29
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k39-HEKTS",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 104.82566520500404,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k40-KONTR",
+  "set": "kap",
+  "altin": "pazar_tedbiri",
+  "kabul": [
+   "pazar_tedbiri"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 51.60488135401101,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": false,
+  "jev": "pazar_tedbiri",
+  "jev_guven": 0.75,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k41-KCHOL",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": null,
+  "dogru": false,
+  "sure": 84.82001812501403,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.66,
+  "tuzak": null,
+  "cikti_token": 32
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k42-BIMAS",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "rutin"
+  ],
+  "etki": "kurumsal_islem",
+  "dogru": true,
+  "sure": 75.20789242800674,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 38
+ },
+ {
+  "model": "moonshotai/kimi-k3",
+  "id": "k43-KONTR",
+  "set": "kap",
+  "altin": "olumsuz_esasli",
+  "kabul": [
+   "olumsuz_esasli",
+   "pazar_tedbiri",
+   "rutin"
+  ],
+  "etki": "olumsuz_esasli",
+  "dogru": true,
+  "sure": 65.79507911999826,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "olumsuz_esasli",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 44
+ }
+]

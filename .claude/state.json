@@ -1,7 +1,7 @@
 {
   "proje_adi": "TradeBot",
   "asama": "uygulama",
-  "guncellendi": "2026-09-25",
+  "guncellendi": "2026-09-26",
   "roadmap": "docs/Roadmap.md",
-  "not": "Faz 0-5 tamam (2026-09-26). Faz 5: 67 kol, A yok; B (sermayesiz paper gozlem, DSR sartsiz - Scryne karari) 2 kol: ma_yon@kripto_btc_eth@1h, tsmom@kripto_btc_eth@4h. CFD'de kaldiracli trend finansmandan ekonomik degil. Kuyruk: Dukascopy 1h/4h + dalga 1c veri gelince. Sirada Faz 6 (Jev) + paralel dalga 2."
+  "not": "Faz 0-5 tamam. Faz 6 suruyor: iskelet + A1 (Binance) canli (zeka servisi host'ta 2026-09-26'dan beri). Spike 04-B: nemotron-3-ultra birincil yukseltme (60 gercek belirsiz vakada 60/60); yedek model olcumu suruyor. Eski belirsiz kuralin 8 yanlis vetosu: kaldirma Scryne onayi bekliyor (tradebot zeka veto-kaldir). Paper listesi: 5 B kolu, hepsi BTC+ETH trend. Sirada: diger toplayicilar (KAP, SEC, RSS, MB, GDELT), B/D rolleri, sonra Faz 7."
 }

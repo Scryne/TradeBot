@@ -52,9 +52,21 @@ def coz(metin: str, alan: str, anahtarlar: set[str]) -> str | None:
 
 class Yukseltme:
     def __init__(self, motor: Engine, base_url: str, modeller: list[str], api_key: str | None,
-                 zaman_asimi: float = 120.0, http: httpx.Client | None = None) -> None:
+                 zaman_asimi: float = 120.0, http: httpx.Client | None = None,
+                 hiz_bekleme: tuple[float, ...] = (15.0, 60.0)) -> None:
         self.motor, self.url, self.modeller, self._anahtar = motor, base_url.rstrip("/"), modeller, api_key
+        self.hiz_bekleme = hiz_bekleme
         self._c = http or httpx.Client(timeout=zaman_asimi)
+
+    def _iste(self, model: str, mesajlar: list[dict]) -> httpx.Response:
+        """429'da `hiz_bekleme` sırasıyla bekleyip aynı modeli yeniden dener (ücretsiz katman; Spike 04-B'de ölçüldü)."""
+        for bekle in (*self.hiz_bekleme, None):
+            r = self._c.post(f"{self.url}/chat/completions", headers={"Authorization": f"Bearer {self._anahtar}"},
+                             json={"model": model, "messages": mesajlar, "temperature": 0, "max_tokens": 4096})
+            if r.status_code != 429 or bekle is None:
+                return r
+            time.sleep(bekle)
+        return r
 
     @property
     def hazir(self) -> bool:
@@ -70,8 +82,7 @@ class Yukseltme:
             t0 = time.perf_counter()
             secim, hata, cikti = None, None, None
             try:
-                r = self._c.post(f"{self.url}/chat/completions", headers={"Authorization": f"Bearer {self._anahtar}"},
-                                 json={"model": model, "messages": mesajlar, "temperature": 0, "max_tokens": 4096})
+                r = self._iste(model, mesajlar)
                 r.raise_for_status()
                 cikti = r.json()["choices"][0]["message"].get("content") or ""
                 secim = coz(cikti, alan, set(tanim["criteria"]))
