@@ -240,13 +240,17 @@ def taraf_matrisi(g: GrupVerisi, modeller: list[MaliyetModeli], ek_bps: np.ndarr
 
 # ------------------------------------------------------------------ backtest
 def calistir_panel(g: GrupVerisi, hedef: np.ndarray, taraf: np.ndarray, modeller: list[MaliyetModeli],
-                   bant: float = 0.0, izleyici=None, fiyat: np.ndarray | None = None) -> Sonuc:
+                   bant: float = 0.0, izleyici=None, fiyat: np.ndarray | None = None,
+                   veto: np.ndarray | None = None) -> Sonuc:
     """hedef [n, k]: bar t kapanışında verilen ağırlık (özkaynağa oran). Dönüş: kol düzeyinde Sonuc (pozisyon = brüt
     maruziyet, devir = Σ|Δw|). `fiyat`: yürütme fiyatı (varsayılan açılış).
 
     Dengeleme: yön değişince (giriş, çıkış, ters dönüş) her zaman işlem; aynı yönde ağırlık hedeften `bant` × |hedef|'ten
     fazla saparsa hedefe döner (oransal bant; oynaklık ölçeğinin her bar küçük işlem üretmesini önler). bant = 0: her bar
-    hedefe dengele (`backtest.calistir(bant=0)` ile birebir)."""
+    hedefe dengele (`backtest.calistir(bant=0)` ile birebir).
+
+    `veto` [n, k]: zekâ katmanı vetosu (bar i'nin açılışında geçerli olanlar; `veto_maskesi`). Vetolu enstrümanda risk
+    artırılamaz: aynı yönde küçülebilir, büyüyemez, ters dönemez (canlı risk motoruyla aynı kural, kural 5)."""
     p = g.acilis if fiyat is None else fiyat
     n, k = p.shape
     if n < 3 or hedef.shape != (n, k):
@@ -271,6 +275,10 @@ def calistir_panel(g: GrupVerisi, hedef: np.ndarray, taraf: np.ndarray, modeller
                 h[:] = 0.0
             elif d.value != "normal":  # fren: yeni risk yok (aynı yönde küçülebilir, büyüyemez, ters dönemez)
                 h = np.where(np.sign(h) == np.sign(kaymis), np.sign(h) * np.minimum(np.abs(h), np.abs(kaymis)), 0.0)
+        if veto is not None and veto[i].any():
+            v = veto[i]
+            h = np.where(v, np.where(np.sign(h) == np.sign(kaymis), np.sign(h) * np.minimum(np.abs(h), np.abs(kaymis)), 0.0),
+                         h)
         degisti = (np.sign(h) != np.sign(onceki_h)) | (i == 0)
         onceki_h = h
         islem = islem_ok & (degisti | (np.abs(h - kaymis) > bant * np.abs(h)))
@@ -286,3 +294,16 @@ def calistir_panel(g: GrupVerisi, hedef: np.ndarray, taraf: np.ndarray, modeller
         oz *= 1.0 + nt
     return Sonuc(t=g.t[:-1], pozisyon=np.abs(w_all).sum(axis=1), brut=brut, maliyet=mal, net=net, devir=devir,
                  ozkaynak=np.cumprod(1.0 + net), durum=durumlar if izleyici is not None else None)
+
+
+def veto_maskesi(g: GrupVerisi, olaylar: list[tuple[str, int, int | None]]) -> np.ndarray:
+    """[n, k] veto maskesi. `olaylar`: (enstrüman, gecerli_ms, bitis_ms|None). Bar i'nin kararı i'nin açılışında
+    uygulanır; veto yalnız `gecerli_ms ≤ t[i]` ise görünür (point-in-time), `bitis_ms`'te kalkar."""
+    m = np.zeros((len(g.t), len(g.kimlikler)), dtype=bool)
+    sutun = {k: j for j, k in enumerate(g.kimlikler)}
+    for kimlik, bas, bit in olaylar:
+        j = sutun.get(kimlik)
+        if j is None:
+            continue
+        m[:, j] |= (g.t >= bas) & ((g.t < bit) if bit is not None else True)
+    return m

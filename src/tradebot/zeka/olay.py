@@ -29,3 +29,10 @@ def aktif_vetolar(motor: Engine, t_ms: int) -> set[str]:
         return set(b.execute(select(olay.c.enstruman).where(
             olay.c.tur == "veto", olay.c.gecerli_ms <= t_ms,
             or_(olay.c.bitis_ms.is_(None), and_(olay.c.bitis_ms > t_ms)))).scalars())
+
+
+def tum_vetolar(motor: Engine) -> list[tuple[str, int, int | None]]:
+    """Backtest için bütün veto olayları: (enstrüman, gecerli_ms, bitis_ms). Maske `panel.veto_maskesi` ile kurulur."""
+    with motor.connect() as b:
+        return [(r.enstruman, int(r.gecerli_ms), r.bitis_ms) for r in
+                b.execute(select(olay.c.enstruman, olay.c.gecerli_ms, olay.c.bitis_ms).where(olay.c.tur == "veto"))]

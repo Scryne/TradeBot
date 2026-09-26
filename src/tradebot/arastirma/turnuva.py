@@ -36,6 +36,7 @@ from tradebot.arastirma.panel import (
     kripto_ek_kayma_bps,
     kur_cevir,
     taraf_matrisi,
+    veto_maskesi,
 )
 from tradebot.cekirdek import StratejiTanimi, nedensellik_testi, ornek
 from tradebot.cekirdek import aileler as al
@@ -80,6 +81,7 @@ class Ayar:
     is_yil: float = 3.0
     oos_yil: float = 1.0
     olcut: Olcut = field(default_factory=Olcut)
+    jev_veto: bool = False  # True: zekâ katmanı vetoları backtest'te uygulanır (Jev'li kol; A/B için aynı kol iki kez)
 
 
 def bar_gun(zd: str, takvim_adi: str) -> float:
@@ -125,9 +127,11 @@ class HazirGrup:
     takvim: str
     bar_yil_olcu: float | None = None  # karışık takvimli grup: ızgaradaki yıllık bar sayısı (veriden)
     yalniz_long: np.ndarray | None = None  # [k] bu enstrümanlarda negatif ağırlık yok
+    veto: np.ndarray | None = None  # [n, k] zekâ katmanı vetoları (point-in-time)
 
 
-def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bit_ms: int | None = None) -> HazirGrup:
+def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bit_ms: int | None = None,
+                 vetolar: list[tuple[str, int, int | None]] | None = None) -> HazirGrup:
     """`tanim`: dalga planındaki grup (kimlikler listesi ya da `dinamik: kripto|bist` + ilk_n; `kur`: USD'ye çevirme;
     `seans`: pozisyon yalnız bu borsa takviminin seansında)."""
     if tanim.get("dinamik") == "kripto":
@@ -157,7 +161,8 @@ def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bi
     # ETF'in hafta sonu barları ileri doldurulmuş (getiri 0) olduğundan ızgara başına yıllıklaştırma doğrudur.
     olcu = (len(g.t) - 1) / ((g.t[-1] - g.t[0]) / YIL_MS) if len(takvimler) > 1 and len(g.t) > 1 else None
     yl = np.array([kayit[k]["piyasa"] in YALNIZ_LONG_PIYASALAR for k in g.kimlikler])
-    return HazirGrup(g, evrende, taraf_matrisi(g, modeller, ek), modeller, sorted(takvimler)[0], olcu, yl)
+    vm = veto_maskesi(g, vetolar) if vetolar is not None else None
+    return HazirGrup(g, evrende, taraf_matrisi(g, modeller, ek), modeller, sorted(takvimler)[0], olcu, yl, vm)
 
 
 # ------------------------------------------------------------------ koşu
@@ -194,7 +199,8 @@ def g_zd(g: GrupVerisi) -> str:
 def kos(h: HazirGrup, hedef: np.ndarray, ayar: Ayar, maliyet_carpani: float = 1.0) -> Sonuc:
     iz = (PortfoyIzleyici(RiskAyar(kaldirac=ayar.kaldirac), baslangic_ms=int(h.g.t[0]), acil_kalici=False)
           if ayar.frenler else None)
-    return calistir_panel(h.g, hedef, h.taraf * maliyet_carpani, h.modeller, bant=ayar.bant, izleyici=iz)
+    return calistir_panel(h.g, hedef, h.taraf * maliyet_carpani, h.modeller, bant=ayar.bant, izleyici=iz,
+                          veto=h.veto if ayar.jev_veto else None)
 
 
 def olc(s: Sonuc) -> dict:
@@ -251,7 +257,7 @@ def kol_kos(defter: Defter, h: HazirGrup, plan: str, strateji: str, grup: str, i
     aile, _, _ = STRATEJILER[strateji]
     zd = g_zd(h.g)
     bg = bar_gun(zd, h.takvim)
-    kol = kol_kimligi(strateji, grup, zd)
+    kol = kol_kimligi(strateji, grup, zd) + ("+jev" if ayar.jev_veto else "")
     kosular, puanlar, satirlar, hedefler = {}, {}, [], {}
     for p0 in dg.izgara(izgara):
         p = cevir(p0, bg)
@@ -261,7 +267,7 @@ def kol_kos(defter: Defter, h: HazirGrup, plan: str, strateji: str, grup: str, i
         s = kos(h, hedef, ayar)
         m = olc(s)
         defter.kaydet(plan, "tarama", vk, aile, p0 | {"_bar": p, "boyut": {"hedef_vol": ayar.hedef_vol,
-                      "kaldirac": ayar.kaldirac, "bant": ayar.bant}, "yon": yon}, f"kol:{grup}", zd,
+                      "kaldirac": ayar.kaldirac, "bant": ayar.bant}, "yon": yon, "jev_veto": ayar.jev_veto}, f"kol:{grup}", zd,
                       h.g.veri_hash, m | {"kol": kol, "enstruman_sayisi": len(h.g.kimlikler)}, time.perf_counter() - t0,
                       izin_kirli=izin_kirli)
         kosular[vk] = {"net": s.net, "pozisyon": s.pozisyon, "t": s.t}
@@ -350,7 +356,8 @@ def dalga_oku(yol: Path) -> dict:
     kaldirac_dogrula(b["kaldirac"])
     d["_ayar"] = Ayar(hedef_vol=b["hedef_vol"], kaldirac=b["kaldirac"], vol_pencere_gun=b["vol_pencere_gun"],
                       frenler=d["frenler"], bant=b["bant"], is_yil=d["walk_forward"]["is_yil"],
-                      oos_yil=d["walk_forward"]["oos_yil"], olcut=Olcut(**d["olcut"]))
+                      oos_yil=d["walk_forward"]["oos_yil"], olcut=Olcut(**d["olcut"]),
+                      jev_veto=bool(d.get("jev_veto", False)))
     return d
 
 

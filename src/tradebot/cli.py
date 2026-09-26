@@ -272,14 +272,19 @@ def arastirma_turnuva(
     for k in sorted(tv.kollar(d), key=lambda x: (x["grup"], x["zd"])):  # grup verisi bir kez yüklensin
         if (gs and k["grup"] not in gs) or (ss and k["strateji"] not in ss) or (zs and k["zd"] not in zs):
             continue
-        kol = tv.kol_kimligi(k["strateji"], k["grup"], k["zd"])
+        kol = tv.kol_kimligi(k["strateji"], k["grup"], k["zd"]) + ("+jev" if d["_ayar"].jev_veto else "")
         if (cikti / f"{kol.replace('@', '__')}.json").exists() and not tekrar:
             continue
         anahtar = (k["grup"], k["zd"])
         try:
             if anahtar not in hazir:
                 hazir.clear()  # bellek: aynı anda tek grup
-                hazir[anahtar] = tv.grup_hazirla(depo, kayit, d["gruplar"][k["grup"]], k["zd"], bit_ms=bit_ms)
+                vetolar = None
+                if d["_ayar"].jev_veto:
+                    from tradebot.zeka.olay import tum_vetolar
+
+                    vetolar = tum_vetolar(m)
+                hazir[anahtar] = tv.grup_hazirla(depo, kayit, d["gruplar"][k["grup"]], k["zd"], bit_ms=bit_ms, vetolar=vetolar)
             t0 = time.perf_counter()
             r = tv.kol_kos(defter, hazir[anahtar], k["plan"], k["strateji"], k["grup"], k["izgara"], k["yon"], d["_ayar"],
                            veri_etiketi=f"bitis {d['veri_bitis']}", en_fazla=k["en_fazla"])

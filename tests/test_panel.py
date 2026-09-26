@@ -526,3 +526,26 @@ def test_karma_grupta_kripto_yalniz_long(tmp_path):
     w = tv.hedef_uret(h, "tsmom", {"ufuk": 20}, "long_short", tv.Ayar(vol_pencere_gun=20))
     j_k, j_e = h.g.kimlikler.index("BINANCE:KUSDT"), h.g.kimlikler.index("ARCA:E")
     assert w[:, j_k].min() >= 0 and w[:, j_e].min() < 0  # kripto short açılmaz, ETF açılabilir
+
+
+def test_veto_riski_artirmaz_ve_pit(depo):
+    from tradebot.arastirma.panel import veto_maskesi
+
+    a = barlar(n=100, tohum=7)
+    yaz(depo, "BINANCE:VUSDT", a)
+    g = grup_yukle(depo, ["BINANCE:VUSDT"], "1d")
+    mm = MaliyetModeli("sifir", 0.0, 0.0, 0.0)
+    hedef = np.zeros((100, 1))
+    hedef[10:] = 0.5
+    hedef[50:] = 0.8  # bar 50'de büyütme isteği
+    v = veto_maskesi(g, [("BINANCE:VUSDT", int(g.t[40]), None), ("BAŞKA", 0, None)])
+    assert not v[39, 0] and v[40, 0]  # geçerli olmadan önce görünmez
+    s = calistir_panel(g, hedef, taraf_matrisi(g, [mm]), [mm], veto=v)
+    s0 = calistir_panel(g, hedef, taraf_matrisi(g, [mm]), [mm])
+    assert s0.pozisyon[52] > 0.7 and s.pozisyon[52] < 0.6  # vetosuz büyür, vetoda büyüyemez
+    h2 = hedef.copy()
+    h2[60:] = 0.2  # küçültme her zaman geçer
+    s2 = calistir_panel(g, h2, taraf_matrisi(g, [mm]), [mm], veto=v)
+    assert s2.pozisyon[62] == pytest.approx(0.2, abs=0.05)
+    v2 = veto_maskesi(g, [("BINANCE:VUSDT", int(g.t[40]), int(g.t[45]))])
+    assert v2[44, 0] and not v2[45, 0]  # süreli veto biter
