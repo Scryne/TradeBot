@@ -211,7 +211,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - Belirsiz yoldan gelen 22 vetonun 8'i yanlış çıktı (ADA, INJ, FLOKI, PHB, ALPACA: yalnız /TUSD–/BTC çifti; ALCX: yalnız
     margin; NOT ×2: "is NOT" kelimesi), 1 veto kaçırılmış (ADAUP). Olaylar yalnız eklenir: yanlış veto `kaldir` olayıyla
     kapanır (75b4ef8). Kaldırma riski artırır (kural 5/7): otomatik yol yok, yalnız onaylı `tradebot zeka veto-kaldir`.
-    8 vetonun kaldırılması Scryne onayını bekliyor. `belirsizleri-yukselt` belirsiz kararları yükseltmeye sorar, yalnız
+    8 veto Scryne onayıyla geriye dönük kaldırıldı (2026-09-26, `kaldir` olayları 249–256). ALCX, ALPACA, PHB'nin sonraki
+    gerçek delist vetoları (Jev ≥ 0,97) yerinde. `belirsizleri-yukselt` belirsiz kararları yükseltmeye sorar, yalnız
     veto ekler.
   - Spike 04-B ✅ (`docs/spikes/04-jev.md` §6): yükseltme zinciri `nemotron-3-ultra` → `glm-5.3`.
     - nemotron: 90 örnekte 89/90; 60 gerçek belirsiz vakada veto kararı 60/60. Gecikme medyan 12–19 sn (ücretsiz katman).

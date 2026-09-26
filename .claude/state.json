@@ -3,5 +3,5 @@
   "asama": "uygulama",
   "guncellendi": "2026-09-26",
   "roadmap": "docs/Roadmap.md",
-  "not": "Faz 0-5 tamam. Faz 6 suruyor: A1 (Binance) canli, zeka servisi host'ta (2026-09-26). Yukseltme zinciri nemotron-3-ultra -> glm-5.3 (Spike 04-B). Eski belirsiz kuralin 8 yanlis vetosu (olay 1,94,105,112,122,133,144,200): kaldirma Scryne onayi bekliyor (tradebot zeka veto-kaldir). Paper listesi: 5 B kolu, hepsi BTC+ETH trend. Sirada: diger toplayicilar (KAP, SEC, RSS, MB, GDELT), A2-A6/B/D rolleri, sonra Faz 7."
+  "not": "Faz 0-5 tamam. Faz 6 suruyor: A1 (Binance) canli, zeka servisi host'ta (2026-09-26). Yukseltme zinciri nemotron-3-ultra -> glm-5.3 (Spike 04-B). Eski belirsiz kuralin 8 yanlis vetosu Scryne onayiyla kaldirildi (kaldir 249-256). Paper listesi: 5 B kolu, hepsi BTC+ETH trend. Sirada: diger toplayicilar (KAP, SEC, RSS, MB, GDELT), A2-A6/B/D rolleri, sonra Faz 7."
 }
