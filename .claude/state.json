@@ -3,5 +3,5 @@
   "asama": "uygulama",
   "guncellendi": "2026-09-25",
   "roadmap": "docs/Roadmap.md",
-  "not": "Faz 0-4 tamam (2026-09-25). Faz 4: boyutlandirma (vol hedefi, yarim Kelly, 3x tavan/5x yasak), risk motoru katman 1-4, frenler + onayli acil durdurma; arastirmada acil = olay + kapi kosulu. BTC SMA iki tarama FAIL (aile trend 18 deneme). Sirada Faz 5 turnuva dalga 1."
+  "not": "Faz 0-5 tamam (2026-09-26). Faz 5: 67 kol, A yok; B (sermayesiz paper gozlem, DSR sartsiz - Scryne karari) 2 kol: ma_yon@kripto_btc_eth@1h, tsmom@kripto_btc_eth@4h. CFD'de kaldiracli trend finansmandan ekonomik degil. Kuyruk: Dukascopy 1h/4h + dalga 1c veri gelince. Sirada Faz 6 (Jev) + paralel dalga 2."
 }

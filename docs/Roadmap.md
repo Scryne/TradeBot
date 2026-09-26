@@ -20,8 +20,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 2 | Veri platformu (ilk dalga) | 🔄 Devam Ediyor | Kripto, Dukascopy, ABD ETF, BIST günlük verileri katalogda; enstrüman kaydı + takvimler + kurumsal işlemler; PIT evren; kaynak başına kalite raporu |
 | 3 | Araştırma motoru | ✅ Tamamlandı | Saf karar çekirdeği; piyasa başına maliyet modelleri; vektörel tarama; walk-forward + plato + DSR; deneme defteri; vektörel ↔ Nautilus parity testi geçiyor |
 | 4 | Risk motoru ve boyutlandırma | ✅ Tamamlandı | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
-| 5 | Turnuva — backtest dalgası 1 | 🔄 Devam Ediyor | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
-| 6 | Zekâ katmanı (Jev) | ⏳ Bekliyor | Toplayıcılar (KAP, SEC, Binance, RSS, merkez bankaları, GDELT); Jev servisi + NVIDIA yükseltme; A, B, D rolleri çalışıyor; yargılar dondurulabiliyor; C özellikleri ölçüldü |
+| 5 | Turnuva — backtest dalgası 1 | ✅ Tamamlandı | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
+| 6 | Zekâ katmanı (Jev) | 🔄 Devam Ediyor | Toplayıcılar (KAP, SEC, Binance, RSS, merkez bankaları, GDELT); Jev servisi + NVIDIA yükseltme; A, B, D rolleri çalışıyor; yargılar dondurulabiliyor; C özellikleri ölçüldü |
 | 7 | Paper canlı — kripto + ABD ETF | ⏳ Bekliyor | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
 | 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | ⏳ Bekliyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
 | 9 | Operasyon: gözetmen, Telegram, raporlar | ⏳ Bekliyor | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
@@ -183,6 +183,13 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - Veri hataları bulundu ve düzeltildi: Dukascopy yavaşlığı → önce günlük dosyalar; yarıda kesilen yükleme artık
     indirileni kaybetmiyor.
   - Bekleyen: Dukascopy 1h/4h kolları (saatlik veri ~2 gün), dalga 1c (dakikalık), nihai DSR.
+  - 2026-09-26 ✅ **Scryne kararı:** B (sermayesiz paper gözlem) için DSR şartı kalktı; A ve gerçek para için DSR ≥ 0,95
+    aynen (`Dalga-1.md` ek 3).
+    - Paper listesi (`docs/turnuva/Paper-Listesi.md`): `ma_yon@kripto_btc_eth@1h`, `tsmom@kripto_btc_eth@4h`, ikisi
+      de B.
+    - Kuyruk (veri geldikçe arka planda): Dukascopy 1h/4h, dalga 1c, nihai `sonlandir`.
+    - Olay tabanlı aile Faz 6 sonrasına kaldı.
+  - Dalga 2 araştırması Faz 6–7 ile paralel yürür (ön kayıtla).
 
 ### Faz 6: Zekâ katmanı (Jev)
 - **İşler:** Spike 04-B: NVIDIA yükseltme modelinin seçimi (anahtar gelince). Metin toplayıcılar (ilk yayın zamanıyla); tek Jev servisi (uzun ömürlü istemci, kayıt,
