@@ -2,7 +2,7 @@
 yukseltme_nvidia.py'nin veto_altin alanı bu sette geçersiz, burada yeniden hesaplanır.
 Kullanım: python yukseltme_analiz.py data yukseltme_u60_<model>.json ...
 """
-import json,sys,statistics;sys.stdout.reconfigure(encoding='utf-8')
+import json; import sys; import statistics;sys.stdout.reconfigure(encoding='utf-8')
 d=sys.argv[1]
 g={o['id']:o for o in json.load(open(f"{d}/belirsiz60_gorev.json",encoding='utf-8'))['ornekler']}
 for f in sys.argv[2:]:
