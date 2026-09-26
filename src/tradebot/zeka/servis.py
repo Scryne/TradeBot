@@ -21,6 +21,7 @@ from tradebot.db import olay as olay_t
 from tradebot.kayit import log
 from tradebot.metin.binance_duyuru import BinanceDuyuru
 from tradebot.metin.kap import KapBildirim
+from tradebot.metin.rss import RssToplayici
 from tradebot.veri.depo import HamDepo
 from tradebot.zeka import a1_binance as a1
 from tradebot.zeka import a2_kap as a2
@@ -163,6 +164,8 @@ class Zeka:
             except Exception as e:  # noqa: BLE001 — bir kaynak düşerse diğerleri sürer
                 _log.error("toplayici_hatasi", kaynak=t.KAYNAK, hata=f"{type(e).__name__}: {e}"[:300])
         for t in self.toplayicilar:
+            if t.KAYNAK not in ROLLER:  # rolü olmayan kaynak (RSS): yalnız toplanır, C özellikleri için birikir
+                continue
             sinir = int(((self.ayar.get("tarama") or {}).get(t.KAYNAK)) or 200)
             olay_sayisi += self.isle(t.KAYNAK, sinir)
         return {"yeni_metin": yeni, "olay": olay_sayisi}
@@ -170,7 +173,8 @@ class Zeka:
 
 def toplayicilar(motor: Engine, a, ayar: dict) -> list:
     ham = HamDepo(a.veri_dizini, motor)
-    hepsi = {a1.KAYNAK: lambda: BinanceDuyuru(ham, motor), a2.KAYNAK: lambda: KapBildirim(ham, motor)}
+    hepsi = {a1.KAYNAK: lambda: BinanceDuyuru(ham, motor), a2.KAYNAK: lambda: KapBildirim(ham, motor),
+             "rss": lambda: RssToplayici(ham, motor, list(ayar.get("rss") or []))}
     return [hepsi[k]() for k in (ayar.get("kaynaklar") or list(hepsi))]
 
 

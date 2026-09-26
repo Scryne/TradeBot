@@ -10,7 +10,7 @@ yukseltme:
   # belirsiz 60'ta 4 kaçırılan veto (kaçırma, yanlış alarmdan pahalı).
   modeller: [nvidia/nemotron-3-ultra-550b-a55b, z-ai/glm-5.3]
   zaman_asimi_sn: 180          # ücretsiz katmanda p90 64 sn ölçüldü
-kaynaklar: [binance_duyuru, kap]  # servis turunda toplanan kaynaklar (rol: A1, A2)
+kaynaklar: [binance_duyuru, kap, rss]  # servis turunda toplanan kaynaklar (rol: A1, A2; rss rolsüz)
 binance:
   kataloglar: [161, 157, 49, 48]   # delist, bakım, haber, listeleme
 kap:
@@ -22,4 +22,16 @@ kap:
 tarama:                            # servis turunda kaynak başına taranan son metin sayısı
   binance_duyuru: 200
   kap: 600                         # ~290 bildirim/gün
+# RSS/Atom: geçmişi yok, yalnız son 15–35 öğe → erken toplanır (C özellikleri için birikir). Rol yok.
+# sayfa: akış yalnız başlık veriyorsa bağlantıdaki sayfa indirilir; bolge: [baş, son] içerik bölgesi işaretleri.
+rss:
+  - {ad: coindesk, url: "https://www.coindesk.com/arc/outboundfeeds/rss/", katalog: kripto_basin, aralik_dk: 10}
+  - {ad: cointelegraph, url: "https://cointelegraph.com/rss", katalog: kripto_basin, aralik_dk: 10}
+  - {ad: theblock, url: "https://www.theblock.co/rss.xml", katalog: kripto_basin, aralik_dk: 10}
+  - {ad: decrypt, url: "https://decrypt.co/feed", katalog: kripto_basin, aralik_dk: 10}
+  - {ad: fed_para, url: "https://www.federalreserve.gov/feeds/press_monetary.xml", katalog: merkez_bankasi,
+     aralik_dk: 30, sayfa: true, bolge: ['id="article"', "<footer"]}
+  - {ad: ecb_basin, url: "https://www.ecb.europa.eu/rss/press.html", katalog: merkez_bankasi, aralik_dk: 30,
+     sayfa: true, bolge: ["<main", "</main>"]}
+  - {ad: sec_basin, url: "https://www.sec.gov/news/pressreleases.rss", katalog: duzenleyici, aralik_dk: 30}
 dongu_sn: 60
