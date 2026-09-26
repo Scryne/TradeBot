@@ -176,6 +176,13 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - Ek: DSR dalga sonunda nihai deneme sayısıyla yeniden hesaplanır.
   - Bu dalgada yok, sırası yazılı: carry (kripto funding) 1b, gün içi kırılım 1c (Dukascopy dakikalık), olay tabanlı
     Faz 6 sonrası, pairs dalga 2.
+  - 2026-09-26 ara sonuç (`docs/turnuva/Dalga-1-Ara-Sonuc.md`): 66 kol + carry, **A/B yok**.
+    - En iyisi BTC+ETH trendi: Sharpe ~1, OOS yıllık +%13–17; DSR'da takılıyor.
+    - CFD'de kaldıraçlı trend finansman yüzünden ekonomik değil.
+  - Ölçüm hataları bulundu ve düzeltildi (ek 2): enstrüman tavanı, temettü.
+  - Veri hataları bulundu ve düzeltildi: Dukascopy yavaşlığı → önce günlük dosyalar; yarıda kesilen yükleme artık
+    indirileni kaybetmiyor.
+  - Bekleyen: Dukascopy 1h/4h kolları (saatlik veri ~2 gün), dalga 1c (dakikalık), nihai DSR.
 
 ### Faz 6: Zekâ katmanı (Jev)
 - **İşler:** Spike 04-B: NVIDIA yükseltme modelinin seçimi (anahtar gelince). Metin toplayıcılar (ilk yayın zamanıyla); tek Jev servisi (uzun ömürlü istemci, kayıt,
