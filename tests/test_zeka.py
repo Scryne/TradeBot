@@ -195,3 +195,22 @@ def test_zeka_turu_veto_ve_pit(m, ayar):
     assert jev.cagri == 3  # aynı (metin, varlık) tekrar sorulmaz
     ol.yaz(m, "veto", "BINANCE:BTCUSDT", 10, "süreli", "test", bitis_ms=20)
     assert "BINANCE:BTCUSDT" in ol.aktif_vetolar(m, 15) and "BINANCE:BTCUSDT" not in ol.aktif_vetolar(m, 20)
+
+
+def test_toplayici_tek_duyuru_hatasinda_durmaz(m, ayar):
+    http = SahteHttp([
+        {"katalog": 161, "code": "iyi", "baslik": "A", "govde": "a", "zaman": 1},
+        {"katalog": 161, "code": "kotu", "baslik": "B", "govde": "b", "zaman": 2},
+    ])
+    asil = http.al
+
+    def al(url, params=None):
+        if params and params.get("articleCode") == "kotu":
+            raise RuntimeError("429")
+        return asil(url, params)
+
+    http.al = al
+    t = BinanceDuyuru(HamDepo(ayar.veri_dizini, m), m, http)
+    assert len(t.topla([161])) == 1  # kötü atlandı, iyi yazıldı
+    http.al = asil
+    assert len(t.topla([161])) == 1  # sonraki turda kötü de gelir

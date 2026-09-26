@@ -54,7 +54,9 @@ def govde_metni(govde_json: str) -> str:
 class BinanceDuyuru:
     def __init__(self, ham: HamDepo, motor: Engine, http: NazikIstemci | None = None) -> None:
         self.ham, self.motor = ham, motor
-        self.http = http or NazikIstemci("binance_cms", aralik_sn=0.5, basliklar={"User-Agent": "Mozilla/5.0"})
+        # Ölçüm (2026-09-26): 0,5 sn aralıkla ~120 detay isteğinden sonra 429 → 2 sn aralık, uzun geri çekilme
+        self.http = http or NazikIstemci("binance_cms", aralik_sn=2.0, deneme=8, geri_cekilme_sn=5.0,
+                                         basliklar={"User-Agent": "Mozilla/5.0"})
 
     def liste(self, katalog: int, sayfa: int = 1) -> list[dict]:
         d = json.loads(self.http.al(LISTE, {"type": 1, "catalogId": katalog, "pageNo": sayfa, "pageSize": 20}))
@@ -80,7 +82,11 @@ class BinanceDuyuru:
             for m in makaleler:
                 if m["code"] in bilinen:
                     continue
-                ham = self.http.al(DETAY, {"articleCode": m["code"]})
+                try:
+                    ham = self.http.al(DETAY, {"articleCode": m["code"]})
+                except Exception as e:  # noqa: BLE001 — bu duyuru sonraki turda yeniden denenir
+                    _log.warning("duyuru_alinamadi", kod=m["code"], hata=str(e)[:200])
+                    continue
                 _, sha, _ = self.ham.kaydet("binance_duyuru", f"{m['code']}", ham, "json")
                 d = json.loads(ham).get("data") or {}
                 satir = {"kaynak": "binance_duyuru", "dis_kimlik": m["code"], "katalog": KATALOGLAR.get(kid, str(kid)),
