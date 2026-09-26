@@ -78,58 +78,59 @@ class Dukascopy:
         self.evren = evren or en.evren_yukle()
         self.http = NazikIstemci("dukascopy", aralik_sn=aralik_sn, deneme=8, geri_cekilme_sn=15.0,
                                  basliklar={"User-Agent": "Mozilla/5.0"})
+        self._ham_onbellek: dict[str, dict[str, str]] = {}
 
-    def _dosya(self, sembol: str, yol: str, anahtar: str, tamamlanmis: bool) -> bytes | None:
-        """Ham dosyayı getirir; tamamlanmış dönem daha önce indirildiyse None (atla)."""
-        if tamamlanmis and self.ham.var_mi("dukascopy", anahtar):
-            return None
+    def _dosya(self, sembol: str, yol: str, anahtar: str, tamamlanmis: bool) -> tuple[bytes, bool]:
+        """(içerik, sunucudan_indi). Tamamlanmış dönem daha önce indirildiyse sunucuya gidilmez, ham depodan okunur:
+        bar dosyaları her koşuda eksiksiz kurulur (yarıda kesilen koşu indirileni kaybettirmez)."""
+        if tamamlanmis and (yol_ham := self._ham_yol(anahtar)) is not None:
+            return Path(yol_ham).read_bytes(), False
         try:
             icerik = self.http.al(URL.format(s=sembol, yol=yol))
         except YokHatasi:
             icerik = b""
-        self.ham.kaydet("dukascopy", anahtar, icerik, "bi5")
-        return icerik
+        yol_ham, _, _ = self.ham.kaydet("dukascopy", anahtar, icerik, "bi5")
+        on_ek = anahtar.rsplit("/", 1)[0] + "/"
+        if on_ek in self._ham_onbellek:
+            self._ham_onbellek[on_ek][anahtar] = str(yol_ham)
+        return icerik, True
 
-    def saatlik_ay(self, e: en.Enstruman, y: int, a: int, taraf: str) -> pl.DataFrame | None:
+    def _ham_yol(self, anahtar: str) -> str | None:
+        on_ek = anahtar.rsplit("/", 1)[0] + "/"
+        if on_ek not in self._ham_onbellek:
+            self._ham_onbellek[on_ek] = {a: str(y) for a, y, _ in self.ham.dosyalar("dukascopy", on_ek)}
+        return self._ham_onbellek[on_ek].get(anahtar)
+
+    def saatlik_ay(self, e: en.Enstruman, y: int, a: int, taraf: str) -> tuple[pl.DataFrame, bool]:
         bugun = date.today()
         tamamlanmis = (y, a) < (bugun.year, bugun.month)
         anahtar = f"{e.sembol}/{taraf}/1h/{y}-{a:02d}"
-        icerik = self._dosya(e.sembol, f"{y}/{a - 1:02d}/{taraf}_candles_hour_1.bi5", anahtar, tamamlanmis)
-        if icerik is None:
-            return None
-        return bi5_coz(icerik, ms(datetime(y, a, 1, tzinfo=UTC)), olcek(e.sembol, e.sinif))
+        icerik, yeni = self._dosya(e.sembol, f"{y}/{a - 1:02d}/{taraf}_candles_hour_1.bi5", anahtar, tamamlanmis)
+        return bi5_coz(icerik, ms(datetime(y, a, 1, tzinfo=UTC)), olcek(e.sembol, e.sinif)), yeni
 
     def gunluk(self, e: en.Enstruman, bas: str, bitis_zamani: float) -> dict:
-        """BID günlük mumlar, yıl başına bir dosya. Barlar "1d"'ye yazılır (saatlikten türetmeye göre önceliklidir).
-
-        Kendini onarır: tamamlanmış yıllar sunucudan tekrar istenmez ama ham depodan okunur; bar dosyası her koşuda
-        bütün yıllardan yeniden kurulur (bir koşu yarıda kesilse de indirilen yıl kaybolmaz)."""
+        """BID günlük mumlar, yıl başına bir dosya. Barlar "1d"'ye yazılır (saatlikten türetmeye göre önceliklidir)."""
         bugun = date.today()
-        eldeki = {a: y for a, y, _ in self.ham.dosyalar("dukascopy", f"{e.sembol}/BID/1d/")}
         parca, yeni = [], 0
         try:
             for y in range(int(bas[:4]), bugun.year + 1):
                 anahtar = f"{e.sembol}/BID/1d/{y}"
-                if y < bugun.year and anahtar in eldeki:
-                    icerik = Path(eldeki[anahtar]).read_bytes()
-                else:
-                    if time.monotonic() > bitis_zamani:
-                        break
-                    icerik = self._dosya(e.sembol, f"{y}/BID_candles_day_1.bi5", anahtar, False)
-                    yeni += 1
+                if time.monotonic() > bitis_zamani and self._ham_yol(anahtar) is None:
+                    break
+                icerik, indi = self._dosya(e.sembol, f"{y}/BID_candles_day_1.bi5", anahtar, y < bugun.year)
+                yeni += indi
                 parca.append(bi5_coz(icerik, ms(datetime(y, 1, 1, tzinfo=UTC)), olcek(e.sembol, e.sinif)))
         finally:
             if parca:
                 self.bar.yaz(e.kimlik, "1d", kapali_ayikla(pl.concat(parca), e.takvim))
         return {"kimlik": e.kimlik, "yeni_dosya": yeni}
 
-    def dakikalik_gun(self, e: en.Enstruman, g: date) -> pl.DataFrame | None:
+    def dakikalik_gun(self, e: en.Enstruman, g: date) -> tuple[pl.DataFrame, bool]:
         tamamlanmis = g < date.today()
         anahtar = f"{e.sembol}/BID/1m/{g.isoformat()}"
-        icerik = self._dosya(e.sembol, f"{g.year}/{g.month - 1:02d}/{g.day:02d}/BID_candles_min_1.bi5", anahtar, tamamlanmis)
-        if icerik is None:
-            return None
-        return bi5_coz(icerik, ms(datetime(g.year, g.month, g.day, tzinfo=UTC)), olcek(e.sembol, e.sinif))
+        icerik, yeni = self._dosya(e.sembol, f"{g.year}/{g.month - 1:02d}/{g.day:02d}/BID_candles_min_1.bi5", anahtar,
+                                   tamamlanmis)
+        return bi5_coz(icerik, ms(datetime(g.year, g.month, g.day, tzinfo=UTC)), olcek(e.sembol, e.sinif)), yeni
 
     def saatlik(self, e: en.Enstruman, bas: str, ask_yil: int, bitis_zamani: float) -> dict:
         """BID tam geçmiş + ASK son `ask_yil` yıl. `bitis_zamani` (monotonic) aşılınca bırakır, sonra devam eder."""
@@ -138,15 +139,16 @@ class Dukascopy:
         ask_bas = f"{bugun.year - ask_yil}-{bugun.month:02d}"
         try:
             for y, a in aylar(bas, bugun):
-                if time.monotonic() > bitis_zamani:
+                zaman_bitti = time.monotonic() > bitis_zamani
+                if zaman_bitti and self._ham_yol(f"{e.sembol}/BID/1h/{y}-{a:02d}") is None:
                     break
-                if (b := self.saatlik_ay(e, y, a, "BID")) is not None:
-                    bid.append(b)
-                    yeni += 1
-                if f"{y}-{a:02d}" >= ask_bas and time.monotonic() <= bitis_zamani:
-                    if (k := self.saatlik_ay(e, y, a, "ASK")) is not None:
-                        ask.append(k)
-                        yeni += 1
+                b, indi = self.saatlik_ay(e, y, a, "BID")
+                bid.append(b)
+                yeni += indi
+                if f"{y}-{a:02d}" >= ask_bas and not (zaman_bitti and self._ham_yol(f"{e.sembol}/ASK/1h/{y}-{a:02d}") is None):
+                    k, indi = self.saatlik_ay(e, y, a, "ASK")
+                    ask.append(k)
+                    yeni += indi
         finally:  # yarıda hata olsa da indirilen aylar barlara girsin (ham depo onları bir daha istemez)
             if bid:
                 self.bar.yaz(e.kimlik, "1h", kapali_ayikla(pl.concat(bid), e.takvim))
@@ -175,16 +177,18 @@ class Dukascopy:
         bugun = date.today()
         gunler = pl.date_range(date(bugun.year - yil, bugun.month, 1), bugun, eager=True).to_list()
         parca, yeni = [], 0
-        for g in reversed(gunler):  # en yeniden eskiye: yürütme doğrulaması için yakın dönem önce
-            if time.monotonic() > bitis_zamani:
-                break
-            if g.weekday() == 5:  # Cumartesi: FX kapalı
-                continue
-            if (d := self.dakikalik_gun(e, g)) is not None:
+        try:
+            for g in reversed(gunler):  # en yeniden eskiye: yürütme doğrulaması için yakın dönem önce
+                if g.weekday() == 5:  # Cumartesi: FX kapalı
+                    continue
+                if time.monotonic() > bitis_zamani and self._ham_yol(f"{e.sembol}/BID/1m/{g.isoformat()}") is None:
+                    break
+                d, indi = self.dakikalik_gun(e, g)
                 parca.append(d)
-                yeni += 1
-        if parca:
-            self.bar.yaz(e.kimlik, "1m", kapali_ayikla(pl.concat(parca), e.takvim))
+                yeni += indi
+        finally:
+            if parca:
+                self.bar.yaz(e.kimlik, "1m", kapali_ayikla(pl.concat(parca), e.takvim))
         return {"kimlik": e.kimlik, "zd": "1m", "yeni_dosya": yeni}
 
     def evren_guncelle(self, butce_dk: float = 60.0) -> list[dict]:

@@ -103,3 +103,42 @@ def test_gunluk_yarida_kesilse_de_kendini_onarir(ayar):
     d.gunluk(ens, "2020-01", _t.monotonic() + 60)
     assert not any("/2020/" in u or "/2021/" in u for u in istenen)  # ham depodan okundu, yeniden istenmedi
     assert len(d.bar.oku("DUKASCOPY:EURUSD", "1d")) >= 3
+
+
+def test_saatlik_yarida_kesilen_aylari_ham_depodan_kurar(ayar):
+    import time as _t
+
+    import pytest
+
+    from tradebot.db import metadata, motor
+    from tradebot.veri import enstruman as en
+    from tradebot.veri.dukascopy import Dukascopy
+
+    e = motor(ayar)
+    metadata.create_all(e)
+    d = Dukascopy(ayar.veri_dizini, e, evren={"dukascopy": {}}, aralik_sn=0)
+    ens = en.Enstruman("DUKASCOPY", "EURUSD", "fx", "fx_24x5", "USD", "dukascopy")
+    ay_dosyasi = _bi5([(2 * 86400 + 12 * 3600, 110000, 110000, 110000, 110000, 1.0)])  # ayın 3. günü 12:00
+
+    def bozuk(url, params=None):
+        if "/2024/02/" in url:  # Mart 2024 (ay 0 tabanlı)
+            raise RuntimeError("503")
+        return ay_dosyasi
+
+    d.http.al = bozuk
+    with pytest.raises(RuntimeError):
+        d.saatlik(ens, "2024-01", 0, _t.monotonic() + 60)
+    # Ocak ve Şubat indi ama bar dosyası yazılmadı sayalım (eski sürüm davranışı / süreç öldü)
+    d.bar.yol("DUKASCOPY:EURUSD", "1h").unlink(missing_ok=True)
+    istenen = []
+
+    def saglam(url, params=None):
+        istenen.append(url)
+        return ay_dosyasi
+
+    d2 = Dukascopy(ayar.veri_dizini, e, evren={"dukascopy": {}}, aralik_sn=0)
+    d2.http.al = saglam
+    d2.saatlik(ens, "2024-01", 0, _t.monotonic() + 60)
+    assert not any("/2024/00/" in u or "/2024/01/" in u for u in istenen)  # Ocak/Şubat sunucudan istenmedi
+    aylar_ = {x // 1000 // 86400 // 30 for x in d2.bar.oku("DUKASCOPY:EURUSD", "1h")["acilis_ms"].to_list()}
+    assert len(d2.bar.oku("DUKASCOPY:EURUSD", "1h")) >= 3 and len(aylar_) >= 3  # Ocak ve Şubat ham depodan geri geldi
