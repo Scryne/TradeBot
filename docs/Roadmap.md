@@ -223,6 +223,16 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     - Yükseltmenin "veto gerekmez" dediği 8 belirsiz veto, Claude'un etiketindeki 8 yanlış vetoyla birebir aynı (olay
       1, 94, 105, 112, 122, 133, 144, 200). Kalan 14 belirsiz veto yükseltmeyle de doğrulandı.
   - Jev /TUSD ile /USDT çiftini karıştırıyor. A1 sorusunun sonraki sürümüne aday (yeni ölçümle).
+  - KAP + A2 ✅ (2864535): servis kaynak→rol eşlemesiyle genel, karar kuralı ortak (`zeka.karar`).
+    - Liste: KAP'ın kendi sorgu uç noktası (`disclosure/members/byCriteria`), gün başına tek istek, bütün BIST.
+      Sıradan gün ~290, rapor sezonu ~1100 bildirim; sonuç kısıtı yok (ölçüldü).
+    - Yapısal olarak veto olamayan konular atlanır: devre kesici, yatırımcı temerrüdü, pay alım satım, geri alım,
+      borçlanma aracı… (sıradan günde %59).
+    - Üretim metin biçimiyle spike'ın 44 KAP örneği yeniden: 44/44, yanlış veto 0 (`a2_bicim_dogrula.py`).
+    - A2 vetosu süreli (pazar_tedbiri 30 gün, olumsuz_esasli 20 gün; keyfi başlangıç, A/B'de ölçülür).
+      `kurumsal_islem` → `kurumsal` olayı (B1: Yahoo bölünme/bedelsiz çapraz kontrolü için; tüketici henüz yok).
+    - Servis KAP'ı canlı izliyor. Geçmiş doldurma 2024-01-01'den başladı (tahmini ~250 bin Jev çağrısı, ~25–30 $,
+      1,5–2 gün).
 
 ### Faz 7: Paper canlı — kripto + ABD ETF
 - **İşler:** Nautilus canlı düğümleri (paper); sermaye dağıtıcı (haftalık); Jev'li ve Jev'siz kol çiftleri;
