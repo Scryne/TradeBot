@@ -1,0 +1,1647 @@
+{
+ "tanim": {
+  "binance": {
+   "type": "choice",
+   "instructions": {
+    "what": "Decide how this Binance announcement affects someone who holds `varlik` in a Binance SPOT account and trades it only against USDT (the `varlik`/USDT spot pair). Read `duyuru.baslik` and `duyuru.metin`. Judge only `varlik`, ignore other tokens in the text.",
+    "not_for": "Do not predict price moves. Judge only what the announcement states."
+   },
+   "criteria": {
+    "token_delist": {
+     "what": "Binance will delist `varlik` itself: all of its spot trading pairs stop and the token is removed from the exchange.",
+     "not_for": "Removal of only some pairs of the token (e.g. /USDC, /BTC, /FDUSD, /TRY, /BNB) or only margin, loan, futures or Binance Alpha products."
+    },
+    "usdt_pair_removed": {
+     "what": "The `varlik`/USDT spot pair specifically is removed or stops trading, while the token may stay listed through other pairs."
+    },
+    "token_conversion": {
+     "what": "`varlik` is merged, swapped or converted into a different token or into fiat, so `varlik`/USDT trading ends and balances are converted.",
+     "not_for": "A network or chain migration or upgrade where the token keeps its name and spot trading continues."
+    },
+    "other_pairs_or_products_removed": {
+     "what": "Only other trading pairs of `varlik` (not /USDT) or other products (margin, loan, futures, collateral, Binance Alpha) are removed; `varlik`/USDT spot trading continues.",
+     "examples": [
+      "Notice of Removal of Spot Trading Pairs listing ENJ/USDC (for ENJ)",
+      "Binance Margin will delist BTTC margin pairs (for BTTC)"
+     ]
+    },
+    "transfers_suspended": {
+     "what": "Deposits and/or withdrawals of `varlik` on some or all networks are suspended, changed or discontinued because of an upgrade, hard fork, maintenance or network change, while spot trading is not impacted."
+    },
+    "positive_or_neutral": {
+     "what": "A listing, new product, promotion, earn offer, trading competition, dividend, tick size change or other change with no negative effect on a `varlik`/USDT spot holder."
+    },
+    "not_about_asset": {
+     "what": "The announcement does not concern `varlik` at all."
+    }
+   }
+  }
+ },
+ "ornekler": [
+  {
+   "set": "binance",
+   "id": "u0-PHB",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Trading Pairs - 2022-03-03",
+     "metin": "Fellow Binancians,\nBinance will remove and cease trading on the following trading pairs at 2022-03-03 03:00 AM (UTC):\nALPACA/BNB, CVC/ETH, FIS/BIDR, FIS/TRY, GNO/BNB, PHB/TUSD, QUICK/BNB, SXP/BIDR, TRIBE/BNB, WRX/EUR, XEM/ETH\nPlease note: Users can still trade the above assets on other trading pairs that are available on Binance.\nRisk warning: Cryptocurrency trading is subject to high market risk. Please make your trades cautiously. You are advised that Binance is not responsible for your trading losses.\nThanks for your support!\nBinance Team\n2022-03-01\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice."
+    },
+    "varlik": "PHB"
+   },
+   "jev": "usdt_pair_removed",
+   "jev_guven": 0.49,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u1-LTCUP",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance to Delist and Cease Redemption for XTZUP, XTZDOWN, LTCUP & LTCDOWN Leveraged Tokens (2022-04-07)",
+     "metin": "Fellow Binancians,\nBinance will delist and cease redemption for XTZUP, XTZDOWN, LTCUP and LTCDOWN leverage tokens at 2022-04-21 03:00 AM (UTC).\nPlease note: Users are advised to redeem their tokens prior to the delisting via the wallet function or the Leverage Tokens page. If users are still holding these tokens after the delisting time, Binance will convert these tokens to USDT based on the net asset value (NAV) of the tokens at the time of delisting and will distribute the USDT to user accounts within 24 hours. After the distribution is completed, the token assets will be removed from the wallet.\nRisk Warning: Leveraged Tokens are designed for short term bets on market movement, with a preference toward momentum. Long term holding of Binance Leveraged Tokens (BLVT) is risky, as the token has some built-in decay in the absence of momentum movements in favor of the position. Note that BLVT is NOT a replacement for a margin-leveraged product, and does not behave the same way. The information here should not be regarded as financial or investment advice from Binance. All trading strategies are used at your discretion and your own risk. Binance will not be liable to you for any loss that might arise from your use of Leveraged Tokens. To learn more about how to protect yourself, visit our Responsible Trading resource page.&nbsp;\nThanks for your support!\nBinance Team\n2022-04-07\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice."
+    },
+    "varlik": "LTCUP"
+   },
+   "jev": "token_delist",
+   "jev_guven": 0.3,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u2-LTCDOWN",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance to Delist and Cease Redemption for XTZUP, XTZDOWN, LTCUP & LTCDOWN Leveraged Tokens (2022-04-07)",
+     "metin": "Fellow Binancians,\nBinance will delist and cease redemption for XTZUP, XTZDOWN, LTCUP and LTCDOWN leverage tokens at 2022-04-21 03:00 AM (UTC).\nPlease note: Users are advised to redeem their tokens prior to the delisting via the wallet function or the Leverage Tokens page. If users are still holding these tokens after the delisting time, Binance will convert these tokens to USDT based on the net asset value (NAV) of the tokens at the time of delisting and will distribute the USDT to user accounts within 24 hours. After the distribution is completed, the token assets will be removed from the wallet.\nRisk Warning: Leveraged Tokens are designed for short term bets on market movement, with a preference toward momentum. Long term holding of Binance Leveraged Tokens (BLVT) is risky, as the token has some built-in decay in the absence of momentum movements in favor of the position. Note that BLVT is NOT a replacement for a margin-leveraged product, and does not behave the same way. The information here should not be regarded as financial or investment advice from Binance. All trading strategies are used at your discretion and your own risk. Binance will not be liable to you for any loss that might arise from your use of Leveraged Tokens. To learn more about how to protect yourself, visit our Responsible Trading resource page.&nbsp;\nThanks for your support!\nBinance Team\n2022-04-07\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice."
+    },
+    "varlik": "LTCDOWN"
+   },
+   "jev": "token_delist",
+   "jev_guven": 0.49,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u3-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin to Delist LUNA on Cross Margin and Isolated Margin",
+     "metin": "Fellow Binancians,\nBinance Margin will delist LUNA as a borrowable asset on Cross Margin and Isolated Margin at 2022-05-13 07:00 AM (UTC).&nbsp;\nCross Margin Pairs: LUNA/BUSD, LUNA/USDT, LUNA/BTC\nIsolated Margin Pairs: LUNA/BUSD, LUNA/USDT, LUNA/BTC, LUNA/ETH, LUNA/UST\nPlease note:\nUsers can still trade the above assets on other trading pairs that are available on Binance.\nAt 2022-05-12 07:00 (UTC), Binance suspended cross and isolated margin borrowing for LUNA.\nAt 2022-05-13 07:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the LUNA/BUSD, LUNA/USDT, LUNA/BTC cross margin pairs, as well as the LUNA/BUSD, LUNA/USDT, LUNA/BTC, LUNA/ETH, LUNA/UST isolated margin pairs. We will then delist these pairs on cross and isolated margin.\nPlease refer to Margin Data for a list of the most updated marginable assets and further information on specific limits and rates.\nFurther information:\nHow to Margin Trade\nHow to Short on Margin Trading\nHow to Long on Margin Trading\nRisk Warning: Margin trading carries a substantial risk and the possibility of both significant profits and losses. Past gains are not indicative of future returns. All of your margin balance may be liquidated in the event of extreme price movement. The information here should not be regarded as financial or investment advice from Binance. All trading strategies are used at your discretion and your own risk. Binance will not be liable to you for any loss that might arise from your use of Margin.\nThanks for your support!\nBinance Team\n2022-05-12\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance\nInstagram: https://www.instagram.com/binance\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice."
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.42,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u4-BTC",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin to Delist LUNA on Cross Margin and Isolated Margin",
+     "metin": "Fellow Binancians,\nBinance Margin will delist LUNA as a borrowable asset on Cross Margin and Isolated Margin at 2022-05-13 07:00 AM (UTC).&nbsp;\nCross Margin Pairs: LUNA/BUSD, LUNA/USDT, LUNA/BTC\nIsolated Margin Pairs: LUNA/BUSD, LUNA/USDT, LUNA/BTC, LUNA/ETH, LUNA/UST\nPlease note:\nUsers can still trade the above assets on other trading pairs that are available on Binance.\nAt 2022-05-12 07:00 (UTC), Binance suspended cross and isolated margin borrowing for LUNA.\nAt 2022-05-13 07:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the LUNA/BUSD, LUNA/USDT, LUNA/BTC cross margin pairs, as well as the LUNA/BUSD, LUNA/USDT, LUNA/BTC, LUNA/ETH, LUNA/UST isolated margin pairs. We will then delist these pairs on cross and isolated margin.\nPlease refer to Margin Data for a list of the most updated marginable assets and further information on specific limits and rates.\nFurther information:\nHow to Margin Trade\nHow to Short on Margin Trading\nHow to Long on Margin Trading\nRisk Warning: Margin trading carries a substantial risk and the possibility of both significant profits and losses. Past gains are not indicative of future returns. All of your margin balance may be liquidated in the event of extreme price movement. The information here should not be regarded as financial or investment advice from Binance. All trading strategies are used at your discretion and your own risk. Binance will not be liable to you for any loss that might arise from your use of Margin.\nThanks for your support!\nBinance Team\n2022-05-12\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance\nInstagram: https://www.instagram.com/binance\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice."
+    },
+    "varlik": "BTC"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.37,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u5-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Trading Pairs and Updates on Tick Size for Spot Trading Pair - 2022-05-13",
+     "metin": "Fellow Binancians,\nBinance will remove and cease trading, close users’ positions, conduct an automatic settlement and cancel all pending orders on the following margin trading pairs at 2022-05-13 00:40 (UTC):\nCross Margin Pairs：LUNA/BUSD, LUNA/USDT, LUNA/BTC\nIsolated Margin Pairs：LUNA/BUSD, LUNA/USDT, LUNA/BTC, LUNA/ETH, LUNA/UST\nBinance will remove and cease trading on the following trading pairs at 2022-05-13 00:40 (UTC):\nSpot Pairs: LUNA/BTC, LUNA/BIDR, LUNA/AUD, LUNA/BNB, LUNA/ETH, LUNA/USDT, LUNA/GBP, LUNA/BRL, LUNA/TRY and LUNA/EUR\nBinance will remove and cease trading on the following trading pairs at 2022-05-13 00:50 (UTC):\nSpot Pairs: BTC/UST, LUNA/UST, ETH/UST, BNB/UST, UST/USDT\nBinance will remove and cease trading, close users’ positions, conduct an automatic settlement and cancel all pending orders on the following margin trading pairs at 2022-05-13 00:50 (UTC):\nCross Margin Pairs: UST/USDT\nIsolated Margin Pairs: BTC/UST, ETH/UST, UST/USDT, UST/BUSD&nbsp;\nBinance will remove and cease trading on the following trading pair at 2022-05-13 01:30 (UTC):\nBUSD-Margined Perpetual Contract: LUNA/BUSD\nIn accordance with our policy to protect our users during excessive volatility, Binance shall adjust the tick size (i.e. the minimum change in the unit price) of certain spot trading pairs at 2022-05-13 00:40 (UTC). For details about tick sizes of all spot trading pairs on Binance, please refer to the Trading Rules.\nThe adjustment will not affect spot trading and other relevant functions.\nTick size via API will also change. API users may use GET/api/v3/exchangeInfo for the latest tick size. For further details and updates, please refer to API Changelog.\nThe tick size update will not affect existing spot orders. After the tick size is updated, orders placed before the update will still be matched with the original tick size.\nPlease adjust your trading strategies accordingly to avoid unnecessary impact on your trading. We apologize for any inconvenience.\nDetails of the adjustment are shown in the table below:\nTrading Pair\nTick Size (Before)\nUpdated Tick Size&nbsp;\nLUNABUSD\n0.00001\n0.0000001\nPlease note:\nUsers can still trade the above assets on other trading pairs that are available on Binance.\nRisk warning: Cryptocurrency trading is subject to high market risk. Please make your trades cautiously. You are advised that Binance is not responsible for your trading losses.\nPlease ensure that you exercise sufficient risk management, have done your own research in regards to the project's fundamentals, and fully understand the project before opting to trade the token.\nThanks for your support!\nBinance Team\n2022-05-13\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nNote: This announcement was last updated to reflect changes on trading pairs to be removed.\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice."
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "positive_or_neutral",
+   "jev_guven": 0.37,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u6-BTC",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Trading Pairs and Updates on Tick Size for Spot Trading Pair - 2022-05-13",
+     "metin": "Fellow Binancians,\nBinance will remove and cease trading, close users’ positions, conduct an automatic settlement and cancel all pending orders on the following margin trading pairs at 2022-05-13 00:40 (UTC):\nCross Margin Pairs：LUNA/BUSD, LUNA/USDT, LUNA/BTC\nIsolated Margin Pairs：LUNA/BUSD, LUNA/USDT, LUNA/BTC, LUNA/ETH, LUNA/UST\nBinance will remove and cease trading on the following trading pairs at 2022-05-13 00:40 (UTC):\nSpot Pairs: LUNA/BTC, LUNA/BIDR, LUNA/AUD, LUNA/BNB, LUNA/ETH, LUNA/USDT, LUNA/GBP, LUNA/BRL, LUNA/TRY and LUNA/EUR\nBinance will remove and cease trading on the following trading pairs at 2022-05-13 00:50 (UTC):\nSpot Pairs: BTC/UST, LUNA/UST, ETH/UST, BNB/UST, UST/USDT\nBinance will remove and cease trading, close users’ positions, conduct an automatic settlement and cancel all pending orders on the following margin trading pairs at 2022-05-13 00:50 (UTC):\nCross Margin Pairs: UST/USDT\nIsolated Margin Pairs: BTC/UST, ETH/UST, UST/USDT, UST/BUSD&nbsp;\nBinance will remove and cease trading on the following trading pair at 2022-05-13 01:30 (UTC):\nBUSD-Margined Perpetual Contract: LUNA/BUSD\nIn accordance with our policy to protect our users during excessive volatility, Binance shall adjust the tick size (i.e. the minimum change in the unit price) of certain spot trading pairs at 2022-05-13 00:40 (UTC). For details about tick sizes of all spot trading pairs on Binance, please refer to the Trading Rules.\nThe adjustment will not affect spot trading and other relevant functions.\nTick size via API will also change. API users may use GET/api/v3/exchangeInfo for the latest tick size. For further details and updates, please refer to API Changelog.\nThe tick size update will not affect existing spot orders. After the tick size is updated, orders placed before the update will still be matched with the original tick size.\nPlease adjust your trading strategies accordingly to avoid unnecessary impact on your trading. We apologize for any inconvenience.\nDetails of the adjustment are shown in the table below:\nTrading Pair\nTick Size (Before)\nUpdated Tick Size&nbsp;\nLUNABUSD\n0.00001\n0.0000001\nPlease note:\nUsers can still trade the above assets on other trading pairs that are available on Binance.\nRisk warning: Cryptocurrency trading is subject to high market risk. Please make your trades cautiously. You are advised that Binance is not responsible for your trading losses.\nPlease ensure that you exercise sufficient risk management, have done your own research in regards to the project's fundamentals, and fully understand the project before opting to trade the token.\nThanks for your support!\nBinance Team\n2022-05-13\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nNote: This announcement was last updated to reflect changes on trading pairs to be removed.\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice."
+    },
+    "varlik": "BTC"
+   },
+   "jev": "positive_or_neutral",
+   "jev_guven": 0.31,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u7-ETH",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Trading Pairs and Updates on Tick Size for Spot Trading Pair - 2022-05-13",
+     "metin": "Fellow Binancians,\nBinance will remove and cease trading, close users’ positions, conduct an automatic settlement and cancel all pending orders on the following margin trading pairs at 2022-05-13 00:40 (UTC):\nCross Margin Pairs：LUNA/BUSD, LUNA/USDT, LUNA/BTC\nIsolated Margin Pairs：LUNA/BUSD, LUNA/USDT, LUNA/BTC, LUNA/ETH, LUNA/UST\nBinance will remove and cease trading on the following trading pairs at 2022-05-13 00:40 (UTC):\nSpot Pairs: LUNA/BTC, LUNA/BIDR, LUNA/AUD, LUNA/BNB, LUNA/ETH, LUNA/USDT, LUNA/GBP, LUNA/BRL, LUNA/TRY and LUNA/EUR\nBinance will remove and cease trading on the following trading pairs at 2022-05-13 00:50 (UTC):\nSpot Pairs: BTC/UST, LUNA/UST, ETH/UST, BNB/UST, UST/USDT\nBinance will remove and cease trading, close users’ positions, conduct an automatic settlement and cancel all pending orders on the following margin trading pairs at 2022-05-13 00:50 (UTC):\nCross Margin Pairs: UST/USDT\nIsolated Margin Pairs: BTC/UST, ETH/UST, UST/USDT, UST/BUSD&nbsp;\nBinance will remove and cease trading on the following trading pair at 2022-05-13 01:30 (UTC):\nBUSD-Margined Perpetual Contract: LUNA/BUSD\nIn accordance with our policy to protect our users during excessive volatility, Binance shall adjust the tick size (i.e. the minimum change in the unit price) of certain spot trading pairs at 2022-05-13 00:40 (UTC). For details about tick sizes of all spot trading pairs on Binance, please refer to the Trading Rules.\nThe adjustment will not affect spot trading and other relevant functions.\nTick size via API will also change. API users may use GET/api/v3/exchangeInfo for the latest tick size. For further details and updates, please refer to API Changelog.\nThe tick size update will not affect existing spot orders. After the tick size is updated, orders placed before the update will still be matched with the original tick size.\nPlease adjust your trading strategies accordingly to avoid unnecessary impact on your trading. We apologize for any inconvenience.\nDetails of the adjustment are shown in the table below:\nTrading Pair\nTick Size (Before)\nUpdated Tick Size&nbsp;\nLUNABUSD\n0.00001\n0.0000001\nPlease note:\nUsers can still trade the above assets on other trading pairs that are available on Binance.\nRisk warning: Cryptocurrency trading is subject to high market risk. Please make your trades cautiously. You are advised that Binance is not responsible for your trading losses.\nPlease ensure that you exercise sufficient risk management, have done your own research in regards to the project's fundamentals, and fully understand the project before opting to trade the token.\nThanks for your support!\nBinance Team\n2022-05-13\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nNote: This announcement was last updated to reflect changes on trading pairs to be removed.\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice."
+    },
+    "varlik": "ETH"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.3,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u8-BNB",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Trading Pairs and Updates on Tick Size for Spot Trading Pair - 2022-05-13",
+     "metin": "Fellow Binancians,\nBinance will remove and cease trading, close users’ positions, conduct an automatic settlement and cancel all pending orders on the following margin trading pairs at 2022-05-13 00:40 (UTC):\nCross Margin Pairs：LUNA/BUSD, LUNA/USDT, LUNA/BTC\nIsolated Margin Pairs：LUNA/BUSD, LUNA/USDT, LUNA/BTC, LUNA/ETH, LUNA/UST\nBinance will remove and cease trading on the following trading pairs at 2022-05-13 00:40 (UTC):\nSpot Pairs: LUNA/BTC, LUNA/BIDR, LUNA/AUD, LUNA/BNB, LUNA/ETH, LUNA/USDT, LUNA/GBP, LUNA/BRL, LUNA/TRY and LUNA/EUR\nBinance will remove and cease trading on the following trading pairs at 2022-05-13 00:50 (UTC):\nSpot Pairs: BTC/UST, LUNA/UST, ETH/UST, BNB/UST, UST/USDT\nBinance will remove and cease trading, close users’ positions, conduct an automatic settlement and cancel all pending orders on the following margin trading pairs at 2022-05-13 00:50 (UTC):\nCross Margin Pairs: UST/USDT\nIsolated Margin Pairs: BTC/UST, ETH/UST, UST/USDT, UST/BUSD&nbsp;\nBinance will remove and cease trading on the following trading pair at 2022-05-13 01:30 (UTC):\nBUSD-Margined Perpetual Contract: LUNA/BUSD\nIn accordance with our policy to protect our users during excessive volatility, Binance shall adjust the tick size (i.e. the minimum change in the unit price) of certain spot trading pairs at 2022-05-13 00:40 (UTC). For details about tick sizes of all spot trading pairs on Binance, please refer to the Trading Rules.\nThe adjustment will not affect spot trading and other relevant functions.\nTick size via API will also change. API users may use GET/api/v3/exchangeInfo for the latest tick size. For further details and updates, please refer to API Changelog.\nThe tick size update will not affect existing spot orders. After the tick size is updated, orders placed before the update will still be matched with the original tick size.\nPlease adjust your trading strategies accordingly to avoid unnecessary impact on your trading. We apologize for any inconvenience.\nDetails of the adjustment are shown in the table below:\nTrading Pair\nTick Size (Before)\nUpdated Tick Size&nbsp;\nLUNABUSD\n0.00001\n0.0000001\nPlease note:\nUsers can still trade the above assets on other trading pairs that are available on Binance.\nRisk warning: Cryptocurrency trading is subject to high market risk. Please make your trades cautiously. You are advised that Binance is not responsible for your trading losses.\nPlease ensure that you exercise sufficient risk management, have done your own research in regards to the project's fundamentals, and fully understand the project before opting to trade the token.\nThanks for your support!\nBinance Team\n2022-05-13\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nNote: This announcement was last updated to reflect changes on trading pairs to be removed.\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice."
+    },
+    "varlik": "BNB"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.45,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u9-BTC",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin to Delist ANC and MIR on Cross Margin and Isolated Margin",
+     "metin": "Fellow Binancians,\nBinance Margin will delist ANC and MIR as borrowable assets on Cross Margin and Isolated Margin at 2022-05-14 02:00 AM (UTC).&nbsp;\nCross Margin Pairs: MIR/BTC, MIR/BUSD, MIR/USDT\nIsolated Margin Pairs: ANC/BUSD, ANC/USDT, MIR/BTC, MIR/BUSD, MIR/USDT\nPlease note:\nUsers can still trade the above assets on other trading pairs that are available on Binance.\nAt 2022-05-13 02:00 (UTC), Binance suspended cross and isolated margin borrowing for ANC and MIR.&nbsp;\nAt 2022-05-14 02:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the MIR/BTC, MIR/BUSD and MIR/USDT cross margin pairs, as well as the ANC/BUSD, ANC/USDT, MIR/BTC, MIR/BUSD and MIR/USDT isolated margin pairs. We will then delist these pairs on Cross and Isolated Margin.\nPlease refer to Margin Data for a list of the most updated marginable assets and further information on specific limits and rates.\nRisk Warning: Margin trading carries a substantial risk and the possibility of both significant profits and losses. Past gains are not indicative of future returns. All of your margin balance may be liquidated in the event of extreme price movement. The information here should not be regarded as financial or investment advice from Binance. All trading strategies are used at your discretion and your own risk. Binance will not be liable to you for any loss that might arise from your use of Margin.\nThanks for your support!\nBinance Team\n2022-05-13\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance\nInstagram: https://www.instagram.com/binance\nNote: This announcement was last updated to reflect changes on trading pairs to be removed.\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice."
+    },
+    "varlik": "BTC"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.43,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u10-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin to Delist ANC and MIR on Cross Margin and Isolated Margin",
+     "metin": "Fellow Binancians,\nBinance Margin will delist ANC and MIR as borrowable assets on Cross Margin and Isolated Margin at 2022-05-14 02:00 AM (UTC).&nbsp;\nCross Margin Pairs: MIR/BTC, MIR/BUSD, MIR/USDT\nIsolated Margin Pairs: ANC/BUSD, ANC/USDT, MIR/BTC, MIR/BUSD, MIR/USDT\nPlease note:\nUsers can still trade the above assets on other trading pairs that are available on Binance.\nAt 2022-05-13 02:00 (UTC), Binance suspended cross and isolated margin borrowing for ANC and MIR.&nbsp;\nAt 2022-05-14 02:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the MIR/BTC, MIR/BUSD and MIR/USDT cross margin pairs, as well as the ANC/BUSD, ANC/USDT, MIR/BTC, MIR/BUSD and MIR/USDT isolated margin pairs. We will then delist these pairs on Cross and Isolated Margin.\nPlease refer to Margin Data for a list of the most updated marginable assets and further information on specific limits and rates.\nRisk Warning: Margin trading carries a substantial risk and the possibility of both significant profits and losses. Past gains are not indicative of future returns. All of your margin balance may be liquidated in the event of extreme price movement. The information here should not be regarded as financial or investment advice from Binance. All trading strategies are used at your discretion and your own risk. Binance will not be liable to you for any loss that might arise from your use of Margin.\nThanks for your support!\nBinance Team\n2022-05-13\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance\nInstagram: https://www.instagram.com/binance\nNote: This announcement was last updated to reflect changes on trading pairs to be removed.\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice."
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.38,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u11-ETH",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Trading Pairs - 2022-11-18",
+     "metin": "Fellow Binancians,\nBinance will remove and cease trading on the following trading pair at 2022-11-16 03:00 (UTC):\nIsolated Margin Pair: VGX/BTC\nBinance will remove and cease trading on the following trading pairs at 2022-11-18 03:00 (UTC):\nSpot Pairs: KSM/BNB, MANA/BNB, OGN/BNB, VGX/BTC, VGX/ETH, ZIL/EUR\nPlease note:\nUsers can still trade the above assets on other trading pairs that are available on Binance.\nAt 2022-11-10 03:00 (UTC), Binance will suspend VGX/BTC isolated margin borrowing.\nAt 2022-11-16 03:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the VGX/BTC isolated margin pair. We will then delist the VGX/BTC isolated margin pair. Users are strongly advised to close their positions prior to the cessation of margin trading to avoid any potential losses.\nBinance will terminate strategy trading services for the aforementioned spot trading pairs at 2022-11-18 03:00 (UTC), where applicable. Users are strongly advised to update their trading strategies prior to the cessation of strategy trading services to avoid any potential losses.\nThanks for your support!\nBinance Team\n2022-11-08\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices are subject to high market risk and price volatility. The value of your investment may go down or up, and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses you may incur. Past performance is not a reliable predictor of future performance. You should only invest in products you are familiar with and where you understand the risks. You should carefully consider your investment experience, financial situation, investment objectives and risk tolerance and consult an independent financial adviser prior to making any investment. This material should not be construed as financial advice. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "ETH"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.42,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u12-BTC",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Trading Pairs - 2022-11-15",
+     "metin": "Fellow Binancians,\nBinance will remove and cease trading on the following trading pairs at 2022-11-15 04:30 (UTC):\nSpot Pairs: FTT/BNB, FTT/BTC, FTT/ETH and FTT/USDT\nPlease note:\nUsers can still trade the above asset on the FTT/BUSD trading pair.\nAll trade orders on the aforementioned trading pairs will be automatically removed after trading ceases in each respective trading pair.\nBinance will terminate strategy trading services for the aforementioned spot trading pairs at 2022-11-15 04:30 (UTC), where applicable. Users are strongly advised to update their trading strategies prior to the cessation of strategy trading services to avoid any potential losses.\nBinance reserves the right to adjust the tick size (i.e. the minimum change in the unit price) of the FTT trading pair(s) based on market conditions without prior notice.\nThanks for your support!\nBinance Team\n2022-11-14\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices are subject to high market risk and price volatility. The value of your investment may go down or up, and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses you may incur. Past performance is not a reliable predictor of future performance. You should only invest in products you are familiar with and where you understand the risks. You should carefully consider your investment experience, financial situation, investment objectives and risk tolerance and consult an independent financial adviser prior to making any investment. This material should not be construed as financial advice. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "BTC"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.36,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u13-BTC",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin Will Delist BNX, TORN and More Margin Pairs on Cross Margin & Isolated Margin",
+     "metin": "Fellow Binancians,\nBinance will remove and cease trading on the following margin trading pairs at 2022-12-22 03:00 (UTC):\nCross Margin Pairs: BNX/BTC, BNX/BUSD, BNX/USDT, DREP/BUSD, DREP/USDT, LOKA/BUSD, LOKA/USDT, MOB/BUSD, MOB/USDT\nIsolated Margin Pairs: TORN/BTC, TORN/BUSD, TORN/USDT\nPlease note:\nAt 2022-12-10 03:00 (UTC), Binance will suspend BNX/BTC, BNX/BUSD, BNX/USDT, DREP/BUSD, DREP/USDT, LOKA/BUSD, LOKA/USDT, MOB/BUSD and MOB/USDT cross margin borrowing, as well as TORN/BTC, TORN/BUSD and TORN/USDT isolated margin borrowing.\nAt 2022-12-22 03:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the BNX/BTC, BNX/BUSD, BNX/USDT, DREP/BUSD, DREP/USDT, LOKA/BUSD, LOKA/USDT, MOB/BUSD and MOB/USDT cross margin pairs, as well as TORN/BTC, TORN/BUSD and TORN/USDT isolated margin pairs. We will then delist the cross and isolated margin pairs. Users are strongly advised to close their positions prior to the cessation of margin trading to avoid any potential losses.\nPortfolio Margin users are advised to transfer the tokens mentioned above out of their Margin Wallet to their Spot Wallet and to top up their margin balance, if required before 2022-12-22 03:00 (UTC). Users should monitor Unified Maintenance Margin Ratio (Uni-MMR) closely to avoid any potential liquidation that could result from the removal of the tokens mentioned above from the Margin Wallet.\n​​Where any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2022-12-08\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses that might arise from your use of Margin. Margin trading carries substantial risk and amplifies both losses and profits. Past performance is not a reliable predictor of future performance. All of your margin balance may be liquidated in the event of adverse price movement. This information should not be regarded as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "BTC"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.36,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u14-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin Will Delist CHESS, CVP and More Tokens as Borrowable Assets From Cross Margin",
+     "metin": "Fellow Binancians,\nBinance Margin will delist CHESS, CVP, MDT, RARE and VOXEL as a borrowable asset from Cross Margin at 2022-12-29 03:00 (UTC).\nCross Margin Pairs: CHESS/BTC, CHESS/BUSD, CHESS/USDT, CVP/BUSD, CVP/USDT, MDT/BTC, MDT/USDT, RARE/BUSD, RARE/USDT, VOXEL/BUSD, VOXEL/USDT\nPlease note:\nAt 2022-12-19 03:00 (UTC), Binance will suspend CHESS/BTC, CHESS/BUSD, CHESS/USDT, CVP/BUSD, CVP/USDT, MDT/BTC, MDT/USDT, RARE/BUSD, RARE/USDT, VOXEL/BUSD and VOXEL/USDT cross margin borrowing.\nAt 2022-12-29 03:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the CHESS/BTC, CHESS/BUSD, CHESS/USDT, CVP/BUSD, CVP/USDT, MDT/BTC, MDT/USDT, RARE/BUSD, RARE/USDT, VOXEL/BUSD and VOXEL/USDT cross margin pairs. We will then delist these pairs from Cross Margin. Users are strongly advised to close their positions prior to the cessation of margin trading to avoid any potential losses.\nPortfolio Margin users are advised to transfer the tokens mentioned above out of their Margin Wallet to their Spot Wallet and to top up their margin balance, if required before 2022-12-29 03:00 (UTC). Users should monitor Unified Maintenance Margin Ratio (Uni-MMR) closely to avoid any potential liquidation that could result from the removal of the tokens mentioned above from the Margin Wallet.\n​​Where any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2022-12-15\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses that might arise from your use of Margin. Margin trading carries substantial risk and amplifies both losses and profits. Past performance is not a reliable predictor of future performance. All of your margin balance may be liquidated in the event of adverse price movement. This information should not be regarded as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.42,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u15-BNB",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Trading Pairs - 2022-12-27",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,\nBinance will remove and cease trading on the following trading pairs at 2022-12-27 03:00 (UTC):\nSpot Pairs: ANC/BNB, ANC/BTC, ANC/USDT, MIR/BTC, MIR/USDT, TORN/BTC, TORN/USDT, YFII/BTC\nPlease note:\nUsers can still trade the above assets on other trading pairs that are available on Binance.\nBinance will terminate strategy trading services for the aforementioned spot trading pairs at 2022-12-27 03:00 (UTC), where applicable. Users are strongly advised to update and/or cancel their trading strategies prior to the cessation of strategy trading services to avoid any potential losses.\nThanks for your support!\nBinance Team\n2022-12-21\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices are subject to high market risk and price volatility. The value of your investment may go down or up, and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses you may incur. Past performance is not a reliable predictor of future performance. You should only invest in products you are familiar with and where you understand the risks. You should carefully consider your investment experience, financial situation, investment objectives and risk tolerance and consult an independent financial adviser prior to making any investment. This material should not be construed as financial advice. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "BNB"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.45,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u16-BTC",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin Will Delist FET, FORTH, KEY, MBOX, WIN as Borrowable Assets From Cross Margin and AION, BTS From Isolated Margin",
+     "metin": "Fellow Binancians,\nBinance Margin will delist FET, FORTH, KEY, MBOX and WIN as borrowable assets from Cross Margin, as well as AION and BTS from Isolated Margin at 2023-01-05 06:00 (UTC).\nCross Margin Pairs: FET/BTC, FET/BUSD, FET/USDT, FORTH/BUSD, FORTH/USDT, KEY/USDT, MBOX/BTC, MBOX/BUSD, MBOX/USDT, WIN/BUSD, WIN/USDT\nIsolated Margin Pairs: AION/BTC, AION/USDT, BTS/BTC, BTS/USDT\nPlease note:\nAt 2022-12-27 06:00 (UTC), Binance will suspend FET/BTC, FET/BUSD, FET/USDT, FORTH/BUSD, FORTH/USDT, KEY/USDT, MBOX/BTC, MBOX/BUSD, MBOX/USDT, WIN/BUSD and WIN/USDT cross margin borrowing, as well as AION/BTC, AION/USDT, BTS/BTC and BTS/USDT isolated margin borrowing.\nAt 2023-01-05 06:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the FET/BTC, FET/BUSD, FET/USDT, FORTH/BUSD, FORTH/USDT, KEY/USDT, MBOX/BTC, MBOX/BUSD, MBOX/USDT, WIN/BUSD and WIN/USDT cross margin pairs, as well as AION/BTC, AION/USDT, BTS/BTC and BTS/USDT isolated margin pairs. We will then delist these pairs from Cross Margin and Isolated Margin. Users are strongly advised to close their positions prior to the cessation of margin trading to avoid any potential losses.\nPortfolio Margin users are advised to transfer the tokens mentioned above out of their Margin Wallet to their Spot Wallet and to top up their margin balance, if required before 2023-01-05 06:00 (UTC). Users should monitor Unified Maintenance Margin Ratio (Uni-MMR) closely to avoid any potential liquidation that may result from the removal of the tokens mentioned above from the Margin Wallet.\n​​Where any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2022-12-22\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses that might arise from your use of Margin. Margin trading carries substantial risk and amplifies both losses and profits. Past performance is not a reliable predictor of future performance. All of your margin balance may be liquidated in the event of adverse price movement. This information should not be regarded as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "BTC"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.34,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u17-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin Will Delist ATA, DEXE, HIGH, STPT & WAN as Borrowable Assets From Cross Margin",
+     "metin": "Fellow Binancians,\nBinance Margin will delist ATA, DEXE, HIGH, STPT and WAN as borrowable assets from Cross Margin at 2023-01-12 06:00 (UTC).\nCross Margin Pairs: ATA/BTC, ATA/BUSD, ATA/USDT, DEXE/BUSD, DEXE/USDT, HIGH/BUSD, HIGH/USDT, STPT/BTC, STPT/BUSD, STPT/USDT, WAN/USDT\nPlease note:\nAt 2023-01-03 06:00 (UTC), Binance will suspend ATA/BTC, ATA/BUSD, ATA/USDT, DEXE/BUSD, DEXE/USDT, HIGH/BUSD, HIGH/USDT, STPT/BTC, STPT/BUSD, STPT/USDT and WAN/USDT cross margin borrowing.\nAt 2023-01-12 06:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the ATA/BTC, ATA/BUSD, ATA/USDT, DEXE/BUSD, DEXE/USDT, HIGH/BUSD, HIGH/USDT, STPT/BTC, STPT/BUSD, STPT/USDT and WAN/USDT cross margin pairs. We will then delist these pairs from Cross Margin. Users are strongly advised to close their positions prior to the cessation of margin trading to avoid any potential losses.\nPortfolio Margin users are advised to transfer the tokens mentioned above out of their Margin Wallet to their Spot Wallet and to top up their margin balance, if required before 2023-01-12 06:00 (UTC). Users should monitor Unified Maintenance Margin Ratio (Uni-MMR) closely to avoid any potential liquidation that may result from the removal of the tokens mentioned above from the Margin Wallet.\n​​Where any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2022-12-29\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses that might arise from your use of Margin. Margin trading carries substantial risk and amplifies both losses and profits. Past performance is not a reliable predictor of future performance. All of your margin balance may be liquidated in the event of adverse price movement. This information should not be regarded as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.38,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u18-BTC",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin Will Delist NEXO, POLS, QUICK as Borrowable Assets From Cross Margin and ALCX, NEXO, POLS, TOMO Trading Pairs From Isolated Margin",
+     "metin": "Fellow Binancians,\nBinance Margin will delist NEXO, POLS and QUICK as borrowable assets from Cross Margin, as well as the following trading pairs from Isolated Margin at 2023-02-02 06:00 (UTC).\nCross Margin Pairs: NEXO/BUSD, NEXO/USDT, POLS/BTC, POLS/BUSD, POLS/USDT, QUICK/BTC, QUICK/BUSD, QUICK/USDT\nIsolated Margin Pairs: ALCX/BTC, NEXO/BUSD, NEXO/USDT, POLS/BTC, TOMO/BTC\nPlease note:\nAt 2023-01-23 06:00 (UTC), Binance will suspend NEXO/BUSD, NEXO/USDT, POLS/BTC, POLS/BUSD, POLS/USDT, QUICK/BTC, QUICK/BUSD and QUICK/USDT cross margin borrowing, as well as ALCX/BTC, NEXO/BUSD, NEXO/USDT, POLS/BTC and TOMO/BTC isolated margin borrowing.\nAt 2023-02-02 06:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the NEXO/BUSD, NEXO/USDT, POLS/BTC, POLS/BUSD, POLS/USDT, QUICK/BTC, QUICK/BUSD and QUICK/USDT cross margin pairs, as well as the ALCX/BTC, NEXO/BUSD, NEXO/USDT, POLS/BTC and TOMO/BTC isolated margin pairs. We will then delist these pairs from Cross Margin and Isolated Margin. Please note that users will not be able to update their positions during the delisting process, and they are strongly advised to close their positions prior to the cessation of margin trading to avoid any potential losses.&nbsp;\nPortfolio Margin users are advised to transfer the tokens mentioned above out of their Margin Wallet to their Spot Wallet and to top up their margin balance, if required before 2023-02-02 06:00 (UTC). Users should monitor Unified Maintenance Margin Ratio (Uni-MMR) closely to avoid any potential liquidation that may result from the removal of the tokens mentioned above from the Margin Wallet.\n​​Where any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-01-19\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses that might arise from your use of Margin. Margin trading carries substantial risk and amplifies both losses and profits. Past performance is not a reliable predictor of future performance. All of your margin balance may be liquidated in the event of adverse price movement. This information should not be regarded as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "BTC"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.41,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u19-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin Will Delist JST, SNM, SUN as Borrowable Assets From Cross Margin",
+     "metin": "Fellow Binancians,\nBinance Margin will delist JST, SNM and SUN as borrowable assets from Cross Margin at 2023-02-10 06:00 (UTC).\nCross Margin Pairs: JST/BUSD, JST/BTC, JST/USDT, SNM/BUSD, SUN/BUSD, SUN/USDT\nPlease note:\nAt 2023-01-30 06:00 (UTC), Binance will suspend JST/BUSD, JST/BTC, JST/USDT, SNM/BUSD, SUN/BUSD and SUN/USDT cross margin borrowing.\nAt 2023-02-10 06:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the JST/BUSD, JST/BTC, JST/USDT, SNM/BUSD, SUN/BUSD and SUN/USDT cross margin pairs. We will then delist these pairs from Cross Margin. Please note that users will not be able to update their positions during the delisting process, and they are strongly advised to close their positions prior to the cessation of margin trading to avoid any potential losses.&nbsp;\nPortfolio Margin users are advised to transfer the tokens mentioned above out of their Margin Wallet to their Spot Wallet and to top up their margin balance, if required before 2023-02-10 06:00 (UTC). Users should monitor Unified Maintenance Margin Ratio (Uni-MMR) closely to avoid any potential liquidation that may result from the removal of the tokens mentioned above from the Margin Wallet.\n​​Where any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-01-27\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses that might arise from your use of Margin. Margin trading carries substantial risk and amplifies both losses and profits. Past performance is not a reliable predictor of future performance. All of your margin balance may be liquidated in the event of adverse price movement. This information should not be regarded as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.41,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u20-BTC",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin Will Delist FIO, GNO, IRIS, MLN, WTC Trading Pairs From Isolated Margin",
+     "metin": "Fellow Binancians,\nBinance Margin will delist FIO, GNO, IRIS, MLN and WTC trading pairs from Isolated Margin at 2023-02-16 06:00 (UTC).&nbsp;&nbsp;\nIsolated Margin Pairs: FIO/BTC, FIO/BUSD, FIO/USDT, GNO/USDT, IRIS/BTC, IRIS/USDT, MLN/BTC, MLN/BUSD, MLN/USDT, WTC/BTC, WTC/USDT\nPlease note:\nAt 2023-02-09 06:00 (UTC), Binance will suspend FIO/BTC, FIO/BUSD, FIO/USDT, GNO/USDT, IRIS/BTC, IRIS/USDT, MLN/BTC, MLN/BUSD, MLN/USDT, WTC/BTC and WTC/USDT isolated margin borrowing.\nAt 2023-02-16 06:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the FIO/BTC, FIO/BUSD, FIO/USDT, GNO/USDT, IRIS/BTC, IRIS/USDT, MLN/BTC, MLN/BUSD, MLN/USDT, WTC/BTC and WTC/USDT isolated margin pairs. We will then delist these pairs from Isolated Margin.&nbsp;\nPlease note that users will not be able to update their positions during the delisting process, and they are strongly advised to close their positions and/or transfer their assets from their Margin Wallet to their Spot Wallet prior to the cessation of margin trading at 2023-02-16 06:00 (UTC). Binance will not be responsible for any potential losses.&nbsp;\n​​Where any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-02-07\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or change or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses that might arise from your use of Margin. Margin trading carries substantial risk and amplifies both losses and profits. Past performance is not a reliable predictor of future performance. All of your margin balance may be liquidated in the event of adverse price movement. This information should not be regarded as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "BTC"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.36,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u21-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin Will Delist LOOM, STRAX as Borrowable Assets From Cross Margin and OG From Isolated Margin",
+     "metin": "Fellow Binancians,\nBinance Margin will delist LOOM and STRAX as borrowable assets from Cross Margin, as well as OG from Isolated Margin at 2023-03-03 06:00 (UTC).&nbsp;&nbsp;\nCross Margin Pairs: LOOM/BUSD, STRAX/BUSD, STRAX/USDT\nIsolated Margin Pairs: OG/BTC, OG/USDT\nPlease note:\nAt 2023-02-24 06:00 (UTC), Binance will suspend LOOM/BUSD, STRAX/BUSD and STRAX/USDT cross margin borrowing, as well as OG/BTC and OG/USDT isolated margin borrowing.\nAt 2023-03-03 06:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the LOOM/BUSD, STRAX/BUSD and STRAX/USDT cross margin pairs, as well as the OG/BTC and OG/USDT isolated margin pairs. If users have any outstanding Cross Margin or Isolated Margin loans, any of the delisted assets held in their Cross and Isolated Margin accounts may be sold. We will then delist these pairs from Cross Margin and Isolated Margin.&nbsp;\nPlease note that users will not be able to update their positions during the delisting process, and they are strongly advised to close their positions and/or transfer their assets from Margin Wallets to Spot Wallets prior to the cessation of margin trading at 2023-03-03 06:00 (UTC). Binance will not be responsible for any potential losses.&nbsp;\nPortfolio Margin users are advised to transfer the tokens mentioned above out of their Margin Wallet to their Spot Wallet and to top up their margin balance, if required before 2023-03-03 06:00 (UTC). Users should monitor the Unified Maintenance Margin Ratio (Uni-MMR) closely to avoid any potential liquidation that may result from the removal of the tokens mentioned above from the Margin Wallet.\n​​Where any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\n&nbsp;\nThanks for your support!\nBinance Team\n2023-02-22\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram: https://t.me/binanceexchange\nTwitter: https://twitter.com/binance\nFacebook: https://www.facebook.com/binance&nbsp;\nInstagram: https://www.instagram.com/binance&nbsp;\nBinance reserves the right in its sole discretion to amend or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses that might arise from your use of Margin. Margin trading carries substantial risk and amplifies both losses and profits. Past performance is not a reliable predictor of future performance. All of your margin balance may be liquidated in the event of adverse price movement. This information should not be regarded as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.41,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u22-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Futures Will Delist and Update the Leverage & Margin Tiers of USDⓈ-M CVXBUSD, GALBUSD and WAVESBUSD Perpetual Contracts",
+     "metin": "Fellow Binancians,\nBinance Futures will close all positions and conduct an automatic settlement on the USDⓈ-M CVXBUSD, GALBUSD and WAVESBUSD Perpetual Contracts at 2023-03-15 09:00 (UTC). The contracts will be delisted after the settlement is complete.\nIn addition, Binance Futures will adjust the leverage and margin tiers of the USDⓈ-M CVXBUSD, GALBUSD and WAVESBUSD Perpetual Contracts at 2023-03-13 10:00 (UTC), as per the tables below. Existing positions opened before the update will be affected. It is strongly advised to adjust the position and leverage prior to the adjustment in order to avoid any potential liquidation.&nbsp;\nUpdates to Leverage &amp; Margin Tiers:\nCVXBUSD (USDⓈ-M Perpetual Contracts)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate (Before Change)\nLeverage After Change\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate (After Change)\n11 - 20x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n5,000 &lt; Position ≤ 25,000\n2.50%\n7 - 8x\n5,000 &lt; Position ≤ 25,000\n2.50%\n6 - 8x\n25,000 &lt; Position ≤ 100,000\n5.00%\n6x\n25,000 &lt; Position ≤ 100,000\n5.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n2x\n250,000 &lt; Position ≤ 1,000,000\n12.50%\n2x\n250,000 &lt; Position ≤ 500,000\n12.50%\n1x\n1,000,000 &lt; Position ≤ 5,000,000\n50.00%\n1x\n500,000 &lt; Position ≤ 1,000,000\n50.00%\nGALBUSD (USDⓈ-M Perpetual Contracts)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate (Before Change)\nLeverage After Change\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate (After Change)\n11 - 20x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n5,000 &lt; Position ≤ 25,000\n2.50%\n7 - 8x\n5,000 &lt; Position ≤ 25,000\n2.50%\n6 - 8x\n25,000 &lt; Position ≤ 100,000\n5.00%\n6x\n25,000 &lt; Position ≤ 100,000\n5.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n2x\n250,000 &lt; Position ≤ 1,000,000\n12.50%\n2x\n250,000 &lt; Position ≤ 500,000\n12.50%\n1x\n1,000,000 &lt; Position ≤ 3,000,000\n50.00%\n1x\n500,000 &lt; Position ≤ 1,000,000\n50.00%\nWAVESBUSD (USDⓈ-M Perpetual Contracts)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate (Before Change)\nLeverage After Change\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate (After Change)\n9 - 10x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n0 &lt; Position ≤ 5,000\n2.00%\n7 - 8x\n5,000 &lt; Position ≤ 25,000\n2.50%\n7 - 8x\n5,000 &lt; Position ≤ 25,000\n2.50%\n6x\n25,000 &lt; Position ≤ 100,000\n5.00%\n6x\n25,000 &lt; Position ≤ 100,000\n5.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n2x\n250,000 &lt; Position ≤ 1,000,000\n12.50%\n2x\n250,000 &lt; Position ≤ 500,000\n12.50%\n1x\n1,000,000 &lt; Position ≤ 3,000,000\n50.00%\n1x\n500,000 &lt; Position ≤ 1,000,000\n50.00%\nPlease Note:&nbsp;\nUsers are advised to close any open positions prior to the delisting time to avoid automatic settlement.\nUsers are not allowed to open new positions for the aforementioned contracts starting from 2023-03-15 08:00 (UTC).\nIt is important to note that the maintenance margin change will directly affect liquidation price. Users who hold existing positions of USDⓈ-M CVXBUSD, GALBUSD and WAVESBUSD Perpetual Contracts will be affected. To avoid being liquidated (i.e., margin ratio hits 100%), please add more margin to your USDⓈ-M Futures account or reduce your positions. It is recommended to control the margin ratio below 80%.\nMaintenance margin rate change will affect the funding rates of the USDⓈ-M Perpetual Contracts above. For more details on funding rate, please refer to Introduction to Binance Futures Funding Rates.\nIn order to protect"
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.41,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u23-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin Will Delist NEBL as a Borrowable Asset From Cross Margin and DCR, NEBL, XVG From Isolated Margin",
+     "metin": "Fellow Binancians,\nBinance Margin will delist NEBL as a borrowable asset from Cross Margin as well as DCR, NEBL and XVG from Isolated Margin at 2023-04-10 06:00 (UTC).&nbsp;&nbsp;\nCross Margin Pair: NEBL/BUSD\nIsolated Margin Pairs: DCR/BTC, DCR/USDT, NEBL/BUSD, XVG/BUSD\nPlease note:\nAt 2023-03-28 06:00 (UTC), Binance will suspend NEBL/BUSD cross margin borrowing, as well as DCR/BTC, DCR/USDT, NEBL/BUSD and XVG/BUSD isolated margin borrowing.\nAt 2023-04-10 06:00 (UTC), Binance will close users’ positions, conduct an automatic settlement and cancel all pending orders on the NEBL/BUSD cross margin pair, as well as the DCR/BTC, DCR/USDT, NEBL/BUSD and XVG/BUSD isolated margin pairs. If users have any outstanding Cross Margin or Isolated Margin loans, any of the delisted assets held in their Cross and Isolated Margin accounts may be sold. We will then delist these pairs from Cross Margin and Isolated Margin.&nbsp;\nPlease note that users will not be able to update their positions during the delisting process, and they are strongly advised to close their positions and/or transfer their assets from Margin Wallets to Spot Wallets prior to the cessation of margin trading at 2023-04-10 06:00 (UTC). Binance will not be responsible for any potential losses.&nbsp;\nPortfolio Margin users are advised to transfer the tokens mentioned above out of their Margin Wallet to their Spot Wallet and to top up their margin balance, if required before 2023-04-10 06:00 (UTC). Users should monitor the Unified Maintenance Margin Ratio (Uni-MMR) closely to avoid any potential liquidation that may result from the removal of the tokens mentioned above from the Margin Wallet.\n​​Where any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-03-27\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram\nTwitter\nFacebook\nInstagram\nBinance reserves the right in its sole discretion to amend or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses that might arise from your use of Margin. Margin trading carries substantial risk and amplifies both losses and profits. Past performance is not a reliable predictor of future performance. All of your margin balance may be liquidated in the event of adverse price movement. This information should not be regarded as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.44,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u24-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Futures Will Delist and Update the Leverage & Margin Tiers of USDⓈ-M PHBBUSD, SANDBUSD and UNIBUSD Perpetual Contracts",
+     "metin": "Fellow Binancians,\nBinance Futures will close all positions and conduct an automatic settlement on the USDⓈ-M PHBBUSD, SANDBUSD and UNIBUSD Perpetual Contracts at 2023-04-11 09:00 (UTC). The contracts will be delisted after the settlement is complete.\nIn addition, Binance Futures will adjust the leverage and margin tiers of the USDⓈ-M PHBBUSD, SANDBUSD and UNIBUSD Perpetual Contracts at 2023-04-06 11:30 (UTC), as per the tables below. Existing positions opened before the update will be affected. It is strongly advised to adjust the position and leverage prior to the adjustment in order to avoid any potential liquidation.&nbsp;\nUpdates to Leverage &amp; Margin Tiers:\nPHBBUSD (USDⓈ-M Perpetual Contracts)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate (Before Change)\nLeverage\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate (After Change)\n11x\n0 &lt; Position ≤ 5,000\n2.00%\n8x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n5,000 &lt; Position ≤ 25,000\n2.50%\n7x\n5,000 &lt; Position ≤ 25,000\n2.50%\n6 - 8x\n25,000 &lt; Position ≤ 100,000\n5.00%\n6x\n25,000 &lt; Position ≤ 100,000\n5.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n2x\n250,000 &lt; Position ≤ 1,000,000\n12.50%\n2x\n250,000 &lt; Position ≤ 1,000,000\n12.50%\n1x\n1,000,000 &lt; Position ≤ 5,000,000\n50.00%\n1x\n1,000,000 &lt; Position ≤ 1,500,000\n50.00%\nSANDBUSD and UNIBUSD (USDⓈ-M Perpetual Contracts)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate (Before Change)\nLeverage\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate (After Change)\n11 - 20x\n0 &lt; Position ≤ 5,000\n2.00%\n8x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n5,000 &lt; Position ≤ 25,000\n2.50%\n7x\n5,000 &lt; Position ≤ 25,000\n2.50%\n6 - 8x\n25,000 &lt; Position ≤ 100,000\n5.00%\n6x\n25,000 &lt; Position ≤ 100,000\n5.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n2x\n250,000 &lt; Position ≤ 1,000,000\n12.50%\n2x\n250,000 &lt; Position ≤ 1,000,000\n12.50%\n1x\n1,000,000 &lt; Position ≤ 5,000,000\n50.00%\n1x\n1,000,000 &lt; Position ≤ 1,500,000\n50.00%\nPlease Note:&nbsp;\nUsers are advised to close any open positions prior to the delisting time to avoid automatic settlement.\nUsers are not allowed to open new positions for the aforementioned contracts starting from 2023-04-11 08:30 (UTC).\nIn order to protect our customers and prevent potential risks in extremely volatile market conditions, Binance Futures may undertake additional protective measures toward the USDⓈ-M PHBBUSD, SANDBUSD and UNIBUSD Perpetual Contracts without further announcement, including but not limited to adjusting the maximum leverage value, position value, and maintenance margin in each margin tier, updating funding rates such as the interest rate, premium and capped funding rate, changing the constituents of the price index, and using the Last Price Protected mechanism to update the Mark Price.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nFor more information:\nDelisting of Futures Contracts\nTrading Rules of USDⓈ-M Futures Contracts\nLeverage and Margin of USDⓈ-M Futures Contracts\nMark Price and Price Index\nThanks for your support!\nBinance Team\n2023-04-06\n&nbsp;\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram\nTwitter\nFacebook\nInstagram\nBinance reserves the right in its sole discretion to amend or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses you may incur. Futures tra"
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.46,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u25-DOTUP",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance to Delist and Cease Redemption for TRXUP, TRXDOWN, DOTUP, DOTDOWN, LINKUP & LINKDOWN Leveraged Tokens (2023-04-27)",
+     "metin": "Fellow Binancians,\nBinance will delist and cease redemption for the TRXUP, TRXDOWN, DOTUP, DOTDOWN, LINKUP and LINKDOWN leveraged tokens at the following timings:\nAt 2023-05-09 06:00 (UTC): TRXUP, TRXDOWN\nAt 2023-05-10 06:00 (UTC): DOTUP, DOTDOWN\nAt 2023-05-11 06:00 (UTC): LINKUP, LINKDOWN\nNotes:&nbsp;\nUsers are advised to redeem their leveraged tokens via the wallet function or the Leverage Tokens page before the delisting. If users are still holding these leveraged tokens after the delisting time, Binance will convert these tokens to USDT based on the net asset value (NAV) of the tokens at the time of delisting, and will distribute the USDT tokens to users’ accounts within 24 hours. After the distribution is complete, the leveraged token assets will be removed from the wallet.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-04-27\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram\nTwitter\nFacebook\nInstagram\nBinance reserves the right in its sole discretion to amend or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses you may incur. Binance Leveraged Tokens (BLVT) are designed for short-term investments only. Long-term holding of BLVT is subject to additional downside risk. Note that BLVT is not a replacement for a margin-leveraged position and does not behave in the same way. Past performance is not a reliable predictor of future performance. Before purchasing BLVT, you should make an independent assessment of the appropriateness of the transaction in light of your own objectives and circumstances, including the risks and potential benefits. Consult your own advisers, where appropriate. This information should not be construed as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "DOTUP"
+   },
+   "jev": "token_delist",
+   "jev_guven": 0.42,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u26-DOTDOWN",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance to Delist and Cease Redemption for TRXUP, TRXDOWN, DOTUP, DOTDOWN, LINKUP & LINKDOWN Leveraged Tokens (2023-04-27)",
+     "metin": "Fellow Binancians,\nBinance will delist and cease redemption for the TRXUP, TRXDOWN, DOTUP, DOTDOWN, LINKUP and LINKDOWN leveraged tokens at the following timings:\nAt 2023-05-09 06:00 (UTC): TRXUP, TRXDOWN\nAt 2023-05-10 06:00 (UTC): DOTUP, DOTDOWN\nAt 2023-05-11 06:00 (UTC): LINKUP, LINKDOWN\nNotes:&nbsp;\nUsers are advised to redeem their leveraged tokens via the wallet function or the Leverage Tokens page before the delisting. If users are still holding these leveraged tokens after the delisting time, Binance will convert these tokens to USDT based on the net asset value (NAV) of the tokens at the time of delisting, and will distribute the USDT tokens to users’ accounts within 24 hours. After the distribution is complete, the leveraged token assets will be removed from the wallet.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-04-27\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram\nTwitter\nFacebook\nInstagram\nBinance reserves the right in its sole discretion to amend or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses you may incur. Binance Leveraged Tokens (BLVT) are designed for short-term investments only. Long-term holding of BLVT is subject to additional downside risk. Note that BLVT is not a replacement for a margin-leveraged position and does not behave in the same way. Past performance is not a reliable predictor of future performance. Before purchasing BLVT, you should make an independent assessment of the appropriateness of the transaction in light of your own objectives and circumstances, including the risks and potential benefits. Consult your own advisers, where appropriate. This information should not be construed as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "DOTDOWN"
+   },
+   "jev": "token_delist",
+   "jev_guven": 0.4,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u27-LINKUP",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance to Delist and Cease Redemption for TRXUP, TRXDOWN, DOTUP, DOTDOWN, LINKUP & LINKDOWN Leveraged Tokens (2023-04-27)",
+     "metin": "Fellow Binancians,\nBinance will delist and cease redemption for the TRXUP, TRXDOWN, DOTUP, DOTDOWN, LINKUP and LINKDOWN leveraged tokens at the following timings:\nAt 2023-05-09 06:00 (UTC): TRXUP, TRXDOWN\nAt 2023-05-10 06:00 (UTC): DOTUP, DOTDOWN\nAt 2023-05-11 06:00 (UTC): LINKUP, LINKDOWN\nNotes:&nbsp;\nUsers are advised to redeem their leveraged tokens via the wallet function or the Leverage Tokens page before the delisting. If users are still holding these leveraged tokens after the delisting time, Binance will convert these tokens to USDT based on the net asset value (NAV) of the tokens at the time of delisting, and will distribute the USDT tokens to users’ accounts within 24 hours. After the distribution is complete, the leveraged token assets will be removed from the wallet.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-04-27\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram\nTwitter\nFacebook\nInstagram\nBinance reserves the right in its sole discretion to amend or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses you may incur. Binance Leveraged Tokens (BLVT) are designed for short-term investments only. Long-term holding of BLVT is subject to additional downside risk. Note that BLVT is not a replacement for a margin-leveraged position and does not behave in the same way. Past performance is not a reliable predictor of future performance. Before purchasing BLVT, you should make an independent assessment of the appropriateness of the transaction in light of your own objectives and circumstances, including the risks and potential benefits. Consult your own advisers, where appropriate. This information should not be construed as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "LINKUP"
+   },
+   "jev": "token_conversion",
+   "jev_guven": 0.47,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u28-LINKDOWN",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance to Delist and Cease Redemption for TRXUP, TRXDOWN, DOTUP, DOTDOWN, LINKUP & LINKDOWN Leveraged Tokens (2023-04-27)",
+     "metin": "Fellow Binancians,\nBinance will delist and cease redemption for the TRXUP, TRXDOWN, DOTUP, DOTDOWN, LINKUP and LINKDOWN leveraged tokens at the following timings:\nAt 2023-05-09 06:00 (UTC): TRXUP, TRXDOWN\nAt 2023-05-10 06:00 (UTC): DOTUP, DOTDOWN\nAt 2023-05-11 06:00 (UTC): LINKUP, LINKDOWN\nNotes:&nbsp;\nUsers are advised to redeem their leveraged tokens via the wallet function or the Leverage Tokens page before the delisting. If users are still holding these leveraged tokens after the delisting time, Binance will convert these tokens to USDT based on the net asset value (NAV) of the tokens at the time of delisting, and will distribute the USDT tokens to users’ accounts within 24 hours. After the distribution is complete, the leveraged token assets will be removed from the wallet.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-04-27\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram\nTwitter\nFacebook\nInstagram\nBinance reserves the right in its sole discretion to amend or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses you may incur. Binance Leveraged Tokens (BLVT) are designed for short-term investments only. Long-term holding of BLVT is subject to additional downside risk. Note that BLVT is not a replacement for a margin-leveraged position and does not behave in the same way. Past performance is not a reliable predictor of future performance. Before purchasing BLVT, you should make an independent assessment of the appropriateness of the transaction in light of your own objectives and circumstances, including the risks and potential benefits. Consult your own advisers, where appropriate. This information should not be construed as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "LINKDOWN"
+   },
+   "jev": "token_delist",
+   "jev_guven": 0.46,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u29-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Futures Will Delist and Update the Leverage & Margin Tiers of USDⓈ-M APEBUSD Perpetual Contract",
+     "metin": "Fellow Binancians,\nBinance Futures will close all positions and conduct an automatic settlement on the USDⓈ-M APEBUSD Perpetual Contract at 2023-05-16 09:00 (UTC). The contract will be delisted after the settlement is complete.\nIn addition, Binance Futures will adjust the leverage and margin tiers of the USDⓈ-M APEBUSD Perpetual Contract at 2023-05-12 12:30 (UTC), as per the table below. Existing positions opened before the update will be affected. It is strongly advised to adjust the position and leverage prior to the adjustment in order to avoid any potential liquidation.&nbsp;\nUpdates to Leverage &amp; Margin Tiers:\nAPEBUSD (USDⓈ-M Perpetual Contract)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate (Before Change)\nLeverage\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate (After Change)\n11 - 20x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n5,000 &lt; Position ≤ 25,000\n2.50%\n7 - 8x\n5,000 &lt; Position ≤ 25,000\n2.50%\n6 - 8x\n25,000 &lt; Position ≤ 100,000\n5.00%\n6x\n25,000 &lt; Position ≤ 100,000\n5.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n2x\n250,000 &lt; Position ≤ 1,000,000\n12.50%\n2x\n250,000 &lt; Position ≤ 1,000,000\n12.50%\n1x\n1,000,000 &lt; Position ≤ 5,000,000\n50.00%\n1x\n1,000,000 &lt; Position ≤ 1,200,000\n50.00%\nPlease Note:&nbsp;\nUsers are advised to close any open positions prior to the delisting time to avoid automatic settlement.\nUsers are not allowed to open new positions for the aforementioned contract starting from 2023-05-16 08:30 (UTC).\nIn order to protect the users and prevent potential risks in extremely volatile market conditions, Binance Futures may undertake additional protective measures toward the USDⓈ-M APEBUSD Perpetual Contract without further announcement, including but not limited to adjusting the maximum leverage value, position value, and maintenance margin in each margin tier, updating funding rates such as the interest rate, premium and capped funding rate, changing the constituents of the price index, and using the Last Price Protected mechanism to update the Mark Price.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nFor more information:\nDelisting of Futures Contracts\nTrading Rules of USDⓈ-M Futures Contracts\nLeverage and Margin of USDⓈ-M Futures Contracts\nMark Price and Price Index\nThanks for your support!\nBinance Team\n2023-05-12\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram\nTwitter\nFacebook\nInstagram\nBinance reserves the right in its sole discretion to amend or cancel this announcement at any time and for any reasons without prior notice.\nRisk Warning: Digital asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses you may incur. Futures trading, in particular, is subject to high market risk and price volatility. All of your margin balance may be liquidated in the event of adverse price movement. Past performance is not a reliable predictor of future performance. Before trading, you should make an independent assessment of the appropriateness of the transaction in light of your own objectives and circumstances, including the risks and potential benefits. Consult your own advisers, where appropriate. This information should not be construed as financial or investment advice. To learn more about how to protect yourself, visit our Responsible Trading page. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.42,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u30-XRPUP",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance to Delist and Cease Redemption for XRPUP and XRPDOWN Leveraged Tokens (2023-07-25)",
+     "metin": "Fellow Binancians,\nBinance will delist and cease redemption for XRPUP and XRPDOWN leveraged tokens at 2023-07-25 06:00 (UTC).\nNotes:&nbsp;\nUsers are advised to redeem their leveraged tokens via the wallet function or the Leverage Tokens page before the delisting. If users are still holding these leveraged tokens after the delisting time, Binance will convert these tokens to USDT based on the net asset value (NAV) of the tokens at the time of delisting, and will distribute the USDT tokens to users’ accounts within 24 hours. After the distribution is complete, the leveraged token assets will be removed from the wallet.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-07-11"
+    },
+    "varlik": "XRPUP"
+   },
+   "jev": "token_delist",
+   "jev_guven": 0.43,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u31-XRPDOWN",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance to Delist and Cease Redemption for XRPUP and XRPDOWN Leveraged Tokens (2023-07-25)",
+     "metin": "Fellow Binancians,\nBinance will delist and cease redemption for XRPUP and XRPDOWN leveraged tokens at 2023-07-25 06:00 (UTC).\nNotes:&nbsp;\nUsers are advised to redeem their leveraged tokens via the wallet function or the Leverage Tokens page before the delisting. If users are still holding these leveraged tokens after the delisting time, Binance will convert these tokens to USDT based on the net asset value (NAV) of the tokens at the time of delisting, and will distribute the USDT tokens to users’ accounts within 24 hours. After the distribution is complete, the leveraged token assets will be removed from the wallet.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-07-11"
+    },
+    "varlik": "XRPDOWN"
+   },
+   "jev": "token_delist",
+   "jev_guven": 0.4,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u32-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Futures Will Delist and Update the Leverage & Margin Tiers of USDⓈ-M AGIXBUSD Perpetual Contract",
+     "metin": "Fellow Binancians,\nBinance Futures will close all positions and conduct an automatic settlement on the USDⓈ-M AGIXBUSD Perpetual Contract at 2023-07-20 09:00 (UTC). The contract will be delisted after the settlement is complete.\nIn addition, Binance Futures will adjust the leverage and margin tiers of the USDⓈ-M AGIXBUSD Perpetual Contract at 2023-07-11 14:00 (UTC), as per the table below. Existing positions opened before the update will be affected. It is strongly advised to adjust the position and leverage prior to the adjustment in order to avoid any potential liquidation.&nbsp;\nUpdates to Leverage &amp; Margin Tiers:\nAGIXBUSD (USDⓈ-M Perpetual Contract)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage Before Change\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate Before Change\nLeverage After Change\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate After Change\n11 - 15x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n5,000 &lt; Position ≤ 25,000\n2.50%\n7 - 8x\n5,000 &lt; Position ≤ 25,000\n2.50%\n6 - 8x\n25,000 &lt; Position ≤ 100,000\n5.00%\n6x\n25,000 &lt; Position ≤ 100,000\n5.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n2x\n250,000 &lt; Position ≤ 1,000,000\n12.50%\n2x\n250,000 &lt; Position ≤ 1,000,000\n12.50%\n1x\n1,000,000 &lt; Position ≤ 5,000,000\n50.00%\n1x\n1,000,000 &lt; Position ≤ 1,500,000\n50.00%\nPlease Note:&nbsp;\nUsers are advised to close any open positions prior to the delisting time to avoid automatic settlement.\nUsers are not allowed to open new positions for the aforementioned contract starting from 2023-07-20 08:30 (UTC).\nIn order to protect users and prevent potential risks in extremely volatile market conditions, Binance Futures may undertake additional protective measures toward the USDⓈ-M AGIXBUSD Perpetual Contract without further announcement, including but not limited to adjusting the maximum leverage value, position value, and maintenance margin in each margin tier, updating funding rates such as the interest rate, premium and capped funding rate, changing the constituents of the price index, and using the Last Price Protected mechanism to update the Mark Price.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nFor more information:\nDelisting of Futures Contracts\nTrading Rules of USDⓈ-M Futures Contracts\nLeverage and Margin of USDⓈ-M Futures Contracts\nMark Price and Price Index\nThanks for your support!\nBinance Team\n2023-07-11"
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.46,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u33-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Futures Will Delist and Update the Leverage & Margin Tiers of USDⓈ-M TRXBUSD and DODOBUSD Perpetual Contracts",
+     "metin": "Fellow Binancians,\nBinance Futures will close all positions and conduct an automatic settlement on the USDⓈ-M TRXBUSD and DODOBUSD Perpetual Contracts at 2023-08-10 09:00 (UTC). The contracts will be delisted after the settlement is complete.\nIn addition, Binance Futures will adjust the leverage and margin tiers of the USDⓈ-M TRXBUSD and DODOBUSD Perpetual Contracts at 2023-08-04 06:00 (UTC), as per the tables below. Existing positions opened before the update will be affected. It is strongly advised to adjust the position and leverage prior to the adjustment in order to avoid any potential liquidation.&nbsp;\nUpdates to Leverage &amp; Margin Tiers:\nTRXBUSD (USDⓈ-M Perpetual Contract)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage Before Change\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate Before Change\nLeverage After Change\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate After Change\n16 - 25x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n0 &lt; Position ≤ 5,000\n2.00%\n11 - 15x\n5,000 &lt; Position ≤ 25,000\n2.50%\n7 - 8x\n5,000 &lt; Position ≤ 25,000\n2.50%\n6 - 10x\n25,000 &lt; Position ≤ 100,000\n5.00%\n6x\n25,000 &lt; Position ≤ 100,000\n5.00%\n5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n3 - 4x\n250,000 &lt; Position ≤ 1,500,000\n12.50%\n3 - 4x\n250,000 &lt; Position ≤ 1,500,000\n12.50%\n2x\n1,500,000 &lt; Position ≤ 3,000,000\n25.00%\n2x\n1,500,000 &lt; Position ≤ 3,000,000\n25.00%\n1x\n3,000,000 &lt; Position ≤ 8,000,000\n50.00%\n1x\n3,000,000 &lt; Position ≤ 4,000,000\n50.00%\nDODOBUSD (USDⓈ-M Perpetual Contract)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage Before Change\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate Before Change\nLeverage After Change\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate After Change\n11 - 20x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n5,000 &lt; Position ≤ 25,000\n2.50%\n7 - 8x\n5,000 &lt; Position ≤ 25,000\n2.50%\n6 - 8x\n25,000 &lt; Position ≤ 100,000\n5.00%\n6x\n25,000 &lt; Position ≤ 100,000\n5.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n3 - 5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n2x\n250,000 &lt; Position ≤ 1,000,000\n12.50%\n2x\n250,000 &lt; Position ≤ 1,000,000\n12.50%\n1x\n1,000,000 &lt; Position ≤ 3,000,000\n50.00%\n1x\n1,000,000 &lt; Position ≤ 1,200,000\n50.00%\nPlease Note:&nbsp;\nUsers are advised to close any open positions prior to the delisting time to avoid automatic settlement.\nUsers are not allowed to open new positions for the aforementioned contracts starting from 2023-08-10 08:30 (UTC).\nIn order to protect users and prevent potential risks in extremely volatile market conditions, Binance Futures may undertake additional protective measures toward the USDⓈ-M TRXBUSD and DODOBUSD Perpetual Contracts without further announcement, including but not limited to adjusting the maximum leverage value, position value, and maintenance margin in each margin tier, updating funding rates such as the interest rate, premium and capped funding rate, changing the constituents of the price index, and using the Last Price Protected mechanism to update the Mark Price.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nFor More Information:\nDelisting of Futures Contracts\nTrading Rules of USDⓈ-M Futures Contracts\nLeverage and Margin of USDⓈ-M Futures Contracts\nMark Price and Price Index\nThanks for your support!\nBinance Team\n2023-08-03\nNote: This announcement was updated on 2023-08-04 to clarify that the leverage and margin tiers of the USDⓈ-M TRXBUSD and DODOBUSD Perpetual Contracts will be adjusted at 2023-08-04 06:00 (UTC), instead of 2023-08-03 14:00 (UTC)."
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.48,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u34-ADAUP",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance to Cease ADAUP & ADADOWN Trading and Subscription Services (2023-08-09)",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,\nAt 2023-08-16 03:00 (UTC), Binance will cease trading and subscription of ADAUP/USDT and ADADOWN/USDT leveraged token trading pairs. All trade orders will be automatically removed thereafter.&nbsp;\nThe redemption service will be available until further notice. A separate announcement will be posted.\nNotes:&nbsp;\nUsers are advised to trade their ADAUP and ADADOWN leveraged tokens for other tokens prior to the scheduled cessation. If users are still holding ADAUP and ADADOWN leveraged tokens after trading ceases, please redeem the tokens via the wallet function or the Leveraged Tokens page.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-08-09"
+    },
+    "varlik": "ADAUP"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.39,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u35-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Futures Will Delist and Update the Leverage & Margin Tiers of USDⓈ-M ADABUSD and MATICBUSD Perpetual Contract",
+     "metin": "Fellow Binancians,\nBinance Futures will close all positions and conduct an automatic settlement on the USDⓈ-M ADABUSD and MATICBUSD Perpetual Contracts at 2023-08-17 09:00 (UTC). The contracts will be delisted after the settlement is complete.\nIn addition, Binance Futures will adjust the leverage and margin tiers of the USDⓈ-M ADABUSD and MATICBUSD Perpetual Contracts at 2023-08-10 12:30 (UTC), as per the tables below. Existing positions opened before the update will be affected. It is strongly advised to adjust the position and leverage prior to the adjustment in order to avoid any potential liquidation.&nbsp;\nUpdates to Leverage &amp; Margin Tiers:\nADABUSD (USDⓈ-M Perpetual Contract)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage Before Change\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate Before Change\nLeverage After Change\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate After Change\n11 - 20x\n0 &lt; Position ≤ 100,000\n2.50%\n9 - 10x\n0 &lt; Position ≤ 100,000\n2.50%\n6 - 10x\n100,000 &lt; Position ≤ 500,000\n5.00%\n6 - 8x\n100,000 &lt; Position ≤ 500,000\n5.00%\n4 - 5x\n500,000 &lt; Position ≤ 1,000,000\n10.00%\n4 - 5x\n500,000 &lt; Position ≤ 1,000,000\n10.00%\n3x\n1,000,000 &lt; Position ≤ 2,000,000\n15.00%\n3x\n1,000,000 &lt; Position ≤ 2,000,000\n15.00%\n2x\n2,000,000 &lt; Position ≤ 5,000,000\n25.00%\n2x\n2,000,000 &lt; Position ≤ 5,000,000\n25.00%\n1x\n5,000,000 &lt; Position ≤ 8,000,000\n50.00%\n1x\n5,000,000 &lt; Position ≤ 5,500,000\n50.00%\nMATICBUSD (USDⓈ-M Perpetual Contract)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage Before Change\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate Before Change\nLeverage After Change\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate After Change\n16 - 25x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n0 &lt; Position ≤ 5,000\n2.00%\n11 - 15x\n5,000 &lt; Position ≤ 25,000\n2.50%\n7 - 8x\n5,000 &lt; Position ≤ 25,000\n2.50%\n6 - 10x\n25,000 &lt; Position ≤ 100,000\n5.00%\n6x\n25,000 &lt; Position ≤ 100,000\n5.00%\n5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n3 - 4x\n250,000 &lt; Position ≤ 1,500,000\n12.50%\n3 - 4x\n250,000 &lt; Position ≤ 1,500,000\n12.50%\n2x\n1,500,000 &lt; Position ≤ 3,000,000\n25.00%\n2x\n1,500,000 &lt; Position ≤ 3,000,000\n25.00%\n1x\n3,000,000 &lt; Position ≤ 8,000,000\n50.00%\n1x\n3,000,000 &lt; Position ≤ 3,500,000\n50.00%\nPlease Note:&nbsp;\nUsers are advised to close any open positions prior to the delisting time to avoid automatic settlement.\nUsers are not allowed to open new positions for the aforementioned contracts starting from 2023-08-17 08:30 (UTC).\nIn order to protect users and prevent potential risks in extremely volatile market conditions, Binance Futures may undertake additional protective measures toward the USDⓈ-M ADABUSD and MATICBUSD Perpetual Contracts without further announcement, including but not limited to adjusting the maximum leverage value, position value, and maintenance margin in each margin tier, updating funding rates such as the interest rate, premium and capped funding rate, changing the constituents of the price index, and using the Last Price Protected mechanism to update the Mark Price.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nFor More Information:\nDelisting of Futures Contracts\nTrading Rules of USDⓈ-M Futures Contracts\nLeverage and Margin of USDⓈ-M Futures Contracts\nMark Price and Price Index\nThanks for your support!\nBinance Team\n2023-08-10"
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.4,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u36-YFII",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Will Delist SNM, SRM and YFII on 2023-08-22",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,\nAt Binance, we periodically review each digital asset we list to ensure that it continues to meet the high level of standard we expect. When a coin or token no longer meets this standard, or the industry changes, we conduct a more in-depth review and potentially delist it. We believe this best protects all our users.\nWhen we conduct these reviews, we consider a variety of factors. Here are some that drive whether we decide to delist a digital asset:\nCommitment of team to project\nLevel and quality of development activity\nTrading volume and liquidity\nStability and safety of network from attacks\nNetwork / smart contract stability\nLevel of public communication\nResponsiveness to our periodic due diligence requests\nEvidence of unethical/fraudulent conduct or negligence\nContribution to a healthy and sustainable crypto ecosystem\nBased on our most recent reviews, we have decided to delist and cease trading on all trading pairs for the following tokens at 2023-08-22 03:00 (UTC):\nSonm (SNM)\nSerum (SRM)\nDFI.Money (YFII)\nPlease note:\nThe exact trading pairs being removed are: SNM/BTC, SNM/BUSD, SRM/BUSD, YFII/USDT\nAll trade orders will be automatically removed after trading ceases in each respective trading pair.\nTo view your assets after trading ceases, please ensure you have not selected “Hide small assets” in your Funds page.\nDeposits of these tokens after 2023-08-23 03:00 (UTC) will not be credited to your account.&nbsp;\nWithdrawals of these coins and tokens from Binance will not be supported after 2023-11-22 03:00 (UTC).\nDelisted tokens may be converted into stablecoins on behalf of users after 2023-11-22 03:00 (UTC). Please note that the conversion of delisted tokens into stablecoins is not guaranteed. A separate notification will be made before the conversion where applicable, and the stablecoins will be credited to users’ Binance accounts after the conversion.&nbsp;\nBinance Simple Earn will delist the token(s) mentioned above at 2023-08-21 06:00 (UTC). Users may choose to redeem their Flexible Product positions beforehand. Otherwise, these Flexible Product positions will be automatically redeemed at the above-mentioned time, and subsequently transferred to users’ Spot Wallets.&nbsp;\nBinance Loans (Flexible Rate) will close all outstanding loan positions for the token(s) mentioned above at 2023-08-18 06:00 (UTC). Users are strongly advised to repay these loans before 2023-08-18 06:00 (UTC) to avoid any potential losses.&nbsp;\nBinance Gift Card will delist the token(s) mentioned above at 2023-08-22 03:00 (UTC). Users are advised to manage gift cards containing these token(s) in advance to avoid any inconveniences.\nBinance Pay will delist the token(s) mentioned above at 2023-08-22 03:00 (UTC).\nBinance will terminate Trading Bots services for the aforementioned spot trading pairs at 2023-08-22 03:00 (UTC), where applicable. Users are strongly advised to update and/or cancel their Trading Bots prior to the cessation of Trading Bots services to avoid any potential losses.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nWe thank you for your support as we continue to build the crypto ecosystem in a way that promotes transparency and long-term, sustainable growth.\nThanks for your support!\nBinance Team\n2023-08-15\nNote: This announcement was updated on 2023-11-24 to clarify that the conversion of delisted tokens into stablecoins is not guaranteed.&nbsp;"
+    },
+    "varlik": "YFII"
+   },
+   "jev": "token_delist",
+   "jev_guven": 0.47,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u37-BUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Futures Will Delist and Update the Leverage & Margin Tiers of USDⓈ-M LTCBUSD and DOGEBUSD Perpetual Contracts",
+     "metin": "Fellow Binancians,\nBinance Futures will close all positions and conduct an automatic settlement on the USDⓈ-M LTCBUSD and DOGEBUSD Perpetual Contracts at 2023-08-24 09:00 (UTC). The contracts will be delisted after the settlement is complete.\nIn addition, Binance Futures will adjust the leverage and margin tiers of the USDⓈ-M LTCBUSD and DOGEBUSD Perpetual Contracts at 2023-08-17 12:30 (UTC), as per the tables below. Existing positions opened before the update will be affected. It is strongly advised to adjust the position and leverage prior to the adjustment in order to avoid any potential liquidation.&nbsp;\nUpdates to Leverage &amp; Margin Tiers:\nLTCBUSD (USDⓈ-M Perpetual Contract)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage Before Change\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate Before Change\nLeverage After Change\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate After Change\n16 - 25x\n0 &lt; Position ≤ 5,000\n2.00%\n9 - 10x\n0 &lt; Position ≤ 5,000\n2.00%\n11 - 15x\n5,000 &lt; Position ≤ 25,000\n2.50%\n7 - 8x\n5,000 &lt; Position ≤ 25,000\n2.50%\n6 - 10x\n25,000 &lt; Position ≤ 100,000\n5.00%\n6x\n25,000 &lt; Position ≤ 100,000\n5.00%\n5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n5x\n100,000 &lt; Position ≤ 250,000\n10.00%\n3 - 4x\n250,000 &lt; Position ≤ 1,500,000\n12.50%\n3 - 4x\n250,000 &lt; Position ≤ 1,500,000\n12.50%\n2x\n1,500,000 &lt; Position ≤ 3,000,000\n25.00%\n2x\n1,500,000 &lt; Position ≤ 3,000,000\n25.00%\n1x\n3,000,000 &lt; Position ≤ 8,000,000\n50.00%\n1x\n3,000,000 &lt; Position ≤ 3,200,000\n50.00%\nDOGEBUSD (USDⓈ-M Perpetual Contract)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage Before Change\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate Before Change\nLeverage After Change\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate After Change\n11 - 20x\n0 &lt; Position ≤ 100,000\n2.50%\n9 - 10x\n0 &lt; Position ≤ 100,000\n2.50%\n6 - 10x\n100,000 &lt; Position ≤ 500,000\n5.00%\n6 - 8x\n100,000 &lt; Position ≤ 500,000\n5.00%\n4 - 5x\n500,000 &lt; Position ≤ 1,000,000\n10.00%\n4 - 5x\n500,000 &lt; Position ≤ 1,000,000\n10.00%\n3x\n1,000,000 &lt; Position ≤ 2,000,000\n15.00%\n3x\n1,000,000 &lt; Position ≤ 2,000,000\n15.00%\n2x\n2,000,000 &lt; Position ≤ 5,000,000\n25.00%\n2x\n2,000,000 &lt; Position ≤ 5,000,000\n25.00%\n1x\n5,000,000 &lt; Position ≤ 8,000,000\n50.00%\n1x\n5,000,000 &lt; Position ≤ 5,200,000\n50.00%\nPlease Note:&nbsp;\nUsers are advised to close any open positions prior to the delisting time to avoid automatic settlement.\nUsers are not allowed to open new positions for the aforementioned contracts starting from 2023-08-24 08:30 (UTC).\nIn order to protect users and prevent potential risks in extremely volatile market conditions, Binance Futures may undertake additional protective measures toward the USDⓈ-M LTCBUSD and DOGEBUSD Perpetual Contracts without further announcement, including but not limited to adjusting the maximum leverage value, position value, and maintenance margin in each margin tier, updating funding rates such as the interest rate, premium and capped funding rate, changing the constituents of the price index, and using the Last Price Protected mechanism to update the Mark Price.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nFor More Information:\nDelisting of Futures Contracts\nTrading Rules of USDⓈ-M Futures Contracts\nLeverage and Margin of USDⓈ-M Futures Contracts\nMark Price and Price Index\nThanks for your support!\nBinance Team\n2023-08-17"
+    },
+    "varlik": "BUSD"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.47,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u38-BTC",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Isolated Margin Trading Pairs - 2023-09-28",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,\nBinance Margin will delist the 1INCH/BUSD, AERGO/BUSD, ARDR/BTC, ARDR/USDT, DATA/BUSD, DIA/BUSD, ERN/BUSD, FIS/BUSD, IOST/BUSD, IQ/BUSD, KNC/BUSD, LOKA/BUSD, LTO/BUSD, OM/BUSD, RARE/BUSD, SUSHI/BUSD, T/BUSD, THETA/BUSD, YFI/BUSD and ZEC/BUSD isolated margin pairs at 2023-09-28 06:00 (UTC).&nbsp;\nPlease note:\nAt 2023-09-22 06:00 (UTC), Binance Margin will suspend isolated margin borrowing on the aforementioned isolated margin pairs.\nAt 2023-09-28 06:00 (UTC), Binance Margin will close users’ positions, conduct an automatic settlement and cancel all pending orders on the aforementioned isolated margin pairs. These pairs will then be delisted from Isolated Margin.&nbsp;\nUsers will not be able to update their positions during the delisting process, and they are strongly advised to close their positions and/or transfer their assets from Margin Wallets to Spot Wallets prior to the cessation of margin trading at 2023-09-28 06:00 (UTC). Binance will not be responsible for any potential losses.&nbsp;\n​​Where any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-09-21"
+    },
+    "varlik": "BTC"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.4,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u39-ADAUP",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance to Delist and Cease Redemption for ADAUP and ADADOWN Leveraged Tokens (2023-11-01)",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,\nBinance will delist and cease redemption for ADAUP and ADADOWN leveraged tokens at 2023-11-01 06:00 (UTC).\nNotes:&nbsp;\nUsers are advised to redeem ADAUP and ADADOWN leveraged tokens via the wallet function or the Leverage Tokens page before the delisting. If users are still holding the aforementioned leveraged tokens after the delisting time, Binance will convert the tokens to USDT based on their respective net asset value (NAV) at the time of delisting, and will distribute the USDT tokens to users’ accounts within 24 hours. After the distribution is complete, ADAUP and ADADOWN leveraged token assets will be removed from the wallet.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-10-18"
+    },
+    "varlik": "ADAUP"
+   },
+   "jev": "token_delist",
+   "jev_guven": 0.37,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u40-ADADOWN",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance to Delist and Cease Redemption for ADAUP and ADADOWN Leveraged Tokens (2023-11-01)",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,\nBinance will delist and cease redemption for ADAUP and ADADOWN leveraged tokens at 2023-11-01 06:00 (UTC).\nNotes:&nbsp;\nUsers are advised to redeem ADAUP and ADADOWN leveraged tokens via the wallet function or the Leverage Tokens page before the delisting. If users are still holding the aforementioned leveraged tokens after the delisting time, Binance will convert the tokens to USDT based on their respective net asset value (NAV) at the time of delisting, and will distribute the USDT tokens to users’ accounts within 24 hours. After the distribution is complete, ADAUP and ADADOWN leveraged token assets will be removed from the wallet.\nWhere any discrepancy arises between the translated versions and the original English version, the English version shall prevail.\nThanks for your support!\nBinance Team\n2023-10-18"
+    },
+    "varlik": "ADADOWN"
+   },
+   "jev": "token_delist",
+   "jev_guven": 0.24,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u41-TUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Margin & Binance Futures Will Delist BUSD",
+     "metin": "Fellow Binancians,\nBinance Margin and Binance Futures will be delisting BUSD in accordance with the following timelines.\nMargin:\nAt 2023-12-01 06:00 (UTC), Binance Margin will suspend BUSD/USDT isolated margin borrowing.\nAt 2023-12-11 09:00 (UTC), Binance Margin will close users’ positions, conduct an automatic settlement and cancel all pending orders on the BUSD/USDT and TUSD/BUSD cross margin pairs, as well as the BUSD/USDT isolated margin pair. If users have any outstanding Cross Margin or Isolated Margin loans, both the delisted assets and any other assets held in their Cross and Isolated Margin accounts may be sold to repay the outstanding liabilities. These pairs will then be removed from Cross Margin and Isolated Margin.&nbsp;\nPlease note that users will not be able to update their positions during the delisting process, and they are strongly advised to close their positions and/or transfer their assets from Margin Wallets to Spot Wallets prior to the cessation of margin trading at 2023-12-11 09:00 (UTC). Binance Margin will not be responsible for any potential losses.&nbsp;\nPortfolio Margin users are advised to transfer the tokens mentioned above out of their Margin Wallet to their Spot Wallet and to top up their margin balance before 2023-12-11 09:00 (UTC) where applicable. Users should monitor the Unified Maintenance Margin Ratio (Uni-MMR) closely to avoid any potential liquidation that may result from the removal of the tokens mentioned above from the Margin Wallet.\nAll BUSD balances in Cross Margin Wallets under the Portfolio Margin account will be automatically converted to USDT from 2023-12-11 09:00 (UTC). The conversion may take approximately 24 hours or longer. Binance Margin will not be liable for any losses on new positions during this period that may incur due to the conversion of funds. Refer to this FAQ for more information.\nFutures:\nBinance Futures will adjust the leverage and margin tiers of the USDⓈ-M BTCBUSD, ETHBUSD, BNBBUSD and XRPBUSD Perpetual Contracts at 2023-11-24 14:00 (UTC), as per the tables below. Existing positions opened before the update will be affected. It is strongly advised to adjust the position and leverage prior to the adjustment in order to avoid any potential liquidation.&nbsp;\nBTCBUSD (USDⓈ-M Perpetual Contract)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage Before Change\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate Before Change\nLeverage After Change\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate After Change\n51 - 75x\n0 &lt; Position ≤ 50,000\n0.40%\n26 - 30x\n0 &lt; Position ≤ 50,000\n0.40%\n26 - 50x\n50,000 &lt; Position ≤ 250,000\n0.50%\n21 - 25x\n50,000 &lt; Position ≤ 250,000\n0.50%\n21 - 25x\n250,000 &lt; Position ≤ 1,000,000\n1.00%\n16 - 20x\n250,000 &lt; Position ≤ 1,000,000\n1.00%\n11 - 20x\n1,000,000 &lt; Position ≤ 7,500,000\n2.50%\n11 - 15x\n1,000,000 &lt; Position ≤ 7,500,000\n2.50%\n6 - 10x\n7,500,000 &lt; Position ≤ 40,000,000\n5.00%\n6 - 10x\n7,500,000 &lt; Position ≤ 40,000,000\n5.00%\n5x\n40,000,000 &lt; Position ≤ 100,000,000\n10.00%\n5x\n40,000,000 &lt; Position ≤ 100,000,000\n10.00%\n4x\n100,000,000 &lt; Position ≤ 200,000,000\n12.50%\n4x\n100,000,000 &lt; Position ≤ 200,000,000\n12.50%\n3x\n200,000,000 &lt; Position ≤ 400,000,000\n15.00%\n3x\n200,000,000 &lt; Position ≤ 400,000,000\n15.00%\n2x\n400,000,000 &lt; Position ≤ 600,000,000\n25.00%\n2x\n400,000,000 &lt; Position ≤ 600,000,000\n25.00%\n1x\n600,000,000 &lt; Position ≤ 1,000,000,000\n50.00%\n1x\n600,000,000 &lt; Position ≤ 600,500,000\n50.00%\nETHBUSD (USDⓈ-M Perpetual Contract)\nPrevious Leverage and Margin Tiers\nNew Leverage and Margin Tiers\nLeverage Before Change\nPosition Before Change (Notional Value in BUSD)\nMaintenance Margin Rate Before Change\nLeverage After Change\nPosition After Change (Notional Value in BUSD)\nMaintenance Margin Rate After Change\n51 - 75x\n0 &lt; Position ≤ 50,000\n0.40%\n26 - 30x\n0 &lt; Position ≤ 50,000\n0.40%\n26 - 50x\n50,000 &lt; Position ≤ 100,000\n0.50%\n21 "
+    },
+    "varlik": "TUSD"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.44,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u42-GBP",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Spot Trading Pairs - 2023-12-29",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,&nbsp;\nTo protect users and maintain a high quality trading market, Binance conducts periodic reviews of all listed spot trading pairs, and may delist selected spot trading pairs due to multiple factors.\nBased on our most recent reviews, Binance will remove and cease trading on the following spot trading pairs:\nAt 2023-12-29 03:00 (UTC): ADA/GBP, BNB/GBP, BTC/GBP, DOGE/GBP, ETH/GBP, GBP/USDT, LINK/GBP, LTC/GBP, MATIC/GBP, SOL/GBP, XRP/GBP\nPlease note:\nThe delisting of a spot trading pair does not affect the availability of the tokens on Binance Spot. Users can still trade the spot trading pair’s base and quote assets on other trading pair(s) that are available on Binance.&nbsp;\nThere may be discrepancies in the translated version of this original article in English. Please reference this original version for the latest or most accurate information where any discrepancies may arise.\nFor More Information:\nBinance Delisting Guidelines &amp; Frequently Asked Questions\nHow to View Delisting Information for Tokens &amp; Spot Trading Pairs on Binance\nThank you for your support!\nBinance Team\n2023-12-22\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram\nX\nFacebook\nInstagram\nBinance reserves the right in its sole discretion to amend or cancel this announcement at any time and for any reasons without prior notice.\nDisclaimer: Digital asset prices are subject to high market risk and price volatility. The value of your investment may go down or up, and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses you may incur. Past performance is not a reliable predictor of future performance. You should only invest in products you are familiar with and where you understand the risks. You should carefully consider your investment experience, financial situation, investment objectives and risk tolerance and consult an independent financial adviser prior to making any investment. This material should not be construed as financial advice. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "GBP"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.37,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u43-FLOKI",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Spot Trading Pairs - 2024-01-12",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,&nbsp;\nTo protect users and maintain a high quality trading market, Binance conducts periodic reviews of all listed spot trading pairs, and may delist selected spot trading pairs due to multiple factors, such as poor liquidity and trading volume.\nBased on our most recent reviews, Binance will remove and cease trading on the following spot trading pairs:\nAt 2024-01-12 03:00 (UTC): CITY/BTC, COS/BNB, COTI/BNB, FLOKI/TUSD, FUN/BNB, HIFI/ETH, LTC/UAH, MULTI/BTC, PSG/BTC\nPlease note:\nThe delisting of a spot trading pair does not affect the availability of the tokens on Binance Spot. Users can still trade the spot trading pair’s base and quote assets on other trading pair(s) that are available on Binance.&nbsp;\nBinance will terminate Spot Trading Bots services for the aforementioned spot trading pairs at 2024-01-12 03:00 (UTC) where applicable. Users are strongly advised to update and/or cancel their Spot Trading Bots prior to the cessation of Spot Trading Bots services to avoid any potential losses.\nThere may be discrepancies in the translated version of this original article in English. Please reference this original version for the latest or most accurate information where any discrepancies may arise.&nbsp;\nFor More Information:\nBinance Delisting Guidelines &amp; Frequently Asked Questions\nHow to View Delisting Information for Tokens &amp; Spot Trading Pairs on Binance\nThank you for your support!\nBinance Team\n2024-01-10"
+    },
+    "varlik": "FLOKI"
+   },
+   "jev": "usdt_pair_removed",
+   "jev_guven": 0.46,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u44-INJ",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Spot Trading Pairs - 2024-05-24",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,&nbsp;\nTo protect users and maintain a high quality trading market, Binance conducts periodic reviews of all listed spot trading pairs, and may delist selected spot trading pairs due to multiple factors, such as poor liquidity and trading volume.\nBased on our most recent reviews, Binance will remove and cease trading on the following spot trading pairs:\nAt 2024-05-24 03:00 (UTC): INJ/TUSD, MEME/TUSD, SNX/ETH, SYN/BTC\nPlease note:\nThe delisting of a spot trading pair does not affect the availability of the tokens on Binance Spot. Users can still trade the spot trading pair’s base and quote assets on other trading pair(s) that are available on Binance.&nbsp;\nBinance will terminate Spot Trading Bots services for the aforementioned spot trading pairs at 2024-05-24 03:00 (UTC) where applicable. Users are strongly advised to update and/or cancel their Spot Trading Bots prior to the cessation of Spot Trading Bots services to avoid any potential losses.\nThere may be discrepancies in the translated version of this original article in English. Please reference this original version for the latest or most accurate information where any discrepancies may arise.&nbsp;\nFor More Information:\nBinance Delisting Guidelines &amp; Frequently Asked Questions\nHow to View Delisting Information for Tokens &amp; Spot Trading Pairs on Binance\nThank you for your support!\nBinance Team\n2024-05-22"
+    },
+    "varlik": "INJ"
+   },
+   "jev": "usdt_pair_removed",
+   "jev_guven": 0.43,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u45-ALPACA",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Spot Trading Pairs - 2024-06-14",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,&nbsp;\nTo protect users and maintain a high quality trading market, Binance conducts periodic reviews of all listed spot trading pairs, and may delist selected spot trading pairs due to multiple factors, such as poor liquidity and trading volume.\nBased on our most recent reviews, Binance will remove and cease trading on the following spot trading pairs:\nAt 2024-06-14 03:00 (UTC): ALPACA/BTC, MDX/BTC, NFP/TUSD, QUICK/BTC, XAI/BNB\nPlease note:\nThe delisting of a spot trading pair does not affect the availability of the tokens on Binance Spot. Users can still trade the spot trading pair’s base and quote assets on other trading pair(s) that are available on Binance.&nbsp;\nBinance will terminate Spot Trading Bots services for the aforementioned spot trading pairs at 2024-06-14 03:00 (UTC) where applicable. Users are strongly advised to update and/or cancel their Spot Trading Bots prior to the cessation of Spot Trading Bots services to avoid any potential losses.\nThere may be discrepancies in the translated version of this original article in English. Please reference this original version for the latest or most accurate information where any discrepancies may arise.&nbsp;\nFor More Information:\nBinance Delisting Guidelines &amp; Frequently Asked Questions\nHow to View Delisting Information for Tokens &amp; Spot Trading Pairs on Binance\nThank you for your support!\nBinance Team\n2024-06-12"
+    },
+    "varlik": "ALPACA"
+   },
+   "jev": "usdt_pair_removed",
+   "jev_guven": 0.44,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u46-ADA",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Spot Trading Pairs - 2024-08-02",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,&nbsp;\nTo protect users and maintain a high quality trading market, Binance conducts periodic reviews of all listed spot trading pairs, and may delist selected spot trading pairs due to multiple factors, such as poor liquidity and trading volume.\nBased on our most recent reviews, Binance will remove and cease trading on the following spot trading pairs:\nAt 2024-08-02 03:00 (UTC): ADA/TUSD, AEVO/BNB, AST/BTC, MANTA/BNB\nPlease note:\nThe delisting of a spot trading pair does not affect the availability of the tokens on Binance Spot. Users can still trade the spot trading pair’s base and quote assets on other trading pair(s) that are available on Binance.&nbsp;\nBinance will terminate Spot Trading Bots services for the aforementioned spot trading pairs at 2024-08-02 03:00 (UTC) where applicable. Users are strongly advised to update and/or cancel their Spot Trading Bots prior to the cessation of Spot Trading Bots services to avoid any potential losses.\nThere may be discrepancies in the translated version of this original article in English. Please reference this original version for the latest or most accurate information where any discrepancies may arise.&nbsp;\nFor More Information:\nBinance Delisting Guidelines &amp; Frequently Asked Questions\nHow to View Delisting Information for Tokens &amp; Spot Trading Pairs on Binance\nThank you for your support!\nBinance Team\n2024-07-31"
+    },
+    "varlik": "ADA"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.44,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u47-NOT",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Will Delist IDRT, KP3R, OOKI, UNFI on 2024-11-06",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,\nAt Binance, we periodically review each digital asset we list to ensure that it continues to meet a high level of standard and industry requirements. When a coin or token no longer meets these standards or the industry landscape changes, we conduct a more in-depth review and potentially delist it. Our priority is to ensure the best services and protections for our users while continuing to adapt to evolving market dynamics.&nbsp;\nWhen we conduct these reviews, we consider a variety of factors. Here are some that drive whether we decide to delist a digital asset:\nCommitment of team to project\nLevel and quality of development activity\nTrading volume and liquidity\nStability and safety of network from attacks\nNetwork / smart contract stability\nLevel of public communication\nResponsiveness to our periodic due diligence requests\nEvidence of unethical/fraudulent conduct or negligence\nNew regulatory requirements\nContribution to a healthy and sustainable crypto ecosystem\nBased on our most recent reviews, we have decided to delist and cease trading on all spot trading pairs for the following token(s) at 2024-11-06 03:00 (UTC):\nRupiah Token (IDRT)\nKeep3rV1 (KP3R)\nOoki Protocol (OOKI)\nUnifi Protocol DAO (UNFI)\nPlease note:\nThe exact trading pairs being removed are: KP3R/USDT, OOKI/USDT, UNFI/BTC, UNFI/TRY, UNFI/USDT, USDT/IDRT\nAll trade orders will be automatically removed after trading ceases in each respective trading pair.\nThe token's valuation will no longer be displayed in your wallet after delisting. To view your assets after trading ceases, please ensure you have not selected “Hide Small Balances” in all of your wallets.\nDeposits of these token(s) after 2024-11-07 03:00 (UTC) will not be credited to your account.&nbsp;\nWithdrawals of these token(s) from Binance will not be supported after 2025-02-06 03:00 (UTC).\nDelisted tokens MAY be converted into stablecoins on behalf of users after 2025-02-07 03:00 (UTC). Please note that the conversion of delisted tokens into stablecoins is NOT guaranteed. A separate notification will be made before the conversion where applicable, and the stablecoins will be credited to users’ Binance accounts after the conversion.&nbsp;\nBinance Simple Earn will delist the token(s) mentioned above after 2024-11-04 03:00 (UTC). Users may choose to redeem their Flexible Products positions beforehand. Otherwise, these Flexible Products positions will be automatically redeemed at the above-mentioned time, and subsequently transferred to users’ Spot Wallets, together with any accrued rewards.&nbsp;\nAt 2024-10-31 03:00 (UTC), KP3R, OOKI, UNFI of VIP Loan will close all outstanding loan positions for the aforementioned token(s) as loanable token(s) and collateral token(s). Users are strongly advised to repay their outstanding loans before 2024-10-31 03:00 (UTC) to avoid any potential losses, where applicable.\nBinance Futures will close all positions and conduct an automatic settlement on the UNFIUSDT USDⓈ-M Perpetual Contract at 2024-10-30 09:00 (UTC). The contracts will be delisted after the settlement is complete. Users are advised to close any open positions prior to the delisting time to avoid automatic settlement. Users are not allowed to open new positions for the aforementioned contracts starting from 2024-10-30 08:30 (UTC). In order to protect users and prevent potential risks in extremely volatile market conditions, Binance Futures may undertake additional protective measures toward the UNFIUSDT USDⓈ-M Perpetual Contract without further announcement, including but not limited to adjusting the maximum leverage value, position value, and maintenance margin in each margin tier, updating funding rates, such as the interest rate, premium and capped funding rate, changing the constituents of the price index, and using the Last Price Protected mechanism to update the Mark Price.&nbsp;\nAt 20"
+    },
+    "varlik": "NOT"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.43,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u48-NOT",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Will Delist AKRO, BLZ, WRX on 2024-12-25",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,\nAt Binance, we periodically review each digital asset we list to ensure that it continues to meet a high level of standard and industry requirements. When a coin or token no longer meets these standards or the industry landscape changes, we conduct a more in-depth review and potentially delist it. Our priority is to ensure the best services and protections for our users while continuing to adapt to evolving market dynamics.&nbsp;\nWhen we conduct these reviews, we consider a variety of factors. Here are some that drive whether we decide to delist a digital asset:\nCommitment of team to project\nLevel and quality of development activity\nTrading volume and liquidity\nStability and safety of network from attacks\nNetwork / smart contract stability\nLevel of public communication\nResponsiveness to our periodic due diligence requests\nEvidence of unethical/fraudulent conduct or negligence\nNew regulatory requirements\nContribution to a healthy and sustainable crypto ecosystem\nBased on our most recent reviews, we have decided to delist and cease trading on all spot trading pairs for the following token(s) at 2024-12-25 03:00 (UTC):\nKaon (AKRO) formerly known as Akropolis\nBluzelle (BLZ)\nWazirX (WRX)\nPlease note:\nThe exact trading pairs being removed are: AKRO/USDT, BLZ/BTC, BLZ/USDT, WRX/USDT\nAll trade orders will be automatically removed after trading ceases in each respective trading pair.\nThe token's valuation will no longer be displayed in your wallet after delisting. To view your assets after trading ceases, please ensure you have not selected “Hide Small Balances” in all of your wallets.\nDeposits of these token(s) after 2024-12-26 03:00 (UTC) will not be credited to your account.&nbsp;\nWithdrawals of these token(s) from Binance will not be supported after 2025-02-25 03:00 (UTC).\nDelisted tokens MAY be converted into stablecoins on behalf of users after 2025-02-26 03:00 (UTC). Please note that the conversion of delisted tokens into stablecoins is NOT guaranteed. A separate notification will be made before the conversion where applicable, and the stablecoins will be credited to users’ Binance accounts after the conversion.&nbsp;\nBinance Futures will close all positions and conduct an automatic settlement on the BLZUSDT USDⓈ-M Perpetual Contract at 2024-12-23 09:00 (UTC). The contracts will be delisted after the settlement is complete. Users are advised to close any open positions prior to the delisting time to avoid automatic settlement. Users are not allowed to open new positions for the aforementioned contracts starting from 2024-12-23 08:30 (UTC). In order to protect users and prevent potential risks in extremely volatile market conditions, Binance Futures may undertake additional protective measures toward the BLZUSDT USDⓈ-M Perpetual Contract without further announcement, including but not limited to adjusting the maximum leverage value, position value, and maintenance margin in each margin tier, updating funding rates, such as the interest rate, premium and capped funding rate, changing the constituents of the price index, and using the Last Price Protected mechanism to update the Mark Price.&nbsp;\nAt 2024-12-23 09:00 (UTC), Binance Funding Rate Arbitrage Bot will close all arbitrage strategies and conduct an automatic settlement on the BLZUSDT symbol. The pair will no longer be available for opening new arbitrage strategies upon delisting.\nBinance Simple Earn will delist the token(s) mentioned above after 2024-12-24 03:00 (UTC). Users may choose to redeem their Flexible Products positions beforehand. Otherwise, these Flexible Products positions will be automatically redeemed at the above-mentioned time, and subsequently transferred to users’ Spot Wallets, together with any accrued rewards.&nbsp;\nAt 2024-12-23 02:00 (UTC), WRX of Binance Loans (Flexible Rates)&nbsp; and AKRO, BLZ, WRX of VIP Loan will close a"
+    },
+    "varlik": "NOT"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.43,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u49-ALGO",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Earn: Notice on Removal of Dual Investment Token Pairs - 2025-02-21",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,&nbsp;\nTo ensure we provide better liquidity and services for users, Binance conducts regular reviews of all listed Dual Investment token pairs.&nbsp;\nBased on our most recent review, the following Dual Investment token pairs will be removed at 2025-02-21 06:00 (UTC):\nALGO: ALGO/USDT, ALGO/USDC\nATOM: ATOM/USDT, ATOM/FDUSD, ATOM/USDC\nPlease note:&nbsp;\nAfter the removal, users will no longer be able to subscribe to these token pairs.\nExisting subscriptions will not be affected and will be settled upon expiration.\nThere may be discrepancies between this original content in English and any translated versions. Please refer to the original English version for the most accurate information, in case any discrepancies arise.\nFor More Information:\nWhat is Binance Dual Investment&nbsp;\nBinance Dual Investment Update: Earn Interest &amp; Trade Smart\nTop 6 Dual Investment Trading Strategies&nbsp;\nThank you for your support!\nBinance Team\n2025-02-20\nDisclaimer: USDC is an e-money token issued by Circle Internet Financial Europe SAS (https://www.circle.com/). USDC’s whitepaper is available here. You may contact Circle using the following contact information: +33(1)59000130 and EEA-Customer-Support@circle.com.&nbsp;\nHolders of USDC have a legal claim against Circle SAS as the EU issuer of USDC. These holders are entitled to request redemption of their USDC from Circle SAS. Such redemption will be made at any time and at par value."
+    },
+    "varlik": "ALGO"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.43,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u50-USDC",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Earn: Notice on Removal of Dual Investment Token Pairs - 2025-02-21",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,&nbsp;\nTo ensure we provide better liquidity and services for users, Binance conducts regular reviews of all listed Dual Investment token pairs.&nbsp;\nBased on our most recent review, the following Dual Investment token pairs will be removed at 2025-02-21 06:00 (UTC):\nALGO: ALGO/USDT, ALGO/USDC\nATOM: ATOM/USDT, ATOM/FDUSD, ATOM/USDC\nPlease note:&nbsp;\nAfter the removal, users will no longer be able to subscribe to these token pairs.\nExisting subscriptions will not be affected and will be settled upon expiration.\nThere may be discrepancies between this original content in English and any translated versions. Please refer to the original English version for the most accurate information, in case any discrepancies arise.\nFor More Information:\nWhat is Binance Dual Investment&nbsp;\nBinance Dual Investment Update: Earn Interest &amp; Trade Smart\nTop 6 Dual Investment Trading Strategies&nbsp;\nThank you for your support!\nBinance Team\n2025-02-20\nDisclaimer: USDC is an e-money token issued by Circle Internet Financial Europe SAS (https://www.circle.com/). USDC’s whitepaper is available here. You may contact Circle using the following contact information: +33(1)59000130 and EEA-Customer-Support@circle.com.&nbsp;\nHolders of USDC have a legal claim against Circle SAS as the EU issuer of USDC. These holders are entitled to request redemption of their USDC from Circle SAS. Such redemption will be made at any time and at par value."
+    },
+    "varlik": "USDC"
+   },
+   "jev": "positive_or_neutral",
+   "jev_guven": 0.45,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u51-ATOM",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Earn: Notice on Removal of Dual Investment Token Pairs - 2025-02-21",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,&nbsp;\nTo ensure we provide better liquidity and services for users, Binance conducts regular reviews of all listed Dual Investment token pairs.&nbsp;\nBased on our most recent review, the following Dual Investment token pairs will be removed at 2025-02-21 06:00 (UTC):\nALGO: ALGO/USDT, ALGO/USDC\nATOM: ATOM/USDT, ATOM/FDUSD, ATOM/USDC\nPlease note:&nbsp;\nAfter the removal, users will no longer be able to subscribe to these token pairs.\nExisting subscriptions will not be affected and will be settled upon expiration.\nThere may be discrepancies between this original content in English and any translated versions. Please refer to the original English version for the most accurate information, in case any discrepancies arise.\nFor More Information:\nWhat is Binance Dual Investment&nbsp;\nBinance Dual Investment Update: Earn Interest &amp; Trade Smart\nTop 6 Dual Investment Trading Strategies&nbsp;\nThank you for your support!\nBinance Team\n2025-02-20\nDisclaimer: USDC is an e-money token issued by Circle Internet Financial Europe SAS (https://www.circle.com/). USDC’s whitepaper is available here. You may contact Circle using the following contact information: +33(1)59000130 and EEA-Customer-Support@circle.com.&nbsp;\nHolders of USDC have a legal claim against Circle SAS as the EU issuer of USDC. These holders are entitled to request redemption of their USDC from Circle SAS. Such redemption will be made at any time and at par value."
+    },
+    "varlik": "ATOM"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.44,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u52-FDUSD",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Earn: Notice on Removal of Dual Investment Token Pairs - 2025-02-21",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,&nbsp;\nTo ensure we provide better liquidity and services for users, Binance conducts regular reviews of all listed Dual Investment token pairs.&nbsp;\nBased on our most recent review, the following Dual Investment token pairs will be removed at 2025-02-21 06:00 (UTC):\nALGO: ALGO/USDT, ALGO/USDC\nATOM: ATOM/USDT, ATOM/FDUSD, ATOM/USDC\nPlease note:&nbsp;\nAfter the removal, users will no longer be able to subscribe to these token pairs.\nExisting subscriptions will not be affected and will be settled upon expiration.\nThere may be discrepancies between this original content in English and any translated versions. Please refer to the original English version for the most accurate information, in case any discrepancies arise.\nFor More Information:\nWhat is Binance Dual Investment&nbsp;\nBinance Dual Investment Update: Earn Interest &amp; Trade Smart\nTop 6 Dual Investment Trading Strategies&nbsp;\nThank you for your support!\nBinance Team\n2025-02-20\nDisclaimer: USDC is an e-money token issued by Circle Internet Financial Europe SAS (https://www.circle.com/). USDC’s whitepaper is available here. You may contact Circle using the following contact information: +33(1)59000130 and EEA-Customer-Support@circle.com.&nbsp;\nHolders of USDC have a legal claim against Circle SAS as the EU issuer of USDC. These holders are entitled to request redemption of their USDC from Circle SAS. Such redemption will be made at any time and at par value."
+    },
+    "varlik": "FDUSD"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.31,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u53-COMBO",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Will Delist AERGO, AST, BURGER, COMBO, LINA on 2025-03-28",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,\nAt Binance, we periodically review each digital asset we list to ensure that it continues to meet a high level of standard and industry requirements. When a coin or token no longer meets these standards or the industry landscape changes, we conduct a more in-depth review and potentially delist it. Our priority is to ensure the best services and protections for our users while continuing to adapt to evolving market dynamics.&nbsp;\nWhen we conduct these reviews, we consider a variety of factors. Below are the updated metrics we look at that influence whether we decide to delist a digital asset:&nbsp;&nbsp;\nCommitment of team to project\nLevel and quality of development activity\nTrading volume and liquidity\nStability and safety of network from attacks\nLevel of public communication, community engagement, and transparency\nResponsiveness to our periodic due diligence requests\nEvidence of unethical/fraudulent conduct or negligence\nNew regulatory requirements\nMaterial/unjustified increase in token supply or changes to tokenomics\nImpact from changes to the project’s ownership structure or to the core team members\nCommunity sentiments\nBased on our most recent reviews, we have decided to delist and cease trading on all spot trading pairs for the following token(s) at 2025-03-28 03:00 (UTC):\nAergo (AERGO)\nAirSwap (AST)\nBurgerCities (BURGER)\nCOMBO (COMBO)\nLinear Finance (LINA)\nAdditionally, the Vote to Delist feature will be introduced after this batch of delisting. Projects that have already been announced for delisting will not be included in Vote to Delist.\nPlease note:\nThe exact trading pair(s) being removed are: AERGO/USDT, AST/USDT, BURGER/USDT, COMBO/TRY, COMBO/USDT, LINA/USDT\nAll trade orders will be automatically removed after trading ceases in each respective trading pair.\nThe token's valuation will no longer be displayed in users’ accounts after delisting. To view their assets after trading ceases, users should ensure they have not selected “Hide Small Balances” in all of their accounts.\nDeposits of these token(s) after 2025-03-29 03:00 (UTC) will not be credited to users’ accounts.&nbsp;\nWithdrawals of these token(s) from Binance will not be supported after 2025-05-27 03:00 (UTC).\nDelisted tokens may be converted into stablecoins on behalf of users after 2025-05-28 03:00 (UTC). Please note that the conversion of delisted tokens into stablecoins is not guaranteed. A separate notification will be made before the conversion where applicable, and the stablecoins will be credited to users’ Binance accounts after the conversion.&nbsp;\nBinance Futures will close all positions and conduct an automatic settlement on the AERGOUSDT, COMBOUSDT and LINAUSDT USDⓈ-M Perpetual Contracts at 2025-03-27 09:00 (UTC). The contracts will be delisted after the settlement is complete. Users are advised to close any open positions prior to the delisting time to avoid automatic settlement. Users are not allowed to open new positions for the aforementioned contracts starting from 2025-03-27 08:30 (UTC). In order to protect users and prevent potential risks in extremely volatile market conditions, Binance Futures may undertake additional protective measures toward the AERGOUSDT, COMBOUSDT and LINAUSDT USDⓈ-M Perpetual Contracts without further announcement, including but not limited to adjusting the maximum leverage value, position value, and maintenance margin in each margin tier, updating funding rates, such as the interest rate, premium and capped funding rate, changing the constituents of the price index, and using the Last Price Protected mechanism to update the Mark Price.&nbsp;\nAt 2025-03-26 05:00 (UTC), Binance Funding Rate Arbitrage Bot will close all arbitrage strategies and conduct an automatic settlement on the AERGOUSDT, COMBOUSDT and LINAUSDT symbols. The pairs will no longer be available for opening new arbitrage str"
+    },
+    "varlik": "COMBO"
+   },
+   "jev": "usdt_pair_removed",
+   "jev_guven": 0.45,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u54-ETH",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Margin Trading Pairs - 2026-01-23",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,\nBinance Margin will delist the following margin trading pairs at 2026-01-23 06:00 (UTC).&nbsp;\nCross Margin Pairs: YGG/BTC, ARPA/BTC, OGN/BTC, COMP/BTC, SUPER/BTC, JOE/BTC\nIsolated Margin Pairs: YGG/BTC, CELO/BTC, VET/ETH, ARPA/BTC, OGN/BTC, GAS/BTC, COMP/BTC, SUPER/BTC, DIA/BTC\nPlease Note:\nEffective immediately, users will no longer be able to transfer any amount of assets of the aforementioned pair(s) via manual transfers and Auto-Transfer Mode into their Isolated Margin accounts. If users hold outstanding liabilities of said tokens, these users may only manually transfer up to the amount of liabilities of that token into their Isolated Margin accounts, less any collateral already available.\nAt 2026-01-21 06:00 (UTC), Binance Margin will suspend isolated margin borrowing on the aforementioned isolated margin pairs.&nbsp;\nAt 2026-01-23 06:00 (UTC), Binance Margin will close users’ positions, conduct an automatic settlement, and cancel all pending orders on the aforementioned cross and isolated margin pairs. These pairs will then be removed from Binance Margin.&nbsp;\nUsers can still trade the above assets on other trading pairs that are available on Binance Margin.\nPlease note that users will not be able to update their positions during the delisting process, which may take approximately 3 hours. Users are strongly advised to close their positions and/or transfer their assets from Margin Accounts to Spot Accounts prior to the cessation of Margin trading at 2026-01-23 06:00 (UTC). Binance will not be responsible for any potential losses.\nThere may be discrepancies between this original content in English and any translated versions. Please refer to the original English version for the most accurate information, in case any discrepancies arise.&nbsp;\nGuides &amp; Related Materials:\nDelistings, Swap, and Rebranding on Binance Margin\nHow to Transfer Funds to My Binance Margin Account\nWhat is Margin Auto-Transfer Mode and How to Use It\nThank you for your support!\nBinance Team\n2026-01-20"
+    },
+    "varlik": "ETH"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.41,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u55-EUR",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Spot Trading Pairs - 2026-02-03",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,\nTo protect users and maintain a high quality trading market, Binance conducts periodic reviews of all listed spot trading pairs, and may delist selected spot trading pairs due to multiple factors, such as poor liquidity and trading volume.\nBased on our most recent reviews, Binance will remove and cease trading on the following spot trading pairs:\nAt 2026-02-03 08:00 (UTC): ARKM/FDUSD, ASTR/BTC, AWE/BTC, BANANA/BNB, DYDX/BTC, EUL/FDUSD, IMX/BTC, JTO/FDUSD, KSM/BTC, LINEA/FDUSD, LINK/BNB, NEAR/ETH, NFP/BTC, PIVX/BTC, PNUT/EUR, QTUM/ETH, SCRT/BTC, SNX/BTC, STG/BTC, SYS/BTC and UTK/USDC\nPlease Note:\nEUR is a fiat currency and does not represent any other digital currencies.\nThe delisting of a spot trading pair does not affect the availability of the tokens on Binance Spot. Users can still trade the spot trading pair's base and quote assets on other trading pair(s) that are available on Binance.\nBinance will terminate Spot Trading Bots services for the aforementioned spot trading pairs at 2026-02-03 08:00 (UTC) where applicable. Users are strongly advised to update and/or cancel their Spot Trading Bots prior to the cessation of Spot Trading Bots services to avoid any potential losses.\nThere may be discrepancies between this original content in English and any translated versions. Please refer to the original English version for the most accurate information, in case any discrepancies arise.\nFor More Information:\nBinance Delisting Guidelines & Frequently Asked Questions\nHow to View Delisting Information for Tokens & Spot Trading Pairs on Binance\nThank you for your support!\nBinance Team\n2026-02-02"
+    },
+    "varlik": "EUR"
+   },
+   "jev": "other_pairs_or_products_removed",
+   "jev_guven": 0.49,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u56-ALCX",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Notice of Removal of Margin Token and Trading Pairs - 2026-02-26",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,\nBinance Margin will delist the following token and margin trading pairs at 2026-02-26 06:00 (UTC).&nbsp;\nCross Margin Pairs: POL/USDC, ALCX/USDT, SAPIEN/USDC, PNUT/USDC, ARKM/USDC, BROCCOLI714/USDC, OPEN/USDC, CKB/USDC, HOLO/USDC, FIL/BTC\nIsolated Margin Pairs: POL/USDC, ALCX/USDT, SAPIEN/USDC, PNUT/USDC, ARKM/USDC, OPEN/USDC, CKB/USDC, HOLO/USDC, FIL/BTC\nBinance Margin will delist the ALCX token at 2026-02-27 08:00 (UTC).\nPlease Note:\nCross Margin and Isolated Margin:\nBinance Margin will delist the aforementioned token(s) from Cross and Isolated Margin at 2026-02-27 08:00 (UTC). The cross and isolated margin pair(s) of the aforementioned token(s) will be removed from Binance Margin.&nbsp;\nEffective immediately, users will no longer be able to transfer any amount of assets of the aforementioned pair(s) via manual transfers and Auto-Transfer Mode into their Isolated Margin accounts. If users hold outstanding liabilities of said tokens, these users may only manually transfer up to the amount of liabilities of that token into their Isolated Margin accounts, less any collateral already available.\nAt 2026-02-25 06:00 (UTC), Binance Margin will suspend isolated margin borrowing on the aforementioned cross margin token(s) and isolated margin pairs.&nbsp;\nAt 2026-02-26 06:00 (UTC), Binance Margin will close users’ positions, conduct an automatic settlement, and cancel all pending orders on the aforementioned cross and isolated margin pairs. These pairs will then be removed from Binance Margin.&nbsp;\nAt 2026-02-27 08:00 (UTC), if users hold both collateral and liabilities of the aforementioned token(s) on cross margin, the collateral will be used to repay the respective liabilities. If there are remaining collateral or liabilities of the aforementioned token(s), one of two options below will occur:\nIf users only hold the aforementioned token(s) in the form of collateral:&nbsp;\nIf the Collateral Margin Level (CML) is above 2, the aforementioned token(s) will be transferred to users’ Spot Accounts, up to the point when the CML reaches 2. The remaining token(s) in their Cross Margin accounts that are to be delisted will then be fully sold.&nbsp;\nIf the CML is below 2, the remaining token(s) in users’ Cross Margin Accounts that are to be delisted will be fully sold.&nbsp;\nIf users only hold the aforementioned token(s) in the form of liabilities:\nIf CML is at or above 2, pending orders will not be affected.&nbsp;\nIf the CML is below 2, all pending orders in their Cross Margin Accounts will be canceled.&nbsp;\nThe system will then sell other collateral tokens to buy and fully repay the delisting token(s)’ liabilities.\nPlease note that users will not be able to update their positions during the delisting process, which may take approximately 3 hours. Users are strongly advised to close their positions and/or transfer their assets from Margin Accounts to Spot Accounts prior to the cessation of Margin trading at 2026-02-27 08:00 (UTC). Binance will not be responsible for any potential losses.\nPortfolio Margin:\nIf the aforementioned token(s) remain in the Portfolio Margin Account after the Margin Scheduled Delisting Time, they will be automatically liquidated. The delisted margin assets will be sold for USDT, or other stablecoins supported in local countries, and the proceeds will be added to the user's Portfolio Margin balance. Binance is not liable for any losses incurred.\nPortfolio Margin users are advised to transfer the aforementioned token(s) out of their Margin Accounts to their Spot Accounts and to top up their margin balance before 2026-02-27 08:00 (UTC) where applicable. Users should monitor the Unified Maintenance Margin Ratio (uniMMR) closely to avoid any potential liquidation that may result from the removal of the aforementioned token(s) from the Margin Account. Refer to this FAQ for more information on how "
+    },
+    "varlik": "ALCX"
+   },
+   "jev": "token_delist",
+   "jev_guven": 0.43,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u57-UTK",
+   "altin": "veto",
+   "kabul": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Will Delist UTK and Support Rebranding and Airdrop Plan on Binance Alpha",
+     "metin": "This is a general Binance Exchange Notice. Products and services referred to here may not be available in your region.\nThis information is released as a Notice pursuant to Binance Exchange Procedure 117.\nFellow Binancians,\nBinance will delist Utrust (UTK) from Binance Spot and support the project’s rebranding to xMoney (XMN), to be listed on Binance Alpha.&nbsp;\nToken Swap Details:\nAccording to xMoney project team’s official announcement, the project provides two options for swapping Utrust (UTK) to xMoney (XMN):&nbsp;\nOption 1 (No lock-up): 3 UTK = 1 XMN\nOption 2 (6-month lock-up): 1 UTK = 1 XMN\nBinance users can follow the instructions from the project’s announcement to swap UTK to XMN token themselves.\nAfter 2026-04-14 02:00 (UTC),&nbsp; deposits of UTK tokens will no longer be credited.\nIf users do not withdraw their UTK tokens by 2026-04-14 14:30 (UTC), Binance will process the swap for users by using Option 1 (3 UTK = 1 XMN).\nAirdrop Details:Apart from the token swap plan, Binance will offer an additional airdrop incentive for eligible UTK token holders. For holding every 3 UTK tokens, eligible holders will receive an airdrop of 2 XMN tokens.\nThe airdrop eligibility is defined with the following condition:\nAfter 2026-04-14 14:30 (UTC), following the suspension of the UTK token trading and withdrawal, users with UTK balance on Binance will receive an airdrop at a ratio of 3 UTK = 2 XMN.\nUTK token holders at Binance will receive XMN tokens in their Binance Alpha 2.0 Accounts. Users may view their token distribution history here.\nFor non Binance Alpha 2.0 users who are restricted due to country limitations, the airdrop will be credited to their Binance Spot Accounts with withdrawals enabled only. The distribution time is estimated to occur after 2026-04-15 12:00 (UTC).\nXMN token’s listing time on Binance Alpha will be announced in a separate announcement.\nPlease Note: The delisting schedule may or may not apply to the products listed below, depending on their association with the token being delisted.\nSpot\nBinance will remove the existing UTK spot trading pair (i.e., UTK/USDT) and cancel all pending UTK spot trading orders at 2026-04-14 14:00 (UTC).\nAll trade orders will be automatically removed after trading ceases.\nBinance will terminate Trading Bots services for the aforementioned spot trading pair at 2026-04-14 14:00 (UTC), where applicable. Users are strongly advised to update and/or cancel their Trading Bots prior to the cessation of Trading Bots services to avoid any potential losses.\nAccounts\nThe token's valuation will no longer be displayed in users’ accounts after delisting. To view their assets after trading ceases, users should ensure they have not selected “Hide Small Balances” in all of their accounts.\nDeposits of UTK tokens will no longer be credited after 2026-04-14 02:00 (UTC).\nWithdrawals of UTK tokens from Binance will not be supported after 2026-04-14 14:30 (UTC).\nSimple Earn\nBinance Simple Earn will delist the token mentioned above after 2026-04-14 10:00 (UTC). Users may choose to redeem their Flexible and Locked Products positions beforehand. Otherwise, these Flexible and Locked Products positions will be automatically redeemed at the above-mentioned time, and subsequently transferred to users’ Spot Accounts, together with any accrued rewards.\nLoan\nAt 2026-04-14 02:00 (UTC) VIP Loan and Flexible Loan will close all outstanding loan positions for the aforementioned token as loanable token and collateral token. Users are strongly advised to repay their outstanding loans before the automatic closure to avoid any potential losses, where applicable.\nConvert\nBinance Convert will subsequently delist the aforementioned token and the associated pair at 2026-04-14 13:00 (UTC)\nConvert Low-Value Assets will delist the token mentioned above at 2026-04-14 07:00 (UTC). Users may choose to convert low-value assets beforehand.&nbsp;\nBuy &amp; Sell\nBinance Buy &amp; Sell Crypto will delist the aforementioned token and t"
+    },
+    "varlik": "UTK"
+   },
+   "jev": "token_conversion",
+   "jev_guven": 0.48,
+   "tuzak": null,
+   "eski_veto": true
+  },
+  {
+   "set": "binance",
+   "id": "u58-MASK",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Alpha Will Remove DIGI, K, SKI, JOJO, PLAYSOLANA, 恶俗企鹅, PAL, TYCOON, HIPPO, LN, BNBXBT, BOOM  (2026-05-29)",
+     "metin": "Note: Please do your own research before making any trades for the aforementioned token to avoid any scams and ensure safety of your funds.\nThis is a general Binance Exchange Notice. Products and services referred to here may not be available in your region.\nFellow Binancians,\nBased on recent reviews, the following token(s) do not adhere to Binance Alpha’s standards and will be removed from the featuring list at 2026-05-29 06:00 (UTC):\nDIGI (MineD)\nK (Sidekick)\nSKI (SKI MASK DOG)\nJOJO (JOJOWORLD)\nPLAYSOLANA (Play Solana)\n恶俗企鹅 (三维威廉泰尔企鹅)\nPAL (Palio)\nTYCOON (Dino Tycoon)\nHIPPO (sudeng)\nLN (Lnfi Network)\nBNBXBT (BNBXBT)\nBOOM (Boom)\nWe remain dedicated to fostering innovation and transparency while prioritizing user protection. For updates and more information, users can follow Binance Wallet’s official X account.\nImportant Notes:\nWithdrawing or selling of these tokens on Binance Alpha will still be allowed after the removal.\nUsers can do so by:\nBinance Alpha: Go to the [Asset] tab &gt; [Alpha] &gt; Withdraw &gt; Select the token\nBinance Alpha: Go to the [Asset] tab &gt; [Alpha] &gt; Select the token &gt; Instant &gt; Sell\nBinance Wallet: Go to the [Market] tab &gt; Search &gt; Trade\nTokens on Binance Alpha may pose a higher than normal risk, and will likely be subject to high price volatility. Users must exercise sufficient risk management and DYOR (do your own research) to fully understand the projects before opting to trade the tokens.\nThere may be discrepancies between this original content in English and any translated versions. Please refer to the original English version for the most accurate information, in case any discrepancies arise.\nFor More Information:\nBinance Alpha Introduces A Regular Review Mechanism to Remove Unqualified Tokens\nEnhancing Transparency: How Binance Listings Work and Community Alerts on Fraudulent Third Parties Impersonations\nThank you for your support!\nBinance Team\n2026-05-29\nTrade on-the-go with Binance’s crypto trading app (iOS/Android)\nFind us on&nbsp;\nTelegram\nWhatsApp\nX\nFacebook\nInstagram\nDiscord\nBinance Wallet reserves the right in its sole discretion to amend or cancel this announcement at any time and for any reasons without prior notice.\nDisclaimer: Digital asset prices are subject to high market risk and price volatility. The value of your investment may go down or up, and you may not get back the amount invested. You are solely responsible for your investment decisions and Binance is not liable for any losses you may incur. Past performance is not a reliable predictor of future performance. You should only invest in products you are familiar with and where you understand the risks. You should carefully consider your investment experience, financial situation, investment objectives and risk tolerance and consult an independent financial adviser prior to making any investment. This material should not be construed as financial advice. Spot trading services are provided by Nest Exchange Limited, which is a Recognised Investment Exchange in the Abu Dhabi Global Market and is an exchange authorised and regulated by the Financial Services Regulatory Authority. For the avoidance of doubt, this announcement is an Exchange Notice for the purposes of Binance’s Exchange Rules. For more information, see our Terms of Use and Risk Warning."
+    },
+    "varlik": "MASK"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.43,
+   "tuzak": null,
+   "eski_veto": false
+  },
+  {
+   "set": "binance",
+   "id": "u59-AI",
+   "altin": "veto_degil",
+   "kabul": [
+    "not_about_asset",
+    "other_pairs_or_products_removed",
+    "positive_or_neutral",
+    "transfers_suspended"
+   ],
+   "veto": [
+    "token_conversion",
+    "token_delist",
+    "usdt_pair_removed"
+   ],
+   "state": {
+    "duyuru": {
+     "baslik": "Binance Will Extend the Monitoring Tag to Include ACT, BLUR, PIVX & QKC on 2026-06-18",
+     "metin": "This is a general announcement. Products and services referred to here may not be available in your region.\nFellow Binancians,\nBased on recent reviews, Binance will extend the Monitoring Tag to include more tokens on 2026-06-18.\nThe tokens to be added to the Monitoring Tag list are:&nbsp;\nAct I : The AI Prophecy (ACT)\nBlur (BLUR)\nPIVX (PIVX)\nQuarkChain (QKC)\nTokens with the Monitoring Tag exhibit notably higher volatility and risks compared to other listed tokens. These tokens are closely monitored, with regular reviews conducted. Keep in mind that tokens with the Monitoring Tag are at risk of no longer meeting our listing criteria and being delisted from the platform.&nbsp;\nTo gain trading access to tokens marked with the Monitoring Tag, users will need to pass the quiz every 90 days on the Binance Spot and/or Binance Margin platforms, and accept the Terms of Use. The quizzes are set up to ensure users are aware of the risks before trading tokens with the Monitoring Tag.&nbsp;\nBinance will conduct periodic project reviews and decide if the Monitoring Tag should be added to or removed from tokens as per its latest findings. These criteria are considered during the review:\nCommitment of team to project\nLevel and quality of development activity\nTrading volume and liquidity\nStability and safety of network from attacks\nNetwork / smart contract stability\nLevel of public communication\nResponsiveness to our periodic due diligence requests\nEvidence of unethical/fraudulent conduct or negligence\nContribution to a healthy and sustainable crypto ecosystem&nbsp;\nPlease note:\nOther services related to the aforementioned tokens will not be affected.&nbsp;\nThe Monitoring Tags for the aforementioned tokens will be updated shortly after the publishing of this announcement.\nThere may be discrepancies between this original content in English and any translated versions. Please refer to the original English version for the most accurate information, in case any discrepancies arise.\nWe thank you for your support as we continue to build the crypto ecosystem in a way that promotes transparency and long-term, sustainable growth.&nbsp;\nThank you for your support!\nBinance Team\n2026-06-18"
+    },
+    "varlik": "AI"
+   },
+   "jev": "not_about_asset",
+   "jev_guven": 0.42,
+   "tuzak": null,
+   "eski_veto": false
+  }
+ ]
+}

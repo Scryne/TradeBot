@@ -1,0 +1,1736 @@
+[
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b1-SSV",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 21.81787083299423,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 569
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b1-MANTA",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 6.63226347399177,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 500
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b2-ENJ",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 13.896350680006435,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 324
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b2-AIXBT",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 12.07709831399552,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 511
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b2-TNSR",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 10.665257831991767,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 357
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b3-QNT",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 15.710625488005462,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 471
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b3-COOKIE",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 24.992121428993414,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 450
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b4-VANA",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 37.04863569700683,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 615
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b5-USDP",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 6.544225174002349,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 459
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b6-API3",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 26.14252466900507,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.98,
+  "tuzak": null,
+  "cikti_token": 740
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b7-SAGA",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 12.934068576010759,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 530
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b8-BDXN",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 28.610986415995285,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.82,
+  "tuzak": null,
+  "cikti_token": 1236
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b10-ICX",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 16.590351014994667,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.98,
+  "tuzak": null,
+  "cikti_token": 526
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b10-STORJ",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 33.49248019800871,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.98,
+  "tuzak": null,
+  "cikti_token": 478
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b10-SCRT",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 9.209995372002595,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.98,
+  "tuzak": null,
+  "cikti_token": 457
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b11-LTC",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 5.607497792996583,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 356
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b11-SUI",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 11.099794951995136,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 486
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b13-APT",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 8.571842878009193,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 344
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b14-BTTC",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 10.973915176000446,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 536
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b15-SKL",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 21.92705435199605,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 319
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b16-ACX",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 9.472921328007942,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 509
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b16-VIC",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 18.271859657004825,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 275
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b16-PYR",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_delist"
+  ],
+  "etki": "token_delist",
+  "dogru": true,
+  "sure": 8.87149836399476,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_delist",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 549
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b17-AEUR",
+  "set": "binance",
+  "altin": "token_delist",
+  "kabul": [
+   "token_conversion",
+   "token_delist"
+  ],
+  "etki": "token_conversion",
+  "dogru": true,
+  "sure": 8.48639207900851,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_conversion",
+  "jev_guven": 0.68,
+  "tuzak": null,
+  "cikti_token": 716
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b18-MOVE",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 20.629829543991946,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 469
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b18-POL",
+  "set": "binance",
+  "altin": "other_pairs_or_products_removed",
+  "kabul": [
+   "other_pairs_or_products_removed"
+  ],
+  "etki": "other_pairs_or_products_removed",
+  "dogru": true,
+  "sure": 13.883891934994608,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "other_pairs_or_products_removed",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 328
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b21-INJ",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 10.035857148002833,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 511
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b22-ZIL",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 8.835342025995487,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 353
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b23-LUNA",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 7.061966712994035,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 382
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b25-STG",
+  "set": "binance",
+  "altin": "token_conversion",
+  "kabul": [
+   "token_conversion",
+   "token_delist",
+   "usdt_pair_removed"
+  ],
+  "etki": "token_conversion",
+  "dogru": true,
+  "sure": 13.118546130004688,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "token_conversion",
+  "jev_guven": 0.96,
+  "tuzak": null,
+  "cikti_token": 573
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b25-ZRO",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "not_about_asset",
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 7.327636353991693,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.38,
+  "tuzak": null,
+  "cikti_token": 339
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b28-VANA",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 10.432609068011516,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 419
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b32-VET",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 11.564495913000428,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 441
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b34-AVA",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 7.699980509001762,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 386
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b36-BB",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 28.911242784000933,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 555
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b39-CFX",
+  "set": "binance",
+  "altin": "transfers_suspended",
+  "kabul": [
+   "transfers_suspended"
+  ],
+  "etki": "transfers_suspended",
+  "dogru": true,
+  "sure": 18.12079411398736,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "transfers_suspended",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 382
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b40-HYPE",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 4.785057900007814,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 231
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b45-COAI",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 14.752264455004479,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 375
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b46-PLUME",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 7.060655697991024,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 251
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b49-APT",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 13.436761723001837,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 337
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b53-PROVE",
+  "set": "binance",
+  "altin": "positive_or_neutral",
+  "kabul": [
+   "positive_or_neutral"
+  ],
+  "etki": "positive_or_neutral",
+  "dogru": true,
+  "sure": 5.918590665998636,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "positive_or_neutral",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 253
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b10-ETH",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset"
+  ],
+  "etki": "not_about_asset",
+  "dogru": true,
+  "sure": 3.37481756300258,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 147
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b21-BTC",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset"
+  ],
+  "etki": "not_about_asset",
+  "dogru": true,
+  "sure": 16.725221082000644,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 149
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b2-DOGE",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset"
+  ],
+  "etki": "not_about_asset",
+  "dogru": true,
+  "sure": 5.327263101004064,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 293
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b40-XRP",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset"
+  ],
+  "etki": "not_about_asset",
+  "dogru": true,
+  "sure": 3.220931023999583,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 202
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "b25-SOL",
+  "set": "binance",
+  "altin": "not_about_asset",
+  "kabul": [
+   "not_about_asset",
+   "positive_or_neutral"
+  ],
+  "etki": "not_about_asset",
+  "dogru": true,
+  "sure": 15.376146548005636,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "not_about_asset",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 205
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k0-KCHOL",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 13.055148533996544,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 324
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k1-ASELS",
+  "set": "kap",
+  "altin": "gecici_durdurma",
+  "kabul": [
+   "gecici_durdurma"
+  ],
+  "etki": "gecici_durdurma",
+  "dogru": true,
+  "sure": 9.161356168988277,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "gecici_durdurma",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 335
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k2-SASA",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 7.4321217499964405,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.95,
+  "tuzak": "toplu SPK yasağı listesi",
+  "cikti_token": 441
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k3-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 5.052101188004599,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.98,
+  "tuzak": "temerrüt (yatırımcı)",
+  "cikti_token": 189
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k4-KONTR",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "rutin"
+  ],
+  "etki": "kurumsal_islem",
+  "dogru": true,
+  "sure": 36.32211898898822,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 0.78,
+  "tuzak": null,
+  "cikti_token": 359
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k5-AKBNK",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 61.848771306991694,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.64,
+  "tuzak": null,
+  "cikti_token": 2190
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k6-ASELS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 3.4635028219927335,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 234
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k7-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 6.382949728009407,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.98,
+  "tuzak": "temerrüt (yatırımcı)",
+  "cikti_token": 190
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k8-HEKTS",
+  "set": "kap",
+  "altin": "gecici_durdurma",
+  "kabul": [
+   "gecici_durdurma"
+  ],
+  "etki": "gecici_durdurma",
+  "dogru": true,
+  "sure": 16.37824731199362,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "gecici_durdurma",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 299
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k9-KCHOL",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 88.42851357399195,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 740
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k10-TUPRS",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 52.55467962101102,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.94,
+  "tuzak": "bağlı ortaklık SA",
+  "cikti_token": 1986
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k11-HEKTS",
+  "set": "kap",
+  "altin": "olumsuz_esasli",
+  "kabul": [
+   "olumsuz_esasli",
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 12.254837654996663,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.69,
+  "tuzak": null,
+  "cikti_token": 280
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k12-SISE",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 18.072260026005097,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.95,
+  "tuzak": "toplu SPK yasağı listesi",
+  "cikti_token": 771
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k13-EREGL",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 21.984127714007627,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.96,
+  "tuzak": null,
+  "cikti_token": 877
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k14-EREGL",
+  "set": "kap",
+  "altin": "gecici_durdurma",
+  "kabul": [
+   "gecici_durdurma"
+  ],
+  "etki": "gecici_durdurma",
+  "dogru": true,
+  "sure": 5.3119981460040435,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "gecici_durdurma",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 246
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k15-BIMAS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 36.21620911100763,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.94,
+  "tuzak": null,
+  "cikti_token": 976
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k16-SISE",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": false,
+  "sure": 39.677345860996866,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.48,
+  "tuzak": null,
+  "cikti_token": 1888
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k17-ASELS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 24.093987511994783,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 405
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k18-BIMAS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 23.91646496798785,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.96,
+  "tuzak": null,
+  "cikti_token": 899
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k19-ASTOR",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 7.09245887499128,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 157
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k20-BIMAS",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 4.30759685501107,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 172
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k21-ASTOR",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 9.703051174001303,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 453
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k22-SASA",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem"
+  ],
+  "etki": "kurumsal_islem",
+  "dogru": true,
+  "sure": 6.077744255002472,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 186
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k23-KONTR",
+  "set": "kap",
+  "altin": "olumsuz_esasli",
+  "kabul": [
+   "olumsuz_esasli"
+  ],
+  "etki": "olumsuz_esasli",
+  "dogru": true,
+  "sure": 10.53135802700126,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "olumsuz_esasli",
+  "jev_guven": 0.97,
+  "tuzak": null,
+  "cikti_token": 478
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k24-ASTOR",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 8.40065975599282,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 294
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k25-SISE",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 12.186235886998475,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.85,
+  "tuzak": null,
+  "cikti_token": 492
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k26-FROTO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 4.5442639800021425,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.98,
+  "tuzak": "temerrüt (yatırımcı)",
+  "cikti_token": 189
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k27-SASA",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem"
+  ],
+  "etki": "kurumsal_islem",
+  "dogru": true,
+  "sure": 49.89548188399931,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 1011
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k28-EREGL",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 11.516384069997002,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 567
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k29-AKBNK",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 18.786476624009083,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 398
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k30-SISE",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 86.62963203000254,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.92,
+  "tuzak": null,
+  "cikti_token": 1437
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k31-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 6.836555781992502,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 184
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k32-AKBNK",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 16.44534982999903,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 0.87,
+  "tuzak": "bağlı ortaklık SA",
+  "cikti_token": 574
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k33-KONTR",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "olumsuz_esasli",
+   "rutin"
+  ],
+  "etki": "kurumsal_islem",
+  "dogru": true,
+  "sure": 28.389489906010567,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 0.61,
+  "tuzak": null,
+  "cikti_token": 490
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k34-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 6.822962241989444,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 215
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k35-THYAO",
+  "set": "kap",
+  "altin": "rutin",
+  "kabul": [
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 2.5972948699927656,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "rutin",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 158
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k36-BIMAS",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 94.46279871500155,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.95,
+  "tuzak": null,
+  "cikti_token": 1040
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k37-KCHOL",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 46.39250667599845,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.47,
+  "tuzak": null,
+  "cikti_token": 1331
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k38-ASTOR",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 3.586770750989672,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 1.0,
+  "tuzak": null,
+  "cikti_token": 267
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k39-HEKTS",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "rutin"
+  ],
+  "etki": "kurumsal_islem",
+  "dogru": true,
+  "sure": 13.439008501009084,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 258
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k40-KONTR",
+  "set": "kap",
+  "altin": "pazar_tedbiri",
+  "kabul": [
+   "pazar_tedbiri"
+  ],
+  "etki": "pazar_tedbiri",
+  "dogru": true,
+  "sure": 9.25348222500179,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": true,
+  "jev": "pazar_tedbiri",
+  "jev_guven": 0.75,
+  "tuzak": null,
+  "cikti_token": 540
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k41-KCHOL",
+  "set": "kap",
+  "altin": "olumlu_esasli",
+  "kabul": [
+   "olumlu_esasli",
+   "rutin"
+  ],
+  "etki": "olumlu_esasli",
+  "dogru": true,
+  "sure": 10.271709164997446,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "olumlu_esasli",
+  "jev_guven": 0.66,
+  "tuzak": null,
+  "cikti_token": 370
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k42-BIMAS",
+  "set": "kap",
+  "altin": "kurumsal_islem",
+  "kabul": [
+   "kurumsal_islem",
+   "rutin"
+  ],
+  "etki": "kurumsal_islem",
+  "dogru": true,
+  "sure": 17.996444367003278,
+  "hata": null,
+  "veto_altin": false,
+  "veto_model": false,
+  "jev": "kurumsal_islem",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 660
+ },
+ {
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "id": "k43-KONTR",
+  "set": "kap",
+  "altin": "olumsuz_esasli",
+  "kabul": [
+   "olumsuz_esasli",
+   "pazar_tedbiri",
+   "rutin"
+  ],
+  "etki": "rutin",
+  "dogru": true,
+  "sure": 20.3727480689995,
+  "hata": null,
+  "veto_altin": true,
+  "veto_model": false,
+  "jev": "olumsuz_esasli",
+  "jev_guven": 0.99,
+  "tuzak": null,
+  "cikti_token": 777
+ }
+]

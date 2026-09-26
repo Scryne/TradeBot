@@ -227,7 +227,7 @@ gösterir.
 | Yüksek kaldıraç hesabı sıfırlar | Spike 01: BTC/ETH Donchian 1–20x | ✅ Doğrulandı: ≥ 5x 12/12 iflas → 3x tavan, yarım Kelly |
 | Nautilus v2 sürüm adayı kararlı mı; Windows/WSL2; özel bağlantı yazılabilir mi | Spike 02 | ✅ Geçti (koşullarla): kurulum, parity, özel Python istemci, canlı paper; koşullar: 1 dk yürütme verisi, sürüm sabitleme, konteyner DNS'i, NTP |
 | Ücretsiz veri yeterli mi (kalite, kapsam, hız); BIST gün içi | Spike 03 | ✅ Geçti: tüm ilk dalga kaynakları çalışıyor; tuzaklar (µs zaman damgası, Yahoo aylık, Dukascopy hız sınırı) indirici kurallarına bağlandı; BIST gün içi yalnız son günler (günlük strateji için yeterli) |
-| Jev A1/A2 eşikleri; NVIDIA yükseltme modeli seçimi | Spike 04 | ✅ A: 90/90, yanlış veto 0 (anahtar kelime: 30) · ⏳ B: NVIDIA anahtarı bekliyor (Faz 6'nın ilk işi) |
+| Jev A1/A2 eşikleri; NVIDIA yükseltme modeli seçimi | Spike 04 | ✅ A: 90/90, yanlış veto 0 (anahtar kelime: 30) · ✅ B: nemotron-3-ultra, 60 gerçek belirsiz vakada veto kararı 60/60 (eski belirsiz kural: 8 yanlış veto) |
 | Paper canlı bağlantılar: ABD ETF paper hesabı Türkiye'den; MT5 köprüsü | Spike 05 | ✅ Yol belli: Alpaca paper (herkese açık) + kendi istemcimiz; MT5 demo + Windows köprü; BIST Yahoo/borsapy; yürütme her yerde Nautilus sandbox |
 | Maliyet varsayımlarının gerçekliği (maker dolum, spread) | Paper ölçümü (Faz 11) | ⏳ |
 | Turnuvada aşırı uyum | Deneme defteri + DSR + walk-forward + paper | Tasarımda |

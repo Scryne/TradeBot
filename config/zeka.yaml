@@ -4,7 +4,10 @@ jev:
   esik: 0.5                    # güven < esik → yükseltme (Spike 04 dersi 4)
 yukseltme:
   base_url: https://integrate.api.nvidia.com/v1
-  modeller: []                 # Spike 04-B sonucu ile doldurulur (sırayla denenen yedek zinciri)
+  # Spike 04-B (2026-09-26): nemotron-3-ultra 90 etiketli örnekte 89/90, 60 gerçek belirsiz vakada veto kararı 60/60
+  # (yanlış veto 0, kaçırılan 0); gecikme medyan 12–19 sn, p90 37–64 sn (ücretsiz katman). Sırayla denenen yedek zinciri.
+  modeller: [nvidia/nemotron-3-ultra-550b-a55b]
+  zaman_asimi_sn: 180          # ücretsiz katmanda p90 64 sn ölçüldü
 binance:
   kataloglar: [161, 157, 49, 48]   # delist, bakım, haber, listeleme
 dongu_sn: 60

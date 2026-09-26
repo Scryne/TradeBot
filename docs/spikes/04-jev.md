@@ -2,7 +2,7 @@
 spike: 04
 konu: Jev — haber/duyuru vetosu (A1), KAP sınıflandırma (A2), kurumsal işlem tespiti (B1); NVIDIA yükseltmesi
 tarih: 2026-09-25
-sonuc: A kısmı GEÇTİ (güçlü) · B kısmı (NVIDIA) BEKLİYOR — API anahtarı gerekiyor
+sonuc: A kısmı GEÇTİ (güçlü) · B kısmı GEÇTİ — nemotron-3-ultra birincil (yedek zinciri ölçümü sürüyor)
 kod: research/spikes/04_jev/ (veto_binance.py, veto_kap.py; ham sonuçlar data/*_sonuc.json)
 model: jev-1.13.0 (typesafe-sdk 0.7.1)
 ---
@@ -90,8 +90,31 @@ sayılmaz.
 - Eğitim kesimi: jev-1.13.0'ın çıkışı 2026-09-10. Metinlerin çoğu öncesine ait. Ama burada sorulan sonucu
   değil, metnin ne söylediği. Sızıntı riski yön tahmininde ısırır, betimleyici sınıflandırmada değil.
 
-## 6. B kısmı: NVIDIA yükseltmesi (BEKLİYOR)
+## 6. B kısmı: NVIDIA yükseltmesi (2026-09-26)
 
-Güven < 0,5 örnekleri ve bilerek zorlaştırılmış yeni örnekler, build.nvidia.com kataloğundaki 2–3 modelle
-(GLM-5, Kimi K3, Nemotron-3 Ultra) karşılaştırılacak: doğruluk, gecikme, kapalı etiketli JSON'a uyum.
-**Gereken:** Scryne'ın build.nvidia.com'da ücretsiz hesap açıp `NVIDIA_API_KEY` ortam değişkenini tanımlaması.
+Kod: `yukseltme_nvidia.py` (ölçüm), `yukseltme_analiz.py` (belirsiz 60 seti). Ham sonuçlar `data/yukseltme_*.json`.
+Aynı Choice tanımları, istem `tradebot.zeka.yukseltme.istem` ile birebir. Ücretsiz katman, `temperature 0`.
+
+**İki set:**
+- **90 etiketli örnek** (04-A'nın seti). Jev'in güveni < 0,5 olan yalnız 3 örnek var, yani yükseltmenin asıl işini
+  az ölçer.
+- **60 gerçek belirsiz vaka:** host'taki geri doldurmada Jev güveni < 0,5 kalan A1 kararlarının hepsi (2022–2026).
+  Claude metni okuyarak etiketledi: 15 veto gerektirir, 45 gerektirmez. Asıl ölçüm budur.
+
+| Model | 90 örnek | 60 belirsiz: veto kararı | Yanlış veto | Kaçırılan | JSON yok | Gecikme medyan / p90 |
+| --- | --- | --- | --- | --- | --- | --- |
+| `nvidia/nemotron-3-ultra-550b-a55b` | 89/90 | **60/60** | 0 | 0 | 0 | 12–19 sn / 37–64 sn |
+| Eski kural (belirsizde ilk iki seçenekte veto varsa veto) | — | 51/60 | 8 | 1 | — | — |
+| `moonshotai/kimi-k3`, `z-ai/glm-5.3`, `deepseek-ai/deepseek-v4.1-flash` | sürüyor | sürüyor | | | | tek çağrı 55–220 sn |
+
+- 90 örnekte nemotron'un tek hatası veto dışı (KAP `rutin` → `olumlu_esasli`). 04-A'daki "kaçırılan 2", kabul
+  kümesinde `rutin` de olan iki KAP örneği, gerçek kaçırma değil.
+- Eski kuralın 8 yanlış vetosu: PHB, FLOKI, INJ, ALPACA, ADA (yalnız /TUSD veya /BTC çifti kaldırılmış), ALCX (yalnız
+  margin), NOT ×2 (aday "is NOT guaranteed" kelimesinden). Kaçırılan: ADAUP (ADAUP/USDT işlemi durdu).
+- **Jev'in zayıf yeri:** /TUSD çifti ile /USDT çiftini karıştırıyor (`other_pairs` tanımının `not_for` listesinde TUSD
+  yok). Soru değişikliği yeni rol sürümü ve yeni ölçüm demek, şimdilik yükseltme yakalıyor.
+- **Gecikme:** ücretsiz katmanda bekleme sırası baskın (üretilen token az, süre uzun). A1 için yeterli: delist duyuruları
+  günler önceden gelir. Canlı istemcide zaman aşımı 180 sn.
+
+**Karar:** yükseltme zinciri `[nemotron-3-ultra]` (`config/zeka.yaml`). Yedek model diğer üçünün sonucuyla eklenir.
+Sınır: etiketleri tek kişi (Claude) verdi.

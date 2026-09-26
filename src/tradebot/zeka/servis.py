@@ -151,5 +151,6 @@ def kur(motor: Engine, a, ayar: dict | None = None) -> Zeka:
                      api_key=a.typesafe_api_key.get_secret_value() if a.typesafe_api_key else None)
     y = ayar["yukseltme"]
     yuk = Yukseltme(motor, y["base_url"], list(y.get("modeller") or []),
-                    a.nvidia_api_key.get_secret_value() if a.nvidia_api_key else None)
+                    a.nvidia_api_key.get_secret_value() if a.nvidia_api_key else None,
+                    zaman_asimi=float(y.get("zaman_asimi_sn", 120)))
     return Zeka(motor, jev, yuk, BinanceDuyuru(HamDepo(a.veri_dizini, motor), motor), ayar)

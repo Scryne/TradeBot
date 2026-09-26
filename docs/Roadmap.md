@@ -208,12 +208,15 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - Host'ta geri doldurma: 436 Binance duyurusu (2022-02 → 2026-09), 2982 A1 yargısı (hatasız), 186 veto, 60 belirsiz
     uyarı. Uyarılar yükseltme modeli tanımlı olmadığı için (`modeller: []`) belirsiz kuralına düştü.
     - Belirsizlerin Jev seçimi: 21 başka çift/ürün, 18 varlıkla ilgisiz, 11 delist, 5 USDT çifti, 3 olumlu, 2 dönüşüm.
-  - Belirsiz yoldan gelen 22 veto (21 küçük altcoin; BTC/ETH/SOL/BNB/XRP'de veto yok) kalır. Olaylar yalnız eklenir.
-    Yükseltme modeli sonradan "veto gerekmez" derse vetoyu kaldırmak riski artırır (kural 5/7). Yükseltme belirsiz
-    60 kararı yeniden okur ve yalnız yeni veto ekleyebilir. (Scryne kararı Claude'a bıraktı, 2026-09-26.)
-  - `zeka` servisi host'ta henüz başlatılmadı. Spike 04-B'yle yükseltme zinciri dolunca başlar.
-  - Spike 04-B başladı (2026-09-26): 90 etiketli örnek × `z-ai/glm-5.3`, `moonshotai/kimi-k3`,
-    `nvidia/nemotron-3-ultra-550b-a55b`, `deepseek-ai/deepseek-v4.1-flash`.
+  - Belirsiz yoldan gelen 22 vetonun 8'i yanlış çıktı (ADA, INJ, FLOKI, PHB, ALPACA: yalnız /TUSD–/BTC çifti; ALCX: yalnız
+    margin; NOT ×2: "is NOT" kelimesi), 1 veto kaçırılmış (ADAUP). Olaylar yalnız eklenir: yanlış veto `kaldir` olayıyla
+    kapanır (75b4ef8). Kaldırma riski artırır (kural 5/7): otomatik yol yok, yalnız onaylı `tradebot zeka veto-kaldir`.
+    8 vetonun kaldırılması Scryne onayını bekliyor. `belirsizleri-yukselt` belirsiz kararları yükseltmeye sorar, yalnız
+    veto ekler.
+  - Spike 04-B ✅ (`docs/spikes/04-jev.md` §6): `nemotron-3-ultra` birincil yükseltme modeli.
+    - 90 örnekte 89/90; 60 gerçek belirsiz vakada veto kararı 60/60. Gecikme medyan 12–19 sn (ücretsiz katman).
+    - Yedek model (kimi-k3 / glm-5.3 / deepseek-v4.1-flash) ölçümü sürüyor; bunlarda tek çağrı 55–220 sn.
+  - Jev /TUSD ile /USDT çiftini karıştırıyor. A1 sorusunun sonraki sürümüne aday (yeni ölçümle).
 
 ### Faz 7: Paper canlı — kripto + ABD ETF
 - **İşler:** Nautilus canlı düğümleri (paper); sermaye dağıtıcı (haftalık); Jev'li ve Jev'siz kol çiftleri;
