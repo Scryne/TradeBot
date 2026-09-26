@@ -1,0 +1,55 @@
+# Turnuva dalga 2: ÖN KAYIT (koşudan önce commit edilir, koşu sırasında değişmez). Gerekçe: docs/turnuva/Dalga-2.md
+# Dalga 1'den öğrenilenler (Dalga-1-Ara-Sonuc.md): 30 günlük oynaklık sakin dönemde kaldıracı şişiriyor; CFD finansmanı
+# kaldıraçlı trendi siliyor; kriptoda trend yalnız büyüklerde çalışıyor. Izgaralar dalga 1 ile AYNI (yeni ayar araması yok).
+
+dalga: 2
+veri_bitis: "2026-09-01"
+frenler: true
+boyut:
+  hedef_vol: 0.20
+  kaldirac: 3.0
+  vol_pencere_gun: 90          # dalga 1: 30 → sakin dönemde kaldıraç şişmesin (tek değişen boyut ayarı)
+  bant: 0.25
+walk_forward: { is_yil: 3, oos_yil: 1 }
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0 }
+
+planlar:
+  trend:
+    kimlik: 2026-09-26-d2-trend
+    hipotez: >-
+      Yavaş (90 gün) oynaklık tahminiyle trend kolları, dalga 1'in 30 günlük sürümüne göre daha sığ düşüş ve en az
+      aynı Sharpe verir; kripto büyüklerle ABD ETF'lerini tek kolda birleştiren karma sepet, çeşitlendirmeyle tek
+      piyasa kollarından daha yüksek Sharpe verir.
+
+gruplar:
+  kripto_buyuk5:  { dinamik: kripto, ilk_n: 5, likidite_gun: 30, asgari_gecmis_gun: 60, asgari_oynaklik: 0.10, yon: long, zd: [4h, 1d] }
+  kripto_btc_eth: { kimlikler: [BINANCE:BTCUSDT, BINANCE:ETHUSDT], asgari_gecmis_gun: 30, yon: long, zd: [4h, 1d] }
+  abd_etf:
+    kimlikler: [ARCA:SPY, ARCA:QQQ, ARCA:IWM, ARCA:DIA, ARCA:TLT, ARCA:IEF, ARCA:SHY, ARCA:GLD, ARCA:SLV, ARCA:USO,
+                ARCA:XLF, ARCA:XLK, ARCA:XLE, ARCA:XLV, ARCA:XLY, ARCA:XLP, ARCA:XLI, ARCA:XLU, ARCA:XLB, ARCA:XLRE,
+                ARCA:XLC, ARCA:EEM, ARCA:EFA, ARCA:VNQ, ARCA:HYG, ARCA:LQD]
+    asgari_gecmis_gun: 60
+    yon: long_short
+    zd: [1d]
+  karma:            # BTC + ETH (yalnız long, spot) + 26 ETF (iki yönlü); karışık takvim, yıllık bar veriden
+    kimlikler: [BINANCE:BTCUSDT, BINANCE:ETHUSDT,
+                ARCA:SPY, ARCA:QQQ, ARCA:IWM, ARCA:DIA, ARCA:TLT, ARCA:IEF, ARCA:SHY, ARCA:GLD, ARCA:SLV, ARCA:USO,
+                ARCA:XLF, ARCA:XLK, ARCA:XLE, ARCA:XLV, ARCA:XLY, ARCA:XLP, ARCA:XLI, ARCA:XLU, ARCA:XLB, ARCA:XLRE,
+                ARCA:XLC, ARCA:EEM, ARCA:EFA, ARCA:VNQ, ARCA:HYG, ARCA:LQD]
+    asgari_gecmis_gun: 60
+    yon: long_short
+    zd: [1d]
+
+kollar:
+  - strateji: tsmom
+    gruplar: [kripto_buyuk5, kripto_btc_eth, abd_etf, karma]
+    zd: [4h, 1d]
+    izgara: { ufuk_gun: [20, 60, 120, 250] }
+  - strateji: ma_yon
+    gruplar: [kripto_buyuk5, kripto_btc_eth, abd_etf, karma]
+    zd: [4h, 1d]
+    izgara: { hizli_gun: [10, 25], yavas_gun: [50, 100, 200] }
+  - strateji: donchian_ls
+    gruplar: [kripto_buyuk5, kripto_btc_eth, abd_etf, karma]
+    zd: [4h, 1d]
+    izgara: { giris_gun: [20, 55, 100], cikis_gun: [10, 20] }

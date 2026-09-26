@@ -45,6 +45,7 @@ from tradebot.veri.depo import BarDepo
 from tradebot.veri.takvim import ZAMAN_DILIMI_MS
 
 YIL_MS = int(365.25 * 86_400_000)
+YALNIZ_LONG_PIYASALAR = {"BINANCE", "BIST"}  # spot kripto ve BIST: açığa satış yok (grup yönü long_short olsa bile)
 
 # ad → (aile, fonksiyon, tür)
 STRATEJILER = {
@@ -122,6 +123,8 @@ class HazirGrup:
     taraf: np.ndarray
     modeller: list[MaliyetModeli]
     takvim: str
+    bar_yil_olcu: float | None = None  # karışık takvimli grup: ızgaradaki yıllık bar sayısı (veriden)
+    yalniz_long: np.ndarray | None = None  # [k] bu enstrümanlarda negatif ağırlık yok
 
 
 def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bit_ms: int | None = None) -> HazirGrup:
@@ -150,14 +153,18 @@ def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bi
     modeller = [model(kayit[k]["piyasa"], kayit[k]["sinif"]) for k in g.kimlikler]
     ek = kripto_ek_kayma_bps(lik) * np.array([kayit[k]["piyasa"] == "BINANCE" for k in g.kimlikler])
     takvimler = {kayit[k]["takvim"] for k in g.kimlikler}
-    return HazirGrup(g, evrende, taraf_matrisi(g, modeller, ek), modeller, sorted(takvimler)[0])
+    # Karışık takvim (ör. kripto 7/24 + ABD ETF): tek takvimin yıllık bar sayısı yanlış olur; ızgaradan ölçülür.
+    # ETF'in hafta sonu barları ileri doldurulmuş (getiri 0) olduğundan ızgara başına yıllıklaştırma doğrudur.
+    olcu = (len(g.t) - 1) / ((g.t[-1] - g.t[0]) / YIL_MS) if len(takvimler) > 1 and len(g.t) > 1 else None
+    yl = np.array([kayit[k]["piyasa"] in YALNIZ_LONG_PIYASALAR for k in g.kimlikler])
+    return HazirGrup(g, evrende, taraf_matrisi(g, modeller, ek), modeller, sorted(takvimler)[0], olcu, yl)
 
 
 # ------------------------------------------------------------------ koşu
 def hedef_uret(h: HazirGrup, strateji: str, p: dict, yon: str, ayar: Ayar, nedensellik: bool = True) -> np.ndarray:
     aile, fonk, tur = STRATEJILER[strateji]
     g = h.g
-    by, bg = bar_yil(g_zd(g), h.takvim), bar_gun(g_zd(g), h.takvim)
+    by, bg = h.bar_yil_olcu or bar_yil(g_zd(g), h.takvim), bar_gun(g_zd(g), h.takvim)
     if tur == "tek":
         tanim = StratejiTanimi(strateji, aile, fonk, p, yon=yon)
         if nedensellik:
@@ -173,6 +180,8 @@ def hedef_uret(h: HazirGrup, strateji: str, p: dict, yon: str, ayar: Ayar, neden
         s = np.clip(s, -1.0 if yon == "long_short" else 0.0, 1.0)
         olcekle = False
     s = np.where(h.evrende, s, 0.0)
+    if h.yalniz_long is not None and h.yalniz_long.any():
+        s[:, h.yalniz_long] = np.maximum(s[:, h.yalniz_long], 0.0)
     return panel_oynaklik_hedefi(s, g.kapanis, h.evrende, ayar.hedef_vol, by, pencere=max(2, int(ayar.vol_pencere_gun * bg)),
                                  azami=ayar.kaldirac, varlik_olcekle=olcekle,
                                  varlik_tavani=RiskAyar(kaldirac=ayar.kaldirac).enstruman_tavani)

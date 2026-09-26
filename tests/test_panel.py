@@ -497,3 +497,32 @@ def test_enstruman_tavani():
     w = panel_oynaklik_hedefi(np.ones((n, 2)), c, np.ones((n, 2), bool), 0.2, 252, pencere=30, azami=3.0,
                               varlik_tavani=0.5)
     assert np.abs(w).max() <= 0.5 + 1e-12 and w[100:, 0].max() == pytest.approx(0.5)
+
+
+def test_karisik_takvim_yillik_bar_veriden(tmp_path):
+    d = BarDepo(tmp_path)
+    n = 730
+    b = barlar(n=n, tohum=3)  # 7/24 günlük
+    yaz(d, "BINANCE:KUSDT", b)
+    hafta_ici = ((b.t // GUN + 3) % 7) < 5  # 1970-01-01 Perşembe → Pazartesi=0
+    e = barlar(n=n, tohum=4)
+    yaz(d, "ARCA:E", Barlar(*(x[hafta_ici] for x in (e.t, e.open, e.high, e.low, e.close, e.volume))))
+    kayit = {"BINANCE:KUSDT": {"piyasa": "BINANCE", "sinif": "kripto", "takvim": "kripto_7x24"},
+             "ARCA:E": {"piyasa": "ARCA", "sinif": "etf", "takvim": "XNYS"}}
+    h = tv.grup_hazirla(d, kayit, {"kimlikler": list(kayit), "asgari_gecmis_gun": 5}, "1d")
+    assert h.bar_yil_olcu == pytest.approx(365.25, rel=0.01)
+    tek = tv.grup_hazirla(d, {"ARCA:E": kayit["ARCA:E"]}, {"kimlikler": ["ARCA:E"], "asgari_gecmis_gun": 5}, "1d")
+    assert tek.bar_yil_olcu is None  # tek takvim: takvimin değeri (252)
+
+
+def test_karma_grupta_kripto_yalniz_long(tmp_path):
+    d = BarDepo(tmp_path)
+    b = barlar(n=400, tohum=5)
+    yaz(d, "BINANCE:KUSDT", b)
+    yaz(d, "ARCA:E", barlar(n=400, tohum=6))
+    kayit = {"BINANCE:KUSDT": {"piyasa": "BINANCE", "sinif": "kripto", "takvim": "kripto_7x24"},
+             "ARCA:E": {"piyasa": "ARCA", "sinif": "etf", "takvim": "kripto_7x24"}}
+    h = tv.grup_hazirla(d, kayit, {"kimlikler": list(kayit), "asgari_gecmis_gun": 5}, "1d")
+    w = tv.hedef_uret(h, "tsmom", {"ufuk": 20}, "long_short", tv.Ayar(vol_pencere_gun=20))
+    j_k, j_e = h.g.kimlikler.index("BINANCE:KUSDT"), h.g.kimlikler.index("ARCA:E")
+    assert w[:, j_k].min() >= 0 and w[:, j_e].min() < 0  # kripto short açılmaz, ETF açılabilir
