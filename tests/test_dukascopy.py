@@ -64,3 +64,42 @@ def test_gunluk_yillik_dosya(ayar):
     n = len(istenen)
     d.gunluk(ens, "2024-01", _t.monotonic() + 60)
     assert len(istenen) == n + 1  # yalnız içinde bulunulan yıl yeniden
+
+
+def test_gunluk_yarida_kesilse_de_kendini_onarir(ayar):
+    import time as _t
+
+    import pytest
+
+    from tradebot.db import metadata, motor
+    from tradebot.veri import enstruman as en
+    from tradebot.veri.dukascopy import Dukascopy
+
+    e = motor(ayar)
+    metadata.create_all(e)
+    d = Dukascopy(ayar.veri_dizini, e, evren={"dukascopy": {}}, aralik_sn=0)
+    ens = en.Enstruman("DUKASCOPY", "EURUSD", "fx", "fx_24x5", "USD", "dukascopy")
+
+    def yil_dosyasi(url):
+        y = int(url.split("/")[-2])
+        return _bi5([(86400, 100000 + y, 100000 + y, 100000 + y, 100000 + y, 1.0)])  # yılın 2. günü
+
+    def bozuk(url, params=None):
+        if "/2022/" in url:
+            raise RuntimeError("503")
+        return yil_dosyasi(url)
+
+    d.http.al = bozuk
+    with pytest.raises(RuntimeError):
+        d.gunluk(ens, "2020-01", _t.monotonic() + 60)
+    assert len(d.bar.oku("DUKASCOPY:EURUSD", "1d")) == 2  # 2020, 2021 yazıldı (kaybolmadı)
+    istenen = []
+
+    def saglam(url, params=None):
+        istenen.append(url)
+        return yil_dosyasi(url)
+
+    d.http.al = saglam
+    d.gunluk(ens, "2020-01", _t.monotonic() + 60)
+    assert not any("/2020/" in u or "/2021/" in u for u in istenen)  # ham depodan okundu, yeniden istenmedi
+    assert len(d.bar.oku("DUKASCOPY:EURUSD", "1d")) >= 3
