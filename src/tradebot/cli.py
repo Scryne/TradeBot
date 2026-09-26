@@ -440,6 +440,26 @@ def zeka_belirsizleri_yukselt() -> None:
     _yazdir(zeka_kur(m, a).belirsizleri_yukselt())
 
 
+@zeka_uygulama.command("veto-kaldir")
+def zeka_veto_kaldir(
+    veto_id: int = typer.Argument(..., help="Kaldırılacak veto olayının id'si"),
+    neden: str = typer.Option(..., help="Gerekçe (ör. etiket: yalnız X/TUSD kaldırıldı)"),
+    onay: str = typer.Option(..., help="Onay veren ve tarihi (kural 7: riski artırır)"),
+    geriye_donuk: bool = typer.Option(False, help="Vetonun kendi anından kaldır (yanlış yargı; backtest hiç görmez)"),
+) -> None:
+    """Yanlış bir vetoyu kaldırır (silmez; `kaldir` olayı ekler). Otomatik yol yok, yalnız onayla elle."""
+    from sqlalchemy import select
+
+    from tradebot.db import olay as olay_t
+    from tradebot.zeka import olay
+
+    _, m = _veri_baglam()
+    with m.connect() as b:
+        v = b.execute(select(olay_t).where(olay_t.c.id == veto_id)).one()
+    an = int(v.gecerli_ms) if geriye_donuk else int(time.time() * 1000)
+    typer.echo(f"kaldır id={olay.kaldir(m, veto_id, an, neden, onay)}: {v.enstruman} ({v.neden[:100]})")
+
+
 @zeka_uygulama.command("calis")
 def zeka_calis(dongu: int = typer.Option(0, help="Saniye; 0 ise config/zeka.yaml dongu_sn")) -> None:
     """Servis döngüsü: her turda topla → yargıla → olay yaz. Bir turun hatası servisi durdurmaz."""

@@ -233,6 +233,19 @@ def test_belirsizleri_yukselt_yalniz_veto_ekler(m, ayar):
     assert z2.belirsizleri_yukselt()["yukseltildi"] == 0  # tekrar sorulmaz
 
 
+def test_veto_kaldirma_onayli_ve_pit(m):
+    v = ol.yaz(m, "veto", "BINANCE:ADAUSDT", 100, "A1 belirsiz", a1.ROL)
+    w = ol.yaz(m, "veto", "BINANCE:INJUSDT", 100, "A1 belirsiz", a1.ROL)
+    with pytest.raises(ValueError):
+        ol.kaldir(m, v, 100, "yanlış", onay=" ")  # onaysız olmaz
+    with pytest.raises(ValueError):
+        ol.kaldir(m, 999, 100, "yok", onay="Scryne")
+    ol.kaldir(m, v, 100, "yalnız ADA/TUSD", onay="Scryne 2026-09-26")  # geriye dönük: hiç görünmez
+    ol.kaldir(m, w, 150, "yalnız INJ/TUSD", onay="Scryne 2026-09-26")  # 150'den itibaren
+    assert ol.aktif_vetolar(m, 120) == {"BINANCE:INJUSDT"} and ol.aktif_vetolar(m, 150) == set()
+    assert sorted(ol.tum_vetolar(m)) == [("BINANCE:ADAUSDT", 100, 100), ("BINANCE:INJUSDT", 100, 150)]
+
+
 def test_toplayici_tek_duyuru_hatasinda_durmaz(m, ayar):
     http = SahteHttp([
         {"katalog": 161, "code": "iyi", "baslik": "A", "govde": "a", "zaman": 1},
