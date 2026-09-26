@@ -117,3 +117,13 @@ planında yazılacak.
   Bu düzeltmeler ölçütü değiştirmez, ölçümü doğrular. Dalganın bütün kolları (kripto dahil) yeni kodla yeniden
   koşulur; önceki koşuların denemeleri defterde sayılı kalır. Önceki sonuçlar `data/turnuva/dalga1/_v7df0fdd/`
   altında arşivlendi.
+- **2026-09-26, ek 3: B kapısı (Scryne kararı).** Ara sonuçtan sonra (`Dalga-1-Ara-Sonuc.md`) karar verildi: **B
+  (sermayesiz paper gözlem) için DSR şartı kaldırıldı.** Diğer bütün ortak koşullar aynen geçerli.
+  - A (sermayeli paper) ve gerçek para için DSR ≥ 0,95 aynen geçerli.
+  - Gerekçe:
+    - Aile başına ~500 denemede DSR eşiği yıllık Sharpe ~1,6'ya çıkıyor; gerçekçi hiçbir kol geçemiyor.
+    - Sermayesiz paperda para riski yok. Paper haftaları, hiçbir seçimle kirlenmemiş gerçek gelecek verisidir; DSR'ın
+      koruduğu şeyi paper daha güçlü korur.
+    - Gerçek paraya giden yol gevşemez.
+  - Bu, sonuç görüldükten sonra yapılmış bir kural değişikliğidir (kural 10). Açıkça kaydedildi. Etkisi yalnız
+    sermayesiz gözleme giriştir.

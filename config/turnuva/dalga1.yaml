@@ -19,9 +19,10 @@ walk_forward: { is_yil: 3, oos_yil: 1 }
 #          + walk-forward OOS (en kötü hafta ≥ −%10, düşüş ≥ −%30, yıllık > 0)
 #          + tam yılların ≥ %60'ı pozitif + hiçbir rejimde t < −2 + stres (maliyet 2x ve 1 bar gecikme) puanı > 0
 #   A (paper, sermayeli):  ortak + DSR ≥ 0,95 + plato
-#   B (paper, sermayesiz gözlem): ortak + DSR ≥ 0,80
+#   B (paper, sermayesiz gözlem): ortak (DSR şartı yok). Önceden: ortak + DSR ≥ 0,80 → Scryne kararıyla
+#   2026-09-26'da değişti (docs/turnuva/Dalga-1.md ek 3). A ve gerçek para için DSR ≥ 0,95 aynen geçerli.
 #   DSR'ın deneme sayısı ailenin deneme defterindeki TÜM taramalarıdır (önceki planlar dahil).
-olcut: { dsr_a: 0.95, dsr_b: 0.80, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0 }
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0 }
 
 planlar:
   trend:

@@ -140,6 +140,12 @@ içeren ücretli veri), CME vadelileri (Databento; 125 $ kredi, Nautilus'ta yerl
 **Puan ve kapılar:**
 - Puan, ortalama net haftalık log büyümedir.
 - Kapılar: kol başına en kötü hafta ≥ −%10, en kötü düşüş ≥ −%30, anlamlı işlem sayısı, DSR anlamlı.
+- **Paper'a giriş iki sınıftır (Scryne kararı 2026-09-26):**
+  - **B (sermayesiz paper gözlem):** tam dönem ve walk-forward örneklem dışı kapıları, yılların ≥ %60'ı pozitif,
+    rejim ve stres testleri. DSR şartı yok; paper'ın kendisi seçimle kirlenmemiş örneklem dışı testtir.
+  - **A (sermayeli paper) ve gerçek para:** B'ye ek olarak DSR ≥ 0,95 + plato, ya da paper'da kanıtlanmış
+    performans (terfi ölçütü Faz 7 planında yazılır).
+  - Ayrıntı: `docs/turnuva/Dalga-1.md` ek 3.
 
 **Sermaye dağıtıcı:**
 - Oynaklık eşitleme (risk paritesi) ve üstünlüğe göre ağırlık (küçültülmüş tahmin).

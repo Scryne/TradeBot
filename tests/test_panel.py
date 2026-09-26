@@ -276,6 +276,10 @@ def test_karar_kurallari():
     assert tv.karar(temel | {"dsr": {"dsr": 0.85}}, o) == "B"
     assert tv.karar(temel | {"plato": {"plato_var": False}}, o) == "B"
     assert tv.karar(temel | {"dsr": {"dsr": 0.5}}, o) == "KALDI"
+    o0 = tv.Olcut(dsr_b=0.0)  # Dalga-1 ek 3: B için DSR şartı yok, A için aynen
+    assert tv.karar(temel | {"dsr": {"dsr": 0.1}}, o0) == "B" and tv.karar(temel | {"dsr": {"dsr": float("nan")}}, o0) == "B"
+    assert tv.karar(temel | {"dsr": {"dsr": 0.97}}, o0) == "A"
+    assert tv.karar(temel | {"dsr": {"dsr": 0.1}, "en_iyi": {"kapilar_gecti": False}}, o0) == "KALDI"
     assert tv.karar(temel | {"stres": {"maliyet_2x_puan": -0.001, "gecikme_puan": 0.001}}, o) == "KALDI"
     assert tv.karar(temel | {"rejim": {"yukari": {"t": 3.0}, "asagi": {"t": -2.5}}}, o) == "KALDI"
     assert tv.karar(temel | {"en_iyi": {"kapilar_gecti": False}}, o) == "KALDI"
@@ -307,7 +311,7 @@ def test_dalga1_on_kayit_dosyasi_gecerli():
     assert all(k["yon"] == "long" for k in ks if k["grup"].startswith(("kripto", "bist")))  # spot/BIST açığa satış yok
     assert all(k["yon"] == "long" for k in ks if k["strateji"] in ("kesitsel_momentum", "ay_donumu"))
     assert all(k["zd"] == "1d" for k in ks if k["grup"].startswith(("abd", "bist")))  # borsalarda gün içi veri yok
-    assert d["_ayar"].kaldirac <= 3.0 and d["_ayar"].olcut.dsr_a == 0.95
+    assert d["_ayar"].kaldirac <= 3.0 and d["_ayar"].olcut.dsr_a == 0.95 and d["_ayar"].olcut.dsr_b == 0.0
     assert all(k["en_fazla"] == "B" for k in ks if k["grup"] == "bist_hisse")
 
 

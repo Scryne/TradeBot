@@ -63,7 +63,7 @@ STRATEJILER = {
 class Olcut:
     """Dalga planındaki geçme ölçütü (config/turnuva/dalga1.yaml → olcut)."""
     dsr_a: float = 0.95
-    dsr_b: float = 0.80
+    dsr_b: float = 0.80  # ≤ 0: B için DSR şartı yok (Scryne kararı 2026-09-26, Dalga-1 ek 3)
     yil_pozitif: float = 0.60
     rejim_t: float = -2.0
     stres_maliyet: float = 2.0
@@ -232,7 +232,7 @@ def karar(r: dict, o: Olcut) -> str:
     ortak = tam and wf and yil and rejim and stres
     if ortak and dsr >= o.dsr_a and r["plato"]["plato_var"]:
         return "B" if r.get("en_fazla") == "B" else "A"  # veri yanlılığı bilinen grup A olamaz
-    if ortak and dsr >= o.dsr_b:
+    if ortak and (o.dsr_b <= 0 or dsr >= o.dsr_b):
         return "B"
     return "KALDI"
 

@@ -8,7 +8,7 @@ notional: 0.5                    # spot N + perp teminatı N (1x) ≤ özkaynak 
 boyut: { hedef_vol: 0.20, kaldirac: 3.0, vol_pencere_gun: 30, bant: 0.25 }  # carry'de kullanılmaz (dalga_oku biçimi)
 walk_forward: { is_yil: 3, oos_yil: 1 }
 # Ölçüt dalga 1 ile aynı. Baz riski modellenmediği için carry kolu EN FAZLA B (paper gözlem).
-olcut: { dsr_a: 0.95, dsr_b: 0.80, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0 }
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0 }
 planlar:
   carry:
     kimlik: 2026-09-25-d1b-carry
