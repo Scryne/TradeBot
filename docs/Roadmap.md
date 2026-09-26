@@ -217,8 +217,10 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     - nemotron: 90 örnekte 89/90; 60 gerçek belirsiz vakada veto kararı 60/60. Gecikme medyan 12–19 sn (ücretsiz katman).
     - kimi-k3 alınmadı (geçersiz çıktı, kaçırılan veto).
   - `zeka` servisi host'ta canlı (2026-09-26 16:19 UTC). Binance 4 katalog, dakikada bir.
-  - `belirsizleri-yukselt` (host): 51 yükseltildi, 1 yeni veto (ADAUP, kaçırılmış olan), 5 belirsiz veto yükseltmeye
-    göre gereksiz. 9 çağrı 429 (paralel spike yükü); 429'da bekle-yeniden-dene eklendi, yeniden koşulacak.
+  - `belirsizleri-yukselt` (host): 60/60 yükseltildi (ilk koşuda 9'u 429; bekle-yeniden-dene eklendikten sonra tamam).
+    - 1 yeni veto: ADAUP (kaçırılmış olan).
+    - Yükseltmenin "veto gerekmez" dediği 8 belirsiz veto, Claude'un etiketindeki 8 yanlış vetoyla birebir aynı (olay
+      1, 94, 105, 112, 122, 133, 144, 200). Kalan 14 belirsiz veto yükseltmeyle de doğrulandı.
   - Jev /TUSD ile /USDT çiftini karıştırıyor. A1 sorusunun sonraki sürümüne aday (yeni ölçümle).
 
 ### Faz 7: Paper canlı — kripto + ABD ETF
