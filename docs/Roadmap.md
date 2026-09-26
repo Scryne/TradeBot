@@ -198,6 +198,22 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   dondurulmuş ölçümü (sızıntı riski işaretli).
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
+  - 2026-09-26 iskelet ✅ (e82003f…3e3dd57, 164 test):
+    - Tablolar `metin`, `jev_yargi`, `olay` (göç 0004, yalnız eklenir).
+    - Binance duyuru toplayıcısı (sayfalı geçmiş; CMS 2 sn aralık, 429 ölçüldü).
+    - Jev istemcisi (dondurma: sürüm + soru/girdi hash'i), OpenAI uyumlu yükseltme zinciri, A1 rolü, `tradebot zeka`
+      komutları (`tur`, `calis`, `geri-doldur`, `vetolar`).
+  - Vetolar backtest'te point-in-time maskeyle uygulanıyor (risk yalnız azalır). Dalga dosyasında `jev_veto` → Jev'li
+    kol (`+jev`), A/B için.
+  - Host'ta geri doldurma: 436 Binance duyurusu (2022-02 → 2026-09), 2982 A1 yargısı (hatasız), 186 veto, 60 belirsiz
+    uyarı. Uyarılar yükseltme modeli tanımlı olmadığı için (`modeller: []`) belirsiz kuralına düştü.
+    - Belirsizlerin Jev seçimi: 21 başka çift/ürün, 18 varlıkla ilgisiz, 11 delist, 5 USDT çifti, 3 olumlu, 2 dönüşüm.
+  - Belirsiz yoldan gelen 22 veto (21 küçük altcoin; BTC/ETH/SOL/BNB/XRP'de veto yok) kalır. Olaylar yalnız eklenir.
+    Yükseltme modeli sonradan "veto gerekmez" derse vetoyu kaldırmak riski artırır (kural 5/7). Yükseltme belirsiz
+    60 kararı yeniden okur ve yalnız yeni veto ekleyebilir. (Scryne kararı Claude'a bıraktı, 2026-09-26.)
+  - `zeka` servisi host'ta henüz başlatılmadı. Spike 04-B'yle yükseltme zinciri dolunca başlar.
+  - Spike 04-B başladı (2026-09-26): 90 etiketli örnek × `z-ai/glm-5.3`, `moonshotai/kimi-k3`,
+    `nvidia/nemotron-3-ultra-550b-a55b`, `deepseek-ai/deepseek-v4.1-flash`.
 
 ### Faz 7: Paper canlı — kripto + ABD ETF
 - **İşler:** Nautilus canlı düğümleri (paper); sermaye dağıtıcı (haftalık); Jev'li ve Jev'siz kol çiftleri;

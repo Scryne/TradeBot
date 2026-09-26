@@ -431,6 +431,15 @@ def zeka_geri_doldur(
     _yazdir(zeka_kur(m, a).tur(sayfa_sayisi=sayfa, kataloglar=[int(x) for x in katalog.split(",")], metin_siniri=None))
 
 
+@zeka_uygulama.command("belirsizleri-yukselt")
+def zeka_belirsizleri_yukselt() -> None:
+    """Yükseltme modeli yokken belirsiz kalan A1 kararlarını yükseltme modeline sorar; yalnız veto ekler."""
+    from tradebot.zeka.servis import kur as zeka_kur
+
+    a, m = _veri_baglam()
+    _yazdir(zeka_kur(m, a).belirsizleri_yukselt())
+
+
 @zeka_uygulama.command("calis")
 def zeka_calis(dongu: int = typer.Option(0, help="Saniye; 0 ise config/zeka.yaml dongu_sn")) -> None:
     """Servis döngüsü: her turda topla → yargıla → olay yaz. Bir turun hatası servisi durdurmaz."""

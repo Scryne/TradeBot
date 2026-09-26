@@ -197,6 +197,42 @@ def test_zeka_turu_veto_ve_pit(m, ayar):
     assert "BINANCE:BTCUSDT" in ol.aktif_vetolar(m, 15) and "BINANCE:BTCUSDT" not in ol.aktif_vetolar(m, 20)
 
 
+def test_belirsizleri_yukselt_yalniz_veto_ekler(m, ayar):
+    with m.begin() as b:
+        for s in ("AAA", "BBB", "CCC"):
+            b.execute(insert(enstruman).values(kimlik=f"BINANCE:{s}USDT", piyasa="BINANCE", sembol=f"{s}USDT", sinif="kripto",
+                                               takvim="kripto_7x24", para_birimi="USDT", kaynak="binance", durum="aktif",
+                                               meta={}, guncellendi=__import__("datetime").datetime.now()))
+    yayin = 1_700_000_000_000
+    http = SahteHttp([{"katalog": 161, "code": "d1", "baslik": "Notice AAA BBB CCC", "govde": "AAA BBB CCC.", "zaman": yayin}])
+    belirsiz = {"not_about_asset": 0.45, "positive_or_neutral": 0.40, "token_delist": 0.15}
+    jev = SahteJev({"AAA": ("token_delist", 0.45, {"token_delist": 0.45, "not_about_asset": 0.40}),  # belirsiz → veto
+                    "BBB": ("not_about_asset", 0.45, belirsiz),                                     # belirsiz, veto yok
+                    "CCC": ("not_about_asset", 0.45, belirsiz)})
+    yuk_cevap = {"AAA": "not_about_asset", "BBB": "usdt_pair_removed", "CCC": "positive_or_neutral"}
+
+    def isle(req: httpx.Request):
+        istem = json.loads(req.content)["messages"][1]["content"]
+        varlik = next(v for v in yuk_cevap if f'"varlik": "{v}"' in istem)
+        return httpx.Response(200, json={"choices": [{"message": {"content": json.dumps({"etki": yuk_cevap[varlik]})}}]})
+
+    top = BinanceDuyuru(HamDepo(ayar.veri_dizini, m), m, http)
+    ayar_z = {"jev": {"esik": 0.5}, "binance": {"kataloglar": [161]}}
+    z = Zeka(m, JevIstemci(m, "jev-1.13.0", istemci=jev), Yukseltme(m, "u", [], None), top, ayar_z)
+    z.tur()
+    gecerli = yayin + ol.GERIYE_DONUK_GECIKME_MS
+    assert ol.aktif_vetolar(m, gecerli) == {"BINANCE:AAAUSDT"}
+    assert z.belirsizleri_yukselt() == {"hazir": False}
+
+    y = Yukseltme(m, "https://x/v1", ["c"], "k", http=httpx.Client(transport=httpx.MockTransport(isle)))
+    z2 = Zeka(m, JevIstemci(m, "jev-1.13.0", istemci=jev), y, top, ayar_z)
+    r = z2.belirsizleri_yukselt()
+    assert r == {"hazir": True, "yukseltildi": 3, "yeni_veto": 1, "korunan_veto": 1, "basarisiz": 0}
+    assert ol.aktif_vetolar(m, gecerli - 1) == set()  # yeni veto da point-in-time: uyarının anında
+    assert ol.aktif_vetolar(m, gecerli) == {"BINANCE:AAAUSDT", "BINANCE:BBBUSDT"}  # AAA kaldırılmadı
+    assert z2.belirsizleri_yukselt()["yukseltildi"] == 0  # tekrar sorulmaz
+
+
 def test_toplayici_tek_duyuru_hatasinda_durmaz(m, ayar):
     http = SahteHttp([
         {"katalog": 161, "code": "iyi", "baslik": "A", "govde": "a", "zaman": 1},

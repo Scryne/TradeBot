@@ -13,6 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.engine import Engine
 
 from tradebot.db import enstruman, jev_yargi, metin
+from tradebot.db import olay as olay_t
 from tradebot.kayit import log
 from tradebot.metin.binance_duyuru import BinanceDuyuru
 from tradebot.veri.depo import HamDepo
@@ -79,6 +80,53 @@ class Zeka:
             if veto:
                 _log.info("a1_veto", enstruman=kimlik, neden=neden, canli=canli)
         return olaylar
+
+    def belirsizleri_yukselt(self) -> dict:
+        """Yükseltme modeli yokken belirsiz kalan A1 kararlarını yükseltme modeline sorar. Yalnız veto EKLER.
+
+        Belirsiz yoldan önceden yazılmış veto, yükseltme "veto gerekmez" dese de kalır: kaldırmak riski artırır
+        (kural 5/7). Yeni vetonun geçerlilik anı: geçmiş duyuruda uyarınınki (yayın + gecikme), canlıda şimdi.
+        Başarılı yükseltmesi olan (metin, varlık) çifti tekrar sorulmaz.
+        """
+        if not self.yuk.hazir:
+            return {"hazir": False}
+        simdi = int(time.time() * 1000)
+        with self.motor.connect() as b:
+            uyarilar = list(b.execute(select(olay_t).where(olay_t.c.tur == "uyari", olay_t.c.rol == a1.ROL)
+                                      .order_by(olay_t.c.id)))
+            vetolu = {(r.metin_id, r.enstruman) for r in b.execute(select(olay_t.c.metin_id, olay_t.c.enstruman).where(
+                olay_t.c.tur == "veto", olay_t.c.rol == a1.ROL))}
+            yukseltilmis = set(b.execute(select(jev_yargi.c.hedef).where(
+                jev_yargi.c.rol == a1.ROL, jev_yargi.c.saglayici == "nvidia", jev_yargi.c.hata.is_(None))).scalars())
+        sayac = {"hazir": True, "yukseltildi": 0, "yeni_veto": 0, "korunan_veto": 0, "basarisiz": 0}
+        for u in uyarilar:
+            if (u.ayrinti or {}).get("yukseltme") is not None:
+                continue
+            hedef = f"metin:{u.metin_id}|{u.enstruman}"
+            if hedef in yukseltilmis:
+                continue
+            with self.motor.connect() as b:
+                m = b.execute(select(metin).where(metin.c.id == u.metin_id)).one()
+            varlik = u.enstruman.removeprefix("BINANCE:").removesuffix("USDT")
+            secim, model = self.yuk.sec(a1.ROL, hedef, a1.ETKI.model_dump(mode="json"), a1.state(m.baslik, m.govde, varlik),
+                                        "etki")
+            if secim is None:
+                sayac["basarisiz"] += 1
+                continue
+            yukseltilmis.add(hedef)
+            sayac["yukseltildi"] += 1
+            if secim not in a1.VETO:
+                sayac["korunan_veto"] += (u.metin_id, u.enstruman) in vetolu
+                continue
+            if (u.metin_id, u.enstruman) in vetolu:
+                continue
+            gecerli = simdi if (u.ayrinti or {}).get("canli") else u.gecerli_ms
+            olay.yaz(self.motor, "veto", u.enstruman, gecerli, f"A1 yukseltme:{secim} ({model}): {m.baslik[:200]}",
+                     a1.ROL, u.metin_id, u.yargi_id, None, {**(u.ayrinti or {}), "yukseltme": secim,
+                                                            "yukseltme_model": model, "sonradan": True})
+            vetolu.add((u.metin_id, u.enstruman))
+            sayac["yeni_veto"] += 1
+        return sayac
 
     def son_metinler(self, sinir: int | None = 200) -> list:
         """Son `sinir` Binance duyurusu; her turda taranır, yargısı olan (metin, varlık) çifti atlanır."""
