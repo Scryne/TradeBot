@@ -3,5 +3,5 @@
   "asama": "uygulama",
   "guncellendi": "2026-09-27",
   "roadmap": "docs/Roadmap.md",
-  "not": "Faz 0-1, 3-5 tamam; Faz 2, 6, 7 paralel suruyor. Faz 7: paper dugumu canli (5 kol x Jev A/B + agresif gozlem kolu), defter PostgreSQL. Sirada: sermaye dagitici, haftalik rapor, A6, yeniden baslatma tatbikati. Altin M15 turnuvasi on kayitli; XAUUSD dakikalik indirmesi (tradebot-xau-dk) bitince kosulacak."
+  "not": "Faz 0-1, 3-5 tamam; Faz 2, 6, 7 paralel suruyor. Faz 7: paper dugumu canli (5 kol x Jev A/B + agresif gozlem kolu + portfoy kolu), sermaye dagitici haftalik (paper_dagitim; hepsi B, ilk dolu golge ~2026-10-26). Sirada: haftalik rapor, A6, terfi olayi (8. haftadan once), yeniden baslatma tatbikati. Altin M15 turnuvasi on kayitli; XAUUSD dakikalik indirmesi (tradebot-xau-dk) bitince kosulacak."
 }
