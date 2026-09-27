@@ -22,11 +22,11 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 4 | Risk motoru ve boyutlandırma | ✅ Tamamlandı | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
 | 5 | Turnuva — backtest dalgası 1 | ✅ Tamamlandı | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
 | 6 | Zekâ katmanı (Jev) | 🔄 Devam Ediyor | Toplayıcılar (Binance, KAP, RSS, Fed/ECB/TCMB); Jev servisi + NVIDIA yükseltme; A1, A2, A4, A5, B1, B2, B4, D3 çalışıyor; yargılar dondurulabiliyor; C1–C2 ölçüldü |
-| 7 | Paper canlı — kripto + ABD ETF | 🔄 Devam Ediyor | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
+| 7 | Paper canlı — kripto + ABD ETF | ✅ Tamamlandı | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
 | 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | ⏳ Bekliyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
 | 9 | Operasyon: gözetmen, Telegram, raporlar | ⏳ Bekliyor | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
 | 10 | Web pano | ⏳ Bekliyor | DESIGN.md dolu; PnL, pozisyon, turnuva tablosu, veto geçmişi, sağlık; Tailscale üzerinden telefondan erişim |
-| 11 | Paper turnuvası — 12 hafta | ⏳ Bekliyor | 12 hafta kesintisiz paper; kademeli sermaye çalıştı; hangi kolların kapıyı geçtiği ve Jev katkısı raporlandı; maliyet varsayımları ölçüldü |
+| 11 | Paper turnuvası — 12 hafta | 🔄 Devam Ediyor | 12 hafta kesintisiz paper; kademeli sermaye çalıştı; hangi kolların kapıyı geçtiği ve Jev katkısı raporlandı; maliyet varsayımları ölçüldü |
 | 12 | Gerçek para (koşullu) | ⏳ Bekliyor | Scryne'ın kararı + aracı kurum/borsa + anahtar (çekim kapalı, IP kısıtlı) + vergi netliği; sabit tavanlı mikro sermaye; ilk emir Scryne onayıyla |
 | 13 | Sonraki dalgalar (koşullu) | ⏳ Bekliyor | Ölçüm fırsat gösterirse: ABD tek hisseleri (ücretli veri), CME vadelileri (Databento), VİOP; her biri ayrı kararla |
 
@@ -278,7 +278,13 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     (önceden ret olursa emir her saat körü körüne yeniden gidiyordu). Jev kısmı **Faz 8'e taşındı**. Gerekçeler:
     sandbox bugüne kadar hiç ret üretmedi; Binance ve MT5 reddi yapısal hata koduyla bildiriyor (eşleme kural işidir);
     Jev yalnız tanınmayan serbest metinde anlamlı, bunun spike'ı gerçek MT5 demo ret örnekleriyle yapılır.
-  - Sırada: terfi değerlendirmesi (8. haftadan önce, ~2026-11-22), planlı yeniden başlatma tatbikatı.
+  - Terfi değerlendirmesi ✅ (`canli/terfi.py`, Paper-Tasarim.md): bekçi haftalık; aynı dönemin backtest'i, gün hizalaması
+    bar kapanışına (test: birebir izleyen paper'da takip hatası < 1e-9).
+  - Çökme tatbikatı ✅ (2026-09-27, `docs/Denetim-2026-09-27.md`): süreç içinden çökme → Docker 13 sn'de kaldırdı →
+    toparlanma → çift karar yok → mutabakat temiz. `docker kill` elle durdurma sayılır, çökme tatbikatı değildir.
+  - **2026-09-27 ✅ Faz 7 tamam.** Bitti kriterinin hepsi karşılandı. ABD ETF ayağı açılmadı: dalga 1'de paper'a giren
+    ETF kolu yok; çıkarsa veri/emir bağlantısı Faz 8'in özel bağlantı yoluyla eklenir. Paper çalışmaya devam ediyor;
+    12 haftalık turnuva sayacı Faz 11'dir (başlangıç 2026-09-27).
 
 ### Faz 8: Özel bağlantılar — MT5 + BIST
 - **İşler:** MT5 demo köprüsü (Windows tarafı; veri + simüle ya da demo emir); BIST gecikmeli veri
@@ -308,6 +314,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   (4/8/12 hafta); gerçek maliyet (spread, maker dolum oranı) ölçülür; Jev katkısı raporlanır.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
+  - Sayaç 2026-09-27'de başladı (paper düğümü canlı, Faz 7 kapandı); 12 hafta ~2026-12-20. Faz 8–10 bununla paralel.
+  - Takvim: ilk gölge dağıtım ~2026-10-26 (28 gün); ilk olası terfi ~2026-11-22 (56 gün, %50 kademe).
 
 ### Faz 12: Gerçek para (koşullu)
 - **İşler:** Scryne kararı; aracı kurum/borsa seçimi; anahtar güvenliği; vergi; sabit tavanlı mikro
