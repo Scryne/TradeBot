@@ -111,6 +111,16 @@ def veri_yahoo(tam: bool = typer.Option(False, help="Tüm geçmişi yeniden indi
     _yazdir(is_akisi.yahoo(a, m, tam))
 
 
+@veri_uygulama.command("haber-takvimi")
+def veri_haber_takvimi() -> None:
+    """FOMC, NFP, CPI yayın anlarını resmi arşivlerden indirir → config/haber_takvimi.yaml (haber filtresi)."""
+    from tradebot.veri.depo import HamDepo
+    from tradebot.veri.haber_takvimi import indir
+
+    a, m = _veri_baglam()
+    _yazdir(indir(HamDepo(a.veri_dizini, m)))
+
+
 @veri_uygulama.command("dukascopy")
 def veri_dukascopy(butce_dk: float = typer.Option(60.0, help="Zaman bütçesi (dakika); kalan sonraki koşuya")) -> None:
     """FX, metal, endeks, emtia (sıkı hız sınırı; kaldığı yerden devam eder)."""
