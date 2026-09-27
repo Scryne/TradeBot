@@ -154,13 +154,16 @@ class RiskMotoru:
             mesafe = abs(p.son_fiyat / p.likidasyon_fiyati - 1)
             if mesafe < a.likidasyon_mesafesi_kat * p.gunluk_oynaklik:
                 return Karar(False, 0.0, (f"likidasyona çok yakın ({mesafe:.1%} < {a.likidasyon_mesafesi_kat:g}σ)",), False)
+        tavan_kucultu = izinli_ek < abs(e.miktar) * (1 - 1e-9)
         if p.adim_miktar > 0:  # lot adımına AŞAĞI yuvarla; 1/0,00001 = 99999,999… gibi kayan nokta hatasına tolerans
             izinli_ek = round(math.floor(izinli_ek / p.adim_miktar + 1e-9) * p.adim_miktar, 12)
         if izinli_ek <= 0:
             return Karar(False, 0.0, ("tavan dolu (enstrüman/sınıf/kaldıraç/emir boyutu)",), False)
         miktar = izinli_ek if e.miktar > 0 else -izinli_ek
-        if abs(miktar) < abs(e.miktar):
+        if tavan_kucultu:
             ger.append(f"miktar tavana göre küçültüldü ({abs(e.miktar):g} → {abs(miktar):g})")
+        elif abs(miktar) < abs(e.miktar):
+            ger.append("lot adımına yuvarlandı")
         self._kaydet(e)
         return Karar(True, miktar, tuple(ger) or ("onay",), False)
 

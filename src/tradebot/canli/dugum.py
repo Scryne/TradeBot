@@ -26,12 +26,13 @@ from nautilus_trader.adapters.binance import (
     BinanceDataClientConfig,
     BinanceDataClientFactory,
     BinanceEnvironment,
+    BinanceInstrumentProviderConfig,
     BinanceProductType,
     BinanceSpotMarketDataMode,
 )
 from nautilus_trader.adapters.sandbox import SandboxExecutionClientConfig, SandboxExecutionClientFactory
 from nautilus_trader.common import Environment
-from nautilus_trader.config import InstrumentProviderConfig, LiveRiskEngineConfig, StrategyConfig
+from nautilus_trader.config import LiveRiskEngineConfig, StrategyConfig
 from nautilus_trader.execution import MakerTakerFeeModel
 from nautilus_trader.live import LiveNode
 from nautilus_trader.model import (
@@ -43,6 +44,7 @@ from nautilus_trader.model import (
     Money,
     OrderSide,
     Quantity,
+    StrategyId,
     TraderId,
     Venue,
 )
@@ -154,7 +156,7 @@ class Beyin:
                                  karar_risk | {"onay": False, "lot_alti": karar_risk["onay"]})
             _log.warning("emir_gonderilmedi", kol=kol.ad, enstruman=kim, istenen=q, risk=karar_risk)
             return
-        s.gonder(karar_id, kim, miktar, fiyat, tur, karar_risk)
+        s.gonder(karar_id, kim, q, miktar, fiyat, tur, karar_risk)
 
     # ------------------------------------------------------------------ dolum, işaretleme, mutabakat
     def dolum(self, kol_ad: str, kim: str, q: float, px: float, ucret: float, tur: str) -> None:
@@ -208,26 +210,27 @@ class Beyin:
 class Tetik(Strategy):
     """1h bar kapanışlarını ve kotasyonları dinler; kararı Beyin'e yaptırır."""
 
-    def __init__(self, config: StrategyConfig, beyin: Beyin) -> None:
-        super().__init__(config)
+    # Nautilus v2: strateji kurucusu yalnız config alır; beyin `bagla` ile sonradan verilir.
+    def bagla(self, beyin: Beyin) -> Tetik:
         self.beyin = beyin
         self.bar_tipleri = [BarType.from_str(f"{nautilus_id(k)}-1-HOUR-LAST-EXTERNAL") for k in beyin.kimlikler]
         self._bekleyen: int | None = None
+        return self
 
     def on_start(self) -> None:
         for k in self.beyin.kimlikler:
             iid = nautilus_id(k)
-            self.subscribe_quote_ticks(iid)
-            self.subscribe_trade_ticks(iid)
+            self.subscribe_quotes(iid)
+            self.subscribe_trades(iid)
         for bt in self.bar_tipleri:
             self.subscribe_bars(bt)
         self.clock.set_time_alert("toparlanma", self.clock.utc_now() + dt.timedelta(seconds=30), self._baslangic)
 
+    def on_quote(self, q) -> None:
+        kim = f"BINANCE:{q.instrument_id.symbol.value}"
+        self.beyin.son_fiyat[kim] = (float(q.bid_price) + float(q.ask_price)) / 2
+
     def _baslangic(self, _event) -> None:
-        for k in self.beyin.kimlikler:
-            q = self.cache.quote_tick(nautilus_id(k))
-            if q is not None:
-                self.beyin.son_fiyat[k] = float(q.bid_price + q.ask_price) / 2
         self.beyin.toparla()
         simdi = int(time.time() * 1000)
         son_kapanis = simdi - simdi % SAAT_MS
@@ -258,10 +261,11 @@ class Tetik(Strategy):
 class KolStratejisi(Strategy):
     """Bir paper kolu: kendi pozisyonları (Nautilus'ta strateji başına ayrı), emir gönderme, dolum ve ret kaydı."""
 
-    def __init__(self, config: StrategyConfig, kol: PaperKol, beyin: Beyin) -> None:
-        super().__init__(config)
+    def bagla(self, kol: PaperKol, beyin: Beyin) -> KolStratejisi:
         self.kol, self.beyin = kol, beyin
         self._emirler: dict[str, tuple[int, str, str]] = {}  # client_order_id → (emir_id, kimlik, tur)
+        self._poz: dict[str, float] = {}  # Nautilus'un bildirdiği dolumlardan (toparlanma dahil) net adet
+        return self
 
     def _enstruman(self, kim: str):
         return self.cache.instrument(nautilus_id(kim))
@@ -282,15 +286,15 @@ class KolStratejisi(Strategy):
         return a if q > 0 else -a
 
     def pozisyon(self, kim: str) -> float:
-        return float(sum(p.signed_qty for p in self.cache.positions_open(instrument_id=nautilus_id(kim),
-                                                                         strategy_id=self.id)))
+        """Bu stratejinin Nautilus dolum olaylarından net adedi (sandbox yeniden başlatmada sıfırdan başlar)."""
+        return self._poz.get(kim, 0.0)
 
-    def gonder(self, karar_id: int | None, kim: str, q: float, fiyat: float, tur: str, risk: dict) -> None:
+    def gonder(self, karar_id: int | None, kim: str, istenen: float, q: float, fiyat: float, tur: str, risk: dict) -> None:
         i = self._enstruman(kim)
         emir = self.order_factory.market(nautilus_id(kim), OrderSide.BUY if q > 0 else OrderSide.SELL,
                                          Quantity(abs(q), i.size_precision))
         cid = emir.client_order_id.value
-        eid = self.beyin.defter.emir_yaz(self.kol.ad, karar_id, cid, kim, q, q, fiyat, tur, risk)
+        eid = self.beyin.defter.emir_yaz(self.kol.ad, karar_id, cid, kim, istenen, q, fiyat, tur, risk)
         self._emirler[cid] = (eid, kim, tur)
         self.submit_order(emir)
 
@@ -306,6 +310,7 @@ class KolStratejisi(Strategy):
             ucret *= px
         self.beyin.defter.olay_yaz(eid, self.kol.ad, "dolum" if tur != "toparlanma" else "toparlanma", kim, q, px, ucret,
                                    event.ts_event // 1_000_000, {"komisyon_para": event.commission.currency.code})
+        self._poz[kim] = self._poz.get(kim, 0.0) + q
         self.beyin.dolum(self.kol.ad, kim, q, px, ucret, tur)
 
     def _ret(self, event, tur: str) -> None:
@@ -342,16 +347,17 @@ def kur(beyin: Beyin, bakiye_usdt: float = 10_000_000.0):
         .add_data_client(None, BinanceDataClientFactory(), BinanceDataClientConfig(
             product_type=BinanceProductType.SPOT, environment=BinanceEnvironment.LIVE,
             spot_market_data_mode=BinanceSpotMarketDataMode.Json,
-            instrument_provider=InstrumentProviderConfig(
-                load_ids=frozenset(str(nautilus_id(k)) for k in beyin.kimlikler))))
+            instrument_provider=BinanceInstrumentProviderConfig(
+                load_all=False,
+                load_ids=[str(nautilus_id(k)) for k in beyin.kimlikler])))
         .add_simulated_exec_client("BINANCE", SandboxExecutionClientFactory(), SandboxExecutionClientConfig(
             venue=BINANCE, starting_balances=[Money(bakiye_usdt, Currency.from_str("USDT"))],
             account_id=AccountId.from_str("BINANCE-PAPER-001"), fee_model=MakerTakerFeeModel(), bar_execution=False))
         .build()
     )
-    node.add_strategy(Tetik(StrategyConfig(strategy_id="TETIK-000", order_id_tag="000"), beyin))
+    node.add_strategy(Tetik(StrategyConfig(strategy_id=StrategyId("TETIK-000"), order_id_tag="000")).bagla(beyin))
     for i, kol in enumerate(beyin.kollar, start=1):
-        s = KolStratejisi(StrategyConfig(strategy_id=f"KOL-{i:03d}", order_id_tag=f"{i:03d}"), kol, beyin)
+        s = KolStratejisi(StrategyConfig(strategy_id=StrategyId(f"KOL-{i:03d}"), order_id_tag=f"{i:03d}")).bagla(kol, beyin)
         beyin.stratejiler[kol.ad] = s
         node.add_strategy(s)
     return node

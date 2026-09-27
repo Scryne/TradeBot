@@ -168,7 +168,7 @@ class SahteStrateji:
     def pozisyon(self, kim):
         return self.poz.get(kim, 0.0)
 
-    def gonder(self, karar_id, kim, q, fiyat, tur, risk):
+    def gonder(self, karar_id, kim, istenen, q, fiyat, tur, risk):
         eid = self.beyin.defter.emir_yaz(self.kol.ad, karar_id, f"c{len(self.gonderilen)}-{self.kol.ad}", kim, q, q,
                                          fiyat, tur, risk)
         self.gonderilen.append((kim, q, tur))
