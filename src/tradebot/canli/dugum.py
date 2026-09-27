@@ -224,8 +224,9 @@ class Tetik(Strategy):
     def on_start(self) -> None:
         for k in self.beyin.kimlikler:
             iid = nautilus_id(k)
+            # Yalnız kotasyon: sandbox dolumu alışta ask, satışta bid'e karşı (aleyhte, kural 4). İşlem akışı da
+            # eşleştirilince geç gelen her işlem için "stale trade" uyarısı basılıyordu (8 saatte ~286 bin satır).
             self.subscribe_quotes(iid)
-            self.subscribe_trades(iid)
         for bt in self.bar_tipleri:
             self.subscribe_bars(bt)
         self.clock.set_time_alert("toparlanma", self.clock.utc_now() + dt.timedelta(seconds=30), self._baslangic)
@@ -356,7 +357,8 @@ def kur(beyin: Beyin, bakiye_usdt: float = 10_000_000.0):
                 load_ids=[str(nautilus_id(k)) for k in beyin.kimlikler])))
         .add_simulated_exec_client("BINANCE", SandboxExecutionClientFactory(), SandboxExecutionClientConfig(
             venue=BINANCE, starting_balances=[Money(bakiye_usdt, Currency.from_str("USDT"))],
-            account_id=AccountId.from_str("BINANCE-PAPER-001"), fee_model=MakerTakerFeeModel(), bar_execution=False))
+            account_id=AccountId.from_str("BINANCE-PAPER-001"), fee_model=MakerTakerFeeModel(), bar_execution=False,
+            trade_execution=False))
         .build()
     )
     node.add_strategy(Tetik(StrategyConfig(strategy_id=StrategyId("TETIK-000"), order_id_tag="000")).bagla(beyin))
