@@ -239,8 +239,10 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     - Üretim metin biçimiyle spike'ın 44 KAP örneği yeniden: 44/44, yanlış veto 0 (`a2_bicim_dogrula.py`).
     - A2 vetosu süreli (pazar_tedbiri 30 gün, olumsuz_esasli 20 gün; keyfi başlangıç, A/B'de ölçülür).
       `kurumsal_islem` → `kurumsal` olayı (B1: Yahoo bölünme/bedelsiz çapraz kontrolü için; tüketici henüz yok).
-    - Servis KAP'ı canlı izliyor. Geçmiş doldurma 2024-01-01'den başladı (tahmini ~250 bin Jev çağrısı, ~25–30 $,
-      1,5–2 gün).
+    - Servis KAP'ı canlı izliyor. Geçmiş doldurma 2024-01-01'den başladı. Ölçülen hız günde ~94 takvim günü (KAP'ın
+      hız sınırı, 3 sn aralık): toplama ~10 gün (~2026-10-07), ardından toplu yargılama.
+    - 2026-09-27 denetimi: alınamayan bildirimler kalıcı delik oluyordu (24 saatte 72) → onarım turu; toplu yargılama
+      parça parça (bellek). İş yeni kodla yeniden başlatıldı (`docs/Denetim-2026-09-27.md`).
 
 ### Faz 7: Paper canlı — kripto + ABD ETF
 - **İşler:** Nautilus canlı düğümleri (paper); sermaye dağıtıcı (haftalık); Jev'li ve Jev'siz kol çiftleri;
@@ -264,7 +266,12 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     yarım Kelly ≤ 3x → kademe; `portfoy@kripto_btc_eth` kolu Jev'li kaynakların etkin hedeflerini katsayıyla işler.
     Hepsi B olduğu için bugün düz; gölge dağıtım her hafta `paper_dagitim`'e yazılıyor (ilk dolu hafta ~2026-10-26,
     28 gün geçmişle).
-  - Sırada: haftalık rapor, A6 emir reddi sınıflandırma, terfi olayı + değerlendirmesi (8. haftadan önce, ~2026-11-22),
+  - 2026-09-27 denetimi (`docs/Denetim-2026-09-27.md`):
+    - Maliyet ölçümü ayrıldı: `gonderim_fiyati` (göç 0008) + `gecikmeli` bayrağı.
+    - `paper_kol_olay` (göç 0009): portföy kolunda kalıcı acil durdurma + onaylı `paper acil-kaldir`; terfi olayı;
+      mutabakat durdurması kayıtta.
+  - ABD ETF: dalga 1'de A/B çıkan ETF kolu yok. Faz 7'nin ETF ayağı kol çıkarsa açılır; düğüm Binance'e özel.
+  - Sırada: haftalık rapor, A6 emir reddi sınıflandırma, terfi değerlendirmesi (8. haftadan önce, ~2026-11-22),
     planlı yeniden başlatma tatbikatı.
 
 ### Faz 8: Özel bağlantılar — MT5 + BIST
@@ -280,6 +287,9 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   log triyajı (D1); yedekler; arıza tatbikatları.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
+  - 2026-09-27 denetimiyle öne alındı: DB yedeği (compose `yedek`, ana bilgisayara kopya, geri yükleme denendi) ve
+    bekçi (compose `saglik`: paper kalp atışı, gece işi, yedek yaşı, log hataları → Telegram). Kalan: Telegram'ın
+    3 seviye / sessiz saat / D4 sorguları, dışarıdan ölü adam denetimi, motor donarsa pozisyon kapatma, D1 Jev triyajı.
 
 ### Faz 10: Web pano
 - **İşler:** `DESIGN.md` (create-design-md + ui-ux-pro-max); FastAPI + arayüz; frontend denetim pasları.
