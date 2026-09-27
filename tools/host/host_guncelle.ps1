@@ -22,4 +22,8 @@ if ($kod -eq 0) {
     Calistir 'docker compose run --rm --no-deps saglik tradebot saglik' | Out-File $log -Append -Encoding utf8
     $saglik = $LASTEXITCODE
 } else { $saglik = -1 }
+# MT5 köprüsü (Windows tarafı, tools/host/mt5kopru.ps1): köprü sürecini sonlandır, gözetmen döngüsü yeni kodla açar
+Get-CimInstance Win32_Process -Filter "Name='python.exe' OR Name='uv.exe'" |
+    Where-Object { $_.CommandLine -match 'mt5\\kopru\.py' } |
+    ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 "$kod $saglik" | Out-File $son -Encoding ascii

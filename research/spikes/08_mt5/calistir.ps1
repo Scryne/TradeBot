@@ -23,16 +23,25 @@ $ErrorActionPreference = 'Continue'
 $log = "$d\calistir.log"
 "$(Get-Date -Format o) basladi" | Out-File $log -Encoding utf8
 $uv = "$env:USERPROFILE\.local\bin\uv.exe"
+# MT5 köprüsü (tools/host/mt5kopru.ps1) aynı terminalleri kullanır: spike boyunca durur, sonunda yeniden başlar
+$kopruler = @(Get-ScheduledTask -TaskPath \TradeBot\ -EA SilentlyContinue | Where-Object TaskName -like 'Mt5Kopru-*')
+$kopruler | Disable-ScheduledTask | Out-Null
+$kopruler | Stop-ScheduledTask
+Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'mt5kopru\.ps1|mt5\\kopru\.py' } |
+    ForEach-Object { Stop-Process -Id $_.ProcessId -Force -EA SilentlyContinue }
+Get-Process terminal64 -EA SilentlyContinue | Where-Object { $_.Path -like 'C:\TradeBot\mt5\*' } | Stop-Process -Force
 foreach ($satir in Get-Content "$d\argumanlar.txt") {
     if (-not $satir.Trim()) { continue }
     "--- $satir" | Out-File $log -Append -Encoding utf8
     $argv = @('run', '--no-project', '--python', '3.12', '--with', 'MetaTrader5', "$d\baglanti.py") + ($satir -split '\s+')
-    # her hesap 10 dk: MT5 çağrısı takılırsa (ikinci turda oldu) görev sonsuza kadar beklemesin
+    # her hesap 20 dk (10 dk örnekleme + emir): MT5 çağrısı takılırsa (ikinci turda oldu) görev sonsuza kadar beklemesin
     $p = Start-Process $uv -ArgumentList $argv -NoNewWindow -PassThru -RedirectStandardOutput "$d\cikti.txt" -RedirectStandardError "$d\hata.txt"
-    if (-not $p.WaitForExit(600000)) { $p | Stop-Process -Force; "zaman asimi" | Out-File $log -Append -Encoding utf8 }
+    if (-not $p.WaitForExit(1200000)) { $p | Stop-Process -Force; "zaman asimi" | Out-File $log -Append -Encoding utf8 }
     Get-Content "$d\cikti.txt", "$d\hata.txt" | Out-File $log -Append -Encoding utf8
     "cikis $($p.ExitCode)" | Out-File $log -Append -Encoding utf8
     # mt5.shutdown() terminali kapatmaz; sonraki tur temiz başlasın (takılan python da)
     Get-Process terminal64, python -EA SilentlyContinue | Where-Object { $_.Path -like 'C:\TradeBot\mt5\*' -or $_.Path -like '*\uv\*' } | Stop-Process -Force
 }
+$kopruler | Enable-ScheduledTask | Out-Null
+$kopruler | Start-ScheduledTask
 "$(Get-Date -Format o) bitti" | Out-File "$d\bitti.txt" -Encoding utf8

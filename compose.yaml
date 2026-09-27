@@ -17,6 +17,9 @@ x-ortak: &ortak
     TRADEBOT_YEDEK_DIZINI: /yedek   # yalnız saglik bağlar (salt okunur); bekçi yedek yaşını denetler
     # İmajda git yok: kod sürümü host_guncelle.ps1'den gelir (deneme defteri her kayıtta tutar)
     TRADEBOT_KOD_SURUMU: ${KOD_SURUMU:-bilinmiyor}
+    # MT5 köprüleri host Windows'ta, yalnız 127.0.0.1'de (Docker Desktop host.docker.internal'ı oraya yönlendirir)
+    TRADEBOT_MT5_KOPRU_FOREX: http://host.docker.internal:8765
+    TRADEBOT_MT5_KOPRU_VIOP: http://host.docker.internal:8766
   volumes:
     - veri:/app/data
     - log:/app/log

@@ -261,17 +261,18 @@ class LogTriyaj:
 
 
 KRITIK = ("paper", "gece_isi", "yedek", "veritabani")
-ORTAM = ("dns", "saat", "disk")   # anlık dalgalanan ortam ölçümleri: bildirim için art arda onay ister
+ORTAM = ("dns", "saat", "disk", "mt5")   # anlık dalgalanan ortam ölçümleri: bildirim için art arda onay ister
 _AGIRLIK = {"OK": 0, "UYARI": 1, "HATA": 2}
 
 
 class DurumIzleyici:
     """Bekçinin durum hafızası: ham durum her turda gelir, bildirim yalnız *onaylı* durum değişince gider.
 
-    Ortam kontrolleri (DNS, saat, disk) son `onay` turun hepsi aynı yönde olunca değişir (histerezis): hepsi bildirilenden
-    kötüyse içlerinden en iyisine yükselir, hepsi iyiyse en kötüsüne iner. UYARI/HATA arasında gidip gelen DNS UYARI
-    olarak onaylanır, tek turluk sıçrama hiç bildirilmez. Kritik kontroller (paper, gece işi, yedek, veritabanı) ilk
-    turda. Açılışta yalnız sorunlular bildirilir, düzelme yalnız bildirilmiş bir sorun için. Sırlar bildirilmez."""
+    Ortam kontrolleri (DNS, saat, disk, MT5 köprüsü) son `onay` turun hepsi aynı yönde olunca değişir (histerezis):
+    hepsi bildirilenden kötüyse içlerinden en iyisine yükselir, hepsi iyiyse en kötüsüne iner. UYARI/HATA arasında
+    gidip gelen DNS UYARI olarak onaylanır, tek turluk sıçrama hiç bildirilmez. Kritik kontroller (paper, gece işi,
+    yedek, veritabanı) ilk turda. Açılışta yalnız sorunlular bildirilir, düzelme yalnız bildirilmiş bir sorun için.
+    Sırlar bildirilmez."""
 
     def __init__(self, onay: int = 3) -> None:
         self.onay = onay
@@ -319,7 +320,33 @@ def hepsi(a: Ayarlar) -> list[Sonuc]:
         kontroller += [paper_kontrol, gece_kontrol]
     if a.yedek_dizini is not None:
         kontroller.append(yedek_kontrol)
+    if a.mt5_kopru_forex or a.mt5_kopru_viop:
+        kontroller.append(mt5_kontrol)
     return [f(a) for f in kontroller]
+
+
+def mt5_kontrol(a: Ayarlar) -> Sonuc:
+    """MT5 köprüleri (Faz 8): ulaşılamayan ya da terminali bağlı olmayan köprü HATA. Piyasa kapalıyken taze tik
+    olmaması normaldir (yalnız bilgi)."""
+    from tradebot.mt5.istemci import KopruHatasi, Mt5Istemci
+
+    parcalar, kotu, olcum = [], [], {}
+    for hesap, url in (("forex", a.mt5_kopru_forex), ("viop", a.mt5_kopru_viop)):
+        if not url:
+            continue
+        try:
+            s = Mt5Istemci(url, zaman_asimi=15).saglik()
+        except KopruHatasi as e:
+            kotu.append(hesap)
+            parcalar.append(f"{hesap}: {str(e)[:80]}")
+            continue
+        olcum[hesap] = s
+        if not s["bagli"]:
+            kotu.append(hesap)
+        yas = s.get("taze_tik_yas_sn")
+        parcalar.append(f"{hesap} {'bağlı' if s['bagli'] else 'BAĞLI DEĞİL'} · fark {s['fark_sn'] / 3600:+.1f} sa "
+                        f"({s['fark_kaynak']})" + ("" if yas is None else f" · son taze tik {yas} sn önce"))
+    return Sonuc("mt5", "HATA" if kotu else "OK", "; ".join(parcalar), olcum)
 
 
 def cikis_kodu(sonuclar: list[Sonuc]) -> int:

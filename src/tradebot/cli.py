@@ -22,6 +22,37 @@ zeka_uygulama = typer.Typer(help="Zekâ katmanı (Faz 6): toplayıcılar, Jev ro
 uygulama.add_typer(zeka_uygulama, name="zeka")
 paper_uygulama = typer.Typer(help="Paper canlı (Faz 7): Nautilus düğümü, defter", no_args_is_help=True)
 uygulama.add_typer(paper_uygulama, name="paper")
+mt5_uygulama = typer.Typer(help="MT5 köprüsü (Faz 8): host Windows'taki köprüleri sorgular", no_args_is_help=True)
+uygulama.add_typer(mt5_uygulama, name="mt5")
+
+
+def _mt5(hesap: str):
+    from tradebot.mt5.istemci import Mt5Istemci
+
+    url = getattr(ayarlar(), f"mt5_kopru_{hesap}", None)
+    if not url:
+        raise typer.BadParameter(f"TRADEBOT_MT5_KOPRU_{hesap.upper()} tanımlı değil")
+    return Mt5Istemci(url)
+
+
+@mt5_uygulama.command("durum")
+def mt5_durum(hesap: str = typer.Argument("forex", help="forex | viop")) -> None:
+    """Köprü sağlığı: terminal bağlı mı, sunucu saat farkı, son taze tik."""
+    typer.echo(json.dumps(_mt5(hesap).saglik(), ensure_ascii=False, indent=1))
+
+
+@mt5_uygulama.command("kotasyon")
+def mt5_kotasyon(hesap: str, semboller: str = typer.Argument(..., help="virgüllü, ör. GOLD,EURUSD")) -> None:
+    """Son bid/ask (tik zamanı UTC)."""
+    typer.echo(json.dumps(_mt5(hesap).kotasyon(semboller.split(",")), ensure_ascii=False, indent=1))
+
+
+@mt5_uygulama.command("mumlar")
+def mt5_mumlar(hesap: str, sembol: str, zd: str = typer.Option("M15", "--zd"),
+               saat: float = typer.Option(6.0, help="Son kaç saat")) -> None:
+    """Son kapanmış barlar (UTC)."""
+    simdi = int(time.time() * 1000)
+    typer.echo(_mt5(hesap).mumlar(sembol, zd, simdi - int(saat * 3_600_000), simdi))
 
 _ISARET = {"OK": "✓", "UYARI": "!", "HATA": "✗"}
 
