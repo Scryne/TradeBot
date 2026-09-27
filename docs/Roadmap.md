@@ -1,7 +1,7 @@
 ---
 proje: TradeBot
 created: 2026-09-24
-updated: 2026-09-24
+updated: 2026-09-27
 type: roadmap
 status: aktif (sürüm 2 — kurumsal, çok piyasalı)
 ---
@@ -21,8 +21,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 3 | Araştırma motoru | ✅ Tamamlandı | Saf karar çekirdeği; piyasa başına maliyet modelleri; vektörel tarama; walk-forward + plato + DSR; deneme defteri; vektörel ↔ Nautilus parity testi geçiyor |
 | 4 | Risk motoru ve boyutlandırma | ✅ Tamamlandı | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
 | 5 | Turnuva — backtest dalgası 1 | ✅ Tamamlandı | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
-| 6 | Zekâ katmanı (Jev) | 🔄 Devam Ediyor | Toplayıcılar (KAP, SEC, Binance, RSS, merkez bankaları, GDELT); Jev servisi + NVIDIA yükseltme; A, B, D rolleri çalışıyor; yargılar dondurulabiliyor; C özellikleri ölçüldü |
-| 7 | Paper canlı — kripto + ABD ETF | ⏳ Bekliyor | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
+| 6 | Zekâ katmanı (Jev) | 🔄 Devam Ediyor | Toplayıcılar (Binance, KAP, RSS, Fed/ECB/TCMB); Jev servisi + NVIDIA yükseltme; A1, A2, A4, A5, B1, B2, B4, D3 çalışıyor; yargılar dondurulabiliyor; C1–C2 ölçüldü |
+| 7 | Paper canlı — kripto + ABD ETF | 🔄 Devam Ediyor | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
 | 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | ⏳ Bekliyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
 | 9 | Operasyon: gözetmen, Telegram, raporlar | ⏳ Bekliyor | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
 | 10 | Web pano | ⏳ Bekliyor | DESIGN.md dolu; PnL, pozisyon, turnuva tablosu, veto geçmişi, sağlık; Tailscale üzerinden telefondan erişim |
@@ -223,6 +223,14 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     - Yükseltmenin "veto gerekmez" dediği 8 belirsiz veto, Claude'un etiketindeki 8 yanlış vetoyla birebir aynı (olay
       1, 94, 105, 112, 122, 133, 144, 200). Kalan 14 belirsiz veto yükseltmeyle de doğrulandı.
   - Jev /TUSD ile /USDT çiftini karıştırıyor. A1 sorusunun sonraki sürümüne aday (yeni ölçümle).
+  - **Kapsam kararı (2026-09-27, Scryne yetkiyi devretti: "tüm yetki sende"):** girdisi olmayan roller girdinin
+    doğduğu faza taşındı; Faz 6 ile Faz 7 paralel.
+    - A6 emir reddi → Faz 7 (emir akışı orada). D1 log triyajı, D2 rapor doğrulama, D4 Telegram → Faz 9.
+    - A3 SEC 8-K → Faz 13 (tek hisse yok; evrende 26 büyük ETF). SEC basın RSS'i toplanıyor.
+    - GDELT atlandı: Faz 7 piyasalarına katkısı zayıf. C4 (metin rejimi) ölçülürken gerekirse geri dönülür.
+    - B3 sözleşme şartnamesi → Faz 8 (MT5/VİOP sözleşmeleri orada).
+    - Gerekçe: darboğaz takvim. 12 haftalık paper turnuvası başlamadan hiçbir kol gerçek paraya aday olamaz;
+      A1 canlı olduğu için paper'da eksik koruma yok.
   - KAP + A2 ✅ (2864535): servis kaynak→rol eşlemesiyle genel, karar kuralı ortak (`zeka.karar`).
     - Liste: KAP'ın kendi sorgu uç noktası (`disclosure/members/byCriteria`), gün başına tek istek, bütün BIST.
       Sıradan gün ~290, rapor sezonu ~1100 bildirim; sonuç kısıtı yok (ölçüldü).
@@ -236,13 +244,15 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 
 ### Faz 7: Paper canlı — kripto + ABD ETF
 - **İşler:** Nautilus canlı düğümleri (paper); sermaye dağıtıcı (haftalık); Jev'li ve Jev'siz kol çiftleri;
-  agresif gözlem kolu (ayrı defter); mutabakat; çökme sonrası yeniden kurulum.
+  agresif gözlem kolu (ayrı defter); mutabakat; çökme sonrası yeniden kurulum; A6 emir reddi sınıflandırma
+  (Faz 6'dan taşındı).
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
 
 ### Faz 8: Özel bağlantılar — MT5 + BIST
 - **İşler:** MT5 demo köprüsü (Windows tarafı; veri + simüle ya da demo emir); BIST gecikmeli veri
-  bağlantısı ve simüle dolum; bu piyasaların takvim/maliyet modelleriyle paper kolları.
+  bağlantısı ve simüle dolum; bu piyasaların takvim/maliyet modelleriyle paper kolları; B3 sözleşme şartnamesi
+  okuma (Faz 6'dan taşındı).
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
 
@@ -271,6 +281,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 - **Notlar:**
 
 ### Faz 13: Sonraki dalgalar (koşullu)
-- **İşler:** Ücretli veriyle ABD tek hisseleri; Databento ile CME vadelileri; VİOP; gerekirse IB bağlantısı.
+- **İşler:** Ücretli veriyle ABD tek hisseleri; Databento ile CME vadelileri; VİOP; gerekirse IB bağlantısı;
+  A3 SEC 8-K rolü (Faz 6'dan taşındı).
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
