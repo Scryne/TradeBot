@@ -17,7 +17,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | --- | --- | --- | --- |
 | 0 | Riskli kararların spike'ları | ✅ Tamamlandı | Spike 02–05 raporları `docs/spikes/` altında; Final Doküman'daki ⚑ kararlar kesinleşti ya da yedek plana geçildi |
 | 1 | Altyapı ve host | ✅ Tamamlandı | Host (WSL2 + Docker + Tailscale + SSH, 7/24 ayarları) hazır; `uv` projesi, Compose iskeleti, PostgreSQL, sır yönetimi, log düzeni; testler yeşil |
-| 2 | Veri platformu (ilk dalga) | 🔄 Devam Ediyor | Kripto, Dukascopy, ABD ETF, BIST günlük verileri katalogda; enstrüman kaydı + takvimler + kurumsal işlemler; PIT evren; kaynak başına kalite raporu |
+| 2 | Veri platformu (ilk dalga) | ✅ Tamamlandı | Kripto, Dukascopy, ABD ETF, BIST günlük verileri katalogda; enstrüman kaydı + takvimler + kurumsal işlemler; PIT evren; kaynak başına kalite raporu |
 | 3 | Araştırma motoru | ✅ Tamamlandı | Saf karar çekirdeği; piyasa başına maliyet modelleri; vektörel tarama; walk-forward + plato + DSR; deneme defteri; vektörel ↔ Nautilus parity testi geçiyor |
 | 4 | Risk motoru ve boyutlandırma | ✅ Tamamlandı | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
 | 5 | Turnuva — backtest dalgası 1 | ✅ Tamamlandı | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
@@ -120,6 +120,15 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - **LUNAUSDT** gibi aynı sembolde farklı varlık: 30+ günlük boşluk "kimlik kırılması şüphesi"; evren bu
     boşlukta enstrümanı dışarıda bırakır.
   - İlk yükleme host'ta başladı (2026-09-25 15:12 UTC, ~3,8 dosya/sn).
+  - 2026-09-27 denetimi (`docs/Denetim-2026-09-27.md`): gece işi hiç tamamlanmamıştı (Dukascopy kaliteden önceydi,
+    her dağıtımda kesiliyordu) → sıra düzeltildi, iş 11 dk'da bitiyor. Kalite raporu ilk kez yazıldı ve kalibre edildi:
+    - Yahoo normalizasyonu: BIST kapalı günlerindeki bayat barlar atılır (bayramlar, 2023-02-08 iptal seansı), OHLC
+      onarımı, imkânsız sıçra-dön barları atılır (±%25 ve geri; TRHOL 2025-01-10 ×102). Yahoo tam yenilendi.
+    - XIST takvimine kanıtlı 3 ek seans (2006-01-09, 2009-05-01, 2010-09-09: 200+ hissede normal hacim).
+    - Sıçrama uyarısı yalnız sıçra-dön (kötü tick izi), taban eşikli; borsanın kendi kaydında (Binance) bilgi.
+    - Sonuç: 66 OK / 1252 UYARI / 90 HATA → **1242 OK / 165 UYARI / 1 HATA**. Kalan BIST uyarıları ±%20 civarı
+      taban-dönüşler (eski limit; gerçek olabilir, işaretli kalır); Binance'te gerçek boşluk/kimlik kırılması.
+  - **2026-09-27 ✅ Faz 2 tamam.** Dukascopy saatlik/dakikalık geçmişi gece işinin bütçeli son adımında sürüyor.
 
 ### Faz 3: Araştırma motoru
 - **İşler:** Saf karar çekirdeği arayüzü; look-ahead bozma testi; piyasa başına maliyet modelleri
@@ -190,6 +199,9 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     - Kuyruk (veri geldikçe arka planda): Dukascopy 1h/4h, dalga 1c, nihai `sonlandir`.
     - Olay tabanlı aile Faz 6 sonrasına kaldı.
   - Dalga 2 araştırması Faz 6–7 ile paralel yürür (ön kayıtla).
+  - 2026-09-27 not: dalga 1'in BIST kolları, sonradan temizlenen verilerle (kapalı gün bayat barları, imkânsız
+    sıçra-dönler) koşmuştu. Hepsi KALDI; temiz veri kolları ancak iyileştirebilirdi, ama sonuca bakıp yeniden koşmak
+    yeni denemedir (kural 10). Sonraki BIST dalgası temiz veriyle koşar.
 
 ### Faz 6: Zekâ katmanı (Jev)
 - **İşler:** Spike 04-B: NVIDIA yükseltme modelinin seçimi (anahtar gelince). Metin toplayıcılar (ilk yayın zamanıyla); tek Jev servisi (uzun ömürlü istemci, kayıt,
