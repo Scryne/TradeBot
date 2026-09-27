@@ -67,9 +67,28 @@ def saglik_komutu(
             bildirici.gonder("KRITIK", f"{h['dosya']} · {h['bilesen']} · {h['olay']}\n"
                              f"{json.dumps(h['ozet'], ensure_ascii=False, default=str)[:600]}",
                              anahtar=f"log:{h['bilesen']}:{h['olay']}")
+        if dongu and a.ortam == "host" and a.veritabani_url is not None:
+            _haftalik_rapor(a, bildirici, kayitci)
         if not dongu:
             raise typer.Exit(saglik.cikis_kodu(sonuclar))
         time.sleep(dongu)
+
+
+def _haftalik_rapor(a, bildirici, kayitci) -> None:
+    """Bekçi: bitmiş son haftanın paper raporu yazılmamışsa üretir (Pazartesi 00:30 UTC sonrası) ve özetini bildirir."""
+    from tradebot.canli import rapor
+    from tradebot.db import motor as db_motor
+
+    h = rapor.bekleyen_hafta(a.veri_dizini, int(time.time() * 1000))
+    if h is None:
+        return
+    try:
+        r, _, yol = rapor.uret(db_motor(a), a.veri_dizini, h)
+    except Exception as e:  # noqa: BLE001 — rapor hatası bekçiyi durdurmaz
+        kayitci.error("paper_rapor_hatasi", hata=f"{type(e).__name__}: {e}"[:300])
+        return
+    kayitci.info("paper_rapor", hafta=r["hafta"], yol=str(yol))
+    bildirici.gonder("BILGI", rapor.telegram_ozeti(r))
 
 
 @db_uygulama.command("yukselt")
@@ -615,3 +634,19 @@ def paper_acil_kaldir(
     denetim.kaydet(m, "paper", "acil_durdurma_kaldirildi", {"kol": kol, "onaylayan": onaylayan, "gerekce": gerekce,
                                                            "olay_id": oid})
     typer.echo(f"{kol}: acil durdurma kaldırma olayı yazıldı (olay {oid}); düğüm sonraki kapanışta uygular.")
+
+
+@paper_uygulama.command("rapor")
+def paper_rapor(hafta: int = typer.Option(1, help="Kaç hafta önce (1 = geçen hafta, 0 = bu hafta, yarım)")) -> None:
+    """Haftalık paper raporu (defterden): Markdown'ı yazdırır ve data/rapor/ altına kaydeder."""
+    import time
+
+    from tradebot.canli import dagitici as dg
+    from tradebot.canli import rapor
+    from tradebot.db import motor as db_motor
+
+    a = ayarlar()
+    h = dg.hafta_basi(int(time.time() * 1000)) - hafta * dg.HAFTA_MS
+    _, md, yol = rapor.uret(db_motor(a), a.veri_dizini, h)
+    typer.echo(md)
+    typer.echo(f"→ {yol}")
