@@ -255,8 +255,12 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     - Defter PostgreSQL'de (göç 0006, yalnız eklenir); toparlanma, mutabakat, risk onayı.
     - Duman testi (ayrı SQLite): Nautilus v2 API farkları (Binance sağlayıcı config, StrategyId, kurucu yalnız config,
       on_quote) düzeltildi; ücret 10 bps.
-  - Sırada: sermaye dağıtıcı + agresif gözlem kolu, haftalık rapor, A6 emir reddi sınıflandırma, yeniden başlatma
-    tatbikatı (toparlanma canlıda).
+  - Agresif gözlem kolu ✅ (9515479): kaynak kolların hedef ortalaması × tam Kelly (≈ 5), spot tavanlarıyla kırpılır
+    (pratikte enstrüman başına %50); ayrı defter, dağıtıma girmez.
+  - 2026-09-27 düzeltme (6c49fcd): düğüm işlem akışına da abone olduğu için sandbox geç gelen her işlemde "stale trade"
+    uyarısı basıyordu (8 saatte ~286 bin satır, Docker log rotasyonu karar kayıtlarını siliyordu). Artık yalnız
+    kotasyon; dolum alışta ask, satışta bid'e karşı. Deploy yeniden başlatmasında toparlanma canlıda çalıştı.
+  - Sırada: sermaye dağıtıcı, haftalık rapor, A6 emir reddi sınıflandırma, planlı yeniden başlatma tatbikatı.
 
 ### Faz 8: Özel bağlantılar — MT5 + BIST
 - **İşler:** MT5 demo köprüsü (Windows tarafı; veri + simüle ya da demo emir); BIST gecikmeli veri
