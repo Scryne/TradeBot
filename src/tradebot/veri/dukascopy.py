@@ -176,20 +176,25 @@ class Dukascopy:
     def dakikalik(self, e: en.Enstruman, yil: int, bitis_zamani: float) -> dict:
         bugun = date.today()
         gunler = pl.date_range(date(bugun.year - yil, bugun.month, 1), bugun, eager=True).to_list()
-        parca, yeni = [], 0
+        parca, yeni, basarisiz = [], 0, []
         try:
             for g in reversed(gunler):  # en yeniden eskiye: yürütme doğrulaması için yakın dönem önce
                 if g.weekday() == 5:  # Cumartesi: FX kapalı
                     continue
                 if time.monotonic() > bitis_zamani and self._ham_yol(f"{e.sembol}/BID/1m/{g.isoformat()}") is None:
                     break
-                d, indi = self.dakikalik_gun(e, g)
+                try:
+                    d, indi = self.dakikalik_gun(e, g)
+                except Exception as ex:  # noqa: BLE001 — tek gün (503 fırtınası) bütün işi durdurmasın; sonraki koşuda
+                    basarisiz.append(g.isoformat())
+                    _log.warning("dakikalik_gun_atlandi", kimlik=e.kimlik, gun=g.isoformat(), hata=str(ex)[:160])
+                    continue
                 parca.append(d)
                 yeni += indi
         finally:
             if parca:
                 self.bar.yaz(e.kimlik, "1m", kapali_ayikla(pl.concat(parca), e.takvim))
-        return {"kimlik": e.kimlik, "zd": "1m", "yeni_dosya": yeni}
+        return {"kimlik": e.kimlik, "zd": "1m", "yeni_dosya": yeni, "basarisiz_gun": len(basarisiz)}
 
     def evren_guncelle(self, butce_dk: float = 60.0) -> list[dict]:
         """Zaman bütçesi içinde saatlik (tüm semboller) sonra dakikalık (seçilenler) indirir; kalanı sonraki koşuya kalır."""
