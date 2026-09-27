@@ -1,0 +1,26 @@
+# Paper kolları (Faz 7). Kaynak: docs/turnuva/Paper-Listesi.md. Varyant = walk-forward'ın SON penceresinin seçimi
+# (turnuva sonuç dosyalarındaki walk_forward.secimler[-1]; yılda bir aynı kuralla yeniden seçilir, yeni deneme sayılmaz).
+# Değişiklik = yeni paper dönemi (defterde yeni kol kimliği). Tasarım: docs/Paper-Tasarim.md.
+
+baslangic_ozkaynak: 100000        # kol başına sanal USDT (B: sermayesiz gözlem; dağıtıcıdan pay almaz)
+jev_ab: true                      # her kol iki kopya: Jev vetolu (+jev) ve vetosuz
+frenler: true                     # kol düzeyinde günlük −%3 / haftalık −%8 fren, −%25 acil (backtest ile aynı)
+
+gruplar:
+  kripto_btc_eth: {kimlikler: [BINANCE:BTCUSDT, BINANCE:ETHUSDT], asgari_gecmis_gun: 30, yon: long}
+
+boyutlar:                         # dalga dosyalarındaki boyut bloğu, birebir
+  dalga1: {hedef_vol: 0.20, kaldirac: 3.0, vol_pencere_gun: 30, bant: 0.25}
+  dalga2: {hedef_vol: 0.20, kaldirac: 3.0, vol_pencere_gun: 90, bant: 0.25}
+
+kollar:
+  - {ad: "ma_yon@kripto_btc_eth@1h", strateji: ma_yon, grup: kripto_btc_eth, zd: 1h, boyut: dalga1,
+     parametre: {hizli_gun: 10, yavas_gun: 50}, sinif: B}
+  - {ad: "tsmom@kripto_btc_eth@4h", strateji: tsmom, grup: kripto_btc_eth, zd: 4h, boyut: dalga1,
+     parametre: {ufuk_gun: 250}, sinif: B}
+  - {ad: "d2:donchian_ls@kripto_btc_eth@4h", strateji: donchian_ls, grup: kripto_btc_eth, zd: 4h, boyut: dalga2,
+     parametre: {giris_gun: 55, cikis_gun: 20}, sinif: B}
+  - {ad: "d2:donchian_ls@kripto_btc_eth@1d", strateji: donchian_ls, grup: kripto_btc_eth, zd: 1d, boyut: dalga2,
+     parametre: {giris_gun: 55, cikis_gun: 10}, sinif: B}
+  - {ad: "d2:tsmom@kripto_btc_eth@4h", strateji: tsmom, grup: kripto_btc_eth, zd: 4h, boyut: dalga2,
+     parametre: {ufuk_gun: 250}, sinif: B}
