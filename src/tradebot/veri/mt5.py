@@ -7,6 +7,8 @@
 - 1d barlar seans gününün 00:00 UTC'sine etiketlenir: MT5'in günlük barı sunucu gece yarısında açılır (NCM: 21:00 UTC,
   önceki takvim günü). Katalogdaki diğer günlük veriler (Yahoo, Dukascopy) gün başı gösterimini kullanır.
 - `volume`: VİOP'ta gerçek hacim (kontrat), CFD'de tik hacmi. `spread` nokta cinsinden korunur (maliyet modeli).
+- Seyrek başlangıç kesilir (gün içi): NCM'nin eski "saatlik" geçmişi aslında günde tek bardır (EURUSD 2022, GOLD 2018
+  öncesi, yılda ~274 bar; 2026-09-28 kalite raporu). Katalog yoğun dönemin başından başlar; ham yanıtlar olduğu gibi kalır.
 """
 from __future__ import annotations
 
@@ -34,6 +36,22 @@ def katalog_barlari(df: pl.DataFrame, zd: str, fark_ms: int, gercek_hacim: bool)
     hacim = pl.col("real_volume") if gercek_hacim else pl.col("tick_volume")
     return df.with_columns(volume=hacim.cast(pl.Float64)).select(
         "acilis_ms", "open", "high", "low", "close", "volume", "tick_volume", "spread", "real_volume")
+
+
+def yogun_baslangic(t_ms: pl.Series, pencere_ay: int = 6, oran: float = 0.5) -> int | None:
+    """Aylık bar sayısı olağan yoğunluğun (aylık sayıların 90. yüzdeliği) `oran` katını geçen ve sonraki
+    `pencere_ay - 1` ay da geçen ilk ayın başı (ms). Medyan değil yüzdelik: seyrek dönem yoğundan uzun olabilir
+    (EURUSD: 5 yıl seyrek, 4 yıl saatlik). Sonraki bir delik başlangıcı geri itmez. Yoksa None."""
+    if t_ms.is_empty():
+        return None
+    say = (pl.DataFrame({"t": t_ms}).with_columns(ay=pl.from_epoch("t", time_unit="ms").dt.truncate("1mo"))
+           .group_by("ay").agg(pl.len().alias("n")).sort("ay").with_columns(ay_ms=pl.col("ay").dt.epoch("ms")))
+    esik = say["n"].quantile(0.9) * oran
+    yogun = (say["n"] >= esik).to_list()
+    for i in range(len(yogun)):
+        if all(yogun[i:i + pencere_ay]):
+            return int(say["ay_ms"][i])
+    return None
 
 
 class Mt5Veri:
@@ -68,7 +86,15 @@ class Mt5Veri:
             return {"kimlik": e.kimlik, "zd": zd, "yeni": 0, "hata": ist.son_hatalar[:1] or None}
         yeni = katalog_barlari(df, zd, fark["ms"], gercek_hacim=e.piyasa == "VIOP")
         n = self.bar.yaz(e.kimlik, zd, yeni)
-        return {"kimlik": e.kimlik, "zd": zd, "yeni": len(yeni), "toplam": n}
+        out = {"kimlik": e.kimlik, "zd": zd, "yeni": len(yeni), "toplam": n}
+        if zd != "1d":
+            tum = self.bar.oku(e.kimlik, zd)
+            bas_yogun = yogun_baslangic(tum["acilis_ms"])
+            if bas_yogun is not None and int(tum["acilis_ms"].min()) < bas_yogun:
+                kalan = tum.filter(pl.col("acilis_ms") >= bas_yogun)
+                self.bar.yaz(e.kimlik, zd, kalan, birlestir=False)
+                out |= {"seyrek_kesildi": tum.height - kalan.height, "toplam": kalan.height}
+        return out
 
     def guncelle(self, butce_dk: float = 60.0) -> list[dict]:
         """Bütün MT5 enstrümanları, bütün zaman dilimleri. Bir enstrümanın hatası diğerlerini durdurmaz."""

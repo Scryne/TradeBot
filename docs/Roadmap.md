@@ -330,7 +330,16 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - Spike 08 (`docs/spikes/08-mt5.md`): Python bağlantısı, sözleşme özellikleri ve geçmiş ✅. Altın `GOLD`; endeks/petrol
     vadeli (`ES6Z`, `GER40Z26`, `CL6X`); VİOP `F_XU030`, `F_USDTRY`, `XU30_YAKINVADE` (H1 2020'den: VİOP için ilk veri
     kaynağı). Barlar sunucu saatiyle (büyük olasılıkla UTC+3). Algo Trading `common.ini`'den açıldı.
-  - Canlı spread + demo emir testi 2026-09-28 10:00 TR'de zamanlı (`Spike08` görevi). Sonra köprü (`mt5kopru`, HTTP).
+  - Canlı spread + demo emir testi 2026-09-28 10:00 TR'de zamanlı (`Spike08` görevi).
+  - 2026-09-27 köprü ✅ (`src/tradebot/mt5/kopru.py`, gözetmen `tools/host/mt5kopru.ps1`): hesap başına süreç, yalnız
+    127.0.0.1; Docker `host.docker.internal` üzerinden okur (sabit DNS bu adı gizliyordu → `extra_hosts`). Kapanmış
+    barlar UTC; sunucu farkı canlı tikten ölçüldü: **+3,0 sa** (2026-09-28). MT5 çağrıları tek işçide, takılırsa süreç
+    kendini sonlandırır. Emir yolu yok. Bekçi `mt5` kontrolü (3 tur onay).
+  - VİOP seansları barlardan: TR 09:40–18:10, endeks ve USD altında akşam 19:15–23:00 (`viop`, `viop_aksam` takvimleri).
+  - MT5 verisi kataloğa (`tradebot veri mt5`, gece işinde): NCMFX GOLD/SILVER/FX/`ES!`/`NQ!`/`YM!`/`CL!`, VİOP
+    `XU30_YAKINVADE` + vadeli kontratlar (önekle); 1m/1h/1d, ham yanıtlar HamDepo'da.
+  - Sırada: spike sonucu (spread, emir) → maliyet modelleri → VİOP/altın backtest dalgası (ön kayıtla) → canlı
+    bar akışı (paper düğümüne MT5 kaynağı).
 
 ### Faz 9: Operasyon
 - **İşler:** Bağımsız gözetmen (kalp atışı, özkaynak, pozisyon; motor donarsa kapatma); Telegram bot (3

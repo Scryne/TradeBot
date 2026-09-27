@@ -239,3 +239,29 @@ def test_toplayici_uctan_uca(ayar):
         assert sum(x.get("yeni", 0) for x in v.guncelle()) == 0
     finally:
         s.shutdown()
+
+
+def test_yogun_baslangic_seyrek_gecmisi_keser():
+    import datetime as d
+    from datetime import UTC, datetime
+
+    import polars as pl
+
+    from tradebot.veri.mt5 import yogun_baslangic
+
+    def seri(a, b, adim):
+        t, g = [], a
+        while g < b:
+            if g.weekday() < 5:
+                t.append(int(g.timestamp() * 1000))
+            g += adim
+        return t
+    gun, saat = d.timedelta(days=1), d.timedelta(hours=1)
+    # NCM EURUSD: 2017–2021 günde tek "saatlik" bar, 2022'den gerçek saatlik
+    t = seri(datetime(2017, 1, 2, tzinfo=UTC), datetime(2022, 1, 1, tzinfo=UTC), gun) + \
+        seri(datetime(2022, 1, 3, tzinfo=UTC), datetime(2024, 1, 1, tzinfo=UTC), saat)
+    assert yogun_baslangic(pl.Series(t)) == int(datetime(2022, 1, 1, tzinfo=UTC).timestamp() * 1000)
+    # XU30_YAKINVADE: yoğun seride 6 aylık kurum deliği başlangıcı geri itmez
+    t = seri(datetime(2016, 1, 4, tzinfo=UTC), datetime(2025, 10, 1, tzinfo=UTC), saat) + \
+        seri(datetime(2026, 4, 1, tzinfo=UTC), datetime(2026, 9, 1, tzinfo=UTC), saat)
+    assert yogun_baslangic(pl.Series(t)) == int(datetime(2016, 1, 1, tzinfo=UTC).timestamp() * 1000)
