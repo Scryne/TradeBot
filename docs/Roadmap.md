@@ -243,6 +243,10 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
       hız sınırı, 3 sn aralık): toplama ~10 gün (~2026-10-07), ardından toplu yargılama.
     - 2026-09-27 denetimi: alınamayan bildirimler kalıcı delik oluyordu (24 saatte 72) → onarım turu; toplu yargılama
       parça parça (bellek). İş yeni kodla yeniden başlatıldı (`docs/Denetim-2026-09-27.md`).
+  - B1 (tasarım, 2026-09-27): asıl değer düzeltilmemiş bölünmeyi yakalamak. Yahoo bir bedelsizi atlarsa seride kalıcı
+    −%50 boşluk kalır; kalite raporunun sıçra-dön kuralı onu görmez (geri dönmüyor). Kural: BIST'te büyük, geri dönmeyen
+    açılış boşluğu + ±30 gün içinde A2 `kurumsal` olayı + Yahoo'da bölünme kaydı yok → "düzeltilmemiş kurumsal işlem
+    şüphesi" (kalite UYARI). KAP geçmişi tamamlanınca (~2026-10-07) kurulur ve geçmişte ölçülür.
 
 ### Faz 7: Paper canlı — kripto + ABD ETF
 - **İşler:** Nautilus canlı düğümleri (paper); sermaye dağıtıcı (haftalık); Jev'li ve Jev'siz kol çiftleri;
