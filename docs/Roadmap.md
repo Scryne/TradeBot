@@ -260,7 +260,12 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - 2026-09-27 düzeltme (6c49fcd): düğüm işlem akışına da abone olduğu için sandbox geç gelen her işlemde "stale trade"
     uyarısı basıyordu (8 saatte ~286 bin satır, Docker log rotasyonu karar kayıtlarını siliyordu). Artık yalnız
     kotasyon; dolum alışta ask, satışta bid'e karşı. Deploy yeniden başlatmasında toparlanma canlıda çalıştı.
-  - Sırada: sermaye dağıtıcı, haftalık rapor, A6 emir reddi sınıflandırma, planlı yeniden başlatma tatbikatı.
+  - Sermaye dağıtıcı ✅ (Paper-Tasarim.md §Sermaye dağıtıcı): haftalık ERC (korelasyonlu) × küçültülmüş üstünlük →
+    yarım Kelly ≤ 3x → kademe; `portfoy@kripto_btc_eth` kolu Jev'li kaynakların etkin hedeflerini katsayıyla işler.
+    Hepsi B olduğu için bugün düz; gölge dağıtım her hafta `paper_dagitim`'e yazılıyor (ilk dolu hafta ~2026-10-26,
+    28 gün geçmişle).
+  - Sırada: haftalık rapor, A6 emir reddi sınıflandırma, terfi olayı + değerlendirmesi (8. haftadan önce, ~2026-11-22),
+    planlı yeniden başlatma tatbikatı.
 
 ### Faz 8: Özel bağlantılar — MT5 + BIST
 - **İşler:** MT5 demo köprüsü (Windows tarafı; veri + simüle ya da demo emir); BIST gecikmeli veri

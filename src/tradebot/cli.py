@@ -544,3 +544,20 @@ def paper_calis(
     from tradebot.canli.dugum import calistir
 
     calistir(sure_sn or None, duman)
+
+
+@paper_uygulama.command("dagitim")
+def paper_dagitim(hafta: int = typer.Option(0, help="Kaç hafta önce (0 = bu hafta)")) -> None:
+    """Portföy kolunun haftalık sermaye dağıtımı (paper_dagitim; yoksa hafta başına kadarki defterle hesaplanıp yazılır)."""
+    import time
+
+    from tradebot.canli import dagitici as dg
+    from tradebot.canli.defter import PaperDefter
+    from tradebot.canli.kollar import PORTFOY, kollar
+    from tradebot.db import motor as db_motor
+
+    ks = kollar()
+    pf = next(k for k in ks if k.strateji == PORTFOY)
+    h = dg.hafta_basi(int(time.time() * 1000)) - hafta * dg.HAFTA_MS
+    defter = PaperDefter(db_motor(ayarlar()), "cli")
+    _yazdir(defter.dagitim_getir(pf, [k for k in ks if k.ad in pf.parametre["kaynaklar"]], h))

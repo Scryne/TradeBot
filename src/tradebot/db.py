@@ -262,6 +262,19 @@ paper_ozkaynak = Table(
     Index("ix_paper_ozkaynak_kol", "kol", "zaman_ms"),
 )
 
+paper_dagitim = Table(  # haftalık sermaye dağıtımı (canli/dagitici.py); yalnız eklenir, hafta başına bir kayıt
+    "paper_dagitim",
+    metadata,
+    Column("id", KIMLIK, primary_key=True, autoincrement=True),
+    Column("portfoy", String(96), nullable=False),       # portföy kolunun adı
+    Column("hafta_ms", BigInteger, nullable=False),      # Pazartesi 00:00 UTC; girdi bundan önceki veridir
+    Column("hesap_ms", BigInteger, nullable=False),      # duvar saati
+    Column("kod_surumu", String(64), nullable=False),
+    Column("kaldirac", Float, nullable=False),           # Σ katsayı (dağıtılan)
+    Column("ayrinti", JSONT, nullable=False),            # kol başına σ, Sharpe, ERC, eğim, ağırlık, kademe, katsayı
+    UniqueConstraint("portfoy", "hafta_ms", name="uq_paper_dagitim"),
+)
+
 
 def motor(a: Ayarlar) -> Engine:
     if a.veritabani_url is None:

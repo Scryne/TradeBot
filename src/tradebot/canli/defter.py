@@ -18,9 +18,10 @@ from datetime import UTC, datetime
 from sqlalchemy import func, insert, select
 from sqlalchemy.engine import Engine
 
+from tradebot.canli import dagitici as dg
 from tradebot.canli.karar import Karar, KolDurum, izleyici_kur
 from tradebot.canli.kollar import PaperKol
-from tradebot.db import paper_emir, paper_emir_olay, paper_karar, paper_kol, paper_ozkaynak
+from tradebot.db import paper_dagitim, paper_emir, paper_emir_olay, paper_karar, paper_kol, paper_ozkaynak
 
 
 def tanim(kol: PaperKol) -> dict:
@@ -116,3 +117,45 @@ class PaperDefter:
         with self.motor.connect() as b:
             return int(b.execute(select(func.count()).select_from(paper_emir_olay).where(
                 paper_emir_olay.c.kol == kol, paper_emir_olay.c.tur == "dolum")).scalar())
+
+    # ------------------------------------------------------------------ dağıtıcı
+    def ozkaynak_gecmisi(self, kol: str, bit_ms: int) -> list[tuple[int, float]]:
+        """bit_ms'den önceki saatlik özkaynak işaretleri (zaman sıralı)."""
+        with self.motor.connect() as b:
+            return [(int(t), float(o)) for t, o in b.execute(
+                select(paper_ozkaynak.c.zaman_ms, paper_ozkaynak.c.ozkaynak)
+                .where(paper_ozkaynak.c.kol == kol, paper_ozkaynak.c.zaman_ms < bit_ms)
+                .order_by(paper_ozkaynak.c.zaman_ms))]
+
+    def kol_baslangic(self, kol: str) -> int | None:
+        with self.motor.connect() as b:
+            return b.execute(select(paper_kol.c.baslangic_ms).where(paper_kol.c.kol == kol)).scalar()
+
+    def dagitim_oku(self, portfoy: str, hafta_ms: int) -> dict | None:
+        with self.motor.connect() as b:
+            return b.execute(select(paper_dagitim.c.ayrinti).where(
+                paper_dagitim.c.portfoy == portfoy, paper_dagitim.c.hafta_ms == hafta_ms)).scalar()
+
+    def dagitim_yaz(self, portfoy: str, hafta_ms: int, sonuc: dict) -> None:
+        with self.motor.begin() as b:
+            b.execute(insert(paper_dagitim).values(portfoy=portfoy, hafta_ms=hafta_ms, hesap_ms=int(time.time() * 1000),
+                                                   kod_surumu=self.kod, kaldirac=float(sonuc["kaldirac"]),
+                                                   ayrinti=sonuc))
+
+    def dagitim_getir(self, portfoy: PaperKol, kaynaklar: list[PaperKol], hafta_ms: int) -> dict:
+        """Haftanın dağıtımı: kayıtlıysa okunur (yeniden başlatmada aynı sonuç), yoksa hafta başına kadar kesilmiş
+        defterle hesaplanıp yazılır."""
+        var = self.dagitim_oku(portfoy.ad, hafta_ms)
+        if var is not None:
+            return var
+        p = portfoy.parametre
+        getiri, gun, sinif = {}, {}, {}
+        for k in kaynaklar:
+            getiri[k.ad] = dg.gunluk_getiri(self.ozkaynak_gecmisi(k.ad, hafta_ms), hafta_ms)
+            bas = self.kol_baslangic(k.ad)
+            gun[k.ad] = max(0.0, (hafta_ms - bas) / dg.GUN_MS) if bas is not None else 0.0
+            sinif[k.ad] = k.sinif
+        sonuc = dg.dagit(getiri, gun, sinif, p["onsel_sharpe"], dg.DagiticiAyar(**p["dagitici"]))
+        sonuc["hafta_ms"] = hafta_ms
+        self.dagitim_yaz(portfoy.ad, hafta_ms, sonuc)
+        return sonuc

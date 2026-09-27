@@ -71,8 +71,9 @@ def test_canli_karar_backtest_ile_birebir(tmp_path, bant, frenler):
 
 def test_paper_kollari_config():
     ks = kollar()
-    assert len(ks) == 11 and sum(k.jev for k in ks) == 5
-    ag = ks[-1]
+    assert len(ks) == 12 and sum(k.jev for k in ks) == 6
+    ag, pf = ks[-2], ks[-1]
+    assert pf.strateji == "portfoy" and pf.jev and all(x.endswith("+jev") for x in pf.parametre["kaynaklar"])
     assert ag.strateji == "agresif" and ag.sinif == "gozlem" and len(ag.parametre["kaynaklar"]) == 5
     assert {k.zd for k in ks} == {"1h", "4h", "1d"}
     assert all(k.ayar.kaldirac <= 3 for k in ks)

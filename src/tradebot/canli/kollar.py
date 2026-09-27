@@ -7,10 +7,12 @@ from pathlib import Path
 import yaml
 
 from tradebot.arastirma.turnuva import STRATEJILER, Ayar
+from tradebot.canli import dagitici as dg
 from tradebot.cekirdek.boyut import kaldirac_dogrula
 
 AYAR_YOLU = Path(__file__).resolve().parents[3] / "config" / "paper.yaml"
 AGRESIF = "agresif"  # agresif gözlem kolu: kaynak kolların hedef ortalaması × tam Kelly, tavanlarla kırpılır
+PORTFOY = "portfoy"  # sermaye dağıtıcının kolu: Σ haftalık katsayı × kaynak kolun etkin hedefi (canli/dagitici.py)
 
 
 @dataclass(frozen=True)
@@ -42,7 +44,7 @@ def kollar(d: dict | None = None) -> list[PaperKol]:
     d = d or oku()
     out = []
     for k in d["kollar"]:
-        if k["strateji"] not in STRATEJILER or k["strateji"] == AGRESIF:
+        if k["strateji"] not in STRATEJILER or k["strateji"] in (AGRESIF, PORTFOY):
             raise ValueError(f"bilinmeyen strateji: {k['strateji']}")
         b = d["boyutlar"][k["boyut"]]
         kaldirac_dogrula(b["kaldirac"])
@@ -63,6 +65,24 @@ def kollar(d: dict | None = None) -> list[PaperKol]:
             raise ValueError(f"agresif kolun kaynakları yok: {eksik}")
         out.append(PaperKol(ag["ad"], AGRESIF, ag["grup"], d["gruplar"][ag["grup"]], "1h", ayar,
                             {"kaynaklar": list(ag["kaynaklar"]), "kelly_carpani": float(ag["kelly_carpani"])}, "gozlem",
+                            float(d.get("baslangic_ozkaynak", 100_000))))
+    pf = d.get("portfoy")
+    if pf:
+        b = d["boyutlar"][pf["boyut"]]
+        ayar = Ayar(hedef_vol=b["hedef_vol"], kaldirac=b["kaldirac"], vol_pencere_gun=b["vol_pencere_gun"],
+                    frenler=bool(d.get("frenler", True)), bant=b["bant"], jev_veto=True)
+        kaynak = {k.ad: k for k in out}
+        eksik = [x for x in pf["kaynaklar"] if x not in kaynak]
+        if eksik:
+            raise ValueError(f"portföy kolunun kaynakları yok: {eksik}")
+        if any(kaynak[x].grup_adi != pf["grup"] for x in pf["kaynaklar"]):
+            raise ValueError("portföy kolunun kaynakları aynı grupta olmalı")
+        if set(pf["onsel_sharpe"]) != set(pf["kaynaklar"]):
+            raise ValueError("her kaynak kolun önsel Sharpe'ı yazılı olmalı")
+        dg.DagiticiAyar(**pf.get("dagitici", {}))  # doğrulama (yarım Kelly üstü reddedilir)
+        out.append(PaperKol(pf["ad"], PORTFOY, pf["grup"], d["gruplar"][pf["grup"]], "1h", ayar,
+                            {"kaynaklar": list(pf["kaynaklar"]), "onsel_sharpe": dict(pf["onsel_sharpe"]),
+                             "dagitici": dict(pf.get("dagitici", {}))}, "portfoy",
                             float(d.get("baslangic_ozkaynak", 100_000))))
     adlar = [k.ad for k in out]
     if len(set(adlar)) != len(adlar):

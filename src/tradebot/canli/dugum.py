@@ -6,6 +6,8 @@ Akış (her 1h bar kapanışında, `Tetik` → `Beyin.saat_kapandi`):
 2. Bu kapanışta sınırı dolan her kol (1h her saat, 4h 00/04/…, 1d 00:00 UTC) için `karar_ver` → karar deftere (emirden
    ÖNCE) → her emir `RiskMotoru.onayla` (kural 5: emre giden tek yol) → onaylıysa kolun Nautilus stratejisi piyasa emri
    gönderir → dolum/ret deftere.
+   Portföy kolu en sonda karar verir: hedefi, haftalık dağıtım katsayıları × kaynak kolların bu kapanıştaki etkin
+   hedefleridir (hafta döndüyse dağıtım önce hesaplanır, `canli/dagitici.py`).
 3. Bütün kollar son kapanışla işaretlenir, özkaynak deftere yazılır.
 4. Beş dakika sonra mutabakat: Nautilus'taki pozisyon ≠ defter → alarm, kol durdurulur (yalnız riski azaltan emir).
 
@@ -50,10 +52,11 @@ from nautilus_trader.model import (
 )
 from nautilus_trader.trading import Strategy
 
+from tradebot.canli import dagitici as dg
 from tradebot.canli import karar as kr
 from tradebot.canli.bar_akisi import CanliBarlar
 from tradebot.canli.defter import PaperDefter
-from tradebot.canli.kollar import AGRESIF, PaperKol
+from tradebot.canli.kollar import AGRESIF, PORTFOY, PaperKol
 from tradebot.kayit import log
 from tradebot.risk.motor import Durum, EmirIstegi, Piyasa, Portfoy, RiskAyar, RiskMotoru
 from tradebot.veri.takvim import ZAMAN_DILIMI_MS
@@ -85,6 +88,7 @@ class Beyin:
         self.durdurulan: set[str] = set()
         self.son_fiyat: dict[str, float] = {}
         self.son_kapanis_ms = 0
+        self.dagitim: dict | None = None  # portföy kolunun bu haftaki dağıtımı (paper_dagitim)
 
     # ------------------------------------------------------------------ karar
     def saat_kapandi(self, kapanis_ms: int, gecikmeli: bool = False) -> bool:
@@ -95,6 +99,7 @@ class Beyin:
         if any(v < beklenen for v in son.values()):
             return False
         vetolu = aktif_vetolar(self.motor, simdi)
+        self._dagitim_guncelle(kapanis_ms)
         for kol in self.kollar:
             zd_ms = ZAMAN_DILIMI_MS[kol.zd]
             sinir = kapanis_ms - kapanis_ms % zd_ms           # kolun son tamamlanmış bar sınırı
@@ -111,6 +116,22 @@ class Beyin:
         self.son_kapanis_ms = kapanis_ms
         return True
 
+    def _dagitim_guncelle(self, kapanis_ms: int) -> None:
+        """Hafta döndüyse (ya da açılışta) dağıtımı defterden okur ya da hesaplayıp yazar. Hata: katsayılar sıfır
+        (portföy düzleşir: belirsizlikte riski azalt) ve alarm."""
+        pf = next((k for k in self.kollar if k.strateji == PORTFOY), None)
+        hafta = dg.hafta_basi(kapanis_ms)
+        if pf is None or (self.dagitim is not None and self.dagitim.get("hafta_ms") == hafta):
+            return
+        kaynaklar = [k for k in self.kollar if k.ad in pf.parametre["kaynaklar"]]
+        try:
+            self.dagitim = self.defter.dagitim_getir(pf, kaynaklar, hafta)
+            _log.info("dagitim", hafta_ms=hafta, kaldirac=round(self.dagitim["kaldirac"], 4),
+                      golge=round(self.dagitim["kaldirac_golge"], 4), uygun=len(self.dagitim["uygun"]))
+        except Exception as e:  # noqa: BLE001
+            self.dagitim = {"hafta_ms": hafta, "kollar": {}, "kaldirac": 0.0, "hata": str(e)[:300]}
+            _log.error("dagitim_hatasi_portfoy_duz", hata=f"{type(e).__name__}: {e}"[:300])
+
     def _kol_karar(self, kol: PaperKol, vetolu: set[str], gecikmeli: bool, sinir_ms: int) -> None:
         h = kr.hazirla(self.barlar.canli, self.kayit, kol, bit_ms=sinir_ms)  # yalnız tamamlanmış zd barları
         bar_ms = int(h.g.t[-1])
@@ -121,6 +142,10 @@ class Beyin:
         if kol.strateji == AGRESIF:
             kaynaklar = [k for k in self.kollar if k.ad in kol.parametre["kaynaklar"]]
             hedef = kr.agresif_hedef(self.barlar.canli, self.kayit, kol, kaynaklar, sinir_ms)
+        elif kol.strateji == PORTFOY:  # kaynaklar bu kapanıştaki kararlarını verdi (liste sırası: portföy en sonda)
+            katsayi = {k: v["katsayi"] for k, v in (self.dagitim or {}).get("kollar", {}).items()}
+            hedef = dg.portfoy_hedef(katsayi, {k: self.durum[k].onceki_h for k in katsayi}, list(h.g.kimlikler),
+                                     RiskAyar(kaldirac=kol.ayar.kaldirac).enstruman_tavani, kol.yon == "long_short")
         k = kr.karar_ver(kol, h, d, vetolu, hedef)
         kid = self.defter.karar_yaz(k, h.g.veri_hash)
         d.onceki_h = dict(zip(k.kimlikler, (float(x) for x in k.etkin_hedef), strict=True))

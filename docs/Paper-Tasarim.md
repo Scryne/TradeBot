@@ -48,4 +48,43 @@ Bir kol A olur, eğer hepsi:
    yıllıklaştırılmış takip hatası ≤ %5; gerçekleşen işlem maliyeti (ücret + kayma) ≤ backtest varsayımının 1,5 katı.
 4. **Çelişki yok:** paper haftalık ortalamasının backtest haftalık dağılımına göre t ≥ −2.
 
-Dağıtıcı ve agresif gözlem kolu bu belgeye eklenecek (Faz 7 devam).
+**Terfinin kaydı (yapılacak, 8. haftadan önce):** sınıf kol tanımının parçasıdır, tanım değişirse kol yeniden açılmak
+zorunda kalır. Terfi bu yüzden ayrı, yalnız eklenen bir olay olarak yazılacak: dağıtıcı sınıfı son terfi olayından
+okur, yoksa config'deki sınıftan. Paper'da terfi otomatiktir (Final Doküman §5), ölçüt yukarıdaki dört madde.
+
+## Sermaye dağıtıcı (Claude, 2026-09-27)
+
+Kod: `src/tradebot/canli/dagitici.py` (saf), `PaperDefter.dagitim_getir` (okuma/yazma), düğümde `_dagitim_guncelle`.
+Ayar: `config/paper.yaml` → `portfoy`. Kayıt: `paper_dagitim` (göç 0007, yalnız eklenir, portföy + hafta başına bir satır).
+Elle bakış: `tradebot paper dagitim`.
+
+1. **Haftalık, Pazartesi 00:00 UTC.** Girdi, hafta başından önceki saatlik özkaynak işaretleridir. Günlük getiri = UTC
+   gününün son işaretinden son işaretine. Hafta içinde yeniden başlatmada kayıtlı dağıtım okunur, yeniden hesaplanmaz.
+2. **Risk paritesi korelasyonla:** son 180 günün ortak günlerinden kovaryans, eşit risk katkısı (ERC). Ortak geçmiş
+   28 günden azsa korelasyon 1 varsayılır: kanıt yokken çeşitlendirme varsayılmaz, bu da kaldıracı düşürür. Beş kolun
+   hepsi BTC+ETH trendi (backtest korelasyonu ~0,79). Bu yüzden yarım Kelly, kolları tek bir risk olarak görür.
+3. **Üstünlük eğimi, küçültülmüş:** Sharpe tahmini = (önsel × 365 + paper Sharpe × paper günü) / (365 + paper günü).
+   Önsel = walk-forward OOS Sharpe × 0,5 (0,83–0,96 → 0,41–0,48): seçim yanlılığı ve rejim payı. Eğim = 1 + (tahmin −
+   ortalama), 0,5–1,5 aralığında. Tahmini ≤ 0 olan kol pay almaz. 12 haftalık paper bile önselin ancak ~%19'u kadar
+   ağırlık taşır: kısa paper dönemi gürültüdür, ağırlığı bir anda çevirmemelidir.
+4. **Kaldıraç:** portföyün yarım Kelly'si, μ_p / σ_p² × 0,5 ve en fazla 3x. `kelly_kesri` 0,5'in üstüne ayarlanamaz.
+   Gerçekçi girdiyle (korelasyon 0,77, kol oynaklığı %16) gölge kaldıraç ~2,2x çıkıyor. Spot'ta risk motoru enstrüman
+   başına 0,5, sınıf başına 1,0 ile keser, portföy hedefi de enstrüman tavanında kırpılır.
+5. **Kademe ve sınıf:** yalnız A kolu sermaye alır. Kademe paper gününe göredir: 28 gün %25, 56 gün %50, 84 gün %100.
+   B→A terfisi 8. haftadan önce olamayacağı için terfi eden kol %50'den başlar. Doğrudan A girmiş bir kol (DSR ≥ 0,95)
+   4. haftada %25 alır. Kademe ve sınıf yüzünden dağıtılmayan pay nakitte kalır, başka kola aktarılmaz.
+6. **Gölge dağıtım:** B kollarının ağırlığı ve gölge kaldıraç her hafta yine kaydedilir, katsayıları 0'dır.
+   Mekanizma, sermaye verilmeden önce 8 hafta boyunca gerçek veride izlenir.
+
+**Portföy kolu (`portfoy@kripto_btc_eth`):** gerçek parada tek hesap nasıl işleyecekse öyle çalışır. Her saat hedef =
+Σ katsayı × kaynak kolun güncel etkin hedefi (kolun kendi fren ve vetosundan sonra). Kendi defteri, frenleri, Jev vetosu
+ve risk onayı vardır. Kaynaklar Jev'li kopyalardır: gerçek parada Jev açık koşacak, Jev'siz kopyalar kontrol grubudur.
+Bugün bütün kollar B olduğundan portföy düz durur. Dağıtım hesaplanamazsa katsayılar sıfırlanır: portföy düzleşir ve
+alarm verilir (belirsizlikte riski azalt).
+
+## Agresif gözlem kolu (Claude, 2026-09-27)
+
+`agresif@kripto_btc_eth`: beş kaynak kolun güncel hedeflerinin ortalaması × tam Kelly (≈ 5, aşağı yuvarlandı), enstrüman
+tavanında kırpılır. Ayrı defteri var, dağıtıma girmez. Soru şu: tam Kelly'nin fazladan getirisi, fazladan düşüşe değer
+mi? Kural 6 geçerli: portföy tavanı 3x, Binance spot'ta kaldıraç yok. Pratikte kolların ortalaması long iken enstrüman
+başına %50 taşır.

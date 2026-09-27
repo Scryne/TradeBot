@@ -36,3 +36,22 @@ agresif:
   kelly_carpani: 5.0
   kaynaklar: ["ma_yon@kripto_btc_eth@1h", "tsmom@kripto_btc_eth@4h", "d2:donchian_ls@kripto_btc_eth@4h",
               "d2:donchian_ls@kripto_btc_eth@1d", "d2:tsmom@kripto_btc_eth@4h"]
+
+# Sermaye dağıtıcı + portföy kolu (Final Doküman §Sermaye dağıtıcı; gerekçe docs/Paper-Tasarim.md; kod canli/dagitici.py).
+# Haftalık (Pazartesi 00:00 UTC): ERC (korelasyonlu) × küçültülmüş üstünlük eğimi → yarım Kelly (≤ 3x) → kademe
+# (4/8/12 hafta: %25/%50/%100). Yalnız A kolları sermaye alır; B'nin gölge ağırlığı kaydedilir, katsayısı 0.
+# Kaynaklar Jev'li kopyalardır: gerçek parada Jev açık koşar; Jev'siz kopyalar kontrol grubudur.
+# Önsel: walk-forward OOS Sharpe (turnuva sonuç dosyaları, 2026-09-27); dağıtıcı onsel_indirim ile yarıya indirir.
+portfoy:
+  ad: "portfoy@kripto_btc_eth"
+  grup: kripto_btc_eth
+  boyut: dalga1
+  kaynaklar: ["ma_yon@kripto_btc_eth@1h+jev", "tsmom@kripto_btc_eth@4h+jev", "d2:donchian_ls@kripto_btc_eth@4h+jev",
+              "d2:donchian_ls@kripto_btc_eth@1d+jev", "d2:tsmom@kripto_btc_eth@4h+jev"]
+  onsel_sharpe:
+    "ma_yon@kripto_btc_eth@1h+jev": 0.834
+    "tsmom@kripto_btc_eth@4h+jev": 0.915
+    "d2:donchian_ls@kripto_btc_eth@4h+jev": 0.829
+    "d2:donchian_ls@kripto_btc_eth@1d+jev": 0.831
+    "d2:tsmom@kripto_btc_eth@4h+jev": 0.958
+  dagitici: {onsel_indirim: 0.5, onsel_gun: 365, asgari_gun: 28, pencere_gun: 180, kelly_kesri: 0.5}
