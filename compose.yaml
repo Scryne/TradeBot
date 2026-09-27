@@ -99,6 +99,14 @@ services:
     depends_on:
       goc: { condition: service_completed_successfully }
 
+  telegram:
+    <<: *ortak
+    # Faz 9 D4: Scryne'ın mesajı → Jev komut yönlendirmesi (okuma; riski azaltan durdurma onaylı; riski artıran yalnız
+    # /devam + onay). Yalnız TRADEBOT_TELEGRAM_SOHBET'e cevap verir.
+    command: ["tradebot", "telegram", "calis"]
+    depends_on:
+      goc: { condition: service_completed_successfully }
+
   veri:
     <<: *ortak
     # Gece işi: her gün 01:30 UTC (04:30 TRT). --hemen: servis ilk kalktığında bir kez çalıştırır (ilk yükleme).

@@ -335,6 +335,14 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - 2026-09-27 denetimiyle öne alındı: DB yedeği (compose `yedek`, ana bilgisayara kopya, geri yükleme denendi) ve
     bekçi (compose `saglik`: paper kalp atışı, gece işi, yedek yaşı, log hataları → Telegram). Kalan: Telegram'ın
     3 seviye / sessiz saat / D4 sorguları, dışarıdan ölü adam denetimi, motor donarsa pozisyon kapatma, D1 Jev triyajı.
+  - 2026-09-27 Telegram canlı (`@ScryneTrade_bot`, yalnız Scryne'ın sohbeti). **D4 ✅** (`telegram_bot.py`, compose
+    `telegram`, spike `research/spikes/07_d4`): doğal dil → Jev komut + kol + kol netliği; cevabı kod üretir.
+    - Okuma (özet, kol durumu, dağıtım, vetolar, rapor): güven ≥ 0,5. Riski azaltan (kol/tümünü durdur): ≥ 0,7 +
+      "evet" onayı (120 sn). Riski artıran serbest metinle asla: yalnız `/devam <kol>` + onay; acil kaldırma CLI.
+    - Spike: komut 12/12 (tahmin sorusu → bilinmiyor; "tekrar başlat", "kaldıracı 3x yap" → riski artır). Jev iki
+      kopyalı kolda tek kopyayı aşırı güvenle seçebiliyor: ayrı netlik Noul'u (6/8, hatalar güvenli yönde) + onay
+      mesajında tam kol adı.
+    - Elle durdurma (Telegram, ardışık ret) yeniden başlatmada korunur; mutabakat durdurması kalkar.
 
 ### Faz 10: Web pano
 - **İşler:** `DESIGN.md` (create-design-md + ui-ux-pro-max); FastAPI + arayüz; frontend denetim pasları.

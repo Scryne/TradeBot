@@ -93,6 +93,13 @@ class Beyin:
         self.dagitim: dict | None = None  # portföy kolunun bu haftaki dağıtımı (paper_dagitim)
         olaylar = defter.kol_olaylari()
         self._son_olay_id = olaylar[-1].id if olaylar else 0  # açılışta durum() olayları zaten uyguladı
+        # Elle (Telegram/CLI) durdurulan kol yeniden başlatmada durdurulmuş kalır: son elle olay `durdur` ise. Mutabakat
+        # durdurması kalkar (toparlanma sandbox'ı defterden kurar, fark ortadan kalkar).
+        son_elle: dict[str, str] = {}
+        for o in olaylar:
+            if o.tur == "devam" or (o.tur == "durdur" and o.ayrinti.get("neden") != "mutabakat"):
+                son_elle[o.kol] = o.tur
+        self.durdurulan |= {k for k, t in son_elle.items() if t == "durdur" and k in self.durum}
 
     # ------------------------------------------------------------------ karar
     def saat_kapandi(self, kapanis_ms: int, gecikmeli: bool = False) -> bool:
@@ -123,9 +130,16 @@ class Beyin:
         return True
 
     def _olaylari_uygula(self) -> None:
-        """Çalışırken yazılan onaylı `acil_kaldir` olayları (CLI) bir sonraki kapanışta uygulanır."""
+        """Çalışırken yazılan olaylar bir sonraki kapanışta uygulanır: onaylı `acil_kaldir` (CLI), elle `durdur` ve
+        `devam` (Telegram, onaylı). Düğümün kendi yazdığı mutabakat durdurması zaten uygulanmıştır."""
         for o in self.defter.kol_olaylari(id_sonra=self._son_olay_id):
             self._son_olay_id = o.id
+            if o.kol in self.durum and o.tur == "durdur" and o.ayrinti.get("neden") != "mutabakat":
+                self.durdurulan.add(o.kol)
+                _log.warning("kol_elle_durduruldu", kol=o.kol, neden=o.ayrinti.get("neden"))
+            elif o.kol in self.durum and o.tur == "devam":
+                self.durdurulan.discard(o.kol)
+                _log.warning("kol_elle_devam", kol=o.kol)
             d = self.durum.get(o.kol)
             iz = d.izleyici if d is not None else None
             if o.tur == "acil_kaldir" and iz is not None and iz.durum == Durum.ACIL_DURDURMA:

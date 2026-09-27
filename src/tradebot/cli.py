@@ -663,3 +663,16 @@ def paper_rapor(hafta: int = typer.Option(1, help="Kaç hafta önce (1 = geçen 
     _, md, yol = rapor.uret(db_motor(a), a.veri_dizini, h)
     typer.echo(md)
     typer.echo(f"→ {yol}")
+
+
+telegram_uygulama = typer.Typer(help="Telegram botu (Faz 9, D4): doğal dil sorgu, onaylı durdurma", no_args_is_help=True)
+uygulama.add_typer(telegram_uygulama, name="telegram")
+
+
+@telegram_uygulama.command("calis")
+def telegram_calis() -> None:
+    """Uzun yoklamayla Telegram botu (compose `telegram`); yalnız TRADEBOT_TELEGRAM_SOHBET'e cevap verir."""
+    from tradebot.telegram_bot import calistir
+
+    kur(ayarlar())
+    calistir()
