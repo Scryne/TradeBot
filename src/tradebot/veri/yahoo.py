@@ -68,7 +68,7 @@ def normalize(df: pl.DataFrame, takvim_adi: str) -> tuple[pl.DataFrame, dict]:
     - Düzeltilmiş seride seyrek OHLC tutarsızlığı (açılış ayrı ölçeklenmiş, ~%1): yüksek/düşük O/K'yı kapsayacak
       şekilde genişletilir."""
     if df.is_empty():
-        return df, {"kapali_gun_atildi": 0, "ohlc_onarildi": 0}
+        return df, {"kapali_gun_atildi": 0, "ohlc_onarildi": 0, "sicrama_atildi": 0}
     t = df["acilis_ms"].to_numpy()
     acik = np.isin(t, takvim(takvim_adi).gunluk_barlar(int(t[0]), int(t[-1]) + 1))
     hacim = df["volume"].fill_null(0.0).to_numpy()
@@ -78,9 +78,19 @@ def normalize(df: pl.DataFrame, takvim_adi: str) -> tuple[pl.DataFrame, dict]:
     bayat = (hacim < 0.01 * medyan) | duz
     at = ~acik & bayat
     tutarsiz = (hi < np.maximum(op, cl)) | (lo > np.minimum(op, cl))
+    # İmkânsız sıçra-dön: kapanıştan kapanışa > ±%25 ve ertesi gün en az yarısı kadar geri. BIST'in günlük fiyat limiti
+    # bunun çok altında, büyük ETF'ler de bir günde %25 sıçrayıp dönmez. Denetim: TRHOL 2025-01-10 ×102; 243 BIST
+    # serisinin 221'inde bölünme kaydı var (düzeltmenin yanlış güne uygulanması). Bar atılır (eksik gün olur).
+    lr = np.diff(np.log(np.where(cl > 0, cl, np.nan)))
+    sic = np.zeros(len(cl), dtype=bool)
+    if len(lr) > 1:
+        buyuk = np.abs(lr[:-1]) > np.log(1.25)
+        don = (np.sign(lr[1:]) == -np.sign(lr[:-1])) & (np.abs(lr[1:]) >= 0.5 * np.abs(lr[:-1]))
+        sic[1:-1] = buyuk & don
     df = df.with_columns(pl.max_horizontal("open", "high", "low", "close").alias("high"),
-                         pl.min_horizontal("open", "high", "low", "close").alias("low")).filter(pl.Series(~at))
-    return df, {"kapali_gun_atildi": int(at.sum()), "ohlc_onarildi": int(tutarsiz.sum())}
+                         pl.min_horizontal("open", "high", "low", "close").alias("low")).filter(pl.Series(~(at | sic)))
+    return df, {"kapali_gun_atildi": int(at.sum()), "ohlc_onarildi": int(tutarsiz.sum()),
+                "sicrama_atildi": int((sic & ~at).sum())}
 
 
 def tamamlanmamis_at(df: pl.DataFrame, takvim_adi: str, simdi_ms: int, tampon_ms: int = 15 * 60_000) -> pl.DataFrame:

@@ -71,7 +71,8 @@ def rapor(df: pl.DataFrame, zaman_dilimi: str, takvim_adi: str, simdi_ms: int | 
     if len(lr) > 50:
         s = pl.Series(np.abs(lr)).rolling_median(window_size=50, min_samples=10).to_numpy()
         esik = SICRAMA_KAT * np.nan_to_num(s, nan=np.inf) / 0.6745
-        buyuk = np.abs(lr) > np.maximum(esik, 1e-4)
+        # taban: sessiz, likit olmayan seride göreli eşik %1'lik oynamalara iniyordu (denetim: BIST'te %1,4 "sıçrama")
+        buyuk = np.abs(lr) > np.maximum(esik, 0.05 if zaman_dilimi == "1d" else 0.02)
         # Kötü tick izi: büyük hareketin hemen ardından en az yarısı kadar ters hareket (sıçra-dön). Geri dönmeyen büyük
         # hareket gerçek olabilir (küçük coinler, haber): yalnız sayılır, uyarı değildir. 2026-09-27 denetimi: eski
         # tanımla Binance serilerinin 711/735'i UYARI'ydı, uyarı anlamını yitirmişti.

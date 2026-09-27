@@ -60,6 +60,25 @@ def test_normalize_kapali_gun_bayat_ise_atilir_ohlc_onarilir():
         pl.when(pl.col("acilis_ms") == int(t[0])).then(9.9).otherwise(pl.col("high")).alias("high"))  # tutarsız
     out, d = normalize(df, "XIST")
     assert 1_675_814_400_000 not in out["acilis_ms"].to_list() and hafta_sonu[0] in out["acilis_ms"].to_list()
-    assert d == {"kapali_gun_atildi": len(kapali) - 1, "ohlc_onarildi": 1}
+    assert d == {"kapali_gun_atildi": len(kapali) - 1, "ohlc_onarildi": 1, "sicrama_atildi": 0}
     ilk = out.row(0, named=True)
     assert ilk["high"] == 10.2 and ilk["low"] == 9.5
+
+
+def test_normalize_imkansiz_sicra_don_atilir():
+    import numpy as np
+    import polars as pl
+
+    from tradebot.veri.takvim import takvim
+    from tradebot.veri.yahoo import normalize
+
+    t0 = 1_704_067_200_000  # 2024-01-01
+    t = takvim("XIST").gunluk_barlar(t0, t0 + 60 * 86_400_000)
+    n = len(t)
+    c = 10 * np.exp(np.cumsum(np.full(n, 0.002)))
+    c[20] *= 102.0                                   # TRHOL tipi: ×102, ertesi gün geri
+    c[40:] *= 1.3                                    # kalıcı +%30 (geri dönmüyor): kalır
+    df = pl.DataFrame({"acilis_ms": t, "open": c, "high": c, "low": c * 0.999, "close": c, "volume": np.full(n, 1e6)})
+    out, d = normalize(df, "XIST")
+    assert d["sicrama_atildi"] == 1 and int(t[20]) not in out["acilis_ms"].to_list() and len(out) == n - 1
+
