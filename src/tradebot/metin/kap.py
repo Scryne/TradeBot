@@ -97,9 +97,13 @@ def sayfa_govdesi(sayfa_html: str) -> str:
 class KapBildirim:
     KAYNAK = KAYNAK
 
-    def __init__(self, ham: HamDepo, motor: Engine, http: NazikIstemci | None = None) -> None:
+    def __init__(self, ham: HamDepo, motor: Engine, http: NazikIstemci | None = None, aralik_sn: float = 0.5,
+                 deneme: int = 2) -> None:
+        """Ölçüm (2026-09-26): 0,5 sn aralıkla ~100 sayfa isteğinden sonra 429 "Request Limit Exceeded", ~3 dk sürüyor.
+        Canlı: az istek, 2 deneme (engelde servis turu Binance'i bekletmesin; kalan sonraki turda). Geçmiş doldurma:
+        `aralik_sn` 3, 6 deneme (üstel bekleme engeli aşar)."""
         self.ham, self.motor = ham, motor
-        self.http = http or NazikIstemci("kap", aralik_sn=0.5, deneme=6, geri_cekilme_sn=5.0,
+        self.http = http or NazikIstemci("kap", aralik_sn=aralik_sn, deneme=deneme, geri_cekilme_sn=5.0,
                                          basliklar={"User-Agent": "Mozilla/5.0", "Accept-Language": "tr"})
 
     def liste(self, gun: date) -> list[dict]:

@@ -448,7 +448,7 @@ def zeka_kap_geri_doldur(
     from tradebot.zeka.servis import kur as zeka_kur
 
     a, m = _veri_baglam()
-    t = KapBildirim(HamDepo(a.veri_dizini, m), m)
+    t = KapBildirim(HamDepo(a.veri_dizini, m), m, aralik_sn=3.0, deneme=6)
     g, son = date.fromisoformat(bas), (date.fromisoformat(bit) if bit else date.today())
     kayitci, toplam = log("zeka.kap"), 0
     while g <= son:
