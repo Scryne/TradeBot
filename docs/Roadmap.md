@@ -266,6 +266,10 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - C1 ✅ (`docs/olcum/C1-Veto-Etkisi.md`, plan `2026-09-27-c1-veto-etkisi`): A1 vetosu sonrası 7 gün BTC'ye göre
     medyan −%21 (%83 negatif) → koruma VAR; `token_delist` 30 günde −%58. A2 (kısmi KAP) 7 gün −%1 → ZAYIF;
     `olumsuz_esasli` etkisiz, `pazar_tedbiri` hafif koruma. A2 süreleri KAP geçmişi tamamlanınca yeni planla ölçülür.
+  - C2 ✅ (`docs/olcum/C2-FOMC-Ton.md`, plan `2026-09-27-c2-fomc-ton`): 173 FOMC kararı, spike 4/4. Jev metni doğru okuyor
+    (karar dağılımı gerçeğe yakın) ama Δton ne aynı gün tahvil tepkisini (t = −0,70) ne sonraki 5 günü açıklıyor →
+    **özelliğe girmez**. Neden: ton değişimi piyasanın beklediği şey; sürpriz, beklenti verisi (fed funds vadeli) ister.
+  - Faz 6'da kalan: B1 çapraz kontrolü (KAP geçmişi ~2026-10-07). Bitince Faz 6 kapanır.
   - B1 (tasarım, 2026-09-27): asıl değer düzeltilmemiş bölünmeyi yakalamak. Yahoo bir bedelsizi atlarsa seride kalıcı
     −%50 boşluk kalır; kalite raporunun sıçra-dön kuralı onu görmez (geri dönmüyor). Kural: BIST'te büyük, geri dönmeyen
     açılış boşluğu + ±30 gün içinde A2 `kurumsal` olayı + Yahoo'da bölünme kaydı yok → "düzeltilmemiş kurumsal işlem
