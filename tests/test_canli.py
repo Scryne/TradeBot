@@ -111,3 +111,121 @@ def test_defter_durumu_kayitlardan_kurar(ayar):
     degismis = dataclasses.replace(kol, parametre={"hizli_gun": 2, "yavas_gun": 4})
     with pytest.raises(ValueError, match="tanım değişti"):
         df.kol_ac(degismis)
+
+
+def test_canli_barlar_kopyalar_tamamlar_yalniz_kapanmis(tmp_path, ayar):
+    import json as _json
+
+    from tradebot.canli.bar_akisi import CanliBarlar
+    from tradebot.db import metadata, motor
+    from tradebot.veri.depo import HamDepo
+
+    m = motor(ayar)
+    metadata.create_all(m)
+    ana, _ = sentetik_depo(tmp_path / "ana", n=48)
+    son_ana = int(ana.oku("BINANCE:AAAUSDT", "1h")["acilis_ms"].max())
+
+    class Http:
+        def __init__(self):
+            self.istek = []
+
+        def al(self, url, params=None):
+            self.istek.append(params)
+            bas = params["startTime"]
+            return _json.dumps([[bas + i * SAAT, "1", "2", "0.5", "1.5", "10", bas + (i + 1) * SAAT - 1, "15", 3]
+                                for i in range(5)]).encode()
+
+    http = Http()
+    cb = CanliBarlar(ana, BarDepo(tmp_path / "canli"), HamDepo(tmp_path / "ham", m), http)
+    simdi = son_ana + 4 * SAAT + SAAT // 2          # 3 yeni bar kapanmış, 4.'sü açık
+    son = cb.hazirla(["BINANCE:AAAUSDT"], simdi)
+    assert son["BINANCE:AAAUSDT"] == son_ana + 3 * SAAT
+    df = cb.canli.oku("BINANCE:AAAUSDT", "1h")
+    assert len(df) == 48 + 3 and df["quote_volume"][-1] == 15.0
+    assert cb.guncelle(["BINANCE:AAAUSDT"], simdi)["BINANCE:AAAUSDT"] == son_ana + 3 * SAAT and len(http.istek) == 1
+
+
+class SahteBarlar:
+    """CanliBarlar yerine: depo hazır, guncelle son bar açılışlarını döndürür."""
+
+    def __init__(self, depo):
+        self.canli = depo
+
+    def guncelle(self, kimlikler, simdi_ms):
+        return {k: int(self.canli.oku(k, "1h")["acilis_ms"].max()) for k in kimlikler}
+
+
+class SahteStrateji:
+    def __init__(self, beyin, kol):
+        self.beyin, self.kol, self.poz, self.gonderilen = beyin, kol, {}, []
+
+    def adim(self, kim):
+        return 1e-6
+
+    def yuvarla(self, kim, q):
+        return round(q, 6)
+
+    def pozisyon(self, kim):
+        return self.poz.get(kim, 0.0)
+
+    def gonder(self, karar_id, kim, q, fiyat, tur, risk):
+        eid = self.beyin.defter.emir_yaz(self.kol.ad, karar_id, f"c{len(self.gonderilen)}-{self.kol.ad}", kim, q, q,
+                                         fiyat, tur, risk)
+        self.gonderilen.append((kim, q, tur))
+        px = fiyat * 1.0005
+        self.beyin.defter.olay_yaz(eid, self.kol.ad, "dolum" if tur != "toparlanma" else "toparlanma", kim, q, px,
+                                   abs(q) * px * 0.001, 0)
+        self.poz[kim] = self.poz.get(kim, 0.0) + q
+        self.beyin.dolum(self.kol.ad, kim, q, px, abs(q) * px * 0.001, tur)
+
+
+def test_beyin_karar_emir_defter_ve_mutabakat(tmp_path, ayar, monkeypatch):
+    import dataclasses
+
+    from tradebot.canli import dugum
+    from tradebot.canli.defter import PaperDefter
+    from tradebot.db import metadata, motor
+
+    monkeypatch.setattr(dugum, "aktif_vetolar", lambda m, t: set())
+    m = motor(ayar)
+    metadata.create_all(m)
+    depo, t = sentetik_depo(tmp_path, n=24 * 40)
+    k1 = dataclasses.replace(kol_yap(frenler=False), baslangic_ozkaynak=100_000.0)
+    k4 = dataclasses.replace(k1, ad="ma_yon@test@4h", zd="4h")
+    df = PaperDefter(m, "test")
+    for k in (k1, k4):
+        df.kol_ac(k, int(t[0]))
+    b = dugum.Beyin(m, [k1, k4], df, SahteBarlar(depo), KAYIT)
+    for k in (k1, k4):
+        b.stratejiler[k.ad] = SahteStrateji(b, k)
+    kapanis = int(t[-1]) + SAAT                                  # son barın kapanışı
+    monkeypatch.setattr(dugum.time, "time", lambda: (kapanis + 5_000) / 1000)  # saat: kapanıştan 5 sn sonra
+    assert b.saat_kapandi(kapanis)
+    from sqlalchemy import func, select
+
+    from tradebot.db import paper_karar, paper_ozkaynak
+    with m.connect() as c:
+        kararlar = dict(c.execute(select(paper_karar.c.kol, func.count()).group_by(paper_karar.c.kol)).all())
+        assert c.execute(select(func.count()).select_from(paper_ozkaynak)).scalar() == 2
+    assert kararlar.get(k1.ad) == 1
+    assert kararlar.get(k4.ad, 0) == (1 if dugum.sinir_doldu("4h", kapanis) else 0)
+    assert b.saat_kapandi(kapanis)                               # aynı kapanış: ikinci karar yok
+    with m.connect() as c:
+        assert c.execute(select(func.count()).select_from(paper_karar).where(paper_karar.c.kol == k1.ad)).scalar() == 1
+    s1 = b.stratejiler[k1.ad]
+    assert s1.gonderilen and all(tur == "karar" for _, _, tur in s1.gonderilen)
+    assert df.durum(k1).adet == pytest.approx(b.durum[k1.ad].adet)  # bellek = defter
+    assert b.mutabakat() == {}
+    kim = next(iter(s1.poz))
+    s1.poz[kim] += 1.0                                           # Nautilus'ta sapma
+    assert k1.ad in b.mutabakat() and k1.ad in b.durdurulan
+    s1.poz = {}                                                  # yeniden başlatma: sandbox boş
+    b.toparla()
+    assert s1.gonderilen[-1][2] == "toparlanma" and df.durum(k1).adet == pytest.approx(b.durum[k1.ad].adet)
+
+
+def test_sinir_doldu():
+    from tradebot.canli.dugum import sinir_doldu
+    gun = 1_700_000_000_000 - 1_700_000_000_000 % 86_400_000
+    assert sinir_doldu("1h", gun + 5 * SAAT) and not sinir_doldu("4h", gun + 5 * SAAT)
+    assert sinir_doldu("4h", gun + 8 * SAAT) and sinir_doldu("1d", gun) and not sinir_doldu("1d", gun + 4 * SAAT)
