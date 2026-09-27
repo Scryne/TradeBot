@@ -248,6 +248,15 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   (Faz 6'dan taşındı).
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
+  - 2026-09-27 paper düğümü canlı (compose `paper`, 02:20 UTC). Tasarım ve B→A terfi ölçütü: `docs/Paper-Tasarim.md`.
+    - 5 paper kolu × Jev A/B = 10 sanal defter (kol başına 100.000 USDT), Binance canlı veri + Nautilus sandbox.
+    - Karar backtest'in aynı fonksiyonlarıyla (`dengele_adim` backtest döngüsünden çıkarıldı); canlı ↔ backtest ağırlık
+      yolu 1e-9 birebir (test); refaktör sonrası kayıtlı turnuva sonuçları gerçek veriyle birebir.
+    - Defter PostgreSQL'de (göç 0006, yalnız eklenir); toparlanma, mutabakat, risk onayı.
+    - Duman testi (ayrı SQLite): Nautilus v2 API farkları (Binance sağlayıcı config, StrategyId, kurucu yalnız config,
+      on_quote) düzeltildi; ücret 10 bps.
+  - Sırada: sermaye dağıtıcı + agresif gözlem kolu, haftalık rapor, A6 emir reddi sınıflandırma, yeniden başlatma
+    tatbikatı (toparlanma canlıda).
 
 ### Faz 8: Özel bağlantılar — MT5 + BIST
 - **İşler:** MT5 demo köprüsü (Windows tarafı; veri + simüle ya da demo emir); BIST gecikmeli veri
