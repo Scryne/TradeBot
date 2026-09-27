@@ -190,6 +190,79 @@ olay = Table(
     Index("ix_olay_enstruman", "enstruman", "gecerli_ms"),
 )
 
+# --- Faz 7: paper defteri (hepsi yalnız eklenir; kol durumu bu kayıtlardan yeniden kurulur) ---
+paper_kol = Table(
+    "paper_kol",
+    metadata,
+    Column("kol", String(96), primary_key=True),
+    Column("acilis", DateTime(timezone=True), nullable=False),
+    Column("baslangic_ms", BigInteger, nullable=False),
+    Column("baslangic_ozkaynak", Float, nullable=False),
+    Column("sinif", String(8), nullable=False),          # B (sermayesiz gözlem) | A (sermayeli)
+    Column("tanim", JSONT, nullable=False),              # config/paper.yaml satırı (strateji, parametre, boyut, jev)
+    Column("kod_surumu", String(64), nullable=False),
+)
+
+paper_karar = Table(
+    "paper_karar",
+    metadata,
+    Column("id", KIMLIK, primary_key=True, autoincrement=True),
+    Column("kol", String(96), nullable=False),
+    Column("bar_ms", BigInteger, nullable=False),        # kararın dayandığı son kapanmış barın açılışı
+    Column("karar_ms", BigInteger, nullable=False),      # duvar saati: emirden ÖNCE yazıldığının kanıtı
+    Column("kod_surumu", String(64), nullable=False),
+    Column("veri_hash", String(64), nullable=False),
+    Column("durum", String(16), nullable=False),         # normal | fren_* | acil_durdurma
+    Column("ayrinti", JSONT, nullable=False),            # kimlikler, hedef, etkin, kaymis, yeni, fiyat, veto, miktar
+    UniqueConstraint("kol", "bar_ms", name="uq_paper_karar"),
+)
+
+paper_emir = Table(
+    "paper_emir",
+    metadata,
+    Column("id", KIMLIK, primary_key=True, autoincrement=True),
+    Column("kol", String(96), nullable=False),
+    Column("karar_id", BigInteger),                      # toparlanma emrinde boş
+    Column("istemci_emir_id", String(64), nullable=False, unique=True),
+    Column("enstruman", String(64), nullable=False),
+    Column("istenen", Float, nullable=False),            # işaretli adet
+    Column("onaylanan", Float, nullable=False),          # risk motorundan sonra (0 = ret)
+    Column("karar_fiyati", Float, nullable=False),       # son kapanış (kayma ölçümü için)
+    Column("zaman_ms", BigInteger, nullable=False),
+    Column("tur", String(16), nullable=False),           # karar | toparlanma
+    Column("risk", JSONT, nullable=False),               # {onay, gerekceler, risk_azaltan}
+)
+
+paper_emir_olay = Table(
+    "paper_emir_olay",
+    metadata,
+    Column("id", KIMLIK, primary_key=True, autoincrement=True),
+    Column("emir_id", BigInteger, nullable=False),
+    Column("kol", String(96), nullable=False),
+    Column("tur", String(16), nullable=False),           # dolum | ret | iptal
+    Column("enstruman", String(64), nullable=False),
+    Column("miktar", Float, nullable=False),             # dolumda işaretli adet
+    Column("fiyat", Float),
+    Column("ucret", Float, nullable=False),              # kote para (USDT)
+    Column("zaman_ms", BigInteger, nullable=False),
+    Column("ayrinti", JSONT, nullable=False),
+    Index("ix_paper_emir_olay_kol", "kol", "zaman_ms"),
+)
+
+paper_ozkaynak = Table(
+    "paper_ozkaynak",
+    metadata,
+    Column("id", KIMLIK, primary_key=True, autoincrement=True),
+    Column("kol", String(96), nullable=False),
+    Column("zaman_ms", BigInteger, nullable=False),
+    Column("ozkaynak", Float, nullable=False),
+    Column("nakit", Float, nullable=False),
+    Column("pozisyon", JSONT, nullable=False),           # {enstrüman: adet}
+    Column("fiyat", JSONT, nullable=False),              # {enstrüman: işaret fiyatı}
+    Index("ix_paper_ozkaynak_kol", "kol", "zaman_ms"),
+)
+
+
 def motor(a: Ayarlar) -> Engine:
     if a.veritabani_url is None:
         raise RuntimeError("TRADEBOT_VERITABANI_URL tanımlı değil")

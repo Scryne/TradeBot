@@ -77,3 +77,37 @@ def test_paper_kollari_config():
     ad = {k.ad: k for k in ks}
     assert ad["d2:donchian_ls@kripto_btc_eth@4h"].parametre == {"giris_gun": 55, "cikis_gun": 20}
     assert ad["tsmom@kripto_btc_eth@4h+jev"].ayar.vol_pencere_gun == 30
+
+
+def test_defter_durumu_kayitlardan_kurar(ayar):
+    import dataclasses
+
+    from sqlalchemy.exc import IntegrityError
+
+    from tradebot.canli.defter import PaperDefter
+    from tradebot.db import metadata, motor
+
+    m = motor(ayar)
+    metadata.create_all(m)
+    df = PaperDefter(m, "test")
+    kol = dataclasses.replace(kol_yap(), baslangic_ozkaynak=1000.0)
+    assert df.kol_ac(kol, 0) and not df.kol_ac(kol, 0)
+    d0 = df.durum(kol)
+    assert d0.nakit == 1000.0 and d0.adet == {} and d0.ilk
+    k = kr.Karar(kol.ad, 3600_000, ("BINANCE:AAAUSDT",), np.array([0.5]), np.array([0.5]), np.array([0.0]),
+                 np.array([0.5]), np.array([True]), np.array([100.0]), "normal", (), {"BINANCE:AAAUSDT": 5.0})
+    kid = df.karar_yaz(k, "h")
+    assert df.karar_var(kol.ad, 3600_000) == kid
+    with pytest.raises(IntegrityError):
+        df.karar_yaz(k, "h")                                  # aynı bar için ikinci karar yok
+    eid = df.emir_yaz(kol.ad, kid, "e1", "BINANCE:AAAUSDT", 5.0, 5.0, 100.0, "karar", {"onay": True})
+    df.olay_yaz(eid, kol.ad, "dolum", "BINANCE:AAAUSDT", 5.0, 101.0, 0.5, 7200_000)
+    d = df.durum(kol)
+    assert d.adet == {"BINANCE:AAAUSDT": 5.0} and d.nakit == pytest.approx(1000 - 505 - 0.5)
+    assert d.onceki_h == {"BINANCE:AAAUSDT": 0.5} and not d.ilk
+    d.isaretle({"BINANCE:AAAUSDT": 110.0})
+    df.ozkaynak_yaz(kol.ad, 7200_000, d, {"BINANCE:AAAUSDT": 110.0})
+    assert df.durum(kol).ozkaynak == pytest.approx(494.5 + 550)
+    degismis = dataclasses.replace(kol, parametre={"hizli_gun": 2, "yavas_gun": 4})
+    with pytest.raises(ValueError, match="tanım değişti"):
+        df.kol_ac(degismis)
