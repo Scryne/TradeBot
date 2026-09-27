@@ -24,7 +24,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 6 | Zekâ katmanı (Jev) | 🔄 Devam Ediyor | Toplayıcılar (Binance, KAP, RSS, Fed/ECB/TCMB); Jev servisi + NVIDIA yükseltme; A1, A2 canlı; B1 çapraz kontrolü; yargılar dondurulabiliyor; C1–C2 ölçüldü (A4, A5, D3, B2, B4 girdilerinin doğduğu faza taşındı, 2026-09-27) |
 | 7 | Paper canlı — kripto + ABD ETF | ✅ Tamamlandı | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
 | 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | ⏳ Bekliyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
-| 9 | Operasyon: gözetmen, Telegram, raporlar | ⏳ Bekliyor | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
+| 9 | Operasyon: gözetmen, Telegram, raporlar | 🔄 Devam Ediyor | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
 | 10 | Web pano | ⏳ Bekliyor | DESIGN.md dolu; PnL, pozisyon, turnuva tablosu, veto geçmişi, sağlık; Tailscale üzerinden telefondan erişim |
 | 11 | Paper turnuvası — 12 hafta | 🔄 Devam Ediyor | 12 hafta kesintisiz paper; kademeli sermaye çalıştı; hangi kolların kapıyı geçtiği ve Jev katkısı raporlandı; maliyet varsayımları ölçüldü |
 | 12 | Gerçek para (koşullu) | ⏳ Bekliyor | Scryne'ın kararı + aracı kurum/borsa + anahtar (çekim kapalı, IP kısıtlı) + vergi netliği; sabit tavanlı mikro sermaye; ilk emir Scryne onayıyla |
@@ -333,8 +333,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
   - 2026-09-27 denetimiyle öne alındı: DB yedeği (compose `yedek`, ana bilgisayara kopya, geri yükleme denendi) ve
-    bekçi (compose `saglik`: paper kalp atışı, gece işi, yedek yaşı, log hataları → Telegram). Kalan: Telegram'ın
-    3 seviye / sessiz saat / D4 sorguları, dışarıdan ölü adam denetimi, motor donarsa pozisyon kapatma, D1 Jev triyajı.
+    bekçi (compose `saglik`: paper kalp atışı, gece işi, yedek yaşı, log hataları → Telegram).
   - 2026-09-27 Telegram canlı (`@ScryneTrade_bot`, yalnız Scryne'ın sohbeti). **D4 ✅** (`telegram_bot.py`, compose
     `telegram`, spike `research/spikes/07_d4`): doğal dil → Jev komut + kol + kol netliği; cevabı kod üretir.
     - Okuma (özet, kol durumu, dağıtım, vetolar, rapor): güven ≥ 0,5. Riski azaltan (kol/tümünü durdur): ≥ 0,7 +
@@ -343,6 +342,17 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
       kopyalı kolda tek kopyayı aşırı güvenle seçebiliyor: ayrı netlik Noul'u (6/8, hatalar güvenli yönde) + onay
       mesajında tam kol adı.
     - Elle durdurma (Telegram, ardışık ret) yeniden başlatmada korunur; mutabakat durdurması kalkar.
+  - 2026-09-27 dış ölü adam ✅: bekçi her turda healthchecks.io'ya sinyal yollar, kritik kontrol HATA ise `/fail`.
+  - 2026-09-27 bildirim seviyeleri ✅. İlk 3 saatte 8 mesajın 3'ü yanlış KRİTİK'ti: saat/DNS tek turluk sıçrama, 5 dk
+    sonra kendiliğinden düzelmiş.
+    - Saat ölçümü hatalıydı: Binance farkında t1 bağlantı kurulmadan alınıyordu. DNS + TLS süresi pencereye giriyor, kayma
+      hep pozitif çıkıyordu (+2,1 sn). Artık açık bağlantıda 3 örnek alınıyor, en kısa gidiş-dönüş kullanılıyor
+      (ana makinede +0,14 sn). NTP'de de ad çözümlemesi pencerenin dışında.
+    - `DurumIzleyici`: ortam kontrolleri (DNS, saat, disk) art arda 3 tur (15 dk) aynı yönde kalmadan bildirilmez;
+      histerezisli, düzelme de onay ister. Kritikler (paper, gece işi, yedek, veritabanı) ilk turda.
+    - Sessiz saat 19–05 UTC (İstanbul 22–08): KRİTİK anında, UYARI/BİLGİ biriktirilir, sabah tek mesaj.
+  - Faz 9'da kalan: motor donarsa pozisyon kapatma (bağımsız gözetmen), günlük özet, D1 Jev log triyajı, arıza
+    tatbikatları.
 
 ### Faz 10: Web pano
 - **İşler:** `DESIGN.md` (create-design-md + ui-ux-pro-max); FastAPI + arayüz; frontend denetim pasları.

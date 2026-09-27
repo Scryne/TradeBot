@@ -2,6 +2,7 @@
 import json
 from datetime import UTC, datetime, timedelta
 
+import pytest
 from sqlalchemy import create_engine
 
 from tradebot import denetim, saglik
@@ -76,10 +77,60 @@ def test_bildirim_susturma_ve_kanal(ayar):
     assert not Bildirici(a, gonderici=giden.append).gonder("KRITIK", "x")  # token yok: yalnız log
     from pydantic import SecretStr
     a = a.model_copy(update={"telegram_token": SecretStr("t")})
-    b = Bildirici(a, sessiz_sn=3600, gonderici=giden.append)
+    b = Bildirici(a, sessiz_sn=3600, gonderici=giden.append, saat=lambda: datetime(2026, 9, 27, 12, tzinfo=UTC))
     assert b.gonder("KRITIK", "paper durdu", anahtar="k") and not b.gonder("KRITIK", "paper durdu", anahtar="k")
     assert b.gonder("BILGI", "düzeldi")
     assert len(giden) == 2 and "KRITIK" in giden[0]
+
+
+def test_sessiz_saat_biriktirir_kritik_gecer(ayar):
+    from pydantic import SecretStr
+
+    from tradebot.bildirim import sessiz_mi
+    assert sessiz_mi(19, (19, 5)) and sessiz_mi(23, (19, 5)) and sessiz_mi(4, (19, 5))
+    assert not sessiz_mi(5, (19, 5)) and not sessiz_mi(12, (19, 5)) and sessiz_mi(3, (2, 6))
+    giden, simdi = [], [datetime(2026, 9, 27, 21, tzinfo=UTC)]   # İstanbul 00:00
+    a = ayar.model_copy(update={"telegram_sohbet": "1", "telegram_token": SecretStr("t")})
+    b = Bildirici(a, gonderici=giden.append, saat=lambda: simdi[0])
+    assert not b.gonder("UYARI", "dns: UYARI") and not b.gonder("BILGI", "haftalık rapor")
+    assert b.gonder("KRITIK", "paper: HATA")                 # kritik gece de anında
+    assert b.bosalt() == 0 and len(giden) == 1               # hâlâ gece
+    simdi[0] = datetime(2026, 9, 28, 5, 5, tzinfo=UTC)
+    assert b.bosalt() == 2 and len(giden) == 2 and b.bekleyen == []
+    assert "gece biriken 2" in giden[1] and "dns: UYARI" in giden[1] and "haftalık rapor" in giden[1]
+    assert b.bosalt() == 0
+    simdi[0] = datetime(2026, 9, 28, 20, tzinfo=UTC)         # uzun birikim: sınırda bölünür
+    for i in range(30):
+        b.gonder("UYARI", f"{i}: " + "x" * 300)
+    simdi[0] = datetime(2026, 9, 29, 6, tzinfo=UTC)
+    assert b.bosalt() == 30 and len(giden) == 5 and all(len(m) <= 4000 for m in giden)
+
+
+def test_durum_izleyici_ortam_onay_ister():
+    S = saglik.Sonuc
+    iz = saglik.DurumIzleyici(onay=3)
+    tur = lambda ad, d: iz.isle(S(ad, d, ""))  # noqa: E731
+    # açılış: sorunsuz → bildirim yok; kritik kontrol ilk turda
+    assert tur("dns", "OK") == (True, False) and tur("paper", "OK") == (True, False)
+    assert tur("paper", "HATA") == (True, True) and iz.bildirilen["paper"] == "HATA"
+    assert tur("paper", "OK") == (True, True) and iz.bildirilen["paper"] == "OK"
+    # tek turluk DNS sıçraması bildirilmez (host'ta 2026-09-27: HATA → 5 dk sonra OK)
+    assert tur("dns", "HATA")[1] is False and tur("dns", "OK")[1] is False and tur("dns", "OK")[1] is False
+    # UYARI/HATA arasında gidip gelen kalıcı sorun: UYARI olarak onaylanır, sonra HATA'ya yükselir
+    assert [tur("dns", d)[1] for d in ("HATA", "UYARI", "HATA")] == [False, False, True]
+    assert iz.bildirilen["dns"] == "UYARI"
+    assert [tur("dns", d)[1] for d in ("HATA", "HATA")] == [False, True] and iz.bildirilen["dns"] == "HATA"
+    # düzelme de onay ister; tek iyi tur yetmez
+    assert [tur("dns", d)[1] for d in ("OK", "HATA", "OK", "OK", "OK")] == [False, False, False, False, True]
+    assert iz.bildirilen["dns"] == "OK"
+    # sırlar hiç bildirilmez
+    assert tur("sirlar", "UYARI") == (True, False)
+
+
+def test_en_kisa_gidis_donus():
+    # 2. örnekte bağlantı gecikmesi (4 sn): orta nokta sapar; en kısa örnek gerçek farkı (+0,1) verir
+    assert saglik.en_kisa_gidis_donus([(100.0, 100.2, 100.2), (200.0, 204.1, 204.1), (300.0, 300.15, 300.1)]) \
+        == pytest.approx(0.1)
 
 
 def test_olu_adam_sinyali(ayar, monkeypatch):

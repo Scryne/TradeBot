@@ -34,6 +34,7 @@ class Ayarlar(BaseSettings):
     telegram_sohbet: str | None = None    # Scryne'ın sohbet kimliği (sır değil; bot yalnız buraya yazar)
     yedek_dizini: Path | None = None      # compose `yedek`in hedefi; tanımlıysa sağlık yedek yaşını denetler
     olu_adam_url: str | None = None       # healthchecks.io ping adresi (yalnız .env'de): host kapanırsa dışarıdan alarm
+    sessiz_saat_utc: tuple[int, int] = (19, 5)   # İstanbul 22:00–08:00 (UTC+3, yaz saati yok); KRITIK hariç biriktirilir
 
     # Sağlık eşikleri (Spike 02/03: bu evde DNS 5–15 sn, saat 1 sn kaymıştı)
     dns_uyari_sn: float = 1.0

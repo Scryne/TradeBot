@@ -38,13 +38,14 @@ def saglik_komutu(
     json_cikti: bool = typer.Option(False, "--json", help="Makine okunur çıktı"),
 ) -> None:
     """Host/konteyner sağlığı: DNS, saat, veritabanı, disk, sırlar; host'ta paper kalp atışı, gece işi, yedek.
-    `--dongu`: bekçi. Durum değişimi ve servis loglarındaki yeni hatalar Telegram'a (tanımlıysa) bildirilir."""
+    `--dongu`: bekçi. Onaylı durum değişimi (`saglik.DurumIzleyici`) ve servis loglarındaki yeni hatalar Telegram'a
+    (tanımlıysa) bildirilir; KRITIK dışındakiler sessiz saatte biriktirilir."""
     from tradebot.bildirim import Bildirici
 
     a = ayarlar()
     kur(a)
     kayitci = log("saglik")
-    onceki: dict[str, str] = {}
+    izleyici = saglik.DurumIzleyici()
     bildirici = Bildirici(a)
     triyaj = saglik.LogTriyaj(a.log_dizini) if dongu and a.log_dizini is not None else None
     while True:
@@ -55,14 +56,16 @@ def saglik_komutu(
             for s in sonuclar:
                 typer.echo(f" {_ISARET[s.durum]} {s.ad:<11} {s.durum:<6} {s.ayrinti}")
         for s in sonuclar if dongu else []:  # tek seferlik komutun çıktısı temiz kalsın (--json ile)
-            if onceki.get(s.ad) != s.durum:
+            degisti, bildir = izleyici.isle(s)
+            if degisti:
                 yaz = kayitci.info if s.durum == "OK" else kayitci.warning
                 yaz("saglik_durumu", kontrol=s.ad, durum=s.durum, ayrinti=s.ayrinti)
-                # açılışta yalnız sorunlu olanlar; sonra her değişim (düzelme dahil)
-                if s.ad != "sirlar" and (s.ad in onceki or s.durum != "OK"):
-                    seviye = {"HATA": "KRITIK", "UYARI": "UYARI"}.get(s.durum, "BILGI")
-                    bildirici.gonder(seviye, f"{s.ad}: {s.durum} · {s.ayrinti}")
-                onceki[s.ad] = s.durum
+            if bildir:
+                durum = izleyici.bildirilen[s.ad]  # onaylı durum (ham turunkiyle aynı olmayabilir)
+                seviye = {"HATA": "KRITIK", "UYARI": "UYARI"}.get(durum, "BILGI")
+                bildirici.gonder(seviye, f"{s.ad}: {durum} · {s.ayrinti}")
+        if dongu:
+            bildirici.bosalt()   # sessiz saatte biriken uyarılar, sabah tek mesaj
         for h in triyaj.yeni_hatalar() if triyaj else []:
             bildirici.gonder("KRITIK", f"{h['dosya']} · {h['bilesen']} · {h['olay']}\n"
                              f"{json.dumps(h['ozet'], ensure_ascii=False, default=str)[:600]}",

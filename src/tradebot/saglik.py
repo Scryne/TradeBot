@@ -13,6 +13,7 @@ Her kontrol OK / UYARI / HATA döndürür; komut en kötü duruma göre çıkı�
 """
 from __future__ import annotations
 
+import http.client
 import json
 import shutil
 import socket
@@ -74,21 +75,39 @@ def sntp_paketi_coz(paket: bytes, t_gonder: float, t_al: float) -> float:
 
 def ntp_fark(sunucu: str, zaman_asimi: float = 3.0) -> float:
     istek = b"\x1b" + 47 * b"\0"  # LI=0, VN=3, Mode=3 (istemci)
+    adres = socket.getaddrinfo(sunucu, 123, socket.AF_INET, socket.SOCK_DGRAM)[0][4]  # DNS t1–t4 penceresine girmesin
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.settimeout(zaman_asimi)
         t1 = time.time()
-        s.sendto(istek, (sunucu, 123))
+        s.sendto(istek, adres)
         paket, _ = s.recvfrom(512)
         t4 = time.time()
     return sntp_paketi_coz(paket, t1, t4)
 
 
-def binance_fark(zaman_asimi: float = 5.0) -> float:
-    t1 = time.time()
-    with urllib.request.urlopen("https://api.binance.com/api/v3/time", timeout=zaman_asimi) as r:
-        sunucu = json.load(r)["serverTime"] / 1000
-    t4 = time.time()
+def en_kisa_gidis_donus(ornekler: list[tuple[float, float, float]]) -> float:
+    """(t1, sunucu, t4) örneklerinden gidiş-dönüşü en kısa olanın farkı. Orta nokta varsayımının hatası en fazla
+    gidiş-dönüşün yarısıdır; en kısa örnek en az hatalı olandır (NTP'nin de yolu)."""
+    t1, sunucu, t4 = min(ornekler, key=lambda o: o[2] - o[0])
     return sunucu - (t1 + t4) / 2
+
+
+def binance_fark(zaman_asimi: float = 5.0, ornek: int = 3) -> float:
+    """Açık bağlantı üzerinden ölçülür. Eskiden t1 bağlantı kurulmadan alınıyordu: DNS + TCP + TLS süresi pencereye
+    giriyor, sunucu damgası pencerenin sonunda kaldığı için kayma hep pozitif çıkıyordu (host'ta DNS yavaşken +2,1 sn
+    HATA, 5 dk sonra +0,1 sn; 2026-09-27)."""
+    b = http.client.HTTPSConnection("api.binance.com", timeout=zaman_asimi)
+    try:
+        b.connect()
+        ornekler = []
+        for _ in range(ornek):
+            t1 = time.time()
+            b.request("GET", "/api/v3/time")
+            sunucu = json.loads(b.getresponse().read())["serverTime"] / 1000
+            ornekler.append((t1, sunucu, time.time()))
+    finally:
+        b.close()
+    return en_kisa_gidis_donus(ornekler)
 
 
 def saat_kontrol(a: Ayarlar) -> Sonuc:
@@ -242,6 +261,40 @@ class LogTriyaj:
 
 
 KRITIK = ("paper", "gece_isi", "yedek", "veritabani")
+ORTAM = ("dns", "saat", "disk")   # anlık dalgalanan ortam ölçümleri: bildirim için art arda onay ister
+_AGIRLIK = {"OK": 0, "UYARI": 1, "HATA": 2}
+
+
+class DurumIzleyici:
+    """Bekçinin durum hafızası: ham durum her turda gelir, bildirim yalnız *onaylı* durum değişince gider.
+
+    Ortam kontrolleri (DNS, saat, disk) son `onay` turun hepsi aynı yönde olunca değişir (histerezis): hepsi bildirilenden
+    kötüyse içlerinden en iyisine yükselir, hepsi iyiyse en kötüsüne iner. UYARI/HATA arasında gidip gelen DNS UYARI
+    olarak onaylanır, tek turluk sıçrama hiç bildirilmez. Kritik kontroller (paper, gece işi, yedek, veritabanı) ilk
+    turda. Açılışta yalnız sorunlular bildirilir, düzelme yalnız bildirilmiş bir sorun için. Sırlar bildirilmez."""
+
+    def __init__(self, onay: int = 3) -> None:
+        self.onay = onay
+        self.ham: dict[str, str] = {}
+        self.pencere: dict[str, list[int]] = {}
+        self.bildirilen: dict[str, str] = {}
+
+    def isle(self, s: Sonuc) -> tuple[bool, bool]:
+        """Döndürür: (ham durum değişti mi → log, onaylı durum değişti mi → bildirim)."""
+        degisti = self.ham.get(s.ad) != s.durum
+        self.ham[s.ad] = s.durum
+        n = self.onay if s.ad in ORTAM else 1
+        p = self.pencere.setdefault(s.ad, [])
+        p.append(_AGIRLIK[s.durum])
+        del p[:-n]
+        if s.ad == "sirlar" or len(p) < n:
+            return degisti, False
+        onceki = _AGIRLIK[self.bildirilen.get(s.ad, "OK")]
+        yeni = min(p) if min(p) > onceki else (max(p) if max(p) < onceki else onceki)
+        if yeni == onceki:
+            return degisti, False
+        self.bildirilen[s.ad] = next(k for k, v in _AGIRLIK.items() if v == yeni)
+        return degisti, True
 
 
 def olu_adam(a: Ayarlar, sonuclar: list[Sonuc], zaman_asimi: float = 10.0) -> bool | None:
