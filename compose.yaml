@@ -7,6 +7,8 @@ x-ortak: &ortak
   build: .
   image: tradebot:yerel
   dns: [1.1.1.1, 8.8.8.8]
+  # Sabit DNS Docker Desktop'ın host.docker.internal kaydını gizliyor (MT5 köprüsü için gerekli): /etc/hosts'a yazılır
+  extra_hosts: ["host.docker.internal:host-gateway"]
   restart: unless-stopped
   env_file: .env
   environment:
