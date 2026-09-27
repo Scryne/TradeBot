@@ -41,7 +41,7 @@ ZD = {"M1": ("TIMEFRAME_M1", 60), "M5": ("TIMEFRAME_M5", 300), "M15": ("TIMEFRAM
       "D1": ("TIMEFRAME_D1", 86_400)}
 SUTUNLAR = ["acilis_ms", "open", "high", "low", "close", "tick_volume", "spread", "real_volume"]
 IZLE = {"forex": "EURUSD,GOLD,USDJPY,GBPUSD", "viop": "XU30_YAKINVADE"}   # Spike 08'deki adlar
-EN_COK_BAR = 50_000          # tek istekte; istemci sayfalar
+EN_COK_BAR = 20_000          # tek istekte; istemci sayfalar (Spike 08: 20 000 sorunsuz, 100 000 M1 takıldı)
 ADIM_MS = 900_000            # sunucu saat farkı 15 dk'nın katıdır
 OZELLIKLER = ("name", "path", "description", "currency_base", "currency_profit", "currency_margin", "digits", "point",
               "trade_contract_size", "trade_tick_size", "trade_tick_value", "volume_min", "volume_step", "volume_max",

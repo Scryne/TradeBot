@@ -48,3 +48,30 @@ bist:
   # SINIR: ücretsiz kaynakta geçmiş endeks üyeliği yok → hayatta kalma yanlılığı. Kalite raporu bunu işaretler;
   # turnuvada BIST kesitsel sonuçları bu uyarıyla okunur.
   bilesen_endeksleri: [XU100]
+
+mt5:
+  # NCM Investment MT5 demo (Faz 8, Spike 08). Veri host Windows'taki köprüden (tools/host/mt5kopru.ps1).
+  # Kimlik piyasası: NCMFX (forex hesabının CFD'leri) ve VIOP. Barlar MT5 barıdır (BID); `spread` kolonu nokta cinsinden
+  # (maliyet modeli), `volume` VİOP'ta gerçek hacim (kontrat), NCMFX'te tik hacmi.
+  # 1m her gece biriktirilir (terminal ~2 ay tutar); 1h ve 1d derin geçmiş içindir. 1d, seans gününün 00:00 UTC'sine
+  # etiketlenir (MT5'te sunucu gece yarısı = 21:00 UTC).
+  zaman_dilimleri: [1m, 1h, 1d]
+  derinlik_gun: { 1m: 90, 1h: 3650, 1d: 9000 }
+  hesaplar:
+    forex:
+      piyasa: NCMFX
+      gruplar:
+        metal:  { takvim: fx_24x5, para: USD, liste: [GOLD, SILVER] }
+        fx:     { takvim: fx_24x5, para: USD, liste: [EURUSD, GBPUSD, USDJPY, AUDUSD, USDCAD, USDCHF] }
+        # "!" sürekli grafik sembolleri işleme kapalı (yalnız geçmiş); işlem vadeli kontratta (ES6Z…)
+        endeks: { takvim: fx_24x5, para: USD, liste: ["ES!", "NQ!", "YM!"] }
+        emtia:  { takvim: fx_24x5, para: USD, liste: ["CL!"] }
+    viop:
+      piyasa: VIOP
+      gruplar:
+        endeks: { takvim: viop_aksam, para: TRY, liste: [XU30_YAKINVADE] }
+        # Vadeli kontratlar önekle bulunur (bugün listelenen her vade); kendi sürekli serimiz bunlardan kurulur
+        endeks_vadeli: { takvim: viop_aksam, para: TRY, on_ek: [F_XU030] }
+        altin_usd:     { takvim: viop_aksam, para: USD, on_ek: [F_XAUUSD] }
+        doviz_vadeli:  { takvim: viop, para: TRY, on_ek: [F_USDTRY] }
+        altin_try:     { takvim: viop, para: TRY, on_ek: [F_XAUTRYM] }

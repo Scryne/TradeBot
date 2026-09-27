@@ -26,10 +26,13 @@ class Mt5Istemci:
         self.url, self.zaman_asimi = url.rstrip("/"), zaman_asimi
 
     def _al(self, yol: str, **q) -> dict:
+        return json.loads(self._ham(yol, **q))
+
+    def _ham(self, yol: str, **q) -> bytes:
         adres = f"{self.url}{yol}" + (f"?{urllib.parse.urlencode(q)}" if q else "")
         try:
             with urllib.request.urlopen(adres, timeout=self.zaman_asimi) as r:
-                return json.load(r)
+                return r.read()
         except urllib.error.HTTPError as e:
             raise KopruHatasi(f"{yol}: HTTP {e.code} {e.read()[:300]!r}") from e
         except OSError as e:
@@ -44,16 +47,25 @@ class Mt5Istemci:
     def kotasyon(self, semboller: list[str]) -> dict:
         return self._al("/kotasyon", semboller=",".join(semboller))
 
-    def mumlar(self, sembol: str, zd: str, bas_ms: int, bit_ms: int) -> pl.DataFrame:
-        """[bas_ms, bit_ms) aralığındaki kapanmış barlar. Köprü tek istekte EN_COK_BAR bar verir; sayfalanır."""
+    def mumlar(self, sembol: str, zd: str, bas_ms: int, bit_ms: int, ham=None,
+               hatada_devam: bool = False) -> pl.DataFrame:
+        """[bas_ms, bit_ms) aralığındaki kapanmış barlar. Köprü tek istekte EN_COK_BAR bar verir; sayfalanır.
+        `ham(anahtar, icerik)`: her sayfanın ham yanıtı (HamDepo'ya yazmak için; kural 9).
+        `hatada_devam`: MT5'in veri vermediği sayfa (ör. geçmişin başlangıcından önce) atlanır, `son_hatalar`'a yazılır."""
+        self.son_hatalar: list = []
         adim = EN_COK_BAR * ZD[zd][1] * 1000
         parcalar = []
         b = bas_ms
         while b < bit_ms:
             s = min(b + adim, bit_ms)
-            r = self._al("/mumlar", sembol=sembol, tf=zd, bas_ms=b, bit_ms=s)
+            icerik = self._ham("/mumlar", sembol=sembol, tf=zd, bas_ms=b, bit_ms=s)
+            r = json.loads(icerik)
+            if ham is not None and r["satirlar"]:
+                ham(f"{sembol}/{zd}/{b}-{s}", icerik)
             if "hata" in r and not r["satirlar"]:
-                raise KopruHatasi(f"/mumlar {sembol} {zd}: MT5 {r['hata']}")
+                if not hatada_devam:
+                    raise KopruHatasi(f"/mumlar {sembol} {zd}: MT5 {r['hata']}")
+                self.son_hatalar.append((b, s, r["hata"]))
             parcalar.extend(r["satirlar"])
             b = s
         df = pl.DataFrame(parcalar, schema=SEMA, orient="row") if parcalar else pl.DataFrame(schema=SEMA)

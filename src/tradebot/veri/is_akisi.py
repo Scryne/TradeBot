@@ -44,7 +44,22 @@ def dukascopy(a: Ayarlar, m: Engine, butce_dk: float) -> dict:
     return {"enstruman": len(r), "dosya": sum(x.get("yeni_dosya", 0) for x in r)}
 
 
+def mt5(a: Ayarlar, m: Engine, butce_dk: float = 60.0) -> dict:
+    """MT5 köprüleri (Faz 8). Köprü tanımsızsa ya da ulaşılamıyorsa atlanır (yalnız log; bekçi ayrıca alarm verir)."""
+    from tradebot.mt5.istemci import Mt5Istemci
+    from tradebot.veri.mt5 import Mt5Veri
+
+    istemciler = {h: Mt5Istemci(u) for h, u in (("forex", a.mt5_kopru_forex), ("viop", a.mt5_kopru_viop)) if u}
+    if not istemciler:
+        return {"atlandi": "köprü tanımsız"}
+    r = Mt5Veri(a.veri_dizini, m, istemciler).guncelle(butce_dk)
+    return {"enstruman": len({x["kimlik"] for x in r}), "yeni_bar": sum(x.get("yeni", 0) for x in r),
+            "hata": [x for x in r if "hata" in x and x["hata"]][:5]}
+
+
 def _zaman_dilimleri(kayit: dict) -> list[str]:
+    if kayit["kaynak"] == "mt5":
+        return ["1h", "1d"]
     return ["1d"] if kayit["kaynak"] == "yahoo" else ["1h"]
 
 
@@ -99,7 +114,7 @@ def _adimlar(adimlar: list, sonuc: dict) -> None:
 
 
 def gece(a: Ayarlar, m: Engine, dukascopy_butce_dk: float = 240.0) -> dict:
-    """Sırayla: Binance → Yahoo → kalite → evren → denetim kaydı (`gece_isi`) → Dukascopy (bütçeli, saatlerce sürebilir)
+    """Sırayla: Binance → Yahoo → MT5 → kalite → evren → denetim kaydı (`gece_isi`) → Dukascopy (bütçeli, saatlerce sürebilir)
     → denetim kaydı (`gece_isi_dukascopy`). Bir adımın hatası diğerlerini durdurmaz.
 
     Dukascopy en sondadır: hız sınırı yüzünden bütçesi 15 saate kadar çıkar ve servis yeniden başlatılırsa (her dağıtımda)
@@ -107,7 +122,7 @@ def gece(a: Ayarlar, m: Engine, dukascopy_butce_dk: float = 240.0) -> dict:
     raporu ve gece_isi denetim kaydı hiç yazılmamıştı). Dukascopy verisinin kalitesi bir sonraki gece raporlanır."""
     t0 = time.monotonic()
     sonuc: dict = {"basla": datetime.now(UTC).isoformat()}
-    _adimlar([("binance", lambda: binance(a, m)), ("yahoo", lambda: yahoo(a, m)),
+    _adimlar([("binance", lambda: binance(a, m)), ("yahoo", lambda: yahoo(a, m)), ("mt5", lambda: mt5(a, m)),
               ("kalite", lambda: kalite_hepsi(a, m)), ("evren", lambda: evren_kur(a, m))], sonuc)
     sonuc["sure_dk"] = round((time.monotonic() - t0) / 60, 1)
     denetim.kaydet(m, "veri", "gece_isi", sonuc)

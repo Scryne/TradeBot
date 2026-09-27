@@ -148,3 +148,94 @@ def test_bekci_mt5_kontrolu(sunucu, ayar):
     r = saglik.mt5_kontrol(a)
     assert r.durum == "HATA" and r.ayrinti.startswith("forex bağlı") and "viop:" in r.ayrinti
     assert "mt5" in saglik.ORTAM
+
+
+# --- katalog: VİOP takvimi, enstrümanlar, toplayıcı (Faz 8) ---
+
+def test_viop_takvimi():
+    from tradebot.veri.takvim import dt, takvim
+    gun = [(str(dt(o))[11:16], str(dt(c))[11:16]) for o, c in takvim("viop_aksam").seanslar(
+        1_790_294_400_000, 1_790_294_400_000 + 86_400_000) if str(dt(o))[:10] == "2026-09-25"]
+    assert gun == [("06:40", "15:10"), ("16:15", "20:00")]                 # Spike 08: MT5 barlarıyla aynı
+    assert [(str(dt(o))[11:16], str(dt(c))[11:16]) for o, c in takvim("viop").seanslar(
+        1_790_294_400_000, 1_790_294_400_000) if str(dt(o))[:10] == "2026-09-25"] == [("06:40", "15:10")]  # gündüz
+    arefe = [(str(dt(o))[11:16], str(dt(c))[11:16]) for o, c in takvim("viop_aksam").seanslar(
+        1_773_878_400_000, 1_773_878_400_000) if str(dt(o))[:10] == "2026-03-19"]
+    assert arefe == [("06:40", "09:30")]                                    # arefede akşam seansı yok
+    on, onalti_otuz = 1_790_294_400_000 + 10 * 3_600_000, 1_790_294_400_000 + 16 * 3_600_000 + 1_800_000
+    assert takvim("viop").acik_mi(on) and not takvim("viop").acik_mi(onalti_otuz)   # USDTRY akşam seansı yok
+    assert takvim("viop_aksam").acik_mi(onalti_otuz)
+
+
+def test_mt5_enstrumanlari_onekle_acilir():
+    from tradebot.veri.enstruman import evren_yukle, mt5_enstrumanlari
+    liste = mt5_enstrumanlari(evren_yukle(), {"forex": ["GOLD", "EURUSD", "AMD"],
+                                              "viop": ["XU30_YAKINVADE", "F_XU0301026", "F_XU0301226", "F_USDTRY1026"]})
+    k = {e.kimlik: (e.sinif, e.takvim) for e in liste}
+    assert k == {"NCMFX:GOLD": ("metal", "fx_24x5"), "NCMFX:EURUSD": ("fx", "fx_24x5"),
+                 "VIOP:XU30_YAKINVADE": ("endeks", "viop_aksam"), "VIOP:F_XU0301026": ("endeks_vadeli", "viop_aksam"),
+                 "VIOP:F_XU0301226": ("endeks_vadeli", "viop_aksam"), "VIOP:F_USDTRY1026": ("doviz_vadeli", "viop")}
+
+
+def test_gunluk_bar_seans_gunune_etiketlenir():
+    import polars as pl
+
+    from tradebot.veri.mt5 import katalog_barlari
+    gun = 1_790_294_400_000                                    # 2026-09-25 00:00 UTC
+    df = pl.DataFrame([[gun - 3 * 3_600_000, 1.0, 2.0, 0.5, 1.5, 70, 3, 9]], schema=istemci.SEMA, orient="row")
+    k = katalog_barlari(df, "1d", FARK, gercek_hacim=True)     # MT5: 2026-09-24 21:00 UTC = sunucu 25'i 00:00
+    assert k["acilis_ms"].to_list() == [gun] and k["volume"].to_list() == [9.0]
+    assert katalog_barlari(df, "1h", FARK, gercek_hacim=False)["volume"].to_list() == [70.0]
+
+
+class SahteMt5Cok(SahteMt5):
+    """Birden çok sembol ve zaman dilimi: sunucu saatiyle hizalı sentetik barlar."""
+    ADIM = {1: 60, 16385: 3600, 16408: 86_400}
+
+    def symbols_get(self):
+        return [NS(name=s, path=s) for s in ("GOLD", "XU30_YAKINVADE", "F_XU0301026")]
+
+    def copy_rates_range(self, sembol, tf, bas, bit):
+        self.istekler.append((sembol, tf, bas, bit))
+        adim = self.ADIM[tf]
+        b, s = int(bas.timestamp()), int(bit.timestamp())
+        ilk = -(-b // adim) * adim
+        return [(t, 10.0, 11.0, 9.0, 10.5, 5, 2, 7) for t in range(ilk, s + 1, adim)]
+
+
+def test_toplayici_uctan_uca(ayar):
+    from sqlalchemy import create_engine, select
+
+    from tradebot.db import ham_dosya, metadata
+    from tradebot.veri.depo import BarDepo
+    from tradebot.veri.enstruman import evren_yukle
+    from tradebot.veri.mt5 import Mt5Veri
+
+    simdi = T0 + 60_000
+    m5 = SahteMt5Cok(simdi)
+    k = kopru.Kopru(m5, kopru.Isci(takilma_sn=60, cik=lambda: None), FARK, saat=lambda: simdi)
+    s = ThreadingHTTPServer(("127.0.0.1", 0), kopru.isleyici(k, cagri_sn=10))
+    threading.Thread(target=s.serve_forever, daemon=True).start()
+    try:
+        ist = Mt5Istemci(f"http://127.0.0.1:{s.server_address[1]}")
+        m = create_engine(ayar.veritabani_url.get_secret_value())
+        metadata.create_all(m)
+        e = evren_yukle()
+        e["mt5"]["derinlik_gun"] = {"1m": 1, "1h": 3, "1d": 10}
+        v = Mt5Veri(ayar.veri_dizini, m, {"forex": ist, "viop": ist}, evren=e, saat=lambda: simdi)
+        r = v.guncelle()
+        assert not [x for x in r if x.get("hata")]
+        kimlikler = {x["kimlik"] for x in r}
+        assert {"NCMFX:GOLD", "VIOP:XU30_YAKINVADE", "VIOP:F_XU0301026"} <= kimlikler
+        d = BarDepo(ayar.veri_dizini)
+        h = d.oku("VIOP:F_XU0301026", "1h")
+        assert h.height >= 71 and h["acilis_ms"].max() + 3_600_000 <= simdi    # yalnız kapanmış barlar
+        assert (h["acilis_ms"] % 3_600_000 == 0).all() and h["volume"][0] == 7.0   # VİOP: gerçek hacim
+        g = d.oku("NCMFX:GOLD", "1d")
+        assert (g["acilis_ms"] % 86_400_000 == 0).all() and g["volume"][0] == 5.0  # gün başı etiketi; CFD: tik hacmi
+        with m.connect() as b:
+            assert b.execute(select(ham_dosya.c.anahtar).where(ham_dosya.c.kaynak == "mt5")).first() is not None
+        # ikinci koşu: yeni bar yok, yalnız kalan istenir
+        assert sum(x.get("yeni", 0) for x in v.guncelle()) == 0
+    finally:
+        s.shutdown()

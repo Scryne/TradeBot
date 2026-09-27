@@ -213,6 +213,15 @@ def veri_dukascopy(butce_dk: float = typer.Option(60.0, help="Zaman bütçesi (d
     _yazdir(is_akisi.dukascopy(a, m, butce_dk))
 
 
+@veri_uygulama.command("mt5")
+def veri_mt5(butce_dk: float = typer.Option(60.0, help="Zaman bütçesi (dakika)")) -> None:
+    """NCM MT5 (forex CFD + VİOP) barları köprüden kataloğa (1m, 1h, 1d)."""
+    from tradebot.veri import is_akisi
+
+    a, m = _veri_baglam()
+    _yazdir(is_akisi.mt5(a, m, butce_dk))
+
+
 @veri_uygulama.command("kalite")
 def veri_kalite() -> None:
     """Tüm enstrümanlar için kalite raporu (veritabanına yazar)."""
@@ -233,7 +242,7 @@ def veri_evren() -> None:
 
 @veri_uygulama.command("gece")
 def veri_gece(dukascopy_butce_dk: float = typer.Option(240.0)) -> None:
-    """Gece işi: Binance → Yahoo → Dukascopy → kalite → evren; sonuç denetim izine yazılır."""
+    """Gece işi: Binance → Yahoo → MT5 → kalite → evren → Dukascopy; sonuç denetim izine yazılır."""
     from tradebot.veri import is_akisi
 
     a, m = _veri_baglam()

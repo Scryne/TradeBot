@@ -69,6 +69,21 @@ def kripto_enstrumani(e: dict, sembol: str, meta: dict | None = None) -> Enstrum
     return Enstruman(k["piyasa"], sembol, k["sinif"], k["takvim"], k["para_birimi"], "binance", meta or {})
 
 
+def mt5_enstrumanlari(e: dict, mevcut: dict[str, list[str]]) -> list[Enstruman]:
+    """`mevcut`: hesap → köprünün bugün listelediği semboller (önekli gruplar buradan açılır; listede olmayan sabit
+    sembol kayda girmez). Kaynak sembol = MT5 adı."""
+    out = []
+    for hesap, h in e["mt5"]["hesaplar"].items():
+        adlar = mevcut.get(hesap, [])
+        for sinif, g in h["gruplar"].items():
+            semboller = [s for s in g.get("liste", []) if s in adlar]
+            semboller += sorted(s for s in adlar if any(s.startswith(o) for o in g.get("on_ek", [])))
+            for s in semboller:
+                out.append(Enstruman(h["piyasa"], s, sinif, g["takvim"], g["para"], "mt5",
+                                     {"kaynak_sembol": s, "hesap": hesap}))
+    return out
+
+
 def kaydet(motor: Engine, liste: list[Enstruman]) -> int:
     """Kayıtları ekler ya da günceller (ilk/son bar alanlarına dokunmaz)."""
     simdi = datetime.now(UTC)

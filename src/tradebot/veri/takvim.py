@@ -5,6 +5,7 @@ Dört tür:
 - `fx_24x5`: New York saatiyle Pazar 17:00 → Cuma 17:00 (DST dahil). Dukascopy'nin hafta sonu mumları bu
   aralığın dışında kalır ve kalite raporunda "kapalı piyasa barı" olarak ayıklanır.
 - `XNYS`, `XIST`: exchange_calendars; tatiller ve yarım günler dahil.
+- `viop`, `viop_aksam`: XIST işlem günleri + VİOP seans saatleri (Spike 08, MT5 barlarından).
 
 Tüm zamanlar UTC epoch milisaniye. Bar zaman damgası barın AÇILIŞ zamanıdır.
 """
@@ -19,6 +20,7 @@ import numpy as np
 import pandas as pd
 
 NY = ZoneInfo("America/New_York")
+IST = ZoneInfo("Europe/Istanbul")
 ZAMAN_DILIMI_MS = {"1m": 60_000, "5m": 300_000, "15m": 900_000, "1h": 3_600_000, "4h": 14_400_000, "1d": 86_400_000}
 
 
@@ -125,12 +127,49 @@ class BorsaTakvimi(Takvim):
         return np.array([g for g in gunler if bas_ms <= g < bit_ms], dtype=np.int64)
 
 
+class ViopTakvimi(BorsaTakvimi):
+    """VİOP: XIST işlem günleri; sürekli işlem TR 09:40–18:10, akşam seansı olan kontratlarda (endeks, USD altın) ayrıca
+    TR 19:15–23:00. Arefede gündüz seansı XIST kapanışında biter, akşam seansı yoktur.
+
+    Kanıt: NCM MT5 1 dk barları, 2026-07-29 → 09-25 (Spike 08). XU030 ve F_XAUUSD 42/43 gün 06:40–15:09 + 16:15–19:59
+    UTC, F_USDTRY ve F_XAUTRYM yalnız gündüz. Saatler yerel (İstanbul) tanımlıdır: 2016 öncesi yaz saati doğru çevrilir.
+    Saatler bugünkü düzendir; VİOP geçmişte başka saatlerle işledi, eski yıllarda kalite raporu bunu gösterir."""
+
+    GUNDUZ = ((9, 40), (18, 10))
+    AKSAM = ((19, 15), (23, 0))
+
+    def __init__(self, aksam: bool, baslangic: str = "2005-01-01") -> None:
+        super().__init__("XIST", baslangic)
+        self.ad, self.aksam = ("viop_aksam" if aksam else "viop"), aksam
+
+    @staticmethod
+    def _yerel(gun, saat: tuple[int, int]) -> int:
+        return ms(datetime(gun.year, gun.month, gun.day, *saat, tzinfo=IST))
+
+    def seanslar(self, bas_ms: int, bit_ms: int) -> list[tuple[int, int]]:
+        out = []
+        for o, c in super().seanslar(bas_ms, bit_ms):
+            gun = dt(o).astimezone(IST).date()
+            tam = c - o >= 5 * 3_600_000          # XIST tam gün 8 saat, arefe ~2,5 saat
+            bas, bit = self._yerel(gun, self.GUNDUZ[0]), self._yerel(gun, self.GUNDUZ[1])
+            out.append((bas, bit if tam else c))
+            if self.aksam and tam:
+                out.append((self._yerel(gun, self.AKSAM[0]), self._yerel(gun, self.AKSAM[1])))
+        return out
+
+    def gunluk_barlar(self, bas_ms: int, bit_ms: int) -> np.ndarray:
+        gunler = sorted({gun_basi(o) for o, _ in self.seanslar(bas_ms, bit_ms)})
+        return np.array([g for g in gunler if bas_ms <= g < bit_ms], dtype=np.int64)
+
+
 @cache
 def takvim(ad: str) -> Takvim:
     if ad == "kripto_7x24":
         return Kripto7x24()
     if ad == "fx_24x5":
         return Fx24x5()
+    if ad in ("viop", "viop_aksam"):
+        return ViopTakvimi(aksam=ad == "viop_aksam")
     return BorsaTakvimi(ad)
 
 
