@@ -86,8 +86,8 @@ services:
   paper:
     <<: *ortak
     # Faz 7: paper düğümü (Nautilus sandbox, Binance canlı veri). Kararlar her 1h kapanışında; defter PostgreSQL'de.
+    # Duman testi 2026-09-27: 1h kolları karar → risk → sandbox dolum → defter uçtan uca çalıştı.
     command: ["tradebot", "paper", "calis"]
-    profiles: ["paper"]            # duman testi geçene kadar varsayılan `up`'ta başlamaz
     depends_on:
       goc: { condition: service_completed_successfully }
 
