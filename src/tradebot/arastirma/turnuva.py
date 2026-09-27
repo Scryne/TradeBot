@@ -38,7 +38,7 @@ from tradebot.arastirma.panel import (
     taraf_matrisi,
     veto_maskesi,
 )
-from tradebot.cekirdek import StratejiTanimi, nedensellik_testi, ornek
+from tradebot.cekirdek import StratejiTanimi, altin, nedensellik_testi, ornek
 from tradebot.cekirdek import aileler as al
 from tradebot.cekirdek.boyut import kaldirac_dogrula, panel_oynaklik_hedefi, yarim_kelly_tavani
 from tradebot.risk.motor import PortfoyIzleyici, RiskAyar
@@ -58,6 +58,13 @@ STRATEJILER = {
     "ay_donumu": ("takvim", al.ay_donumu, "tek"),
     "kesitsel_momentum": ("kesitsel_momentum", al.kesitsel_momentum, "panel"),
     "acilis_araligi": ("gun_ici_kirilim", al.acilis_araligi_kirilim, "tek"),
+    # Altın M15 (EA karşılığı; docs/turnuva/Altin-M15.md): giriş ailesi + EA risk katmanları
+    "seans_kirilim": ("altin_m15", altin.seans_kirilim, "tek"),
+    "kanal_kirilim": ("altin_m15", altin.kanal_kirilim, "tek"),
+    "trend_geri_cekilme": ("altin_m15", altin.trend_geri_cekilme, "tek"),
+    "bant_donus": ("altin_m15", altin.bant_donus, "tek"),
+    "sikisma_kirilim": ("altin_m15", altin.sikisma_kirilim, "tek"),
+    "ea_birlesik": ("altin_m15", altin.ea_birlesik, "tek"),
 }
 
 
@@ -358,6 +365,10 @@ def dalga_oku(yol: Path) -> dict:
                       frenler=d["frenler"], bant=b["bant"], is_yil=d["walk_forward"]["is_yil"],
                       oos_yil=d["walk_forward"]["oos_yil"], olcut=Olcut(**d["olcut"]),
                       jev_veto=bool(d.get("jev_veto", False)))
+    if d.get("haber_takvimi"):  # altın M15: haber filtresi (çekirdek G/Ç yapmaz; anlar buradan verilir)
+        from tradebot.veri.haber_takvimi import yukle
+
+        altin.haber_ayarla(yukle())
     return d
 
 

@@ -1,0 +1,60 @@
+# Turnuva — Altın M15 (EA karşılığı). ÖN KAYIT (koşudan önce commit edilir, koşu sırasında değişmez).
+# Gerekçe ve iddia ölçümü: docs/turnuva/Altin-M15.md. Scryne'ın isteği (2026-09-27): satılan bir çok stratejili altın EA'sı
+# ("XAUUSD Adaptive Edge M15") araştırılsın, profesyonel karşılığı kurulsun, gerçekliği ölçülsün.
+# Veri: Dukascopy XAUUSD dakikalık BID (son 3 yıl) → 15m. Walk-forward IS 1,5 yıl / OOS 0,5 yıl (dalga 1c ile aynı).
+
+dalga: altin_m15
+veri_bitis: "2026-09-25"
+frenler: true
+haber_takvimi: true               # config/haber_takvimi.yaml (FOMC/NFP/CPI) → altin.haber_ayarla
+boyut:
+  hedef_vol: 0.20                  # kol yalnız işlem açıkken pozisyonda: gerçekleşen oynaklık hedefin altında kalır
+  kaldirac: 3.0                    # sabit tavan (kural 6); EA'nın videodaki kaldıracı burada imkânsız
+  vol_pencere_gun: 30
+  bant: 0.25
+walk_forward: { is_yil: 1.5, oos_yil: 0.5 }
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0 }
+
+planlar:
+  altin_m15:
+    kimlik: 2026-09-27-altin-m15
+    hipotez: >-
+      Satılan çok stratejili altın EA'larının kullandığı bilinen gün içi fikirlerden (seans kırılımı, kanal kırılımı,
+      trendde geri çekilme, bant dönüşü, sıkışma kırılımı) en az biri, EA'nın risk katmanlarıyla (ATR stop, 2R hedef,
+      192 bar, günlük ±3R, 3 ardışık kayıp, haber filtresi) XAUUSD M15'te maliyet sonrası pozitif ve walk-forward'da
+      kalıcı getiri verir. Sıfır hipotezi: hiçbiri vermez (gün içi altın, maliyet sonrası rastgele yürüyüşe yakın).
+
+gruplar:
+  xau_m15:
+    kimlikler: [DUKASCOPY:XAUUSD]
+    asgari_gecmis_gun: 30
+    yon: long_short
+    zd: [15m]
+
+# EA varsayılanları sabit: rr 2.0, azami_bar 192, gunluk_r 3, ardisik 3. Izgara yalnız stop genişliği, haber filtresi
+# (açık/kapalı: filtrenin katkısı ölçülür) ve ailenin tek ana parametresi. Toplam 32 deneme.
+kollar:
+  - strateji: seans_kirilim
+    gruplar: [xau_m15]
+    zd: [15m]
+    izgara: { aralik_bit_saat: [7], son_saat: [16], sl_atr: [1.5, 2.0], haber_dk: [0, 60] }
+  - strateji: kanal_kirilim
+    gruplar: [xau_m15]
+    zd: [15m]
+    izgara: { n: [48, 96], sl_atr: [1.5, 2.0], haber_dk: [0, 60] }
+  - strateji: trend_geri_cekilme
+    gruplar: [xau_m15]
+    zd: [15m]
+    izgara: { esik: [30], sl_atr: [1.5, 2.0], haber_dk: [0, 60] }
+  - strateji: bant_donus
+    gruplar: [xau_m15]
+    zd: [15m]
+    izgara: { z: [2.0, 2.5], sl_atr: [1.5, 2.0], haber_dk: [0, 60] }
+  - strateji: sikisma_kirilim
+    gruplar: [xau_m15]
+    zd: [15m]
+    izgara: { sl_atr: [1.5, 2.0], haber_dk: [0, 60] }
+  - strateji: ea_birlesik
+    gruplar: [xau_m15]
+    zd: [15m]
+    izgara: { sl_atr: [1.5, 2.0], haber_dk: [0, 60] }
