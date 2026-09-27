@@ -82,12 +82,13 @@ class Mt5Veri:
                 fark["ms"] = json.loads(icerik)["fark_sn"] * 1000
 
         df = ist.mumlar(e.sembol, MT5_ZD[zd], bas, simdi_ms, ham=ham, hatada_devam=True)
+        out: dict = {"kimlik": e.kimlik, "zd": zd, "yeni": 0}
         if df.is_empty():
-            return {"kimlik": e.kimlik, "zd": zd, "yeni": 0, "hata": ist.son_hatalar[:1] or None}
-        yeni = katalog_barlari(df, zd, fark["ms"], gercek_hacim=e.piyasa == "VIOP")
-        n = self.bar.yaz(e.kimlik, zd, yeni)
-        out = {"kimlik": e.kimlik, "zd": zd, "yeni": len(yeni), "toplam": n}
-        if zd != "1d":
+            out["hata"] = ist.son_hatalar[:1] or None
+        else:
+            yeni = katalog_barlari(df, zd, fark["ms"], gercek_hacim=e.piyasa == "VIOP")
+            out |= {"yeni": len(yeni), "toplam": self.bar.yaz(e.kimlik, zd, yeni)}
+        if zd != "1d" and self.bar.yol(e.kimlik, zd).exists():   # yeni bar gelmese de (ilk kurulumdan kalan seri)
             tum = self.bar.oku(e.kimlik, zd)
             bas_yogun = yogun_baslangic(tum["acilis_ms"])
             if bas_yogun is not None and int(tum["acilis_ms"].min()) < bas_yogun:
