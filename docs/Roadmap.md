@@ -23,7 +23,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 5 | Turnuva — backtest dalgası 1 | ✅ Tamamlandı | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
 | 6 | Zekâ katmanı (Jev) | 🔄 Devam Ediyor | Toplayıcılar (Binance, KAP, RSS, Fed/ECB/TCMB); Jev servisi + NVIDIA yükseltme; A1, A2 canlı; B1 çapraz kontrolü; yargılar dondurulabiliyor; C1–C2 ölçüldü (A4, A5, D3, B2, B4 girdilerinin doğduğu faza taşındı, 2026-09-27) |
 | 7 | Paper canlı — kripto + ABD ETF | ✅ Tamamlandı | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
-| 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | ⏳ Bekliyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
+| 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | 🔄 Devam Ediyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
 | 9 | Operasyon: gözetmen, Telegram, raporlar | 🔄 Devam Ediyor | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
 | 10 | Web pano | ⏳ Bekliyor | DESIGN.md dolu; PnL, pozisyon, turnuva tablosu, veto geçmişi, sağlık; Tailscale üzerinden telefondan erişim |
 | 11 | Paper turnuvası — 12 hafta | 🔄 Devam Ediyor | 12 hafta kesintisiz paper; kademeli sermaye çalıştı; hangi kolların kapıyı geçtiği ve Jev katkısı raporlandı; maliyet varsayımları ölçüldü |
@@ -325,6 +325,12 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   teminat artışı, işlem saati değişikliği; demo hesaptan gelen gerçek bildirimlerle spike).
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
+  - 2026-09-27 kurum NCM Investment (VİOP ve forex aynı MT5'te). Scryne iki demo açtı (Forex 316722, VİOP 316723);
+    iki taşınabilir terminal host'ta (`C:\TradeBot\mt5orex|viop`).
+  - Spike 08 (`docs/spikes/08-mt5.md`): Python bağlantısı, sözleşme özellikleri ve geçmiş ✅. Altın `GOLD`; endeks/petrol
+    vadeli (`ES6Z`, `GER40Z26`, `CL6X`); VİOP `F_XU030`, `F_USDTRY`, `XU30_YAKINVADE` (H1 2020'den: VİOP için ilk veri
+    kaynağı). Barlar sunucu saatiyle (büyük olasılıkla UTC+3). Algo Trading `common.ini`'den açıldı.
+  - Canlı spread + demo emir testi 2026-09-28 10:00 TR'de zamanlı (`Spike08` görevi). Sonra köprü (`mt5kopru`, HTTP).
 
 ### Faz 9: Operasyon
 - **İşler:** Bağımsız gözetmen (kalp atışı, özkaynak, pozisyon; motor donarsa kapatma); Telegram bot (3
