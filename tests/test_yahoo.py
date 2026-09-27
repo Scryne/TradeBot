@@ -33,3 +33,33 @@ def test_tamamlanmamis_gun_atilir():
     kapanis_sonrasi = ms(datetime(2026, 6, 2, 20, 30, tzinfo=UTC))
     assert gun not in tamamlanmamis_at(df, "XNYS", seans_ici)["acilis_ms"].to_list()
     assert gun in tamamlanmamis_at(df, "XNYS", kapanis_sonrasi)["acilis_ms"].to_list()
+
+
+def test_normalize_kapali_gun_bayat_ise_atilir_ohlc_onarilir():
+    import numpy as np
+    import polars as pl
+
+    from tradebot.veri.takvim import takvim
+    from tradebot.veri.yahoo import normalize
+
+    gun = 86_400_000
+    t0 = 1_675_036_800_000  # 2023-01-30 Pazartesi
+    t = np.arange(t0, t0 + 14 * gun, gun, dtype=np.int64)
+    acik = set(takvim("XIST").gunluk_barlar(int(t[0]), int(t[-1]) + 1).tolist())
+    kapali = [x for x in t if x not in acik]
+    assert 1_675_814_400_000 in kapali  # 2023-02-08: deprem sonrası iptal edilen seans
+    n = len(t)
+    df = pl.DataFrame({"acilis_ms": t, "open": np.full(n, 10.0), "high": np.full(n, 10.5), "low": np.full(n, 9.5),
+                       "close": np.full(n, 10.2), "volume": np.full(n, 1e6)})
+    hafta_sonu = [x for x in kapali if x != 1_675_814_400_000]
+    df = df.with_columns(
+        pl.when(pl.col("acilis_ms") == 1_675_814_400_000).then(2500.0)          # bayat: hacim çok düşük
+        .when(pl.col("acilis_ms").is_in(hafta_sonu[:1])).then(1e6)              # normal hacim: kalır (takvim yanılabilir)
+        .when(pl.col("acilis_ms").is_in(hafta_sonu[1:])).then(0.0)
+        .otherwise(pl.col("volume")).alias("volume"),
+        pl.when(pl.col("acilis_ms") == int(t[0])).then(9.9).otherwise(pl.col("high")).alias("high"))  # tutarsız
+    out, d = normalize(df, "XIST")
+    assert 1_675_814_400_000 not in out["acilis_ms"].to_list() and hafta_sonu[0] in out["acilis_ms"].to_list()
+    assert d == {"kapali_gun_atildi": len(kapali) - 1, "ohlc_onarildi": 1}
+    ilk = out.row(0, named=True)
+    assert ilk["high"] == 10.2 and ilk["low"] == 9.5

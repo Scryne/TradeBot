@@ -89,6 +89,18 @@ def _haftalik_rapor(a, bildirici, kayitci) -> None:
         return
     kayitci.info("paper_rapor", hafta=r["hafta"], yol=str(yol))
     bildirici.gonder("BILGI", rapor.telegram_ozeti(r))
+    from tradebot.canli import terfi
+    from tradebot.canli.kollar import kollar
+
+    try:
+        sonuc = terfi.hafta_degerlendir(db_motor(a), a.veri_dizini, kollar(), h + 7 * 86_400_000)
+    except Exception as e:  # noqa: BLE001
+        kayitci.error("terfi_hatasi", hata=f"{type(e).__name__}: {e}"[:300])
+        return
+    for x in sonuc:
+        kayitci.info("terfi_degerlendirme", kol=x["kol"], gecti=x.get("gecti"), hata=x.get("hata"))
+        if x.get("gecti"):
+            bildirici.gonder("BILGI", f"Terfi: {x['kol']} B → A (paper ölçütü geçti; dağıtım gelecek hafta)")
 
 
 @db_uygulama.command("yukselt")

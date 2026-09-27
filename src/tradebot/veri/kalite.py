@@ -68,9 +68,16 @@ def rapor(df: pl.DataFrame, zaman_dilimi: str, takvim_adi: str, simdi_ms: int | 
     if len(lr) > 50:
         s = pl.Series(np.abs(lr)).rolling_median(window_size=50, min_samples=10).to_numpy()
         esik = SICRAMA_KAT * np.nan_to_num(s, nan=np.inf) / 0.6745
-        sic = np.where(np.abs(lr) > np.maximum(esik, 1e-4))[0]
+        buyuk = np.abs(lr) > np.maximum(esik, 1e-4)
+        # Kötü tick izi: büyük hareketin hemen ardından en az yarısı kadar ters hareket (sıçra-dön). Geri dönmeyen büyük
+        # hareket gerçek olabilir (küçük coinler, haber): yalnız sayılır, uyarı değildir. 2026-09-27 denetimi: eski
+        # tanımla Binance serilerinin 711/735'i UYARI'ydı, uyarı anlamını yitirmişti.
+        don = np.zeros(len(lr), dtype=bool)
+        don[:-1] = buyuk[:-1] & (np.sign(lr[1:]) == -np.sign(lr[:-1])) & (np.abs(lr[1:]) >= 0.5 * np.abs(lr[:-1]))
+        sic = np.where(don)[0]
+        o["buyuk_hareket"] = int(buyuk.sum())
         o["sicrama"] = int(len(sic))
-        o["sicrama_ornek"] = [{"t": _t(int(t[i + 1])), "getiri": round(float(lr[i]), 4)}
+        o["sicrama_ornek"] = [{"t": _t(int(t[i + 1])), "getiri": round(float(lr[i]), 4), "donus": round(float(lr[i + 1]), 4)}
                               for i in sorted(sic, key=lambda i: -abs(lr[i]))[:5]]
     o["sifir_hacim_oran"] = round(float((df["volume"].to_numpy() <= 0).mean()), 4)
     if "spread" in df.columns:

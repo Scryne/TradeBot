@@ -20,9 +20,9 @@ from tradebot.canli import dagitici as dg
 from tradebot.db import paper_dagitim, paper_emir, paper_emir_olay, paper_karar, paper_kol, paper_kol_olay, paper_ozkaynak
 
 
-def topla(motor: Engine, hafta_ms: int) -> dict:
-    """Haftanın ham kayıtları (hafta sonuna kadar kesilmiş)."""
-    bit = hafta_ms + dg.HAFTA_MS
+def topla(motor: Engine, hafta_ms: int, bit_ms: int | None = None) -> dict:
+    """[hafta_ms, bit_ms) döneminin ham kayıtları (varsayılan: bir hafta); işaretler dönem sonuna kadar kesilmiş."""
+    bit = bit_ms or hafta_ms + dg.HAFTA_MS
     with motor.connect() as b:
         kollar = {r.kol: {"baslangic_ozkaynak": r.baslangic_ozkaynak, "sinif": r.sinif, "baslangic_ms": r.baslangic_ms}
                   for r in b.execute(select(paper_kol))}
@@ -51,6 +51,23 @@ def topla(motor: Engine, hafta_ms: int) -> dict:
             "olaylar": olaylar, "dagitim": {p: a for p, a in dagitim}}
 
 
+def maliyet_bps(dolumlar: list[dict]) -> tuple[float | None, float | None]:
+    """(yürütme, gecikme kayması) bps, notional ağırlıklı, aleyhte pozitif. Bkz. modül açıklaması."""
+    def _not(d: dict) -> float:
+        return abs(d["miktar"] * d["fiyat"])
+
+    def _yon(d: dict) -> int:
+        return 1 if d["miktar"] > 0 else -1
+
+    yur = [d for d in dolumlar if d["gonderim"] and not d["gecikmeli"]]
+    yn = sum(map(_not, yur))
+    yur_bps = sum((d["fiyat"] / d["gonderim"] - 1) * _yon(d) * _not(d) + d["ucret"] for d in yur) / yn * 1e4 if yn else None
+    gec = [d for d in dolumlar if d["gonderim"] and d["gecikmeli"]]
+    gn = sum(map(_not, gec))
+    gec_bps = sum((d["gonderim"] / d["karar_fiyati"] - 1) * _yon(d) * _not(d) for d in gec) / gn * 1e4 if gn else None
+    return yur_bps, gec_bps
+
+
 def _kol_ozet(kol: str, bilgi: dict, isaret: list[tuple[int, float]], hafta_ms: int, kararlar: list[dict],
               dolumlar: list[dict], olaylar: list[dict]) -> dict:
     b0 = bilgi["baslangic_ozkaynak"]
@@ -62,14 +79,7 @@ def _kol_ozet(kol: str, bilgi: dict, isaret: list[tuple[int, float]], hafta_ms: 
         tepe = max(tepe, o)
         dd = min(dd, o / tepe - 1)
     ciro = sum(abs(d["miktar"] * d["fiyat"]) for d in dolumlar)
-    yur = [d for d in dolumlar if d["gonderim"] and not d["gecikmeli"]]
-    yur_not = sum(abs(d["miktar"] * d["fiyat"]) for d in yur)
-    yur_bps = (sum((d["fiyat"] / d["gonderim"] - 1) * (1 if d["miktar"] > 0 else -1) * abs(d["miktar"] * d["fiyat"])
-                   + d["ucret"] for d in yur) / yur_not * 1e4) if yur_not else None
-    gec = [d for d in dolumlar if d["gonderim"] and d["gecikmeli"]]
-    gec_not = sum(abs(d["miktar"] * d["fiyat"]) for d in gec)
-    gec_bps = (sum((d["gonderim"] / d["karar_fiyati"] - 1) * (1 if d["miktar"] > 0 else -1) * abs(d["miktar"] * d["fiyat"])
-                   for d in gec) / gec_not * 1e4) if gec_not else None
+    yur_bps, gec_bps = maliyet_bps(dolumlar)
     return {"kol": kol, "sinif": bilgi["sinif"], "hafta": oz_son / oz_bas - 1, "toplam": oz_son / b0 - 1, "en_kotu_dusus": dd,
             "ozkaynak": oz_son, "karar": len(kararlar), "islem": len(dolumlar), "ciro": ciro / oz_bas if oz_bas else 0.0,
             "yurutme_bps": yur_bps, "gecikme_bps": gec_bps,

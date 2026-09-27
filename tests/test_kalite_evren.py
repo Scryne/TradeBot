@@ -31,7 +31,21 @@ def test_eksik_bosluk_kimlik_kirilmasi_sicrama():
     fiyat = np.r_[np.linspace(100, 101, 200), np.linspace(0.5, 0.6, 200)]  # LUNA benzeri
     durum, o = kalite.rapor(_seri(np.r_[a, b], fiyat), "1h", "kripto_7x24")
     assert durum == "UYARI" and o["kimlik_kirilmasi_supheli"] and o["eksik"] > 1000
-    assert o["uzun_bosluk"][0]["gun"] > 50 and o["sicrama"] >= 1
+    assert o["uzun_bosluk"][0]["gun"] > 50
+    assert o["buyuk_hareket"] >= 1 and o["sicrama"] == 0  # kalıcı seviye kırılması kötü tick değil
+
+
+def test_sicra_don_kotu_tick_uyari():
+    t0 = ms(datetime(2026, 1, 1, tzinfo=UTC))
+    t = np.arange(t0, t0 + 300 * SAAT, SAAT)
+    fiyat = 100 * np.exp(np.cumsum(np.random.default_rng(1).normal(0, 0.003, 300)))
+    fiyat[150] *= 1.3                                   # tek barlık kötü tick: sıçrar ve geri döner
+    durum, o = kalite.rapor(_seri(t, fiyat), "1h", "kripto_7x24")
+    assert durum == "UYARI" and o["sicrama"] == 1 and o["sicrama_ornek"][0]["donus"] < 0
+    kalici = 100 * np.exp(np.cumsum(np.random.default_rng(1).normal(0, 0.003, 300)))
+    kalici[150:] *= 1.3
+    durum, o = kalite.rapor(_seri(t, kalici), "1h", "kripto_7x24")
+    assert durum == "OK" and o["sicrama"] == 0 and o["buyuk_hareket"] == 1
 
 
 def test_ohlc_tutarsiz_hata():

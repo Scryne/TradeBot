@@ -15,6 +15,7 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
+import numpy as np
 import polars as pl
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
@@ -57,6 +58,29 @@ def yanit_coz(ham: bytes) -> tuple[pl.DataFrame, list[dict]]:
         olaylar.append({"tarih_ms": gun_basi(int(v["date"]) * 1000), "tur": "bolunme",
                         "deger": float(v["numerator"]) / float(v["denominator"])})
     return df, olaylar
+
+
+def normalize(df: pl.DataFrame, takvim_adi: str) -> tuple[pl.DataFrame, dict]:
+    """Türetilmiş bar deposuna yazmadan önce (ham değişmez, kural 9). 2026-09-27 denetimi:
+    - Yahoo, BIST kapalıyken bar üretiyor (bayramlar; 2023-02-08'de iptal edilen seans: THYAO O=K=115, hacim 2.500).
+      Takvim kapalı diyorsa **ve** bar bayatsa (hacim son 20 barın medyanının %1'i altında ya da O=Y=D=K) atılır.
+      Normal hacimli bar, takvim kapalı dese de kalır (takvim de yanılabilir; kalite raporu işaretler).
+    - Düzeltilmiş seride seyrek OHLC tutarsızlığı (açılış ayrı ölçeklenmiş, ~%1): yüksek/düşük O/K'yı kapsayacak
+      şekilde genişletilir."""
+    if df.is_empty():
+        return df, {"kapali_gun_atildi": 0, "ohlc_onarildi": 0}
+    t = df["acilis_ms"].to_numpy()
+    acik = np.isin(t, takvim(takvim_adi).gunluk_barlar(int(t[0]), int(t[-1]) + 1))
+    hacim = df["volume"].fill_null(0.0).to_numpy()
+    medyan = pl.Series(hacim).shift(1).rolling_median(window_size=20, min_samples=5).fill_null(0.0).to_numpy()
+    op, hi, lo, cl = (df[k].to_numpy() for k in ("open", "high", "low", "close"))
+    duz = (op == hi) & (hi == lo) & (lo == cl)
+    bayat = (hacim < 0.01 * medyan) | duz
+    at = ~acik & bayat
+    tutarsiz = (hi < np.maximum(op, cl)) | (lo > np.minimum(op, cl))
+    df = df.with_columns(pl.max_horizontal("open", "high", "low", "close").alias("high"),
+                         pl.min_horizontal("open", "high", "low", "close").alias("low")).filter(pl.Series(~at))
+    return df, {"kapali_gun_atildi": int(at.sum()), "ohlc_onarildi": int(tutarsiz.sum())}
 
 
 def tamamlanmamis_at(df: pl.DataFrame, takvim_adi: str, simdi_ms: int, tampon_ms: int = 15 * 60_000) -> pl.DataFrame:
@@ -112,6 +136,9 @@ class Yahoo:
             return self.gunluk(e, baslangic, tam=True)
         _, sha, _ = self.ham.kaydet("yahoo", f"chart/{ks}/1d/{datetime.now(UTC):%Y-%m-%d}{'-tam' if tam else ''}", ham, "json")
         df = tamamlanmamis_at(df, e.takvim, simdi)
+        df, duzeltme = normalize(df, e.takvim)
+        if any(duzeltme.values()):
+            _log.info("yahoo_normalize", kimlik=kimlik, **duzeltme)
         self._olay_yaz(kimlik, olaylar, sha)
         n = self.bar.yaz(kimlik, "1d", df, birlestir=not tam) if not df.is_empty() else 0
         tum = self.bar.oku(kimlik, "1d")

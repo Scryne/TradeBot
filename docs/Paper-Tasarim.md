@@ -50,8 +50,17 @@ Bir kol A olur, eğer hepsi:
 
 **Terfinin kaydı:** sınıf kol tanımının parçasıdır, tanım değişirse kol yeniden açılmak zorunda kalır. Terfi bu yüzden
 `paper_kol_olay`'a `terfi` olayı olarak yazılır (göç 0009): dağıtıcı sınıfı hafta başından önceki son terfi olayından
-okur, yoksa config'deki sınıftan (`PaperDefter.sinif`). Paper'da terfi otomatiktir (Final Doküman §5). **Yapılacak (8.
-haftadan önce, ~2026-11-22):** yukarıdaki dört ölçütü hesaplayıp olayı yazan değerlendirme (aynı dönemin backtest'i dahil).
+okur, yoksa config'deki sınıftan (`PaperDefter.sinif`). Paper'da terfi otomatiktir (Final Doküman §5).
+
+**Değerlendirme (`canli/terfi.py`):** bekçi her Pazartesi raporla birlikte 56 günü dolduran B kollarını değerlendirir,
+geçene `terfi` olayı yazar, sonucu `data/rapor/terfi-<hafta>.json`'a kaydeder. Dağıtım olayı bir sonraki hafta başında
+görür: bir haftalık gecikme bilinçli, backtest hesabı paper düğümünün saatlik döngüsünü bloklamasın.
+- Aynı dönemin backtest'i canlı bar deposunda, turnuvanın kendi fonksiyonlarıyla koşar (Jev vetosu uygulanmaz).
+- **Gün hizalaması:** paper işareti barın kapanışında yazılır. İki taraf da günü kapanış zamanına göre etiketler
+  (00:00 işareti biten günündür). Bir saatlik kayma BTC'de yıllık ~%5 sahte takip hatası üretirdi, yani ölçütün
+  tamamını. Test: backtest'i birebir izleyen paper'da takip hatası < 1e-9.
+- Kesinti payı eksik saatlik işaretlerden hesaplanır. Yürütme maliyeti ölçülemiyorsa (hiç zamanında dolum yoksa) ölçüt
+  geçmez.
 
 ## Kol olayları ve acil durdurma (Claude, 2026-09-27 denetimi)
 

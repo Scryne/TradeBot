@@ -60,13 +60,15 @@ def kademe_orani(gun: float, ayar: DagiticiAyar) -> float:
     return oran
 
 
-def gunluk_getiri(isaretler: list[tuple[int, float]], bit_ms: int) -> dict[int, float]:
-    """Saatlik özkaynak işaretlerinden günlük log getiri: gün sonu = o UTC gününün son işareti (bit_ms'den önce).
+def gunluk_getiri(isaretler: list[tuple[int, float]], bit_ms: int, dahil: bool = False) -> dict[int, float]:
+    """Saatlik özkaynak işaretlerinden günlük log getiri. İşaret barın KAPANIŞINDA yazılır: 00:00'daki işaret biten
+    günündür (etiket = (t − 1 ms)'nin günü). Böylece gün d, kapanışı d içinde olan barları kapsar; backtest de barı
+    kapanış gününe atar (terfi: takip hatası). `dahil`: bit_ms'deki işaret de sayılır (hafta başında yazıldıysa).
     Döndürür: {gün başı ms: önceki işaretli günden bu güne log getiri}."""
     gun_sonu: dict[int, float] = {}
     for t, oz in isaretler:
-        if t < bit_ms and oz > 0:
-            gun_sonu[t - t % GUN_MS] = oz  # sıralı gelir: son yazılan günün son işaretidir
+        if (t <= bit_ms if dahil else t < bit_ms) and oz > 0:
+            gun_sonu[(t - 1) - (t - 1) % GUN_MS] = oz  # sıralı gelir: günün son işareti
     gunler = sorted(gun_sonu)
     return {g: math.log(gun_sonu[g] / gun_sonu[o]) for o, g in zip(gunler, gunler[1:], strict=False)}
 

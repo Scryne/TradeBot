@@ -26,10 +26,13 @@ def test_hafta_basi_pazartesi():
 
 
 def test_gunluk_getiri_gun_sonu_ve_kesik():
-    isaret = [(T0 + h * 3_600_000, 100.0 * (1.01 ** (h // 24)) + (h % 24) * 0.001) for h in range(24 * 5)]
-    g = dg.gunluk_getiri(isaret, T0 + 3 * GUN)  # 3. gün ve sonrası görülmez
+    # işaret barın kapanışında: h. saatin barı T0 + (h+1) saatte işaretlenir; 00:00 işareti biten günündür
+    isaret = [(T0 + (h + 1) * 3_600_000, 100.0 * (1.01 ** (h // 24)) + (h % 24) * 0.001) for h in range(24 * 5)]
+    g = dg.gunluk_getiri(isaret, T0 + 3 * GUN)  # 3. gün ve sonrası görülmez; 2. günün 00:00 işareti de (hariç)
     assert list(g) == [T0 + GUN, T0 + 2 * GUN]
-    assert all(abs(v - math.log(1.01)) < 1e-5 for v in g.values())
+    assert all(abs(v - math.log(1.01)) < 1e-4 for v in g.values())
+    g = dg.gunluk_getiri(isaret, T0 + 3 * GUN, dahil=True)
+    assert list(g) == [T0 + GUN, T0 + 2 * GUN] and abs(g[T0 + 2 * GUN] - math.log(1.01)) < 1e-5
 
 
 def test_kademe():
@@ -118,6 +121,6 @@ def test_defter_dagitim_haftada_bir_ve_kesik(tmp_path):
             defter.ozkaynak_yaz(k.ad, bas + i * 3_600_000, KolDurum(ozkaynak=float(o), nakit=float(o)), {})
     s = defter.dagitim_getir(pf, kaynak, T0)
     assert s["hafta_ms"] == T0 and len(s["uygun"]) == 5
-    assert all(v["gozlem"] == 59 for v in s["kollar"].values())  # hafta başından sonraki işaretler görülmez
+    assert all(v["gozlem"] == 60 for v in s["kollar"].values())  # hafta başından sonraki işaretler görülmez
     assert s["kaldirac"] == 0.0 and s["kaldirac_golge"] > 0     # hepsi B
     assert defter.dagitim_getir(pf, kaynak, T0) == s             # ikinci çağrı kayıttan okur
