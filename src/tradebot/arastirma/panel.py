@@ -239,6 +239,34 @@ def taraf_matrisi(g: GrupVerisi, modeller: list[MaliyetModeli], ek_bps: np.ndarr
 
 
 # ------------------------------------------------------------------ backtest
+DURUMLAR = ("normal", "fren_gunluk", "fren_haftalik", "acil_durdurma")
+
+
+def riski_artirma(h: np.ndarray, kaymis: np.ndarray) -> np.ndarray:
+    """Aynı yönde küçülebilir, büyüyemez, ters dönemez (fren ve veto kuralı; canlı risk motoruyla aynı, kural 5)."""
+    return np.where(np.sign(h) == np.sign(kaymis), np.sign(h) * np.minimum(np.abs(h), np.abs(kaymis)), 0.0)
+
+
+def dengele_adim(hedef: np.ndarray, kaymis: np.ndarray, onceki_h: np.ndarray, ilk: bool, islem_ok: np.ndarray,
+                 bitti: np.ndarray, durum: str = "normal", veto: np.ndarray | None = None,
+                 bant: float = 0.0) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Bir bar için dengeleme kararı (saf; backtest `calistir_panel` ve canlı paper motoru AYNI fonksiyonu çağırır).
+
+    hedef: bu barda tutulmak istenen ağırlık; kaymis: fiyatla kaymış mevcut ağırlık; onceki_h: önceki barın etkin hedefi.
+    Dönüş: (yeni ağırlık, etkin hedef — sonraki barın onceki_h'si, işlem yapılan enstrümanlar)."""
+    h = np.nan_to_num(np.asarray(hedef, dtype=float)).copy()
+    h[bitti] = 0.0
+    if durum == "acil_durdurma":
+        h[:] = 0.0
+    elif durum != "normal":  # fren: yeni risk yok
+        h = riski_artirma(h, kaymis)
+    if veto is not None and veto.any():
+        h = np.where(veto, riski_artirma(h, kaymis), h)
+    degisti = (np.sign(h) != np.sign(onceki_h)) | ilk
+    islem = islem_ok & (degisti | (np.abs(h - kaymis) > bant * np.abs(h)))
+    return np.where(islem, h, kaymis), h, islem
+
+
 def calistir_panel(g: GrupVerisi, hedef: np.ndarray, taraf: np.ndarray, modeller: list[MaliyetModeli],
                    bant: float = 0.0, izleyici=None, fiyat: np.ndarray | None = None,
                    veto: np.ndarray | None = None) -> Sonuc:
@@ -265,24 +293,12 @@ def calistir_panel(g: GrupVerisi, hedef: np.ndarray, taraf: np.ndarray, modeller
     kaymis, onceki_h, oz = np.zeros(k), np.zeros(k), 1.0
     durumlar = np.zeros(n - 1, dtype=np.int8)
     for i in range(n - 1):
-        h = h_all[i].copy()
-        islem_ok = g.bar_var[i] | g.bitti[i]
-        h[g.bitti[i]] = 0.0
+        durum = "normal"
         if izleyici is not None:
-            d = izleyici.guncelle(oz, int(g.t[i]))
-            durumlar[i] = ("normal", "fren_gunluk", "fren_haftalik", "acil_durdurma").index(d.value)
-            if d.value == "acil_durdurma":
-                h[:] = 0.0
-            elif d.value != "normal":  # fren: yeni risk yok (aynı yönde küçülebilir, büyüyemez, ters dönemez)
-                h = np.where(np.sign(h) == np.sign(kaymis), np.sign(h) * np.minimum(np.abs(h), np.abs(kaymis)), 0.0)
-        if veto is not None and veto[i].any():
-            v = veto[i]
-            h = np.where(v, np.where(np.sign(h) == np.sign(kaymis), np.sign(h) * np.minimum(np.abs(h), np.abs(kaymis)), 0.0),
-                         h)
-        degisti = (np.sign(h) != np.sign(onceki_h)) | (i == 0)
-        onceki_h = h
-        islem = islem_ok & (degisti | (np.abs(h - kaymis) > bant * np.abs(h)))
-        w = np.where(islem, h, kaymis)
+            durum = izleyici.guncelle(oz, int(g.t[i])).value
+            durumlar[i] = DURUMLAR.index(durum)
+        w, onceki_h, _ = dengele_adim(h_all[i], kaymis, onceki_h, i == 0, g.bar_var[i] | g.bitti[i], g.bitti[i], durum,
+                                      veto[i] if veto is not None else None, bant)
         dv = np.abs(w - kaymis)
         carpan = np.where(g.bitti[i], KALKAN_MALIYET_CARPANI, 1.0)
         fin = np.where(w >= 0, fin_uzun, fin_kisa) * np.abs(w) * sure[i] / YIL_MS
