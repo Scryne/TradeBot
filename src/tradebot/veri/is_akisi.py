@@ -59,7 +59,7 @@ def kalite_hepsi(a: Ayarlar, m: Engine) -> dict:
             df = depo.oku(k["kimlik"], zd)
             if df.is_empty():
                 continue
-            durum, ozet = kalite.rapor(df, zd, k["takvim"], simdi)
+            durum, ozet = kalite.rapor(df, zd, k["takvim"], simdi, sicrama_uyari=k["kaynak"] != "binance")
             if k["meta"].get("evren_uyarisi"):
                 ozet["evren_uyarisi"] = k["meta"]["evren_uyarisi"]
             kalite.kaydet(m, k["kimlik"], zd, durum, ozet)

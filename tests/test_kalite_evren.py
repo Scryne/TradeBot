@@ -95,3 +95,12 @@ def test_sonraki_calisma():
     from tradebot.veri.is_akisi import sonraki_calisma
     assert sonraki_calisma(datetime(2026, 9, 25, 0, 10, tzinfo=UTC), 1, 30) == datetime(2026, 9, 25, 1, 30, tzinfo=UTC)
     assert sonraki_calisma(datetime(2026, 9, 25, 2, 0, tzinfo=UTC), 1, 30) == datetime(2026, 9, 26, 1, 30, tzinfo=UTC)
+
+
+def test_borsanin_kendi_kaydinda_sicra_don_uyari_degil():
+    t0 = ms(datetime(2026, 1, 1, tzinfo=UTC))
+    t = np.arange(t0, t0 + 300 * SAAT, SAAT)
+    fiyat = 100 * np.exp(np.cumsum(np.random.default_rng(1).normal(0, 0.003, 300)))
+    fiyat[150] *= 1.3
+    durum, o = kalite.rapor(_seri(t, fiyat), "1h", "kripto_7x24", sicrama_uyari=False)
+    assert durum == "OK" and o["sicrama"] == 1  # sayılır, uyarı değil

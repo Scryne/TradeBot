@@ -79,21 +79,34 @@ class Fx24x5(Takvim):
         return ~((gun == 5) | ((gun == 4) & (saat >= 17)) | ((gun == 6) & (saat < 17)))
 
 
+# exchange_calendars'ın kapalı saydığı ama borsanın açık olduğu günler (UTC seans). Kanıt (2026-09-27 kalite denetimi):
+# Yahoo'da o gün 200+ BIST hissesinde normal hacimli bar var. 2006-01-09 ve 2010-09-09 bayram arifesi (yarım gün),
+# 2009-05-01 tam gün. Saatler yaklaşıktır; yalnız günlük veride gün düzeyinde kullanılır.
+EK_SEANSLAR: dict[str, list[tuple[str, str]]] = {
+    "XIST": [("2006-01-09T07:30", "2006-01-09T10:30"), ("2009-05-01T07:30", "2009-05-01T15:30"),
+             ("2010-09-09T06:30", "2010-09-09T09:30")],
+}
+
+
 class BorsaTakvimi(Takvim):
-    """exchange_calendars sarmalayıcısı. Bar açık sayılır: açılışı seans içindeyse [open, close)."""
+    """exchange_calendars sarmalayıcısı (+ kanıtlı `EK_SEANSLAR`). Bar açık sayılır: açılışı seans içindeyse [open, close)."""
 
     def __init__(self, kod: str, baslangic: str = "1990-01-01") -> None:
         self.ad = kod
         self._c = xc.get_calendar(kod, start=baslangic)
+        self._ek = [(int(pd.Timestamp(o, tz="UTC").value // 1_000_000), int(pd.Timestamp(c, tz="UTC").value // 1_000_000))
+                    for o, c in EK_SEANSLAR.get(kod, [])]
 
     def seanslar(self, bas_ms: int, bit_ms: int) -> list[tuple[int, int]]:
         bas = pd.Timestamp(bas_ms, unit="ms", tz="UTC").tz_convert(None).normalize() - pd.Timedelta(days=1)
         bit = pd.Timestamp(bit_ms, unit="ms", tz="UTC").tz_convert(None).normalize() + pd.Timedelta(days=1)
+        ek = [(o, c) for o, c in self._ek if bas.value // 1_000_000 <= o <= bit.value // 1_000_000]
         bas, bit = max(bas, self._c.first_session), min(bit, self._c.last_session)
         if bas > bit:
-            return []
+            return sorted(ek)
         s = self._c.schedule.loc[bas:bit]
-        return [(int(o.value // 1_000_000), int(c.value // 1_000_000)) for o, c in zip(s["open"], s["close"], strict=True)]
+        return sorted([(int(o.value // 1_000_000), int(c.value // 1_000_000))
+                       for o, c in zip(s["open"], s["close"], strict=True)] + ek)
 
     def acik_mi(self, t_ms: int) -> bool:
         return any(o <= t_ms < c for o, c in self.seanslar(t_ms, t_ms))

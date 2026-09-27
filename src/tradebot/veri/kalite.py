@@ -28,7 +28,10 @@ def _t(ms: int) -> str:
     return dt(ms).strftime("%Y-%m-%d %H:%M")
 
 
-def rapor(df: pl.DataFrame, zaman_dilimi: str, takvim_adi: str, simdi_ms: int | None = None) -> tuple[str, dict]:
+def rapor(df: pl.DataFrame, zaman_dilimi: str, takvim_adi: str, simdi_ms: int | None = None,
+          sicrama_uyari: bool = True) -> tuple[str, dict]:
+    """`sicrama_uyari=False`: borsanın kendi kaydı (Binance, SHA-256 doğrulamalı): sıçra-dön kötü tick olamaz, likit
+    olmayan coinlerde gerçek fitildir (denetim: medyan %18); sayılır ama uyarı değildir."""
     if df.is_empty():
         return "HATA", {"satir": 0, "not": "veri yok"}
     df = df.sort("acilis_ms")
@@ -89,7 +92,7 @@ def rapor(df: pl.DataFrame, zaman_dilimi: str, takvim_adi: str, simdi_ms: int | 
 
     if o["tekrar"] or o["ohlc_tutarsiz"]:
         durum = "HATA"
-    elif o["eksik_oran"] > EKSIK_UYARI or o["kapali_saatte_bar"] or o.get("sicrama") or kirilma:
+    elif o["eksik_oran"] > EKSIK_UYARI or o["kapali_saatte_bar"] or (sicrama_uyari and o.get("sicrama")) or kirilma:
         durum = "UYARI"
     else:
         durum = "OK"

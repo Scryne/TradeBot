@@ -122,3 +122,11 @@ def test_ham_depo_ayni_icerik_farkli_anahtar(m, ayar):
     y2, _, yeni2 = d.kaydet("dukascopy", "EURUSD/BID/1h/2010-02", b"", "bi5")
     assert yeni1 and not yeni2 and y1 == y2  # tek dosya
     assert d.var_mi("dukascopy", "EURUSD/BID/1h/2010-02") is not None  # ama anahtar kayıtlı: tekrar indirilmez
+
+
+def test_xist_ek_seanslar_kanitli_gunler():
+    from tradebot.veri.takvim import EK_SEANSLAR, takvim
+    gunler = {datetime.fromtimestamp(x / 1000, UTC).date().isoformat()
+              for x in takvim("XIST").gunluk_barlar(ms(datetime(2006, 1, 1, tzinfo=UTC)), ms(datetime(2011, 1, 1, tzinfo=UTC)))}
+    assert {"2006-01-09", "2009-05-01", "2010-09-09"} <= gunler and len(EK_SEANSLAR["XIST"]) == 3
+    assert "2010-09-10" not in gunler  # bayramın kendisi kapalı kalır
