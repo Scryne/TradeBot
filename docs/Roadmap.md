@@ -366,8 +366,9 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     - `DurumIzleyici`: ortam kontrolleri (DNS, saat, disk) art arda 3 tur (15 dk) aynı yönde kalmadan bildirilmez;
       histerezisli, düzelme de onay ister. Kritikler (paper, gece işi, yedek, veritabanı) ilk turda.
     - Sessiz saat 19–05 UTC (İstanbul 22–08): KRİTİK anında, UYARI/BİLGİ biriktirilir, sabah tek mesaj.
-  - Faz 9'da kalan: motor donarsa pozisyon kapatma (bağımsız gözetmen), günlük özet, D1 Jev log triyajı, arıza
-    tatbikatları.
+  - 2026-09-28 günlük özet ✅: bekçi her gün sessiz saat bitince (05:00 UTC) bir kez gönderir: sağlık, kolların 24
+    saatlik ve başlangıçtan getirisi (Jev'li kopya yalnız A/B farkı olarak), işlem/fren, yeni Jev olayları, gece işi.
+  - Faz 9'da kalan: motor donarsa pozisyon kapatma (bağımsız gözetmen), D1 Jev log triyajı, arıza tatbikatları.
 
 ### Faz 10: Web pano
 - **İşler:** `DESIGN.md` (create-design-md + ui-ux-pro-max); FastAPI + arayüz; frontend denetim pasları.

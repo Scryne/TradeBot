@@ -80,3 +80,37 @@ def test_bekleyen_hafta(tmp_path):
     assert rapor.bekleyen_hafta(tmp_path / "yok", simdi, H + dg.HAFTA_MS) is None   # paper hafta bittikten sonra başladı
     assert rapor.bekleyen_hafta(tmp_path / "yok", simdi, None) is None             # hiç paper kolu yok
     assert rapor.bekleyen_hafta(tmp_path / "yok", simdi, H + 3 * 86_400_000) == H   # hafta içinde başladı: raporlanır
+
+
+def test_gunluk_ozet(tmp_path):
+    from datetime import UTC, datetime
+
+    from tradebot import denetim
+    from tradebot.cli import gunluk_ozet_zamani
+
+    m = create_engine(f"sqlite:///{tmp_path / 'g.db'}")
+    metadata.create_all(m)
+    df = PaperDefter(m, "t")
+    a = dataclasses.replace(kol_yap(), ad="x@g@1h", baslangic_ozkaynak=100.0)
+    j = dataclasses.replace(a, ad="x@g@1h+jev")
+    for k in (a, j):
+        df.kol_ac(k, H - 7 * 86_400_000)
+    simdi = H + 30 * SAAT
+    for k, oz in ((a.ad, [100, 102, 101]), (j.ad, [100, 102, 103])):
+        for t, o in zip([H - SAAT, H + 5 * SAAT, H + 29 * SAAT], oz, strict=True):   # ilki 24 saatten önce
+            df.ozkaynak_yaz(k, t, KolDurum(ozkaynak=o, nakit=o), {})
+    denetim.kaydet(m, "veri", "gece_isi", {"binance": {"dosya": 3}, "yahoo": {"hata": "HTTPError: 503"}},
+                   zaman=datetime.fromtimestamp((simdi - 3 * SAAT) / 1000, UTC))
+    metin = rapor.gunluk_ozet(m, simdi, "Sağlık: hepsi OK")
+    # pencere [H+6s, H+30s): başlangıç H+5s işareti (102) → 101; başlangıçtan 100 → 101
+    assert "Sağlık: hepsi OK" in metin and "x@g@1h: -0.98% · +1.00%" in metin
+    assert "Jev farkı +1.96%" in metin and "x@g@1h+jev:" not in metin         # Jev'li kopya yalnız fark olarak
+    assert "HATALI adım: yahoo" in metin and "Jev: yeni olay yok" in metin
+    # zamanlama: sessiz saat bitmeden yok, bittikten sonra bir kez
+    sabah = int(datetime(2026, 9, 28, 4, 59, tzinfo=UTC).timestamp() * 1000)
+    assert gunluk_ozet_zamani(sabah, 5, tmp_path) is None
+    yol = gunluk_ozet_zamani(sabah + 2 * 60_000, 5, tmp_path)
+    assert yol is not None and yol.name == "gunluk-2026-09-28.txt"
+    yol.parent.mkdir(parents=True)
+    yol.write_text("x")
+    assert gunluk_ozet_zamani(sabah + 3 * SAAT, 5, tmp_path) is None

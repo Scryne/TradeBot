@@ -194,3 +194,49 @@ def bekleyen_hafta(veri_dizini, simdi_ms: int, ilk_ms: int | None, gecikme_ms: i
         return None
     ad = datetime.fromtimestamp(h / 1000, UTC).date().isoformat()
     return None if (Path(veri_dizini) / "rapor" / f"paper-{ad}.md").exists() else h
+
+
+GUN_MS = 86_400_000
+
+
+def gunluk_ozet(motor: Engine, simdi_ms: int, saglik_satiri: str = "") -> str:
+    """Günlük Telegram özeti (Faz 9): son 24 saat. Kol getirileri defterden (haftalık raporla aynı hesap), yeni Jev
+    olayları, gece işinin son sonucu. Jev'li kopyalar A/B farkı varsa gösterilir (yoksa kalabalık yapmaz)."""
+    from tradebot.db import denetim_izi, olay
+
+    r = ozetle(topla(motor, simdi_ms - GUN_MS, simdi_ms))
+    ad = {k["kol"]: k for k in r["kollar"]}
+    tarih = datetime.fromtimestamp(simdi_ms / 1000, UTC).date().isoformat()
+    satir = [f"Günlük özet · {tarih}"]
+    if saglik_satiri:
+        satir.append(saglik_satiri)
+    satir.append("Kollar (24 saat · başlangıçtan):")
+    for k in r["kollar"]:
+        if k["kol"].endswith("+jev"):
+            continue
+        j = ad.get(k["kol"] + "+jev")
+        ab = f" · Jev farkı {_yuzde(j['hafta'] - k['hafta'])}" if j and abs(j["hafta"] - k["hafta"]) > 1e-9 else ""
+        satir.append(f"• {k['kol']}: {_yuzde(k['hafta'])} · {_yuzde(k['toplam'])}{ab}")
+    islem = sum(k["islem"] for k in r["kollar"])
+    fren = sum(k["fren"] for k in r["kollar"])
+    olaylar = [f"{k['kol']}: {', '.join(k['olay'])}" for k in r["kollar"] if k["olay"]]
+    satir.append(f"İşlem {islem} · frenli karar {fren}" + (f" · kol olayı: {'; '.join(olaylar)}" if olaylar else ""))
+    bas = datetime.fromtimestamp((simdi_ms - GUN_MS) / 1000, UTC)
+    with motor.connect() as b:
+        yeni = b.execute(select(olay.c.tur, olay.c.rol, olay.c.enstruman).where(olay.c.zaman >= bas)).all()
+        gece = b.execute(select(denetim_izi.c.zaman, denetim_izi.c.veri).where(denetim_izi.c.olay == "gece_isi")
+                         .order_by(denetim_izi.c.zaman.desc()).limit(1)).first()
+    if yeni:
+        say = defaultdict(int)
+        for tur, rol, _ in yeni:
+            say[f"{rol} {tur}"] += 1
+        vetolu = sorted({e for t, _, e in yeni if t == "veto"})
+        satir.append("Jev: " + ", ".join(f"{k} {v}" for k, v in sorted(say.items()))
+                     + (f" ({', '.join(vetolu[:8])}{' …' if len(vetolu) > 8 else ''})" if vetolu else ""))
+    else:
+        satir.append("Jev: yeni olay yok")
+    if gece is not None:
+        hatali = [ad_ for ad_, v in gece.veri.items() if isinstance(v, dict) and "hata" in v and v["hata"]
+                  and not isinstance(v["hata"], list)]
+        satir.append(f"Gece işi {gece.zaman:%H:%M} UTC: " + ("tamam" if not hatali else f"HATALI adım: {', '.join(hatali)}"))
+    return "\n".join(satir)

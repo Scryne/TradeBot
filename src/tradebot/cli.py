@@ -105,9 +105,42 @@ def saglik_komutu(
             kayitci.warning("olu_adam_sinyali_gitmedi")
         if dongu and a.ortam == "host" and a.veritabani_url is not None:
             _haftalik_rapor(a, bildirici, kayitci)
+            _gunluk_ozet(a, bildirici, kayitci, izleyici)
         if not dongu:
             raise typer.Exit(saglik.cikis_kodu(sonuclar))
         time.sleep(dongu)
+
+
+def gunluk_ozet_zamani(simdi_ms: int, sessiz_bitis_saat: int, veri_dizini) -> Path | None:
+    """Bugünün özeti gönderilecekse işaret dosyasının yolu: sessiz saat bittiyse ve bugün henüz yazılmadıysa."""
+    from datetime import UTC, datetime
+
+    t = datetime.fromtimestamp(simdi_ms / 1000, UTC)
+    yol = Path(veri_dizini) / "rapor" / f"gunluk-{t.date().isoformat()}.txt"
+    return None if t.hour < sessiz_bitis_saat or yol.exists() else yol
+
+
+def _gunluk_ozet(a, bildirici, kayitci, izleyici) -> None:
+    """Bekçi: her gün sessiz saat bitince bir kez (Final Doküman §Operasyon: günlük özet). Dosya işareti yeniden
+    başlatmada ikinci kez gönderilmesini önler."""
+    from tradebot.canli import rapor
+    from tradebot.db import motor as db_motor
+
+    simdi = int(time.time() * 1000)
+    yol = gunluk_ozet_zamani(simdi, a.sessiz_saat_utc[1], a.veri_dizini)
+    if yol is None:
+        return
+    sorun = {ad: d for ad, d in izleyici.bildirilen.items() if d != "OK"}
+    saglik_satiri = "Sağlık: " + (", ".join(f"{k} {v}" for k, v in sorted(sorun.items())) if sorun else "hepsi OK")
+    try:
+        metin = rapor.gunluk_ozet(db_motor(a), simdi, saglik_satiri)
+    except Exception as e:  # noqa: BLE001 — özet hatası bekçiyi durdurmaz
+        kayitci.error("gunluk_ozet_hatasi", hata=f"{type(e).__name__}: {e}"[:300])
+        return
+    yol.parent.mkdir(parents=True, exist_ok=True)
+    yol.write_text(metin, encoding="utf-8")
+    bildirici.gonder("BILGI", metin)
+    kayitci.info("gunluk_ozet", yol=str(yol))
 
 
 def _haftalik_rapor(a, bildirici, kayitci) -> None:
