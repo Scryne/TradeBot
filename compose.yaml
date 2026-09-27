@@ -14,6 +14,7 @@ x-ortak: &ortak
     TRADEBOT_VERITABANI_URL: postgresql+psycopg://tradebot:${POSTGRES_PASSWORD}@postgres:5432/tradebot
     TRADEBOT_LOG_DIZINI: /app/log
     TRADEBOT_VERI_DIZINI: /app/data
+    TRADEBOT_YEDEK_DIZINI: /yedek   # yalnız saglik bağlar (salt okunur); bekçi yedek yaşını denetler
     # İmajda git yok: kod sürümü host_guncelle.ps1'den gelir (deneme defteri her kayıtta tutar)
     TRADEBOT_KOD_SURUMU: ${KOD_SURUMU:-bilinmiyor}
   volumes:
@@ -56,6 +57,30 @@ services:
       driver: json-file
       options: { max-size: "20m", max-file: "5" }
 
+  yedek:
+    # Veritabanı yedeği (2026-09-27 denetimi: hiç yedek yoktu). Günde bir, 02:15 UTC'den sonra pg_dump (özel biçim),
+    # pg_restore --list ile doğrulanır, 14 gün saklanır. Hedef Windows diski (C:\TradeBot\yedek): WSL sanal diskinden
+    # ayrı dosya sistemi. guncelle.ps1 her dağıtımda son yedeği ana bilgisayara da çeker (evden ayrı kopya).
+    image: postgres:17
+    restart: unless-stopped
+    entrypoint: ["sh", "/yedek.sh"]
+    environment:
+      PGHOST: postgres
+      PGUSER: tradebot
+      PGDATABASE: tradebot
+      PGPASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env içinde tanımlı olmalı}
+      SAAT: "0215"
+      SAKLA: "14"
+      TZ: UTC
+    volumes:
+      - ./docker/yedek/yedek.sh:/yedek.sh:ro
+      - ../yedek:/yedek
+    depends_on:
+      postgres: { condition: service_healthy }
+    logging:
+      driver: json-file
+      options: { max-size: "5m", max-file: "2" }
+
   goc:
     <<: *ortak
     command: ["tradebot", "db", "yukselt"]
@@ -65,7 +90,12 @@ services:
 
   saglik:
     <<: *ortak
+    # Bekçi: 5 dakikada bir sağlık + paper kalp atışı + gece işi + yedek yaşı + log triyajı → Telegram (tanımlıysa).
     command: ["tradebot", "saglik", "--dongu", "300"]
+    volumes:
+      - veri:/app/data
+      - log:/app/log
+      - ../yedek:/yedek:ro
     depends_on:
       goc: { condition: service_completed_successfully }
 

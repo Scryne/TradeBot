@@ -31,6 +31,8 @@ class Ayarlar(BaseSettings):
     typesafe_api_key: SecretStr | None = Field(default=None, validation_alias="TYPESAFE_API_KEY")
     nvidia_api_key: SecretStr | None = Field(default=None, validation_alias="NVIDIA_API_KEY")
     telegram_token: SecretStr | None = Field(default=None, validation_alias="TRADEBOT_TELEGRAM_TOKEN")
+    telegram_sohbet: str | None = None    # Scryne'ın sohbet kimliği (sır değil; bot yalnız buraya yazar)
+    yedek_dizini: Path | None = None      # compose `yedek`in hedefi; tanımlıysa sağlık yedek yaşını denetler
 
     # Sağlık eşikleri (Spike 02/03: bu evde DNS 5–15 sn, saat 1 sn kaymıştı)
     dns_uyari_sn: float = 1.0

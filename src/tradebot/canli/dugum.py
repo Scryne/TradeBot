@@ -89,6 +89,8 @@ class Beyin:
         self.son_fiyat: dict[str, float] = {}
         self.son_kapanis_ms = 0
         self.dagitim: dict | None = None  # portföy kolunun bu haftaki dağıtımı (paper_dagitim)
+        olaylar = defter.kol_olaylari()
+        self._son_olay_id = olaylar[-1].id if olaylar else 0  # açılışta durum() olayları zaten uyguladı
 
     # ------------------------------------------------------------------ karar
     def saat_kapandi(self, kapanis_ms: int, gecikmeli: bool = False) -> bool:
@@ -99,6 +101,7 @@ class Beyin:
         if any(v < beklenen for v in son.values()):
             return False
         vetolu = aktif_vetolar(self.motor, simdi)
+        self._olaylari_uygula()
         self._dagitim_guncelle(kapanis_ms)
         for kol in self.kollar:
             zd_ms = ZAMAN_DILIMI_MS[kol.zd]
@@ -106,7 +109,8 @@ class Beyin:
             if not gecikmeli and sinir != kapanis_ms:
                 continue
             if gecikmeli and kapanis_ms - sinir >= SAAT_MS:   # geç kalınmış: sonraki sınırı bekle (parity korunur)
-                _log.warning("karar_kacirildi", kol=kol.ad, sinir_ms=sinir)
+                if not self.defter.karar_var(kol.ad, sinir - zd_ms):  # o sınırın kararı zaten verildiyse kaçırılmadı
+                    _log.warning("karar_kacirildi", kol=kol.ad, sinir_ms=sinir)
                 continue
             try:
                 self._kol_karar(kol, vetolu, gecikmeli, sinir)
@@ -115,6 +119,16 @@ class Beyin:
         self._isaretle(kapanis_ms)
         self.son_kapanis_ms = kapanis_ms
         return True
+
+    def _olaylari_uygula(self) -> None:
+        """Çalışırken yazılan onaylı `acil_kaldir` olayları (CLI) bir sonraki kapanışta uygulanır."""
+        for o in self.defter.kol_olaylari(id_sonra=self._son_olay_id):
+            self._son_olay_id = o.id
+            d = self.durum.get(o.kol)
+            iz = d.izleyici if d is not None else None
+            if o.tur == "acil_kaldir" and iz is not None and iz.durum == Durum.ACIL_DURDURMA:
+                iz.acil_durdurma_kaldir(o.ayrinti["onaylayan"], o.ayrinti["gerekce"])
+                _log.warning("acil_durdurma_kaldirildi", kol=o.kol, onaylayan=o.ayrinti["onaylayan"])
 
     def _dagitim_guncelle(self, kapanis_ms: int) -> None:
         """Hafta döndüyse (ya da açılışta) dağıtımı defterden okur ya da hesaplayıp yazar. Hata: katsayılar sıfır
@@ -147,7 +161,7 @@ class Beyin:
             hedef = dg.portfoy_hedef(katsayi, {k: self.durum[k].onceki_h for k in katsayi}, list(h.g.kimlikler),
                                      RiskAyar(kaldirac=kol.ayar.kaldirac).enstruman_tavani, kol.yon == "long_short")
         k = kr.karar_ver(kol, h, d, vetolu, hedef)
-        kid = self.defter.karar_yaz(k, h.g.veri_hash)
+        kid = self.defter.karar_yaz(k, h.g.veri_hash, gecikmeli)
         d.onceki_h = dict(zip(k.kimlikler, (float(x) for x in k.etkin_hedef), strict=True))
         d.ilk = False
         _log.info("karar", kol=kol.ad, bar_ms=bar_ms, durum=k.durum, yeni=[round(float(x), 4) for x in k.yeni],
@@ -220,6 +234,7 @@ class Beyin:
         for kol_ad, f in farklar.items():
             if kol_ad not in self.durdurulan:
                 self.durdurulan.add(kol_ad)
+                self.defter.kol_olay_yaz(kol_ad, "durdur", {"neden": "mutabakat", "fark": f})
                 _log.error("mutabakat_farki_kol_durdu", kol=kol_ad, fark=f)
         return farklar
 
@@ -324,7 +339,8 @@ class KolStratejisi(Strategy):
         emir = self.order_factory.market(nautilus_id(kim), OrderSide.BUY if q > 0 else OrderSide.SELL,
                                          Quantity(abs(q), i.size_precision))
         cid = emir.client_order_id.value
-        eid = self.beyin.defter.emir_yaz(self.kol.ad, karar_id, cid, kim, istenen, q, fiyat, tur, risk)
+        eid = self.beyin.defter.emir_yaz(self.kol.ad, karar_id, cid, kim, istenen, q, fiyat, tur, risk,
+                                         self.beyin.son_fiyat.get(kim))
         self._emirler[cid] = (eid, kim, tur)
         self.submit_order(emir)
 

@@ -53,6 +53,28 @@ Betikler: `tools/host/baslangic.ps1` (bir kez, elle), `tools/host/kurulum.ps1` (
   Yeniden başlatma testi: açılış → otomatik oturum → servisler 57 sn'de geri.
 - Host: 192.168.1.4 (yerel), Tailscale 100.83.56.99. SSH takma adı `tradebot-host`.
 
+## Yedek ve bekçi (2026-09-27 denetimi)
+
+Denetimde veritabanının hiç yedeği olmadığı görüldü. Yedek bu yüzden Faz 9'dan öne alındı.
+
+- **Yedek (compose `yedek`):** her gün 02:15 UTC'den sonra `pg_dump -Fc` alınır, `pg_restore --list` ile doğrulanır ve
+  `C:\TradeBot\yedek` altına yazılır (WSL sanal diskinden ayrı dosya sistemi). 14 gün saklanır. `son.json` dosyası
+  zamanı, boyutu ve SHA-256'yı tutar.
+- **Evden ayrı kopya:** `guncelle.ps1` her dağıtımda son yedeği ana bilgisayara (`~/TradeBot-yedek`, son 10) çeker ve
+  SHA-256'yı doğrular.
+- **Geri yükleme:** önce boş bir veritabanına, sonra karşılaştırma:
+  `docker compose exec -T postgres createdb -U tradebot tradebot_geri`, ardından
+  `docker compose exec -T postgres pg_restore -U tradebot -d tradebot_geri /yedek/<dosya>`. Bunun için `postgres`
+  servisine yedek dizini bağlı değildir, dosya `docker cp` ile konteynere kopyalanır.
+- **Bekçi (compose `saglik`, 5 dakikada bir):** DNS, saat, veritabanı, disk ve sırları denetler. Host'ta ayrıca paper kalp
+  atışına (son özkaynak işareti > 70 dk uyarı, > 2 sa hata), gece işine (> 26 sa uyarı, > 50 sa hata), yedek yaşına
+  (> 26 sa hata) ve servis loglarındaki yeni `error` satırlarına bakar. Durum değişimini ve yeni hataları Telegram'a
+  yollar; aynı olay saatte en fazla bir kez gider. Bekçi motordan bağımsız bir süreçtir: paper donarsa onu görür.
+  Host'un tamamen kapanmasını göremez; bunun için dışarıda bir "ölü adam" denetimi Faz 9'da.
+- **Telegram (Scryne, bir kez):** BotFather'da bot aç → token. Bota bir mesaj at →
+  `https://api.telegram.org/bot<TOKEN>/getUpdates` → `chat.id`. İkisi host'taki `.env`'e yazılır:
+  `TRADEBOT_TELEGRAM_TOKEN`, `TRADEBOT_TELEGRAM_SOHBET`. Token sırdır, git'e ve loga girmez.
+
 ## Güvenlik notları
 
 - SSH yalnız "Özel" (ev) ağ profilinden ve yerel alt ağdan açık. İnternete port yönlendirmesi **yapılmaz**.

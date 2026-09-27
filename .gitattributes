@@ -1,0 +1,2 @@
+# Kabuk betikleri konteynerde koşar: host (Windows, core.autocrlf=true) çekse de LF kalmalı
+*.sh text eol=lf

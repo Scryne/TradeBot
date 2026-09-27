@@ -29,11 +29,12 @@ def test_maskeleyici_ad_ve_deger():
 
 def test_log_satiri_json_ve_maskeli(tmp_path, monkeypatch, capsys):
     monkeypatch.setenv("NVIDIA_API_KEY", "nvapi-cokgizli-9999")
+    monkeypatch.setattr("sys.argv", ["tradebot", "paper", "calis", "--duman"])
     a = Ayarlar(_env_file=None, log_dizini=tmp_path)
     kur(a)
     log("test").warning("deneme", ayrinti="anahtar nvapi-cokgizli-9999 kullanildi")
     logging.shutdown()
-    satir = (tmp_path / "tradebot.jsonl").read_text(encoding="utf-8").strip().splitlines()[-1]
+    satir = (tmp_path / "paper-calis.jsonl").read_text(encoding="utf-8").strip().splitlines()[-1]
     kayit = json.loads(satir)
     assert kayit["bilesen"] == "test" and kayit["level"] == "warning"
     assert kayit["zaman"].endswith("Z")  # UTC
@@ -45,3 +46,10 @@ def test_bos_sir_tanimsiz_sayilir(monkeypatch):
     monkeypatch.setenv("TRADEBOT_TELEGRAM_TOKEN", "   ")
     a = Ayarlar(_env_file=None)
     assert a.nvidia_api_key is None and a.telegram_token is None
+
+
+def test_surec_adi():
+    from tradebot.kayit import surec_adi
+    assert surec_adi(["saglik", "--dongu", "300"]) == "saglik"
+    assert surec_adi(["zeka", "kap-geri-doldur", "--bas", "2024-01-01"]) == "zeka-kap-geri-doldur"
+    assert surec_adi([]) == "tradebot"

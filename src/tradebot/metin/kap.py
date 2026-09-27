@@ -103,6 +103,7 @@ class KapBildirim:
         Canlı: az istek, 2 deneme (engelde servis turu Binance'i bekletmesin; kalan sonraki turda). Geçmiş doldurma:
         `aralik_sn` 3, 6 deneme (üstel bekleme engeli aşar)."""
         self.ham, self.motor = ham, motor
+        self.alinamayan: list[tuple[date, str]] = []  # (gün, bildirim no): geçmiş doldurmanın onarım turu için
         self.http = http or NazikIstemci("kap", aralik_sn=aralik_sn, deneme=deneme, geri_cekilme_sn=5.0,
                                          basliklar={"User-Agent": "Mozilla/5.0", "Accept-Language": "tr"})
 
@@ -137,6 +138,7 @@ class KapBildirim:
                         govde = sayfa_govdesi(ham.decode("utf-8", "ignore"))
                 except Exception as e:  # noqa: BLE001 — bu bildirim sonraki turda yeniden denenir
                     _log.warning("bildirim_alinamadi", no=no, hata=str(e)[:200])
+                    self.alinamayan.append((gun, no))
                     continue
                 _, sha, _ = self.ham.kaydet(KAYNAK, no, ham, uzanti)
                 satir = {"kaynak": KAYNAK, "dis_kimlik": no, "katalog": k.get("disclosureClass"),

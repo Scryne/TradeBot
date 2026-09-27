@@ -48,9 +48,33 @@ Bir kol A olur, eğer hepsi:
    yıllıklaştırılmış takip hatası ≤ %5; gerçekleşen işlem maliyeti (ücret + kayma) ≤ backtest varsayımının 1,5 katı.
 4. **Çelişki yok:** paper haftalık ortalamasının backtest haftalık dağılımına göre t ≥ −2.
 
-**Terfinin kaydı (yapılacak, 8. haftadan önce):** sınıf kol tanımının parçasıdır, tanım değişirse kol yeniden açılmak
-zorunda kalır. Terfi bu yüzden ayrı, yalnız eklenen bir olay olarak yazılacak: dağıtıcı sınıfı son terfi olayından
-okur, yoksa config'deki sınıftan. Paper'da terfi otomatiktir (Final Doküman §5), ölçüt yukarıdaki dört madde.
+**Terfinin kaydı:** sınıf kol tanımının parçasıdır, tanım değişirse kol yeniden açılmak zorunda kalır. Terfi bu yüzden
+`paper_kol_olay`'a `terfi` olayı olarak yazılır (göç 0009): dağıtıcı sınıfı hafta başından önceki son terfi olayından
+okur, yoksa config'deki sınıftan (`PaperDefter.sinif`). Paper'da terfi otomatiktir (Final Doküman §5). **Yapılacak (8.
+haftadan önce, ~2026-11-22):** yukarıdaki dört ölçütü hesaplayıp olayı yazan değerlendirme (aynı dönemin backtest'i dahil).
+
+## Kol olayları ve acil durdurma (Claude, 2026-09-27 denetimi)
+
+`paper_kol_olay` (yalnız eklenir): `durdur` (mutabakat farkı; önceden yalnız bellekteydi), `acil_kaldir`, `terfi`.
+
+- **Portföy kolu gerçek hesabın paper karşılığıdır: acil durdurma (tepeden −%25) kalıcıdır** (kural 7). Yalnız
+  `tradebot paper acil-kaldir --kol … --onaylayan … --gerekce …` ile kalkar: olay deftere ve denetim izine yazılır,
+  çalışan düğüm sonraki kapanışta uygular. Yeniden başlatmada özkaynak geçmişi olaylarla aynı sırada yeniden oynatılır.
+- Gözlem kollarında (B, agresif) acil durdurma araştırmadaki gibi kalıcı değildir: stratejinin tamamı ölçülür.
+- Mutabakat durdurması yeniden başlatmada kalkar: toparlanma sandbox'ı defterden yeniden kurar, fark ortadan kalkar.
+  Olay kayıtta kalır, bekçi hatayı Telegram'a bildirir.
+
+## Maliyet ölçümü (2026-09-27 denetimi)
+
+İlk gün verisi: zamanında verilen kararda kayma ~0 bps + ücret 10 bps (backtest varsayımı taraf başı 13 bps). Açılıştaki
+gecikmeli kararlarda ise "kayma" +8…+19 bps göründü. Bu yürütme maliyeti değil, karar kapanışından 20 dakika sonra
+gönderilen emrin arada kalan fiyat hareketi. Ayrım artık defterde:
+- `paper_emir.gonderim_fiyati` (göç 0008): emir giderken canlı orta fiyat.
+- `paper_karar.ayrinti.gecikmeli`: açılışta sınırdan sonra verilen karar.
+- **Yürütme maliyeti** = dolum ↔ gönderim fiyatı (+ ücret). **Gecikme kayması** = gönderim ↔ karar fiyatı. Terfi ölçütü 3
+  yürütme maliyetini gecikmeli olmayan kararlardan ölçer; gecikme kayması ayrıca raporlanır.
+- Sandbox yalnız kotasyona karşı doldurur (alışta ask, satışta bid; L1 miktarı biterse sonraki kotasyon). Derinlik
+  modeli yok: kol başına 100.000 USDT'de BTC/ETH için sorun değil, büyük sermayede iyimser kalır.
 
 ## Sermaye dağıtıcı (Claude, 2026-09-27)
 

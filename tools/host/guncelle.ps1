@@ -65,3 +65,24 @@ if (-not $sonuc) { throw "Zaman aşımı ($ZamanAsimiSn sn): görev bitmedi. Otu
 $kod, $saglik = $sonuc -split '\s+'
 if ($kod -ne '0') { throw "docker compose başarısız ($kod)" }
 Write-Host "Host güncel: $surum · sağlık çıkış kodu $saglik (0 = tümü OK, 1 = uyarı, 2 = hata)" -ForegroundColor Green
+
+# 5) Son veritabanı yedeğini ana bilgisayara çek (evden ayrı kopya; SHA-256 doğrulanır, son 10 tutulur).
+#    Yedek yoksa ya da çekilemezse dağıtım başarısız sayılmaz, uyarı yazılır.
+$yerel = Join-Path $HOME 'TradeBot-yedek'
+New-Item -ItemType Directory -Force $yerel | Out-Null
+$sonJson = (ssh $Hedef 'if exist C:\TradeBot\yedek\son.json type C:\TradeBot\yedek\son.json' 2>$null | Out-String).Trim()
+if (-not $sonJson) {
+    Write-Host 'Yedek: host''ta henüz son.json yok (yedek servisi ilk yedeğini 02:15 UTC sonrasında alır).' -ForegroundColor Yellow
+} else {
+    $y = $sonJson | ConvertFrom-Json
+    $hedefDosya = Join-Path $yerel $y.dosya
+    if (-not (Test-Path $hedefDosya)) {
+        scp -q "${Hedef}:C:/TradeBot/yedek/$($y.dosya)" $hedefDosya
+        if ($LASTEXITCODE -ne 0 -or (Get-FileHash $hedefDosya -Algorithm SHA256).Hash.ToLower() -ne $y.sha256) {
+            Remove-Item $hedefDosya -Force -ErrorAction SilentlyContinue
+            Write-Host "Yedek: $($y.dosya) çekilemedi ya da SHA-256 tutmadı." -ForegroundColor Yellow
+        }
+    }
+    Get-ChildItem $yerel -Filter 'tradebot-*.dump' | Sort-Object Name -Descending | Select-Object -Skip 10 | Remove-Item -Force
+    Write-Host "Yedek: $($y.dosya) ($([math]::Round($y.bayt / 1MB)) MB, $($y.zaman)) → $yerel" -ForegroundColor Green
+}

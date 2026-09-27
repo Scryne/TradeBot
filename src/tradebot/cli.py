@@ -37,11 +37,16 @@ def saglik_komutu(
     dongu: int = typer.Option(0, help="Saniye; 0 ise tek sefer, >0 ise sürekli kontrol ve durum değişiminde log."),
     json_cikti: bool = typer.Option(False, "--json", help="Makine okunur çıktı"),
 ) -> None:
-    """Host/konteyner sağlığı: DNS, saat, veritabanı, disk, sırlar."""
+    """Host/konteyner sağlığı: DNS, saat, veritabanı, disk, sırlar; host'ta paper kalp atışı, gece işi, yedek.
+    `--dongu`: bekçi. Durum değişimi ve servis loglarındaki yeni hatalar Telegram'a (tanımlıysa) bildirilir."""
+    from tradebot.bildirim import Bildirici
+
     a = ayarlar()
     kur(a)
     kayitci = log("saglik")
     onceki: dict[str, str] = {}
+    bildirici = Bildirici(a)
+    triyaj = saglik.LogTriyaj(a.log_dizini) if dongu and a.log_dizini is not None else None
     while True:
         sonuclar = saglik.hepsi(a)
         if json_cikti:
@@ -53,7 +58,15 @@ def saglik_komutu(
             if onceki.get(s.ad) != s.durum:
                 yaz = kayitci.info if s.durum == "OK" else kayitci.warning
                 yaz("saglik_durumu", kontrol=s.ad, durum=s.durum, ayrinti=s.ayrinti)
+                # açılışta yalnız sorunlu olanlar; sonra her değişim (düzelme dahil)
+                if s.ad != "sirlar" and (s.ad in onceki or s.durum != "OK"):
+                    seviye = {"HATA": "KRITIK", "UYARI": "UYARI"}.get(s.durum, "BILGI")
+                    bildirici.gonder(seviye, f"{s.ad}: {s.durum} · {s.ayrinti}")
                 onceki[s.ad] = s.durum
+        for h in triyaj.yeni_hatalar() if triyaj else []:
+            bildirici.gonder("KRITIK", f"{h['dosya']} · {h['bilesen']} · {h['olay']}\n"
+                             f"{json.dumps(h['ozet'], ensure_ascii=False, default=str)[:600]}",
+                             anahtar=f"log:{h['bilesen']}:{h['olay']}")
         if not dongu:
             raise typer.Exit(saglik.cikis_kodu(sonuclar))
         time.sleep(dongu)
@@ -468,7 +481,18 @@ def zeka_kap_geri_doldur(
         toplam += n
         kayitci.info("kap_gun", gun=g.isoformat(), yeni=n)
         g += timedelta(days=1)
-    _yazdir({"yeni_metin": toplam, "olay": zeka_kur(m, a).isle("kap") if yargila else 0})
+    # Onarım: alınamayan bildirimlerin günleri en çok 3 tur yeniden gezilir (bilinenler atlanır, yalnız delikler iner).
+    # Bunsuz her başarısız bildirim geçmişte kalıcı delik olurdu (2026-09-27 denetimi: 24 saatte 72).
+    for tur in range(3):
+        gunler = sorted({x for x, _ in t.alinamayan})
+        if not gunler:
+            break
+        t.alinamayan = []
+        for x in gunler:
+            toplam += len(t.topla([x]))
+        kayitci.info("kap_onarim_turu", tur=tur + 1, gun=len(gunler), kalan=len(t.alinamayan))
+    _yazdir({"yeni_metin": toplam, "alinamayan": [f"{x.isoformat()}:{no}" for x, no in t.alinamayan],
+             "olay": zeka_kur(m, a).isle("kap") if yargila else 0})
 
 
 @zeka_uygulama.command("belirsizleri-yukselt")
@@ -561,3 +585,33 @@ def paper_dagitim(hafta: int = typer.Option(0, help="Kaç hafta önce (0 = bu ha
     h = dg.hafta_basi(int(time.time() * 1000)) - hafta * dg.HAFTA_MS
     defter = PaperDefter(db_motor(ayarlar()), "cli")
     _yazdir(defter.dagitim_getir(pf, [k for k in ks if k.ad in pf.parametre["kaynaklar"]], h))
+
+
+@paper_uygulama.command("acil-kaldir")
+def paper_acil_kaldir(
+    kol: str = typer.Option(..., help="Kol adı (ör. portfoy@kripto_btc_eth)"),
+    onaylayan: str = typer.Option(..., help="Onaylayan kişi (Scryne)"),
+    gerekce: str = typer.Option(..., help="Neden yeniden başlatılıyor"),
+) -> None:
+    """Acil durdurmayı kaldırır (kural 7: yalnız Scryne'ın açık onayıyla; otomatik yol yok). Olay deftere ve denetim
+    izine yazılır; çalışan düğüm bir sonraki saat kapanışında uygular."""
+    from tradebot import denetim
+    from tradebot.canli.defter import PaperDefter
+    from tradebot.canli.kollar import kollar
+    from tradebot.db import motor as db_motor
+    from tradebot.risk.motor import Durum
+
+    if not onaylayan.strip() or not gerekce.strip():
+        raise typer.BadParameter("onaylayan ve gerekçe zorunlu")
+    k = next((x for x in kollar() if x.ad == kol), None)
+    if k is None:
+        raise typer.BadParameter(f"kol yok: {kol}")
+    m = db_motor(ayarlar())
+    defter = PaperDefter(m, "cli")
+    d = defter.durum(k)
+    if d.izleyici is None or d.izleyici.durum != Durum.ACIL_DURDURMA:
+        raise typer.BadParameter(f"{kol} acil durdurmada değil")
+    oid = defter.kol_olay_yaz(kol, "acil_kaldir", {"onaylayan": onaylayan, "gerekce": gerekce})
+    denetim.kaydet(m, "paper", "acil_durdurma_kaldirildi", {"kol": kol, "onaylayan": onaylayan, "gerekce": gerekce,
+                                                           "olay_id": oid})
+    typer.echo(f"{kol}: acil durdurma kaldırma olayı yazıldı (olay {oid}); düğüm sonraki kapanışta uygular.")

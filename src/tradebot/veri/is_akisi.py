@@ -87,13 +87,7 @@ def evren_kur(a: Ayarlar, m: Engine) -> dict:
     return out
 
 
-def gece(a: Ayarlar, m: Engine, dukascopy_butce_dk: float = 240.0) -> dict:
-    """Sırayla: Binance → Yahoo → Dukascopy (bütçeli) → kalite → evren. Bir adımın hatası diğerlerini durdurmaz."""
-    t0 = time.monotonic()
-    sonuc: dict = {"basla": datetime.now(UTC).isoformat()}
-    adimlar = [("binance", lambda: binance(a, m)), ("yahoo", lambda: yahoo(a, m)),
-               ("dukascopy", lambda: dukascopy(a, m, dukascopy_butce_dk)),
-               ("kalite", lambda: kalite_hepsi(a, m)), ("evren", lambda: evren_kur(a, m))]
+def _adimlar(adimlar: list, sonuc: dict) -> None:
     for ad, f in adimlar:
         t = time.monotonic()
         try:
@@ -102,9 +96,25 @@ def gece(a: Ayarlar, m: Engine, dukascopy_butce_dk: float = 240.0) -> dict:
             sonuc[ad] = {"hata": f"{type(e).__name__}: {e}"[:300]}
             _log.error("gece_adim_hatasi", adim=ad, hata=sonuc[ad]["hata"])
         _log.info("gece_adim", adim=ad, sonuc=sonuc[ad])
+
+
+def gece(a: Ayarlar, m: Engine, dukascopy_butce_dk: float = 240.0) -> dict:
+    """Sırayla: Binance → Yahoo → kalite → evren → denetim kaydı (`gece_isi`) → Dukascopy (bütçeli, saatlerce sürebilir)
+    → denetim kaydı (`gece_isi_dukascopy`). Bir adımın hatası diğerlerini durdurmaz.
+
+    Dukascopy en sondadır: hız sınırı yüzünden bütçesi 15 saate kadar çıkar ve servis yeniden başlatılırsa (her dağıtımda)
+    kesilir. Önceden sondan bir önceki adımdı; iş hiç kalite/evren adımına ulaşamadı (2026-09-27 denetimi: kalite
+    raporu ve gece_isi denetim kaydı hiç yazılmamıştı). Dukascopy verisinin kalitesi bir sonraki gece raporlanır."""
+    t0 = time.monotonic()
+    sonuc: dict = {"basla": datetime.now(UTC).isoformat()}
+    _adimlar([("binance", lambda: binance(a, m)), ("yahoo", lambda: yahoo(a, m)),
+              ("kalite", lambda: kalite_hepsi(a, m)), ("evren", lambda: evren_kur(a, m))], sonuc)
     sonuc["sure_dk"] = round((time.monotonic() - t0) / 60, 1)
     denetim.kaydet(m, "veri", "gece_isi", sonuc)
-    return sonuc
+    d: dict = {"basla": datetime.now(UTC).isoformat()}
+    _adimlar([("dukascopy", lambda: dukascopy(a, m, dukascopy_butce_dk))], d)
+    denetim.kaydet(m, "veri", "gece_isi_dukascopy", d)
+    return sonuc | {"dukascopy": d["dukascopy"]}
 
 
 def sonraki_calisma(simdi: datetime, saat_utc: int, dakika: int) -> datetime:

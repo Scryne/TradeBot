@@ -228,6 +228,7 @@ paper_emir = Table(
     Column("istenen", Float, nullable=False),            # işaretli adet
     Column("onaylanan", Float, nullable=False),          # risk motorundan sonra (0 = ret)
     Column("karar_fiyati", Float, nullable=False),       # son kapanış (kayma ölçümü için)
+    Column("gonderim_fiyati", Float),                    # emir giderken canlı orta fiyat (göç 0008; öncesi boş)
     Column("zaman_ms", BigInteger, nullable=False),
     Column("tur", String(16), nullable=False),           # karar | toparlanma
     Column("risk", JSONT, nullable=False),               # {onay, gerekceler, risk_azaltan}
@@ -260,6 +261,18 @@ paper_ozkaynak = Table(
     Column("pozisyon", JSONT, nullable=False),           # {enstrüman: adet}
     Column("fiyat", JSONT, nullable=False),              # {enstrüman: işaret fiyatı}
     Index("ix_paper_ozkaynak_kol", "kol", "zaman_ms"),
+)
+
+paper_kol_olay = Table(  # kolun durum olayları (yalnız eklenir): durdur | acil_kaldir | terfi
+    "paper_kol_olay",
+    metadata,
+    Column("id", KIMLIK, primary_key=True, autoincrement=True),
+    Column("kol", String(96), nullable=False),
+    Column("zaman_ms", BigInteger, nullable=False),
+    Column("tur", String(16), nullable=False),
+    Column("kod_surumu", String(64), nullable=False),
+    Column("ayrinti", JSONT, nullable=False),            # acil_kaldir: onaylayan, gerekce · terfi: eski, yeni, gerekce
+    Index("ix_paper_kol_olay_kol", "kol", "zaman_ms"),
 )
 
 paper_dagitim = Table(  # haftalık sermaye dağıtımı (canli/dagitici.py); yalnız eklenir, hafta başına bir kayıt

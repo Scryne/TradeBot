@@ -21,7 +21,15 @@ from sqlalchemy.engine import Engine
 from tradebot.canli import dagitici as dg
 from tradebot.canli.karar import Karar, KolDurum, izleyici_kur
 from tradebot.canli.kollar import PaperKol
-from tradebot.db import paper_dagitim, paper_emir, paper_emir_olay, paper_karar, paper_kol, paper_ozkaynak
+from tradebot.db import (
+    paper_dagitim,
+    paper_emir,
+    paper_emir_olay,
+    paper_karar,
+    paper_kol,
+    paper_kol_olay,
+    paper_ozkaynak,
+)
 
 
 def tanim(kol: PaperKol) -> dict:
@@ -71,31 +79,35 @@ class PaperDefter:
             adet[k] = adet.get(k, 0.0) + q
             nakit -= q * p + u
         onceki = dict(zip(son["kimlikler"], son["etkin"], strict=True)) if son else {}
+        kaldir = [(o.zaman_ms, o.ayrinti["onaylayan"], o.ayrinti["gerekce"]) for o in self.kol_olaylari(kol.ad, "acil_kaldir")]
         return KolDurum(ozkaynak=gecmis[-1][1] if gecmis else kol.baslangic_ozkaynak, nakit=nakit,
                         adet={k: a for k, a in adet.items() if abs(a) > 1e-12}, onceki_h=onceki, ilk=son is None,
-                        izleyici=izleyici_kur(kol, gecmis))
+                        izleyici=izleyici_kur(kol, gecmis, kaldir))
 
     # ------------------------------------------------------------------ karar, emir, olay
     def karar_var(self, kol: str, bar_ms: int) -> int | None:
         with self.motor.connect() as b:
             return b.execute(select(paper_karar.c.id).where(paper_karar.c.kol == kol, paper_karar.c.bar_ms == bar_ms)).scalar()
 
-    def karar_yaz(self, k: Karar, veri_hash: str) -> int:
+    def karar_yaz(self, k: Karar, veri_hash: str, gecikmeli: bool = False) -> int:
+        """`gecikmeli`: açılışta, sınırdan sonra verilen karar (karar fiyatı ile gönderim arasındaki hareket yürütme
+        maliyeti değildir; maliyet ölçümünde ayrılır)."""
         ayr = {"kimlikler": list(k.kimlikler), "hedef": _liste(k.hedef), "etkin": _liste(k.etkin_hedef),
                "kaymis": _liste(k.kaymis), "yeni": _liste(k.yeni), "islem": [bool(x) for x in k.islem],
-               "fiyat": _liste(k.fiyat), "veto": list(k.veto), "miktar": k.miktar}
+               "fiyat": _liste(k.fiyat), "veto": list(k.veto), "miktar": k.miktar, "gecikmeli": gecikmeli}
         with self.motor.begin() as b:
             return int(b.execute(insert(paper_karar).values(
                 kol=k.kol, bar_ms=k.bar_ms, karar_ms=int(time.time() * 1000), kod_surumu=self.kod,
                 veri_hash=veri_hash[:64], durum=k.durum, ayrinti=ayr)).inserted_primary_key[0])
 
     def emir_yaz(self, kol: str, karar_id: int | None, istemci_emir_id: str, enstruman: str, istenen: float,
-                 onaylanan: float, karar_fiyati: float, tur: str, risk: dict) -> int:
+                 onaylanan: float, karar_fiyati: float, tur: str, risk: dict,
+                 gonderim_fiyati: float | None = None) -> int:
         with self.motor.begin() as b:
             return int(b.execute(insert(paper_emir).values(
                 kol=kol, karar_id=karar_id, istemci_emir_id=istemci_emir_id, enstruman=enstruman, istenen=istenen,
-                onaylanan=onaylanan, karar_fiyati=karar_fiyati, zaman_ms=int(time.time() * 1000), tur=tur,
-                risk=risk)).inserted_primary_key[0])
+                onaylanan=onaylanan, karar_fiyati=karar_fiyati, gonderim_fiyati=gonderim_fiyati,
+                zaman_ms=int(time.time() * 1000), tur=tur, risk=risk)).inserted_primary_key[0])
 
     def emir(self, istemci_emir_id: str):
         with self.motor.connect() as b:
@@ -117,6 +129,28 @@ class PaperDefter:
         with self.motor.connect() as b:
             return int(b.execute(select(func.count()).select_from(paper_emir_olay).where(
                 paper_emir_olay.c.kol == kol, paper_emir_olay.c.tur == "dolum")).scalar())
+
+    # ------------------------------------------------------------------ kol olayları
+    def kol_olay_yaz(self, kol: str, tur: str, ayrinti: dict, zaman_ms: int | None = None) -> int:
+        with self.motor.begin() as b:
+            return int(b.execute(insert(paper_kol_olay).values(
+                kol=kol, zaman_ms=zaman_ms or int(time.time() * 1000), tur=tur, kod_surumu=self.kod,
+                ayrinti=ayrinti)).inserted_primary_key[0])
+
+    def kol_olaylari(self, kol: str | None = None, tur: str | None = None, id_sonra: int = 0) -> list:
+        q = select(paper_kol_olay).where(paper_kol_olay.c.id > id_sonra).order_by(paper_kol_olay.c.id)
+        if kol is not None:
+            q = q.where(paper_kol_olay.c.kol == kol)
+        if tur is not None:
+            q = q.where(paper_kol_olay.c.tur == tur)
+        with self.motor.connect() as b:
+            return list(b.execute(q))
+
+    def sinif(self, kol: PaperKol, bit_ms: int | None = None) -> str:
+        """Kolun sınıfı: son `terfi` olayı (bit_ms'den önce), yoksa tanımdaki. Sınıf tanımın parçası olduğu için terfi
+        tanımı değiştirmez, olay olarak yazılır (kol yeniden açılmaz)."""
+        son = [o for o in self.kol_olaylari(kol.ad, "terfi") if bit_ms is None or o.zaman_ms < bit_ms]
+        return son[-1].ayrinti["yeni"] if son else kol.sinif
 
     # ------------------------------------------------------------------ dağıtıcı
     def ozkaynak_gecmisi(self, kol: str, bit_ms: int) -> list[tuple[int, float]]:
@@ -154,7 +188,7 @@ class PaperDefter:
             getiri[k.ad] = dg.gunluk_getiri(self.ozkaynak_gecmisi(k.ad, hafta_ms), hafta_ms)
             bas = self.kol_baslangic(k.ad)
             gun[k.ad] = max(0.0, (hafta_ms - bas) / dg.GUN_MS) if bas is not None else 0.0
-            sinif[k.ad] = k.sinif
+            sinif[k.ad] = self.sinif(k, hafta_ms)
         sonuc = dg.dagit(getiri, gun, sinif, p["onsel_sharpe"], dg.DagiticiAyar(**p["dagitici"]))
         sonuc["hafta_ms"] = hafta_ms
         self.dagitim_yaz(portfoy.ad, hafta_ms, sonuc)

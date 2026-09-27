@@ -7,9 +7,11 @@ Maskeleme iki katmanlı:
 """
 from __future__ import annotations
 
+import itertools
 import logging
 import re
 import sys
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Any
 
@@ -42,12 +44,21 @@ def sir_maskeleyici(sirlar: list[str]):
     return isleyici
 
 
+def surec_adi(argv: list[str] | None = None) -> str:
+    """Log dosyasının adı: komutun ilk iki alt komutu (`tradebot paper calis` → paper-calis)."""
+    argv = sys.argv[1:] if argv is None else argv
+    parca = list(itertools.takewhile(lambda x: not x.startswith("-"), argv))[:2]
+    return re.sub(r"[^a-z0-9-]", "", "-".join(parca).lower()) or "tradebot"
+
+
 def kur(a: Ayarlar) -> None:
-    """Uygulama başında bir kez çağrılır."""
+    """Uygulama başında bir kez çağrılır. Dosya: süreç başına ayrı, 50 MB × 5 döner (2026-09-27 denetimi: bütün servisler
+    tek dosyaya rotasyonsuz yazıyordu; çok süreçli rotasyon güvenli değildir, ayrı dosya bunu çözer)."""
     hedefler: list[logging.Handler] = [logging.StreamHandler(sys.stdout)]
     if a.log_dizini is not None:
         Path(a.log_dizini).mkdir(parents=True, exist_ok=True)
-        hedefler.append(logging.FileHandler(Path(a.log_dizini) / "tradebot.jsonl", encoding="utf-8"))
+        hedefler.append(RotatingFileHandler(Path(a.log_dizini) / f"{surec_adi()}.jsonl", maxBytes=50_000_000,
+                                            backupCount=5, encoding="utf-8"))
     logging.basicConfig(format="%(message)s", level=a.log_seviyesi, handlers=hedefler, force=True)
     # HTTP kütüphaneleri her isteği INFO'da basıyor (ilk yüklemede on binlerce satır); yalnız uyarı ve üstü.
     for gurultulu in ("httpx", "httpcore", "urllib3"):

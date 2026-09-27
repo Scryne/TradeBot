@@ -12,7 +12,7 @@ import numpy as np
 
 from tradebot.arastirma import turnuva as tv
 from tradebot.arastirma.panel import dengele_adim
-from tradebot.canli.kollar import PaperKol
+from tradebot.canli.kollar import PORTFOY, PaperKol
 from tradebot.risk.motor import Durum, PortfoyIzleyici, RiskAyar
 from tradebot.veri.depo import BarDepo
 from tradebot.veri.takvim import ZAMAN_DILIMI_MS
@@ -50,15 +50,29 @@ class Karar:
     miktar: dict[str, float]    # emir miktarı (işaretli adet)
 
 
-def izleyici_kur(kol: PaperKol, gecmis: list[tuple[int, float]]) -> PortfoyIzleyici | None:
+def izleyici_kur(kol: PaperKol, gecmis: list[tuple[int, float]],
+                 kaldirmalar: list[tuple[int, str, str]] = ()) -> PortfoyIzleyici | None:
     """Fren durumu özkaynak geçmişinden yeniden kurulur (yeniden başlatmada ayrı durum dosyası gerekmez).
-    Araştırmadaki gibi acil durdurma kalıcı: paper'da kalıcı değil (kural 7 canlı parada; paper kolu gözlemdir)."""
+
+    Gözlem kollarında acil durdurma kalıcı değildir (araştırmadaki gibi): kolun stratejisi ölçülür. Portföy kolu gerçek
+    hesabın paper karşılığıdır: orada kalıcıdır (kural 7) ve yalnız onaylı `acil_kaldir` olayıyla kalkar.
+    `kaldirmalar` (zaman_ms, onaylayan, gerekce) özkaynak geçmişiyle aynı zaman sırasında yeniden oynatılır."""
     if not kol.ayar.frenler:
         return None
     iz = PortfoyIzleyici(RiskAyar(kaldirac=kol.ayar.kaldirac), baslangic_ms=gecmis[0][0] if gecmis else 0,
-                         acil_kalici=False)  # özkaynak başlangıca oranla (1,0'dan), backtest gibi
+                         acil_kalici=kol.strateji == PORTFOY)  # özkaynak başlangıca oranla (1,0'dan), backtest gibi
+    kalan = sorted(kaldirmalar)
+
+    def uygula(t: int | None) -> None:
+        while kalan and (t is None or kalan[0][0] <= t):
+            _, kim, neden = kalan.pop(0)
+            if iz.durum == Durum.ACIL_DURDURMA:
+                iz.acil_durdurma_kaldir(kim, neden)
+
     for t, oz in gecmis:
+        uygula(t)
         iz.guncelle(oz / kol.baslangic_ozkaynak, t)
+    uygula(None)
     return iz
 
 

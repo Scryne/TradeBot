@@ -249,3 +249,82 @@ def test_agresif_hedef_ortalama_kelly_tavan(tmp_path):
     d = kr.KolDurum(ozkaynak=1.0, nakit=1.0)
     k = kr.karar_ver(ag, ha, d, set(), h)                      # dengeleme zinciri aynı
     assert np.allclose(k.hedef, h)
+
+
+def test_beyin_portfoy_kaynak_hedefi_ve_olaylar(tmp_path, ayar, monkeypatch):
+    """Portföy kolu: aynı kapanışta kaynak kolun etkin hedefi × katsayı (enstrüman tavanında kırpılır); hafta dağıtımı
+    yoksa hesaplanıp yazılır; mutabakat durdurması olay olarak yazılır."""
+    import dataclasses
+
+    from sqlalchemy import func, select
+
+    from tradebot.canli import dagitici as dg
+    from tradebot.canli import dugum
+    from tradebot.canli.defter import PaperDefter
+    from tradebot.db import metadata, motor, paper_dagitim, paper_karar
+
+    monkeypatch.setattr(dugum, "aktif_vetolar", lambda m, t: set())
+    m = motor(ayar)
+    metadata.create_all(m)
+    depo, t = sentetik_depo(tmp_path, n=24 * 40)
+    k1 = dataclasses.replace(kol_yap(frenler=False), baslangic_ozkaynak=100_000.0)
+    pf = dataclasses.replace(k1, ad="portfoy@test", strateji="portfoy", sinif="portfoy",
+                             parametre={"kaynaklar": [k1.ad], "onsel_sharpe": {k1.ad: 0.8}, "dagitici": {}})
+    df = PaperDefter(m, "test")
+    for k in (k1, pf):
+        df.kol_ac(k, int(t[0]))
+    b = dugum.Beyin(m, [k1, pf], df, SahteBarlar(depo), KAYIT)
+    for k in (k1, pf):
+        b.stratejiler[k.ad] = SahteStrateji(b, k)
+    kapanis = int(t[-1]) + SAAT
+    monkeypatch.setattr(dugum.time, "time", lambda: (kapanis + 5_000) / 1000)
+
+    b.dagitim = {"hafta_ms": dg.hafta_basi(kapanis), "kollar": {k1.ad: {"katsayi": 1.6}}, "kaldirac": 1.6}
+    assert b.saat_kapandi(kapanis)
+    with m.connect() as c:
+        ayr = dict(c.execute(select(paper_karar.c.kol, paper_karar.c.ayrinti)).all())
+    beklenen = np.clip(1.6 * np.array(ayr[k1.ad]["etkin"]), 0.0, 0.5)
+    assert np.allclose(ayr[pf.ad]["hedef"], beklenen) and max(ayr[k1.ad]["etkin"]) > 0  # gerçekten pozisyonlu
+    assert ayr[pf.ad]["gecikmeli"] is False
+
+    b.dagitim = None                                             # açılış: hafta dağıtımı defterden hesaplanır
+    b._dagitim_guncelle(kapanis)
+    with m.connect() as c:
+        assert c.execute(select(func.count()).select_from(paper_dagitim)).scalar() == 1
+    assert b.dagitim["kaldirac"] == 0.0                          # geçmiş yok, sınıf B
+
+    s1 = b.stratejiler[k1.ad]
+    s1.poz[next(iter(s1.poz))] += 1.0
+    b.mutabakat()
+    assert [o.tur for o in df.kol_olaylari(k1.ad)] == ["durdur"]
+
+
+def test_portfoy_acil_kalici_ve_onayli_kaldirma():
+    import dataclasses
+
+    from tradebot.risk.motor import Durum
+
+    k = dataclasses.replace(kol_yap(), baslangic_ozkaynak=100.0)
+    pf = dataclasses.replace(k, ad="portfoy", strateji="portfoy")
+    gun = 86_400_000
+    t0 = 1_790_000_000_000 - 1_790_000_000_000 % gun
+    yol = [(t0 + i * gun, v) for i, v in enumerate([100, 97, 94, 91, 88, 85, 82, 79, 76, 73, 72, 72, 72])]
+    assert kr.izleyici_kur(k, yol).durum != Durum.ACIL_DURDURMA          # gözlem kolu: kalıcı değil
+    assert kr.izleyici_kur(pf, yol).durum == Durum.ACIL_DURDURMA         # portföy: kalıcı
+    iz = kr.izleyici_kur(pf, yol, [(yol[11][0] + 1, "Scryne", "inceleme tamam")])
+    assert iz.durum == Durum.NORMAL
+    son = kr.izleyici_kur(pf, yol, [(yol[-1][0] + 5, "Scryne", "geç onay")])  # son işaretten sonra da uygulanır
+    assert son.durum == Durum.NORMAL
+
+
+def test_terfi_olayi_sinifi_degistirir(ayar):
+    from tradebot.canli.defter import PaperDefter
+    from tradebot.db import metadata, motor
+
+    m = motor(ayar)
+    metadata.create_all(m)
+    df = PaperDefter(m, "test")
+    k = kol_yap()
+    assert df.sinif(k) == "B"
+    df.kol_olay_yaz(k.ad, "terfi", {"eski": "B", "yeni": "A", "gerekce": "test"}, zaman_ms=1_000)
+    assert df.sinif(k, bit_ms=500) == "B" and df.sinif(k, bit_ms=2_000) == "A" and df.sinif(k) == "A"

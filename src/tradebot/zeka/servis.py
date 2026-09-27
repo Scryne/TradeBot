@@ -13,7 +13,7 @@ import time
 from pathlib import Path
 
 import yaml
-from sqlalchemy import select
+from sqlalchemy import select, tuple_
 from sqlalchemy.engine import Engine
 
 from tradebot.db import jev_yargi, metin
@@ -154,7 +154,19 @@ class Zeka:
         rol = ROLLER[kaynak]
         evren = rol.evren(self.motor)
         simdi = int(time.time() * 1000)
-        return sum(len(self.rol_metin(rol, m, evren, simdi)) for m in reversed(self.son_metinler(kaynak, sinir)))
+        if sinir is not None:
+            return sum(len(self.rol_metin(rol, m, evren, simdi)) for m in reversed(self.son_metinler(kaynak, sinir)))
+        # Tümü (geçmiş doldurma, ~300 bin KAP metni): gövdeleriyle belleğe sığmaz → (yayın, id) sırasıyla parça parça.
+        n, son = 0, (-1, -1)
+        while True:
+            with self.motor.connect() as b:
+                parca = list(b.execute(select(metin).where(metin.c.kaynak == kaynak,
+                                                           tuple_(metin.c.yayin_ms, metin.c.id) > son)
+                                       .order_by(metin.c.yayin_ms, metin.c.id).limit(2000)))
+            if not parca:
+                return n
+            n += sum(len(self.rol_metin(rol, m, evren, simdi)) for m in parca)
+            son = (parca[-1].yayin_ms, parca[-1].id)
 
     def tur(self) -> dict:
         yeni, olay_sayisi = 0, 0

@@ -338,6 +338,18 @@ def test_kap_toplayici_atla_ve_tekrarsiz(m, ayar):
     assert t.topla([date(2026, 9, 25)]) == [] and http.sayfa_istenen == [10]
 
 
+def test_kap_alinamayan_kaydedilir_ve_sonraki_turda_iner(m, ayar):
+    http = SahteKapHttp([_kap_kaydi(12, "2026-09-25", "10:00:00", "Özel Durum Açıklaması (Genel)", "X", "AAA")],
+                        {12: "<p>x</p>"})
+    asil = http.al
+    http.al = lambda url, params=None: (_ for _ in ()).throw(RuntimeError("Server disconnected"))
+    t = kap.KapBildirim(HamDepo(ayar.veri_dizini, m), m, http)
+    assert t.topla([date(2026, 9, 25)]) == [] and t.alinamayan == [(date(2026, 9, 25), "12")]
+    http.al = asil
+    t.alinamayan = []
+    assert len(t.topla([date(2026, 9, 25)])) == 1 and t.alinamayan == []  # onarım turu: yalnız delik iner
+
+
 def test_a2_sureli_veto_kurumsal_ve_atla(m, ayar):
     with m.begin() as b:
         for s in ("AAA", "BBB", "CCC"):
