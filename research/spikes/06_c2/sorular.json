@@ -1,0 +1,16 @@
+{
+ "ton": {"type": "score",
+  "instructions": {"what": "How hawkish or dovish is the monetary policy stance that the FOMC statement in `aciklama.metin` expresses, taking into account both the policy action it announces and the guidance it gives about future policy?",
+                   "not_for": "Do not use knowledge of how markets reacted or what happened later. Judge only the text."},
+  "criteria": [
+   "Strongly dovish: the Committee cuts the policy rate or launches or expands asset purchases or other major accommodation, and/or signals that further easing is likely.",
+   "Mildly dovish: the Committee holds policy but leans toward easing, stresses downside risks to growth or employment, or signals patience before any tightening.",
+   "Neutral: the Committee holds policy with balanced risks and gives no clear lean toward tightening or easing.",
+   "Mildly hawkish: the Committee holds policy or tapers accommodation but leans toward tightening, stresses inflation concerns, or signals that increases are approaching.",
+   "Strongly hawkish: the Committee raises the policy rate or shrinks its balance sheet, and/or signals that further increases are likely."]},
+ "karar": {"type": "choice",
+  "instructions": "What does the FOMC statement in `aciklama.metin` announce about the target range (or target level) for the federal funds rate at this meeting?",
+  "criteria": {"artis": "The Committee raises the federal funds rate target.",
+               "sabit": "The Committee keeps the federal funds rate target unchanged.",
+               "indirim": "The Committee lowers the federal funds rate target."}}
+}
