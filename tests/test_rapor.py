@@ -70,10 +70,13 @@ def test_haftalik_rapor(tmp_path):
 
 def test_bekleyen_hafta(tmp_path):
     simdi = H + 7 * 86_400_000 + 10 * 60_000            # sonraki Pazartesi 00:10: henüz erken
-    assert rapor.bekleyen_hafta(tmp_path, simdi) == H - dg.HAFTA_MS
+    assert rapor.bekleyen_hafta(tmp_path, simdi, H - dg.HAFTA_MS) == H - dg.HAFTA_MS
     simdi += 30 * 60_000                                  # 00:40
-    assert rapor.bekleyen_hafta(tmp_path, simdi) == H
+    assert rapor.bekleyen_hafta(tmp_path, simdi, H - dg.HAFTA_MS) == H
     (tmp_path / "rapor").mkdir()
     import datetime as dt
     (tmp_path / "rapor" / f"paper-{dt.datetime.fromtimestamp(H / 1000, dt.UTC).date()}.md").write_text("x")
-    assert rapor.bekleyen_hafta(tmp_path, simdi) is None
+    assert rapor.bekleyen_hafta(tmp_path, simdi, H - dg.HAFTA_MS) is None
+    assert rapor.bekleyen_hafta(tmp_path / "yok", simdi, H + dg.HAFTA_MS) is None   # paper hafta bittikten sonra başladı
+    assert rapor.bekleyen_hafta(tmp_path / "yok", simdi, None) is None             # hiç paper kolu yok
+    assert rapor.bekleyen_hafta(tmp_path / "yok", simdi, H + 3 * 86_400_000) == H   # hafta içinde başladı: raporlanır

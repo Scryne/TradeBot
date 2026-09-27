@@ -165,6 +165,13 @@ def telegram_ozeti(r: dict) -> str:
     return "\n".join(satir)
 
 
+def ilk_acilis(motor: Engine) -> int | None:
+    from sqlalchemy import func
+
+    with motor.connect() as b:
+        return b.execute(select(func.min(paper_kol.c.baslangic_ms))).scalar()
+
+
 def uret(motor: Engine, veri_dizini, hafta_ms: int) -> tuple[dict, str, object]:
     """Raporu üretir ve `data/rapor/paper-<hafta>.md` olarak yazar. Döndürür: (rapor, markdown, yol)."""
     from pathlib import Path
@@ -177,10 +184,13 @@ def uret(motor: Engine, veri_dizini, hafta_ms: int) -> tuple[dict, str, object]:
     return r, md, yol
 
 
-def bekleyen_hafta(veri_dizini, simdi_ms: int, gecikme_ms: int = 30 * 60_000) -> int | None:
-    """Raporu henüz yazılmamış, bitmiş son hafta (bittikten `gecikme_ms` sonra; son saatin işareti yazılmış olsun)."""
+def bekleyen_hafta(veri_dizini, simdi_ms: int, ilk_ms: int | None, gecikme_ms: int = 30 * 60_000) -> int | None:
+    """Raporu henüz yazılmamış, bitmiş son hafta (bittikten `gecikme_ms` sonra; son saatin işareti yazılmış olsun).
+    `ilk_ms`: ilk paper kolunun açılışı; ondan önce biten hafta raporlanmaz (boş rapor)."""
     from pathlib import Path
 
     h = dg.hafta_basi(simdi_ms - gecikme_ms) - dg.HAFTA_MS
+    if ilk_ms is None or h + dg.HAFTA_MS <= ilk_ms:
+        return None
     ad = datetime.fromtimestamp(h / 1000, UTC).date().isoformat()
     return None if (Path(veri_dizini) / "rapor" / f"paper-{ad}.md").exists() else h

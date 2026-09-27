@@ -79,11 +79,12 @@ def _haftalik_rapor(a, bildirici, kayitci) -> None:
     from tradebot.canli import rapor
     from tradebot.db import motor as db_motor
 
-    h = rapor.bekleyen_hafta(a.veri_dizini, int(time.time() * 1000))
+    m = db_motor(a)
+    h = rapor.bekleyen_hafta(a.veri_dizini, int(time.time() * 1000), rapor.ilk_acilis(m))
     if h is None:
         return
     try:
-        r, _, yol = rapor.uret(db_motor(a), a.veri_dizini, h)
+        r, _, yol = rapor.uret(m, a.veri_dizini, h)
     except Exception as e:  # noqa: BLE001 — rapor hatası bekçiyi durdurmaz
         kayitci.error("paper_rapor_hatasi", hata=f"{type(e).__name__}: {e}"[:300])
         return
@@ -93,7 +94,7 @@ def _haftalik_rapor(a, bildirici, kayitci) -> None:
     from tradebot.canli.kollar import kollar
 
     try:
-        sonuc = terfi.hafta_degerlendir(db_motor(a), a.veri_dizini, kollar(), h + 7 * 86_400_000)
+        sonuc = terfi.hafta_degerlendir(m, a.veri_dizini, kollar(), h + 7 * 86_400_000)
     except Exception as e:  # noqa: BLE001
         kayitci.error("terfi_hatasi", hata=f"{type(e).__name__}: {e}"[:300])
         return
