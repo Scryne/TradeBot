@@ -326,7 +326,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
   - 2026-09-27 kurum NCM Investment (VİOP ve forex aynı MT5'te). Scryne iki demo açtı (Forex 316722, VİOP 316723);
-    iki taşınabilir terminal host'ta (`C:\TradeBot\mt5orex|viop`).
+    iki taşınabilir terminal host'ta (`C:\TradeBot\mt5orex`, `C:TradeBotmt5iop`).
   - Spike 08 (`docs/spikes/08-mt5.md`): Python bağlantısı, sözleşme özellikleri ve geçmiş ✅. Altın `GOLD`; endeks/petrol
     vadeli (`ES6Z`, `GER40Z26`, `CL6X`); VİOP `F_XU030`, `F_USDTRY`, `XU30_YAKINVADE` (H1 2020'den: VİOP için ilk veri
     kaynağı). Barlar sunucu saatiyle (büyük olasılıkla UTC+3). Algo Trading `common.ini`'den açıldı.
