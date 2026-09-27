@@ -10,6 +10,7 @@ from tradebot.arastirma.turnuva import STRATEJILER, Ayar
 from tradebot.cekirdek.boyut import kaldirac_dogrula
 
 AYAR_YOLU = Path(__file__).resolve().parents[3] / "config" / "paper.yaml"
+AGRESIF = "agresif"  # agresif gözlem kolu: kaynak kolların hedef ortalaması × tam Kelly, tavanlarla kırpılır
 
 
 @dataclass(frozen=True)
@@ -41,7 +42,7 @@ def kollar(d: dict | None = None) -> list[PaperKol]:
     d = d or oku()
     out = []
     for k in d["kollar"]:
-        if k["strateji"] not in STRATEJILER:
+        if k["strateji"] not in STRATEJILER or k["strateji"] == AGRESIF:
             raise ValueError(f"bilinmeyen strateji: {k['strateji']}")
         b = d["boyutlar"][k["boyut"]]
         kaldirac_dogrula(b["kaldirac"])
@@ -51,6 +52,18 @@ def kollar(d: dict | None = None) -> list[PaperKol]:
             out.append(PaperKol(k["ad"] + ("+jev" if jev else ""), k["strateji"], k["grup"], d["gruplar"][k["grup"]],
                                 k["zd"], ayar, dict(k["parametre"]), k.get("sinif", "B"),
                                 float(d.get("baslangic_ozkaynak", 100_000))))
+    ag = d.get("agresif")
+    if ag:
+        b = d["boyutlar"][ag["boyut"]]
+        ayar = Ayar(hedef_vol=b["hedef_vol"], kaldirac=b["kaldirac"], vol_pencere_gun=b["vol_pencere_gun"],
+                    frenler=bool(d.get("frenler", True)), bant=b["bant"], jev_veto=False)
+        bilinen = {k.ad for k in out}
+        eksik = [x for x in ag["kaynaklar"] if x not in bilinen]
+        if eksik:
+            raise ValueError(f"agresif kolun kaynakları yok: {eksik}")
+        out.append(PaperKol(ag["ad"], AGRESIF, ag["grup"], d["gruplar"][ag["grup"]], "1h", ayar,
+                            {"kaynaklar": list(ag["kaynaklar"]), "kelly_carpani": float(ag["kelly_carpani"])}, "gozlem",
+                            float(d.get("baslangic_ozkaynak", 100_000))))
     adlar = [k.ad for k in out]
     if len(set(adlar)) != len(adlar):
         raise ValueError("kol adları tekil olmalı")

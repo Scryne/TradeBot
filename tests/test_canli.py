@@ -71,7 +71,9 @@ def test_canli_karar_backtest_ile_birebir(tmp_path, bant, frenler):
 
 def test_paper_kollari_config():
     ks = kollar()
-    assert len(ks) == 10 and sum(k.jev for k in ks) == 5
+    assert len(ks) == 11 and sum(k.jev for k in ks) == 5
+    ag = ks[-1]
+    assert ag.strateji == "agresif" and ag.sinif == "gozlem" and len(ag.parametre["kaynaklar"]) == 5
     assert {k.zd for k in ks} == {"1h", "4h", "1d"}
     assert all(k.ayar.kaldirac <= 3 for k in ks)
     ad = {k.ad: k for k in ks}
@@ -229,3 +231,20 @@ def test_sinir_doldu():
     gun = 1_700_000_000_000 - 1_700_000_000_000 % 86_400_000
     assert sinir_doldu("1h", gun + 5 * SAAT) and not sinir_doldu("4h", gun + 5 * SAAT)
     assert sinir_doldu("4h", gun + 8 * SAAT) and sinir_doldu("1d", gun) and not sinir_doldu("1d", gun + 4 * SAAT)
+
+
+def test_agresif_hedef_ortalama_kelly_tavan(tmp_path):
+    import dataclasses
+
+    depo, t = sentetik_depo(tmp_path)
+    a = kol_yap()
+    b = dataclasses.replace(a, ad="b", parametre={"hizli_gun": 2, "yavas_gun": 8})
+    ag = dataclasses.replace(a, ad="agresif", strateji="agresif", parametre={"kaynaklar": ["x", "b"], "kelly_carpani": 5.0})
+    kapanis = int(t[-1]) + SAAT
+    ha, hb = (kr.hazirla(depo, KAYIT, k, bit_ms=kapanis) for k in (a, b))
+    beklenen = np.clip((np.nan_to_num(kr.hedef_son(ha, a)) + np.nan_to_num(kr.hedef_son(hb, b))) / 2 * 5.0, 0.0, 0.5)
+    h = kr.agresif_hedef(depo, KAYIT, ag, [a, b], kapanis)
+    assert np.allclose(h, beklenen) and h.max() <= 0.5 and h.min() >= 0.0
+    d = kr.KolDurum(ozkaynak=1.0, nakit=1.0)
+    k = kr.karar_ver(ag, ha, d, set(), h)                      # dengeleme zinciri aynı
+    assert np.allclose(k.hedef, h)

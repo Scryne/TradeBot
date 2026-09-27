@@ -15,6 +15,7 @@ from tradebot.arastirma.panel import dengele_adim
 from tradebot.canli.kollar import PaperKol
 from tradebot.risk.motor import Durum, PortfoyIzleyici, RiskAyar
 from tradebot.veri.depo import BarDepo
+from tradebot.veri.takvim import ZAMAN_DILIMI_MS
 
 
 @dataclass
@@ -70,7 +71,25 @@ def hedef_son(h: tv.HazirGrup, kol: PaperKol) -> np.ndarray:
     return tv.hedef_uret(h, kol.strateji, p, kol.yon, kol.ayar, nedensellik=False)[-1]
 
 
-def karar_ver(kol: PaperKol, h: tv.HazirGrup, d: KolDurum, vetolu: set[str]) -> Karar:
+def agresif_hedef(depo: BarDepo, kayit: dict[str, dict], kol: PaperKol, kaynaklar: list[PaperKol],
+                  kapanis_ms: int) -> np.ndarray:
+    """Agresif gözlem kolu: kaynak kolların güncel hedeflerinin (her biri kendi son tamamlanmış sınırında) ortalaması ×
+    tam Kelly, enstrüman tavanıyla kırpılır (spot: yalnız long). Brüt tavanı risk motoru uygular."""
+    hedefler, ks = [], None
+    for k in kaynaklar:
+        zd_ms = ZAMAN_DILIMI_MS[k.zd]
+        h = hazirla(depo, kayit, k, bit_ms=kapanis_ms - kapanis_ms % zd_ms)
+        if ks is None:
+            ks = list(h.g.kimlikler)
+        elif list(h.g.kimlikler) != ks:
+            raise ValueError("agresif kolun kaynakları aynı enstrümanları taşımalı")
+        hedefler.append(np.nan_to_num(hedef_son(h, k)))
+    tavan = RiskAyar(kaldirac=kol.ayar.kaldirac).enstruman_tavani
+    return np.clip(np.mean(hedefler, axis=0) * kol.parametre["kelly_carpani"], -tavan if kol.yon == "long_short" else 0.0,
+                   tavan)
+
+
+def karar_ver(kol: PaperKol, h: tv.HazirGrup, d: KolDurum, vetolu: set[str], hedef: np.ndarray | None = None) -> Karar:
     """Son kapanmış bar için dengeleme kararı. `vetolu`: şu an geçerli vetolar (yalnız Jev'li kopya kullanır).
     Fren durumu, işlem yapılacak barın açılış anında güncellenir (backtest `calistir_panel` ile aynı an)."""
     g = h.g
@@ -84,7 +103,7 @@ def karar_ver(kol: PaperKol, h: tv.HazirGrup, d: KolDurum, vetolu: set[str]) -> 
     if d.izleyici is not None:
         durum = d.izleyici.guncelle(oz / kol.baslangic_ozkaynak, t_islem).value
     veto = np.array([kol.jev and k in vetolu for k in ks])
-    hedef = hedef_son(h, kol)
+    hedef = hedef_son(h, kol) if hedef is None else np.asarray(hedef, dtype=float)
     onceki = np.array([d.onceki_h.get(k, 0.0) for k in ks])
     yeni, etkin, islem = dengele_adim(hedef, kaymis, onceki, d.ilk, g.bar_var[-1] | g.bitti[-1], g.bitti[-1], durum,
                                       veto if veto.any() else None, kol.ayar.bant)

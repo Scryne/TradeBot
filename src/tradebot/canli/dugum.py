@@ -53,7 +53,7 @@ from nautilus_trader.trading import Strategy
 from tradebot.canli import karar as kr
 from tradebot.canli.bar_akisi import CanliBarlar
 from tradebot.canli.defter import PaperDefter
-from tradebot.canli.kollar import PaperKol
+from tradebot.canli.kollar import AGRESIF, PaperKol
 from tradebot.kayit import log
 from tradebot.risk.motor import Durum, EmirIstegi, Piyasa, Portfoy, RiskAyar, RiskMotoru
 from tradebot.veri.takvim import ZAMAN_DILIMI_MS
@@ -117,7 +117,11 @@ class Beyin:
         if self.defter.karar_var(kol.ad, bar_ms):
             return
         d = self.durum[kol.ad]
-        k = kr.karar_ver(kol, h, d, vetolu)
+        hedef = None
+        if kol.strateji == AGRESIF:
+            kaynaklar = [k for k in self.kollar if k.ad in kol.parametre["kaynaklar"]]
+            hedef = kr.agresif_hedef(self.barlar.canli, self.kayit, kol, kaynaklar, sinir_ms)
+        k = kr.karar_ver(kol, h, d, vetolu, hedef)
         kid = self.defter.karar_yaz(k, h.g.veri_hash)
         d.onceki_h = dict(zip(k.kimlikler, (float(x) for x in k.etkin_hedef), strict=True))
         d.ilk = False

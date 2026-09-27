@@ -24,3 +24,15 @@ kollar:
      parametre: {giris_gun: 55, cikis_gun: 10}, sinif: B}
   - {ad: "d2:tsmom@kripto_btc_eth@4h", strateji: tsmom, grup: kripto_btc_eth, zd: 4h, boyut: dalga2,
      parametre: {ufuk_gun: 250}, sinif: B}
+
+# Agresif gözlem kolu (Final Doküman §Sermaye dağıtıcı): tam Kelly, ayrı defter, dağıtıma girmez.
+# Kelly: kolların backtest'i yıllık ~%19 getiri, ~%19 oynaklık → f* = μ/σ² ≈ 5 (aşağı yuvarlandı). Binance SPOT'ta kaldıraç
+# yok ve risk motoru enstrüman başına 0,5, sınıf başına 1,0 izin verir: çarpan tavanlara takılır. Pratikte agresif kol
+# "kolların ortalaması long ise o enstrümanda %50" demektir (vol hedefli kollar ~%20–30 taşır). Kararı her saat verir.
+agresif:
+  ad: "agresif@kripto_btc_eth"
+  grup: kripto_btc_eth
+  boyut: dalga1
+  kelly_carpani: 5.0
+  kaynaklar: ["ma_yon@kripto_btc_eth@1h", "tsmom@kripto_btc_eth@4h", "d2:donchian_ls@kripto_btc_eth@4h",
+              "d2:donchian_ls@kripto_btc_eth@1d", "d2:tsmom@kripto_btc_eth@4h"]
