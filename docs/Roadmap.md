@@ -271,13 +271,20 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     - `paper_kol_olay` (göç 0009): portföy kolunda kalıcı acil durdurma + onaylı `paper acil-kaldir`; terfi olayı;
       mutabakat durdurması kayıtta.
   - ABD ETF: dalga 1'de A/B çıkan ETF kolu yok. Faz 7'nin ETF ayağı kol çıkarsa açılır; düğüm Binance'e özel.
-  - Sırada: haftalık rapor, A6 emir reddi sınıflandırma, terfi değerlendirmesi (8. haftadan önce, ~2026-11-22),
-    planlı yeniden başlatma tatbikatı.
+  - Haftalık rapor ✅: `tradebot paper rapor`; bekçi her Pazartesi 00:30 UTC sonrası `data/rapor/paper-<hafta>.md`
+    üretir, özeti Telegram'a gider. Kol başına getiri, düşüş, yürütme/gecikme maliyeti, fren/veto; Jev A/B; agresif ↔
+    kaynak ortalaması; dağıtım.
+  - A6 (Claude kararı, 2026-09-27): kod tarafı ✅. Aynı kol + enstrümanda art arda 3 ret → kol durur, olay + alarm
+    (önceden ret olursa emir her saat körü körüne yeniden gidiyordu). Jev kısmı **Faz 8'e taşındı**. Gerekçeler:
+    sandbox bugüne kadar hiç ret üretmedi; Binance ve MT5 reddi yapısal hata koduyla bildiriyor (eşleme kural işidir);
+    Jev yalnız tanınmayan serbest metinde anlamlı, bunun spike'ı gerçek MT5 demo ret örnekleriyle yapılır.
+  - Sırada: terfi değerlendirmesi (8. haftadan önce, ~2026-11-22), planlı yeniden başlatma tatbikatı.
 
 ### Faz 8: Özel bağlantılar — MT5 + BIST
 - **İşler:** MT5 demo köprüsü (Windows tarafı; veri + simüle ya da demo emir); BIST gecikmeli veri
   bağlantısı ve simüle dolum; bu piyasaların takvim/maliyet modelleriyle paper kolları; B3 sözleşme şartnamesi
-  okuma (Faz 6'dan taşındı).
+  okuma (Faz 6'dan taşındı); A6'nın Jev kısmı (Faz 7'den taşındı): MT5 ret kodları eşleme tablosu, tanınmayan serbest
+  metin için Jev, gerçek demo ret örnekleriyle spike.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
 

@@ -328,3 +328,30 @@ def test_terfi_olayi_sinifi_degistirir(ayar):
     assert df.sinif(k) == "B"
     df.kol_olay_yaz(k.ad, "terfi", {"eski": "B", "yeni": "A", "gerekce": "test"}, zaman_ms=1_000)
     assert df.sinif(k, bit_ms=500) == "B" and df.sinif(k, bit_ms=2_000) == "A" and df.sinif(k) == "A"
+
+
+def test_ardisik_ret_kolu_durdurur(tmp_path, ayar):
+    import dataclasses
+
+    from tradebot.canli import dugum
+    from tradebot.canli.defter import PaperDefter
+    from tradebot.db import metadata, motor
+
+    m = motor(ayar)
+    metadata.create_all(m)
+    depo, t = sentetik_depo(tmp_path, n=24 * 5)
+    k = dataclasses.replace(kol_yap(), baslangic_ozkaynak=100_000.0)
+    df = PaperDefter(m, "test")
+    df.kol_ac(k, int(t[0]))
+    b = dugum.Beyin(m, [k], df, SahteBarlar(depo), KAYIT)
+    kim = "BINANCE:AAAUSDT"
+    b.ret(k.ad, kim, "yetersiz bakiye")
+    b.ret(k.ad, kim, "yetersiz bakiye")
+    b.dolum(k.ad, kim, 0.0, 100.0, 0.0, "karar")               # araya giren dolum sayacı sıfırlar
+    b.ret(k.ad, kim, "yetersiz bakiye")
+    assert k.ad not in b.durdurulan
+    for _ in range(2):
+        b.ret(k.ad, kim, "yetersiz bakiye")
+    assert k.ad in b.durdurulan
+    o = df.kol_olaylari(k.ad)
+    assert [x.tur for x in o] == ["durdur"] and o[0].ayrinti["neden"] == "ardisik_ret" and o[0].ayrinti["sayi"] == 3

@@ -63,6 +63,7 @@ from tradebot.veri.takvim import ZAMAN_DILIMI_MS
 from tradebot.zeka.olay import aktif_vetolar
 
 SAAT_MS = 3_600_000
+ARDISIK_RET_SINIRI = 3  # aynı kol + enstrümanda art arda borsa reddi → kol durur (yalnız riski azaltan emir), alarm
 BINANCE = Venue("BINANCE")
 _log = log("canli.dugum")
 
@@ -86,6 +87,7 @@ class Beyin:
         self.risk = {k.ad: RiskMotoru(RiskAyar(kaldirac=k.ayar.kaldirac)) for k in kollar}
         self.stratejiler: dict[str, KolStratejisi] = {}
         self.durdurulan: set[str] = set()
+        self.ardisik_ret: dict[tuple[str, str], int] = {}
         self.son_fiyat: dict[str, float] = {}
         self.son_kapanis_ms = 0
         self.dagitim: dict | None = None  # portföy kolunun bu haftaki dağıtımı (paper_dagitim)
@@ -202,7 +204,19 @@ class Beyin:
         s.gonder(karar_id, kim, q, miktar, fiyat, tur, karar_risk)
 
     # ------------------------------------------------------------------ dolum, işaretleme, mutabakat
+    def ret(self, kol_ad: str, kim: str, neden: str) -> None:
+        """Borsa/sandbox reddi. Art arda `ARDISIK_RET_SINIRI` ret: kol durur (A6'nın kod tarafı; ret kodları yapısal,
+        Jev yalnız tanınmayan serbest metin için Faz 8'de, gerçek MT5 ret örnekleriyle). Dolum sayacı sıfırlar."""
+        n = self.ardisik_ret.get((kol_ad, kim), 0) + 1
+        self.ardisik_ret[(kol_ad, kim)] = n
+        if n >= ARDISIK_RET_SINIRI and kol_ad not in self.durdurulan:
+            self.durdurulan.add(kol_ad)
+            self.defter.kol_olay_yaz(kol_ad, "durdur", {"neden": "ardisik_ret", "enstruman": kim, "sayi": n,
+                                                        "son_neden": neden[:300]})
+            _log.error("ardisik_ret_kol_durdu", kol=kol_ad, enstruman=kim, sayi=n, neden=neden[:200])
+
     def dolum(self, kol_ad: str, kim: str, q: float, px: float, ucret: float, tur: str) -> None:
+        self.ardisik_ret.pop((kol_ad, kim), None)
         if tur == "toparlanma":
             return  # defterde pozisyon zaten var
         d = self.durum[kol_ad]
@@ -367,6 +381,7 @@ class KolStratejisi(Strategy):
         self.beyin.defter.olay_yaz(eid, self.kol.ad, tur, kim, 0.0, None, 0.0, event.ts_event // 1_000_000,
                                    {"neden": str(getattr(event, "reason", ""))[:500]})
         _log.error("emir_reddedildi", kol=self.kol.ad, enstruman=kim, tur=tur, neden=str(getattr(event, "reason", ""))[:200])
+        self.beyin.ret(self.kol.ad, kim, str(getattr(event, "reason", "")))
 
     def on_order_rejected(self, event) -> None:
         self._ret(event, "ret")
