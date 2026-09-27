@@ -21,7 +21,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 3 | Araştırma motoru | ✅ Tamamlandı | Saf karar çekirdeği; piyasa başına maliyet modelleri; vektörel tarama; walk-forward + plato + DSR; deneme defteri; vektörel ↔ Nautilus parity testi geçiyor |
 | 4 | Risk motoru ve boyutlandırma | ✅ Tamamlandı | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
 | 5 | Turnuva — backtest dalgası 1 | ✅ Tamamlandı | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
-| 6 | Zekâ katmanı (Jev) | 🔄 Devam Ediyor | Toplayıcılar (Binance, KAP, RSS, Fed/ECB/TCMB); Jev servisi + NVIDIA yükseltme; A1, A2, A4, A5, B1, B2, B4, D3 çalışıyor; yargılar dondurulabiliyor; C1–C2 ölçüldü |
+| 6 | Zekâ katmanı (Jev) | 🔄 Devam Ediyor | Toplayıcılar (Binance, KAP, RSS, Fed/ECB/TCMB); Jev servisi + NVIDIA yükseltme; A1, A2 canlı; B1 çapraz kontrolü; yargılar dondurulabiliyor; C1–C2 ölçüldü (A4, A5, D3, B2, B4 girdilerinin doğduğu faza taşındı, 2026-09-27) |
 | 7 | Paper canlı — kripto + ABD ETF | ✅ Tamamlandı | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
 | 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | ⏳ Bekliyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
 | 9 | Operasyon: gözetmen, Telegram, raporlar | ⏳ Bekliyor | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
@@ -255,6 +255,17 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
       hız sınırı, 3 sn aralık): toplama ~10 gün (~2026-10-07), ardından toplu yargılama.
     - 2026-09-27 denetimi: alınamayan bildirimler kalıcı delik oluyordu (24 saatte 72) → onarım turu; toplu yargılama
       parça parça (bellek). İş yeni kodla yeniden başlatıldı (`docs/Denetim-2026-09-27.md`).
+  - **Kapsam kararı 2 (Claude, 2026-09-27; aynı ilke: girdisi olmayan rol girdinin doğduğu faza):**
+    - A5 → Faz 8. Binance spot'ta borsa geneli kesintiyi bayat veri kontrolü ve A6 zaten karşılıyor; kaldıraçsız spot
+      pozisyonda bakım penceresi özel risk değil. Toplanan 20 bakım duyurusunun ikisi de "system upgrade" diyor ama
+      "Spot trading will not be affected" (anahtar kelime tuzağı: Jev'e uygun yargı). Asıl değer MT5 aracı kurum
+      bildirimlerinde (tatil öncesi teminat artışı, işlem saati): örnekler orada doğar.
+    - A4 pump/manipülasyon → küçük coin kolu paper'a girdiğinde (paper evreni BTC/ETH).
+    - D3 → plan sayısı ~30'a ulaşınca (bugün 8; DSR sayımı aile bazında zaten doğru).
+    - B2, B4 → C ölçümleriyle birlikte (tüketicileri C özellikleri).
+  - C1 ✅ (`docs/olcum/C1-Veto-Etkisi.md`, plan `2026-09-27-c1-veto-etkisi`): A1 vetosu sonrası 7 gün BTC'ye göre
+    medyan −%21 (%83 negatif) → koruma VAR; `token_delist` 30 günde −%58. A2 (kısmi KAP) 7 gün −%1 → ZAYIF;
+    `olumsuz_esasli` etkisiz, `pazar_tedbiri` hafif koruma. A2 süreleri KAP geçmişi tamamlanınca yeni planla ölçülür.
   - B1 (tasarım, 2026-09-27): asıl değer düzeltilmemiş bölünmeyi yakalamak. Yahoo bir bedelsizi atlarsa seride kalıcı
     −%50 boşluk kalır; kalite raporunun sıçra-dön kuralı onu görmez (geri dönmüyor). Kural: BIST'te büyük, geri dönmeyen
     açılış boşluğu + ±30 gün içinde A2 `kurumsal` olayı + Yahoo'da bölünme kaydı yok → "düzeltilmemiş kurumsal işlem
@@ -306,7 +317,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 - **İşler:** MT5 demo köprüsü (Windows tarafı; veri + simüle ya da demo emir); BIST gecikmeli veri
   bağlantısı ve simüle dolum; bu piyasaların takvim/maliyet modelleriyle paper kolları; B3 sözleşme şartnamesi
   okuma (Faz 6'dan taşındı); A6'nın Jev kısmı (Faz 7'den taşındı): MT5 ret kodları eşleme tablosu, tanınmayan serbest
-  metin için Jev, gerçek demo ret örnekleriyle spike.
+  metin için Jev, gerçek demo ret örnekleriyle spike; A5 aracı kurum bildirimleri (Faz 6'dan taşındı: tatil öncesi
+  teminat artışı, işlem saati değişikliği; demo hesaptan gelen gerçek bildirimlerle spike).
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
 
