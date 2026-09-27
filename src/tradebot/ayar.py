@@ -33,6 +33,7 @@ class Ayarlar(BaseSettings):
     telegram_token: SecretStr | None = Field(default=None, validation_alias="TRADEBOT_TELEGRAM_TOKEN")
     telegram_sohbet: str | None = None    # Scryne'ın sohbet kimliği (sır değil; bot yalnız buraya yazar)
     yedek_dizini: Path | None = None      # compose `yedek`in hedefi; tanımlıysa sağlık yedek yaşını denetler
+    olu_adam_url: str | None = None       # healthchecks.io ping adresi (yalnız .env'de): host kapanırsa dışarıdan alarm
 
     # Sağlık eşikleri (Spike 02/03: bu evde DNS 5–15 sn, saat 1 sn kaymıştı)
     dns_uyari_sn: float = 1.0

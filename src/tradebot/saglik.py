@@ -241,6 +241,25 @@ class LogTriyaj:
         return out
 
 
+KRITIK = ("paper", "gece_isi", "yedek", "veritabani")
+
+
+def olu_adam(a: Ayarlar, sonuclar: list[Sonuc], zaman_asimi: float = 10.0) -> bool | None:
+    """Dış "ölü adam" sinyali (healthchecks.io). Kritik bir kontrol HATA ise `/fail` (dış kanaldan da alarm), değilse
+    başarı. Host tamamen kapanırsa sinyal kesilir ve dış servis alarm verir: bekçinin göremediği tek durum bu.
+    Döndürür: gönderildi mi (None: adres tanımsız)."""
+    if not a.olu_adam_url:
+        return None
+    hata = [s.ad for s in sonuclar if s.ad in KRITIK and s.durum == "HATA"]
+    url = a.olu_adam_url.rstrip("/") + ("/fail" if hata else "")
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, data=(", ".join(hata) or "ok").encode()),
+                                    timeout=zaman_asimi) as r:
+            return r.status == 200
+    except OSError:
+        return False
+
+
 def hepsi(a: Ayarlar) -> list[Sonuc]:
     kontroller = [dns_kontrol, saat_kontrol, veritabani_kontrol, disk_kontrol, sir_kontrol]
     if a.ortam == "host" and a.veritabani_url is not None:

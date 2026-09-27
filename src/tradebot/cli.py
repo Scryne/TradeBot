@@ -67,6 +67,8 @@ def saglik_komutu(
             bildirici.gonder("KRITIK", f"{h['dosya']} · {h['bilesen']} · {h['olay']}\n"
                              f"{json.dumps(h['ozet'], ensure_ascii=False, default=str)[:600]}",
                              anahtar=f"log:{h['bilesen']}:{h['olay']}")
+        if dongu and saglik.olu_adam(a, sonuclar) is False:
+            kayitci.warning("olu_adam_sinyali_gitmedi")
         if dongu and a.ortam == "host" and a.veritabani_url is not None:
             _haftalik_rapor(a, bildirici, kayitci)
         if not dongu:

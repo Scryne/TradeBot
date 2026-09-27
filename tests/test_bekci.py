@@ -80,3 +80,24 @@ def test_bildirim_susturma_ve_kanal(ayar):
     assert b.gonder("KRITIK", "paper durdu", anahtar="k") and not b.gonder("KRITIK", "paper durdu", anahtar="k")
     assert b.gonder("BILGI", "düzeldi")
     assert len(giden) == 2 and "KRITIK" in giden[0]
+
+
+def test_olu_adam_sinyali(ayar, monkeypatch):
+    giden = []
+
+    class Yanit:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+    monkeypatch.setattr(saglik.urllib.request, "urlopen", lambda req, timeout: giden.append(req.full_url) or Yanit())
+    assert saglik.olu_adam(ayar, []) is None                        # adres yok: sinyal yok
+    a = ayar.model_copy(update={"olu_adam_url": "https://hc-ping.com/abc"})
+    ok = [saglik.Sonuc("paper", "OK", ""), saglik.Sonuc("sirlar", "UYARI", "")]
+    assert saglik.olu_adam(a, ok) and giden[-1] == "https://hc-ping.com/abc"
+    assert saglik.olu_adam(a, [saglik.Sonuc("paper", "HATA", "")]) and giden[-1] == "https://hc-ping.com/abc/fail"
+    assert saglik.olu_adam(a, [saglik.Sonuc("dns", "HATA", "")]) and giden[-1] == "https://hc-ping.com/abc"  # kritik değil
