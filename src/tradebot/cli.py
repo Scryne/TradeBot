@@ -20,6 +20,8 @@ arastirma_uygulama = typer.Typer(help="Araştırma motoru (Faz 3): test planı v
 uygulama.add_typer(arastirma_uygulama, name="arastirma")
 zeka_uygulama = typer.Typer(help="Zekâ katmanı (Faz 6): toplayıcılar, Jev rolleri, olaylar", no_args_is_help=True)
 uygulama.add_typer(zeka_uygulama, name="zeka")
+paper_uygulama = typer.Typer(help="Paper canlı (Faz 7): Nautilus düğümü, defter", no_args_is_help=True)
+uygulama.add_typer(paper_uygulama, name="paper")
 
 _ISARET = {"OK": "✓", "UYARI": "!", "HATA": "✗"}
 
@@ -531,3 +533,14 @@ def zeka_vetolar() -> None:
     with m.connect() as b:
         for r in b.execute(select(olay_t).order_by(olay_t.c.id.desc()).limit(20)):
             typer.echo(f"{r.id:>5} {r.tur:<6} {r.enstruman:<22} {r.neden[:110]}")
+
+
+@paper_uygulama.command("calis")
+def paper_calis(
+    sure_sn: float = typer.Option(0, help="Saniye; 0 = süresiz (servis)"),
+    duman: bool = typer.Option(False, help="Duman testi: defter ayrı SQLite dosyasında, canlı bar deposu ayrı dizinde"),
+) -> None:
+    """Paper düğümü: Binance canlı veri + sandbox yürütme; kararlar, emirler ve dolumlar paper defterine."""
+    from tradebot.canli.dugum import calistir
+
+    calistir(sure_sn or None, duman)

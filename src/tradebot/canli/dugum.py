@@ -357,8 +357,9 @@ def kur(beyin: Beyin, bakiye_usdt: float = 10_000_000.0):
     return node
 
 
-def calistir(sure_sn: float | None = None) -> None:
-    """Paper düğümünü başlatır (compose `paper` servisi). `sure_sn`: duman testi için süre sınırı."""
+def calistir(sure_sn: float | None = None, duman: bool = False) -> None:
+    """Paper düğümünü başlatır (compose `paper` servisi). `sure_sn`: süre sınırı. `duman`: defter ayrı SQLite dosyasında,
+    canlı bar deposu ayrı dizinde (asıl defter yalnız eklenir; deneme koşusu onu kirletmemeli)."""
     from tradebot.ayar import ayarlar
     from tradebot.canli.kollar import kollar as kol_listesi
     from tradebot.db import motor as db_motor
@@ -369,12 +370,22 @@ def calistir(sure_sn: float | None = None) -> None:
     m = db_motor(a)
     kod = os.environ.get("TRADEBOT_KOD_SURUMU", "yerel")
     ks = kol_listesi()
-    defter = PaperDefter(m, kod)
+    canli_dizin = a.veri_dizini / ("canli_duman" if duman else "canli")
+    if duman:
+        from sqlalchemy import create_engine
+
+        from tradebot.db import metadata
+
+        dm = create_engine(f"sqlite:///{a.veri_dizini / 'paper_duman.db'}")
+        metadata.create_all(dm)
+        defter = PaperDefter(dm, kod + "+duman")
+    else:
+        defter = PaperDefter(m, kod)
     simdi = int(time.time() * 1000)
     for kol in ks:
         if defter.kol_ac(kol, simdi):
             _log.info("kol_acildi", kol=kol.ad)
-    barlar = CanliBarlar(BarDepo(a.veri_dizini), BarDepo(a.veri_dizini / "canli"), HamDepo(a.veri_dizini, m))
+    barlar = CanliBarlar(BarDepo(a.veri_dizini), BarDepo(canli_dizin), HamDepo(a.veri_dizini, m))
     kayit = {k["kimlik"]: k for k in en.hepsi(m)}
     beyin = Beyin(m, ks, defter, barlar, kayit)
     barlar.hazirla(beyin.kimlikler, simdi)

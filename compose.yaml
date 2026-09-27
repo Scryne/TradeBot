@@ -83,6 +83,14 @@ services:
     depends_on:
       goc: { condition: service_completed_successfully }
 
+  paper:
+    <<: *ortak
+    # Faz 7: paper düğümü (Nautilus sandbox, Binance canlı veri). Kararlar her 1h kapanışında; defter PostgreSQL'de.
+    command: ["tradebot", "paper", "calis"]
+    profiles: ["paper"]            # duman testi geçene kadar varsayılan `up`'ta başlamaz
+    depends_on:
+      goc: { condition: service_completed_successfully }
+
 volumes:
   pg:
   veri:
