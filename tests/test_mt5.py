@@ -7,6 +7,7 @@ import time
 from http.server import ThreadingHTTPServer
 from types import SimpleNamespace as NS
 
+import numpy as np
 import pytest
 
 from tradebot.mt5 import istemci, kopru
@@ -41,7 +42,9 @@ class SahteMt5:
         return True
 
     def symbol_info(self, ad):
-        return NS(name=ad, point=0.01, digits=2, trade_contract_size=100.0, volume_min=0.01) if ad == "GOLD" else None
+        if ad not in ("GOLD", "XU30_YAKINVADE", "F_XU0301026"):
+            return None
+        return NS(name=ad, point=0.01, digits=2, trade_contract_size=100.0, volume_min=0.01)
 
     def symbol_info_tick(self, _):
         return NS(bid=2650.1, ask=2650.4, last=0.0, time_msc=self.tik_ms)
@@ -183,9 +186,20 @@ def test_gunluk_bar_seans_gunune_etiketlenir():
     from tradebot.veri.mt5 import katalog_barlari
     gun = 1_790_294_400_000                                    # 2026-09-25 00:00 UTC
     df = pl.DataFrame([[gun - 3 * 3_600_000, 1.0, 2.0, 0.5, 1.5, 70, 3, 9]], schema=istemci.SEMA, orient="row")
-    k = katalog_barlari(df, "1d", FARK, gercek_hacim=True)     # MT5: 2026-09-24 21:00 UTC = sunucu 25'i 00:00
+    k = katalog_barlari(df, "1d", FARK, gercek_hacim=True, nokta=0.01)   # MT5: 2026-09-24 21:00 UTC = sunucu 25'i 00:00
     assert k["acilis_ms"].to_list() == [gun] and k["volume"].to_list() == [9.0]
-    assert katalog_barlari(df, "1h", FARK, gercek_hacim=False)["volume"].to_list() == [70.0]
+    assert k["spread"].to_list() == [0.03] and k["spread_nokta"].to_list() == [3]   # fiyat birimi (panel bunu bekler)
+    assert katalog_barlari(df, "1h", FARK, gercek_hacim=False, nokta=0.01)["volume"].to_list() == [70.0]
+
+
+def test_spread_birimi_gocu():
+    import polars as pl
+
+    from tradebot.veri.mt5 import spread_birimi_duzelt
+    eski = pl.DataFrame({"acilis_ms": [1], "spread": [10]})
+    yeni = spread_birimi_duzelt(eski, 1e-5)
+    assert yeni["spread"].to_list() == [pytest.approx(1e-4)] and yeni["spread_nokta"].to_list() == [10]
+    assert spread_birimi_duzelt(yeni, 1e-5) is None
 
 
 class SahteMt5Cok(SahteMt5):
@@ -233,6 +247,11 @@ def test_toplayici_uctan_uca(ayar):
         assert (h["acilis_ms"] % 3_600_000 == 0).all() and h["volume"][0] == 7.0   # VİOP: gerçek hacim
         g = d.oku("NCMFX:GOLD", "1d")
         assert (g["acilis_ms"] % 86_400_000 == 0).all() and g["volume"][0] == 5.0  # gün başı etiketi; CFD: tik hacmi
+        assert g["spread"][0] == pytest.approx(0.02) and g["spread_nokta"][0] == 2        # nokta × point
+        # panel bu katalogdan makul yarım spread okur: 0,02 / 2 / 10 × 1e4 = 10 bps (eski birimle 1.000 bps olurdu)
+        from tradebot.arastirma.panel import grup_yukle
+        ys = grup_yukle(d, ["NCMFX:GOLD"], "1h").yari_spread_bps
+        assert ys is not None and float(np.nanmax(ys)) == pytest.approx(10.0)
         with m.connect() as b:
             assert b.execute(select(ham_dosya.c.anahtar).where(ham_dosya.c.kaynak == "mt5")).first() is not None
         # ikinci koşu: yeni bar yok, yalnız kalan istenir

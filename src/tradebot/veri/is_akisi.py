@@ -135,6 +135,22 @@ def gece(a: Ayarlar, m: Engine, dukascopy_butce_dk: float = 240.0) -> dict:
     return sonuc | {"dukascopy": d["dukascopy"]}
 
 
+def telafi_gerekli(m: Engine, simdi: datetime, esik_saat: float = 20.0) -> bool:
+    """Servis başlarken gece işi hemen koşsun mu: son `gece_isi` kaydı `esik_saat`'ten eskiyse (ya da hiç yoksa).
+    2026-09-28 denetimi: `--hemen` koşulsuzdu; her dağıtım gece işini baştan başlatıyordu (bir günde 3 kez: 659 Yahoo
+    isteği, yarıda kesilen Dukascopy adımı). Kesinti sonrası telafi korunur."""
+    from sqlalchemy import func, select
+
+    from tradebot.db import denetim_izi
+
+    with m.connect() as b:
+        son = b.execute(select(func.max(denetim_izi.c.zaman)).where(denetim_izi.c.olay == "gece_isi")).scalar()
+    if son is None:
+        return True
+    son = son if son.tzinfo else son.replace(tzinfo=UTC)
+    return (simdi - son).total_seconds() > esik_saat * 3600
+
+
 def sonraki_calisma(simdi: datetime, saat_utc: int, dakika: int) -> datetime:
     hedef = simdi.replace(hour=saat_utc, minute=dakika, second=0, microsecond=0)
     return hedef if hedef > simdi else hedef + timedelta(days=1)

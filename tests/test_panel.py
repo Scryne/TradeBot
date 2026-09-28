@@ -549,3 +549,20 @@ def test_veto_riski_artirmaz_ve_pit(depo):
     assert s2.pozisyon[62] == pytest.approx(0.2, abs=0.05)
     v2 = veto_maskesi(g, [("BINANCE:VUSDT", int(g.t[40]), int(g.t[45]))])
     assert v2[44, 0] and not v2[45, 0]  # süreli veto biter
+
+
+def test_likidite_temettu_duzeltmesinden_bagimsiz(tmp_path):
+    """2026-09-28 denetimi: likidite sıralaması temettü düzeltmeli fiyatla yapılıyordu; düzeltme çarpanı SONRAKİ
+    temettülere bağlı olduğundan eski günlerin cirosu gelecek bilgisiyle küçülüyordu. Ciro düzeltmeden önce ölçülür."""
+    from tradebot.arastirma.panel import evren_maskesi, grup_yukle
+    d = BarDepo(tmp_path)
+    n = 200
+    t = np.arange(n, dtype=np.int64) * GUN + 1_600_000_000_000 // GUN * GUN
+    for kimlik, hacim, adj in (("BIST:AAA", 1100.0, 0.5), ("BIST:BBB", 1000.0, 1.0)):
+        c = np.full(n, 10.0)
+        d.yaz(kimlik, "1d", pl.DataFrame({"acilis_ms": t, "open": c, "high": c, "low": c, "close": c,
+                                           "volume": np.full(n, hacim), "adj_close": c * adj}))
+    g = grup_yukle(d, ["BIST:AAA", "BIST:BBB"], "1d")
+    e, lik = evren_maskesi(g, ilk_n=1, likidite_gun=10, asgari_gecmis_gun=20)
+    # AAA'nın gerçek cirosu %10 fazla; düzeltilmiş fiyatla (×0,5) BBB'nin gerisinde görünürdü
+    assert e[50, 0] and not e[50, 1] and lik[50, 0] == pytest.approx(11_000.0)

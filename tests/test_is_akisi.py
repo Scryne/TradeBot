@@ -18,3 +18,20 @@ def test_gece_sirasi_ve_denetim(ayar, monkeypatch):
     with m.connect() as b:
         olaylar = [r.olay for r in b.execute(select(denetim_izi).order_by(denetim_izi.c.id))]
     assert olaylar == ["gece_isi", "gece_isi_dukascopy"]
+
+
+def test_telafi_yalniz_eski_gece_isinde(tmp_path):
+    from datetime import UTC, datetime, timedelta
+
+    from sqlalchemy import create_engine
+
+    from tradebot import denetim
+    from tradebot.db import metadata
+    from tradebot.veri.is_akisi import telafi_gerekli
+    m = create_engine(f"sqlite:///{tmp_path / 't.db'}")
+    metadata.create_all(m)
+    simdi = datetime(2026, 9, 28, 12, tzinfo=UTC)
+    assert telafi_gerekli(m, simdi)                                            # hiç yok
+    denetim.kaydet(m, "veri", "gece_isi", {}, zaman=simdi - timedelta(hours=3))
+    assert not telafi_gerekli(m, simdi)                                        # dağıtım sonrası: koşma
+    assert telafi_gerekli(m, simdi + timedelta(hours=21))                      # kesinti sonrası: telafi

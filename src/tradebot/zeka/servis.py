@@ -6,6 +6,12 @@ Karar kuralı ortaktır (`zeka.karar`).
 
 Çökme güvenliği: yargısı olan (metin, enstrüman) çifti tekrar sorulmaz; yargısı olmayan sonraki turda yeniden ele alınır.
 Bir toplayıcının hatası diğerlerini ve rolleri durdurmaz.
+
+Model yok (Jev hata verdi VE yükseltme de cevap vermedi; kural 8 "belirsizlikte riski azalt ve alarm ver"): canlı metinde
+`ONLEM_VETO_MS` süreli önlem vetosu + hata logu (bekçi → Telegram KRİTİK). Metin sonraki turda yeniden sorulur, gerçek
+yargı gelince kalıcı karar ayrıca yazılır; önlem vetosu süresi dolunca kendiliğinden biter (A2'nin süreli vetosu gibi).
+Geçmiş doldurmada önlem vetosu yazılmaz (backtest'e kesintiye bağlı, yeniden üretilemez veto girmesin). 2026-09-28
+denetimi: önceden bu durumda veto yazılmıyor, her turda yeni bir "uyarı" satırı birikiyor ve alarm gitmiyordu.
 """
 from __future__ import annotations
 
@@ -32,6 +38,7 @@ from tradebot.zeka.yukseltme import Yukseltme
 
 AYAR_YOLU = Path(__file__).resolve().parents[3] / "config" / "zeka.yaml"
 CANLI_PENCERE_MS = 10 * 60_000
+ONLEM_VETO_MS = 6 * 3_600_000
 ROLLER = {a1.KAYNAK: a1, a2.KAYNAK: a2}
 ROL_ADI = {r.ROL: r for r in ROLLER.values()}
 _log = log("zeka.servis")
@@ -44,6 +51,7 @@ def ayar_oku(yol: Path = AYAR_YOLU) -> dict:
 class Zeka:
     def __init__(self, motor: Engine, jev: JevIstemci, yukseltme: Yukseltme, toplayicilar: list, ayar: dict) -> None:
         self.motor, self.jev, self.yuk, self.toplayicilar, self.ayar = motor, jev, yukseltme, toplayicilar, ayar
+        self._onlem: set[tuple[int, str]] = set()   # önlem vetosu yazılmış (metin, enstrüman): turda tekrar yazılmaz
 
     def _sorulmus(self, rol, metin_id: int) -> set[str]:
         with self.motor.connect() as b:
@@ -78,6 +86,17 @@ class Zeka:
             yuk, yuk_model = (None, None)
             if y.hata or guven < esik:
                 yuk, yuk_model = self.yuk.sec(rol.ROL, hedef, rol.ETKI.model_dump(mode="json"), st, "etki")
+            if y.hata and yuk is None:   # model yok: önlem vetosu (canlı) + alarm; metin sonraki turda yeniden sorulur
+                if canli and (m.id, kimlik) not in self._onlem:
+                    self._onlem.add((m.id, kimlik))
+                    olaylar.append(olay.yaz(self.motor, "veto", kimlik, gecerli,
+                                            f"{rol.ONEK} önlem: model yanıt vermedi: {m.baslik[:200]}", rol.ROL, m.id,
+                                            y.id, gecerli + ONLEM_VETO_MS,
+                                            {"onlem": True, "jev_hata": y.hata[:200], "baslik": m.baslik[:200]}))
+                    _log.error("model_yok_onlem_veto", rol=rol.ROL, enstruman=kimlik, metin_id=m.id, hata=y.hata[:200])
+                elif not canli:
+                    _log.warning("model_yok_gecmis", rol=rol.ROL, enstruman=kimlik, metin_id=m.id)
+                continue
             veto, neden = karar(None if y.hata else secim, guven, p, yuk, self.yuk.hazir, rol.VETO, esik)
             belirsiz = neden.startswith("belirsiz")
             son_secim = yuk if yuk is not None else secim

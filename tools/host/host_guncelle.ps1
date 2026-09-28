@@ -15,6 +15,14 @@ Set-Location 'C:\TradeBot\app'
 # Deneme defteri için kod sürümü (imajda git yok; compose TRADEBOT_KOD_SURUMU'na geçirir)
 $env:KOD_SURUMU = (git rev-parse --short HEAD).Trim()
 "=== $(Get-Date -Format o) · $($env:KOD_SURUMU) ===" | Out-File $log -Encoding utf8
+# Paper düğümü her saat kapanışında karar verir; kapanışın hemen öncesinde/sonrasında yeniden başlatma kararı gecikmeli
+# yola düşürür (2026-09-28 denetimi). :57–:02 arasındaysa :02'yi bekle.
+$dk = (Get-Date).ToUniversalTime().Minute
+if ($dk -ge 57 -or $dk -lt 2) {
+    $bekle = ((62 - $dk) % 60) * 60
+    "saat kapanışı: $bekle sn bekleniyor" | Out-File $log -Append -Encoding utf8
+    Start-Sleep -Seconds $bekle
+}
 Calistir 'docker compose up -d --build' | Out-File $log -Append -Encoding utf8
 $kod = $LASTEXITCODE
 Calistir 'docker compose ps' | Out-File $log -Append -Encoding utf8

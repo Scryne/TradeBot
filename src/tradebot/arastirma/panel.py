@@ -59,6 +59,7 @@ class GrupVerisi:
     konum: list[np.ndarray]  # barlar[j]'nin ızgaradaki indeksleri
     veri_hash: str
     bar_ms: int
+    ciro: list[np.ndarray] | None = None  # her enstrümanın bar cirosu (kapanış × hacim), temettü düzeltmesinden ÖNCE
 
 
 def bar_yukle(depo: BarDepo, kimlik: str, zd: str) -> tuple[pl.DataFrame, str] | None:
@@ -86,7 +87,10 @@ def grup_yukle(depo: BarDepo, kimlikler: list[str], zd: str, bas_ms: int | None 
             df = df.filter(pl.col("acilis_ms") >= bas_ms)
         if bit_ms is not None:
             df = df.filter(pl.col("acilis_ms") < bit_ms)
-        df = toplam_getiri(df)
+        # Ciro temettü düzeltmesinden önce: `adj_close / close` çarpanı SONRAKİ temettülere bağlıdır, point-in-time
+        # likidite sıralamasına gelecek bilgisi sokardı (2026-09-28 denetimi). Yahoo close'u yalnız bölünme düzeltmeli,
+        # hacmi de öyle: çarpımı gerçek ciro.
+        df = toplam_getiri(df.with_columns((pl.col("close") * pl.col("volume")).alias("_ciro")))
         if len(df) < 3:
             continue
         dfs.append(df)
@@ -99,7 +103,7 @@ def grup_yukle(depo: BarDepo, kimlikler: list[str], zd: str, bas_ms: int | None 
     acilis, kapanis = np.full((n, k), np.nan), np.full((n, k), np.nan)
     ys = np.full((n, k), np.nan)
     bar_var, bitti = np.zeros((n, k), dtype=bool), np.zeros((n, k), dtype=bool)
-    barlar, konum = [], []
+    barlar, konum, ciro = [], [], []
     spread_var = False
     for j, d in enumerate(dfs):
         ix = np.searchsorted(t, d["acilis_ms"].to_numpy())
@@ -112,9 +116,10 @@ def grup_yukle(depo: BarDepo, kimlikler: list[str], zd: str, bas_ms: int | None 
         barlar.append(Barlar.sozlukten({"t": d["acilis_ms"], "open": d["open"], "high": d["high"], "low": d["low"],
                                         "close": d["close"], "volume": d["volume"]}))
         konum.append(ix)
+        ciro.append(d["_ciro"].to_numpy())
     acilis, kapanis = _ileri_doldur(acilis), _ileri_doldur(kapanis)
     return GrupVerisi(adlar, t, acilis, kapanis, bar_var, bitti, ys if spread_var else None, barlar, konum,
-                      hashlib.sha256("|".join(hashler).encode()).hexdigest(), ZAMAN_DILIMI_MS[zd])
+                      hashlib.sha256("|".join(hashler).encode()).hexdigest(), ZAMAN_DILIMI_MS[zd], ciro)
 
 
 def toplam_getiri(df: pl.DataFrame) -> pl.DataFrame:
@@ -142,7 +147,8 @@ def kur_cevir(g: GrupVerisi, depo: BarDepo, kur_kimlik: str) -> GrupVerisi:
     i = np.searchsorted(kt, g.t, side="right") - 1  # açılıştan önce kapanmış son kur barı
     kur = np.where(i >= 0, kc[np.maximum(i, 0)], np.nan)[:, None]
     return GrupVerisi(g.kimlikler, g.t, g.acilis / kur, g.kapanis / kur, g.bar_var, g.bitti, g.yari_spread_bps,
-                      g.barlar, g.konum, hashlib.sha256(f"{g.veri_hash}|{kur_kimlik}:{kh}".encode()).hexdigest(), g.bar_ms)
+                      g.barlar, g.konum, hashlib.sha256(f"{g.veri_hash}|{kur_kimlik}:{kh}".encode()).hexdigest(), g.bar_ms,
+                      g.ciro)
 
 
 def _ileri_doldur(x: np.ndarray) -> np.ndarray:
@@ -164,7 +170,7 @@ def izgaraya(g: GrupVerisi, j: int, dizi: np.ndarray) -> np.ndarray:
 
 # ------------------------------------------------------------------ point-in-time evren
 def gunluk_tablo(g: GrupVerisi) -> dict[str, np.ndarray]:
-    """Gün × enstrüman: hacim (kote para; kapanış × hacim), son kapanış, bar sayısı. Yalnız o günün barlarından."""
+    """Gün × enstrüman: hacim (kote para; düzeltilmemiş ciro), son kapanış, bar sayısı. Yalnız o günün barlarından."""
     gun = g.t // GUN
     gunler = np.unique(gun)
     gi = np.searchsorted(gunler, gun)
@@ -173,7 +179,7 @@ def gunluk_tablo(g: GrupVerisi) -> dict[str, np.ndarray]:
     kapanis = np.full((len(gunler), k), np.nan)
     for j, b in enumerate(g.barlar):
         gj = gi[g.konum[j]]
-        np.add.at(hacim[:, j], gj, b.close * b.volume)
+        np.add.at(hacim[:, j], gj, g.ciro[j] if g.ciro is not None else b.close * b.volume)
         np.add.at(bar[:, j], gj, 1)
         kapanis[gj, j] = b.close  # aynı güne düşen son bar kazanır (sıralı)
     return {"gun": gunler, "hacim": hacim, "bar": bar, "kapanis": kapanis}

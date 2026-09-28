@@ -126,6 +126,16 @@ def test_temel_akil_kontrolleri():
     assert "piyasa kapalı" in m.onayla(_e(0.1, emir="d"), kapali, _pf()).gerekceler
 
 
+def test_fiyat_bandi_riski_azaltani_engellemez():
+    # 2026-09-28 denetimi: sert harekette karar fiyatı son fiyattan > %5 ayrılınca kapatma emri de reddediliyordu (kural 7)
+    m = RiskMotoru()
+    pf = _pf(poz={"BINANCE:BTCUSDT": 0.2})
+    k = m.onayla(_e(-0.2, fiyat=60_000.0, emir="a"), PIY, pf)                        # %20 sapma, pozisyonu kapatır
+    assert k.onay and k.risk_azaltan and k.miktar == -0.2
+    assert not m.onayla(_e(0.1, fiyat=60_000.0, emir="b"), PIY, pf).onay            # artıran: bant uygulanır
+    assert not m.onayla(_e(-0.5, fiyat=60_000.0, emir="c"), PIY, pf).onay           # ters dönüş = artıran
+
+
 def test_emir_hizi_siniri():
     m = RiskMotoru(RiskAyar(dakikalik_emir_sayisi=3, azami_emir_orani=1.0))
     sonuc = [m.onayla(_e(0.001, emir=f"e{i}"), PIY, _pf()).onay for i in range(5)]

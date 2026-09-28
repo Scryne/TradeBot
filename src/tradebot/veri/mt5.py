@@ -6,7 +6,10 @@
 - Ham yanıtlar (köprünün JSON'u, sunucu saat farkı dahil) HamDepo'ya yazılır; barlar ondan yeniden üretilebilir (kural 9).
 - 1d barlar seans gününün 00:00 UTC'sine etiketlenir: MT5'in günlük barı sunucu gece yarısında açılır (NCM: 21:00 UTC,
   önceki takvim günü). Katalogdaki diğer günlük veriler (Yahoo, Dukascopy) gün başı gösterimini kullanır.
-- `volume`: VİOP'ta gerçek hacim (kontrat), CFD'de tik hacmi. `spread` nokta cinsinden korunur (maliyet modeli).
+- `volume`: VİOP'ta gerçek hacim (kontrat), CFD'de tik hacmi.
+- `spread` FİYAT birimindedir (nokta × point; Dukascopy'deki ASK − BID ile aynı anlam, panel yarım spread'i bundan
+  hesaplar). MT5'in ham nokta değeri `spread_nokta`'dadır. 2026-09-28 denetimi: önceden nokta olarak yazılıyordu, panel
+  fiyat birimi varsaydığı için EURUSD'de 10 nokta ~42.000 bps'lik maliyete dönüşürdü (veriden spread okuyan bir modelle).
 - Seyrek başlangıç kesilir (gün içi): NCM'nin eski "saatlik" geçmişi aslında günde tek bardır (EURUSD 2022, GOLD 2018
   öncesi, yılda ~274 bar; 2026-09-28 kalite raporu). Katalog yoğun dönemin başından başlar; ham yanıtlar olduğu gibi kalır.
 """
@@ -29,13 +32,22 @@ MT5_ZD = {"1m": "M1", "1h": "H1", "1d": "D1"}
 _log = log("veri.mt5")
 
 
-def katalog_barlari(df: pl.DataFrame, zd: str, fark_ms: int, gercek_hacim: bool) -> pl.DataFrame:
-    """Köprü tablosu → katalog şeması. 1d: açılış (UTC) + sunucu farkı = sunucu günü → o günün 00:00 UTC'si."""
+def katalog_barlari(df: pl.DataFrame, zd: str, fark_ms: int, gercek_hacim: bool, nokta: float) -> pl.DataFrame:
+    """Köprü tablosu → katalog şeması. 1d: açılış (UTC) + sunucu farkı = sunucu günü → o günün 00:00 UTC'si.
+    `nokta`: sembolün point değeri (spread nokta → fiyat birimi)."""
     if zd == "1d":
         df = df.with_columns(pl.col("acilis_ms").map_elements(lambda t: gun_basi(t + fark_ms), return_dtype=pl.Int64))
     hacim = pl.col("real_volume") if gercek_hacim else pl.col("tick_volume")
-    return df.with_columns(volume=hacim.cast(pl.Float64)).select(
-        "acilis_ms", "open", "high", "low", "close", "volume", "tick_volume", "spread", "real_volume")
+    return df.with_columns(volume=hacim.cast(pl.Float64), spread_nokta=pl.col("spread"),
+                           spread=pl.col("spread").cast(pl.Float64) * nokta).select(
+        "acilis_ms", "open", "high", "low", "close", "volume", "tick_volume", "spread", "spread_nokta", "real_volume")
+
+
+def spread_birimi_duzelt(df: pl.DataFrame, nokta: float) -> pl.DataFrame | None:
+    """Eski (spread nokta cinsinden) katalog dosyası → yeni şema. Zaten yeni şemadaysa None."""
+    if "spread_nokta" in df.columns or "spread" not in df.columns:
+        return None
+    return df.with_columns(spread_nokta=pl.col("spread"), spread=pl.col("spread").cast(pl.Float64) * nokta)
 
 
 def yogun_baslangic(t_ms: pl.Series, pencere_ay: int = 6, oran: float = 0.5) -> int | None:
@@ -64,12 +76,29 @@ class Mt5Veri:
         self.evren = evren or en.evren_yukle()
 
     def enstrumanlar(self) -> list[en.Enstruman]:
+        """Kayıt listesi; her birinin `meta.nokta`'sı köprünün sözleşme özelliklerinden (spread birimi için)."""
         mevcut = {h: [s for s, _ in i.semboller()] for h, i in self.istemciler.items()}
-        return en.mt5_enstrumanlari(self.evren, mevcut)
+        liste = en.mt5_enstrumanlari(self.evren, mevcut)
+        out = []
+        for h, ist in self.istemciler.items():
+            adlar = [e.sembol for e in liste if e.meta["hesap"] == h]
+            ozellik = ist.semboller(adlar) if adlar else {}
+            for e in liste:
+                if e.meta["hesap"] == h:
+                    nokta = (ozellik.get(e.sembol) or {}).get("point")
+                    out.append(en.Enstruman(e.piyasa, e.sembol, e.sinif, e.takvim, e.para_birimi, e.kaynak,
+                                            e.meta | {"nokta": nokta}))
+        return out
 
     def _bir(self, e: en.Enstruman, zd: str, simdi_ms: int) -> dict:
         ist = self.istemciler[e.meta["hesap"]]
+        nokta = e.meta.get("nokta")
+        if nokta is None:
+            raise KopruHatasi(f"{e.sembol}: point değeri yok (spread birimi belirsiz, yazılmadı)")
         eski = self.bar.oku(e.kimlik, zd)
+        if not eski.is_empty() and (d := spread_birimi_duzelt(eski, nokta)) is not None:   # tek seferlik göç
+            self.bar.yaz(e.kimlik, zd, d, birlestir=False)
+            eski = d
         adim = ZAMAN_DILIMI_MS[zd]
         derinlik = self.evren["mt5"]["derinlik_gun"][zd] * 86_400_000
         # 1d etiketi gün başıdır, MT5 açılışı önceki gün 21:00 UTC: bir gün geriden iste (birleştirmede yenisi kazanır)
@@ -86,7 +115,7 @@ class Mt5Veri:
         if df.is_empty():
             out["hata"] = ist.son_hatalar[:1] or None
         else:
-            yeni = katalog_barlari(df, zd, fark["ms"], gercek_hacim=e.piyasa == "VIOP")
+            yeni = katalog_barlari(df, zd, fark["ms"], gercek_hacim=e.piyasa == "VIOP", nokta=nokta)
             out |= {"yeni": len(yeni), "toplam": self.bar.yaz(e.kimlik, zd, yeni)}
         if zd != "1d" and self.bar.yol(e.kimlik, zd).exists():   # yeni bar gelmese de (ilk kurulumdan kalan seri)
             tum = self.bar.oku(e.kimlik, zd)

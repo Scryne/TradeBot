@@ -383,3 +383,34 @@ def test_a2_soru_tanimlari_spike04_ile_birebir():
     spec.loader.exec_module(mod)
     assert soru_sha(a2.SORULAR) == soru_sha({"etki": mod.ETKI, "aciliyet": mod.ACILIYET})
     assert a2.VETO == mod.VETO
+
+
+def test_model_yok_onlem_vetosu_ve_alarm(m, ayar):
+    """Kural 8 (2026-09-28 denetimi): Jev hata + yükseltme yok → canlı metinde süreli önlem vetosu, uyarı seli yok,
+    metin sonraki turda yeniden sorulur; geçmiş doldurmada önlem vetosu yazılmaz."""
+    import time as _t
+
+    from tradebot.zeka.servis import ONLEM_VETO_MS
+    with m.begin() as b:
+        b.execute(insert(enstruman).values(kimlik="BINANCE:ICXUSDT", piyasa="BINANCE", sembol="ICXUSDT", sinif="kripto",
+                                           takvim="kripto_7x24", para_birimi="USDT", kaynak="binance", durum="aktif",
+                                           meta={}, guncellendi=__import__("datetime").datetime.now()))
+    simdi = int(_t.time() * 1000)
+    http = SahteHttp([{"katalog": 161, "code": "c1", "baslik": "Binance Will Delist ICX", "govde": "ICX pairs removed.",
+                       "zaman": simdi - 60_000},
+                      {"katalog": 161, "code": "g1", "baslik": "Binance Will Delist ICX (old)", "govde": "ICX.",
+                       "zaman": simdi - 30 * 86_400_000}])
+    jev = SahteJev(hata="HTTPError: 503")
+    z = Zeka(m, JevIstemci(m, "jev-1.13.0", istemci=jev), Yukseltme(m, "u", [], None),
+             [BinanceDuyuru(HamDepo(ayar.veri_dizini, m), m, http)], {"jev": {"esik": 0.5}, "binance": {"kataloglar": [161]}})
+    z.tur()
+    with m.connect() as b:
+        v = b.execute(select(olay.c.tur, olay.c.gecerli_ms, olay.c.bitis_ms, olay.c.ayrinti)).all()
+    assert len(v) == 1 and v[0].tur == "veto" and v[0].ayrinti["onlem"]          # yalnız canlı metin, uyarı yok
+    assert v[0].bitis_ms - v[0].gecerli_ms == ONLEM_VETO_MS
+    assert "BINANCE:ICXUSDT" in ol.aktif_vetolar(m, v[0].gecerli_ms)
+    once = jev.cagri
+    z.tur()
+    assert jev.cagri > once                                                      # yeniden sorulur
+    with m.connect() as b:
+        assert b.execute(select(olay.c.id)).all().__len__() == 1                 # önlem vetosu tekrar yazılmaz

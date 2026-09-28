@@ -285,7 +285,7 @@ def veri_gece(dukascopy_butce_dk: float = typer.Option(240.0)) -> None:
 @veri_uygulama.command("zamanla")
 def veri_zamanla(
     saat: str = typer.Option("01:30", help="Her gün UTC HH:MM"),
-    hemen: bool = typer.Option(False, help="Başlarken bir kez hemen çalıştır"),
+    hemen: bool = typer.Option(False, help="Başlarken, son gece işi 20 saatten eskiyse bir kez hemen çalıştır"),
     dukascopy_butce_dk: float = typer.Option(240.0),
 ) -> None:
     """Gece işini her gün belirtilen UTC saatinde çalıştırır (servis olarak)."""
@@ -296,7 +296,7 @@ def veri_zamanla(
     a, m = _veri_baglam()
     kayitci = log("veri.zamanla")
     ss, dd = map(int, saat.split(":"))
-    if hemen:
+    if hemen and is_akisi.telafi_gerekli(m, datetime.now(UTC)):   # yalnız son gece işi 20 saatten eskiyse
         is_akisi.gece(a, m, dukascopy_butce_dk)
     while True:
         hedef = is_akisi.sonraki_calisma(datetime.now(UTC), ss, dd)

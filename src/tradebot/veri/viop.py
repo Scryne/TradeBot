@@ -75,7 +75,7 @@ def surekli(vadeli: pl.DataFrame, spot: pl.DataFrame, vadeler: list[int], pencer
         k = (1 + rv[i]) / (1 + rs[i])   # geçiş günü ayarlı getiri: (1 + r_v) / k − 1 = r_s
         carpan[:i] *= k
         gecisler.append({"vade_ms": e, "gecis_ms": int(t[i]), "vadeli": float(rv[i]), "spot": float(rs[i]), "k": float(k)})
-    fiyat = ["open", "high", "low", "close"]
+    fiyat = ["open", "high", "low", "close"] + (["spread"] if "spread" in j.columns else [])  # spread fiyat birimi
     out = j.with_columns([(pl.col(c) * pl.Series(carpan)).alias(c) for c in fiyat] + [pl.Series("ayar", carpan)]) \
         .drop("spot")
     delikler = [{"bas_ms": int(t[i - 1]), "bit_ms": int(t[i]), "gun": int(ara[i])} for i in np.flatnonzero(ara > delik_gun)]

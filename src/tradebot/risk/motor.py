@@ -1,7 +1,9 @@
 """Risk motoru, katman 1–4 (Final Doküman §Risk motoru). Emre giden tek yol `RiskMotoru.onayla`dır (değişmez kural 5).
 
 Asimetri (değişmez kural 7): riski AZALTAN emir (mutlak pozisyonu küçülten) frende, acil durdurmada, vetoda ve kol
-durdurmada da geçer; yalnız temel akıl kontrollerinden (fiyat bandı, geçerli miktar) geçmesi gerekir. Riski ARTIRAN
+durdurmada da geçer; yalnız geçerli miktar/fiyat ve çift emir kontrolünden geçmesi gerekir. Fiyat bandı yalnız riski
+ARTIRAN emre uygulanır (2026-09-28 denetimi: sert harekette karar fiyatı ile son fiyat %5'ten fazla ayrılınca kapatma
+emri de reddediliyordu; bant yanlış fiyatla büyük pozisyon açmayı önlemek içindir, küçültmeyi değil). Riski ARTIRAN
 emir bütün katmanlardan geçmek zorundadır ve miktarı tavanlara göre küçültülebilir.
 
 Portföy durumu (`PortfoyIzleyici`):
@@ -113,11 +115,11 @@ class RiskMotoru:
             return Karar(False, 0.0, ("geçersiz miktar ya da fiyat",), azaltan)
         if e.istemci_emir_id in self._goruldu:
             return Karar(False, 0.0, ("çift emir (aynı istemci emir kimliği)",), azaltan)
-        if abs(e.fiyat_tahmini / p.son_fiyat - 1) > a.fiyat_bandi:
-            return Karar(False, 0.0, (f"fiyat bandı dışı (±%{a.fiyat_bandi * 100:g})",), azaltan)
         if azaltan:
             self._kaydet(e)
             return Karar(True, e.miktar, ("riski azaltan emir",), True)
+        if abs(e.fiyat_tahmini / p.son_fiyat - 1) > a.fiyat_bandi:
+            return Karar(False, 0.0, (f"fiyat bandı dışı (±%{a.fiyat_bandi * 100:g})",), False)
 
         # --- Katman 1 (risk artıran) ---
         if not p.acik:

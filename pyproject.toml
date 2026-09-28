@@ -40,6 +40,7 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]   # test_rapor, test_telegram_bot `tests.test_canli`'dan yardımcı alır
 addopts = "-q"
 
 [tool.ruff]
