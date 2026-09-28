@@ -52,9 +52,12 @@ def mt5(a: Ayarlar, m: Engine, butce_dk: float = 60.0) -> dict:
     istemciler = {h: Mt5Istemci(u) for h, u in (("forex", a.mt5_kopru_forex), ("viop", a.mt5_kopru_viop)) if u}
     if not istemciler:
         return {"atlandi": "köprü tanımsız"}
+    from tradebot.veri.viop import xu030_surekli
+
     r = Mt5Veri(a.veri_dizini, m, istemciler).guncelle(butce_dk)
     return {"enstruman": len({x["kimlik"] for x in r}), "yeni_bar": sum(x.get("yeni", 0) for x in r),
-            "hata": [x for x in r if "hata" in x and x["hata"]][:5]}
+            "hata": [x for x in r if "hata" in x and x["hata"]][:5],
+            "xu030_surekli": xu030_surekli(BarDepo(a.veri_dizini), m)}
 
 
 def _zaman_dilimleri(kayit: dict) -> list[str]:
