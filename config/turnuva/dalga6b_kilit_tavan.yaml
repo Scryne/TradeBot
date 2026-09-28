@@ -1,0 +1,25 @@
+# Turnuva dalga 6b — kilit açılımı kolu (−7/0) risk motorunun tavanlarıyla: ÖN KAYIT (koşudan önce commit edilir).
+# Neden: paper'da emre giden tek yol risk motorudur (kural 5). Motorun varsayılan tavanları (tek enstrüman özkaynağın
+# %50'si, kol brütü 1x) BTC uzun bacağını en çok 5 açık olayla sınırlar; ön kayıtlı dalga 6 yalnız 3x brüt tavanıyla
+# ölçüldü (azami 11 açık olay). Tavanı yükseltmek riski artırır ve Scryne'ın onayını ister (kural 7); onun yerine kol
+# tavanlarla ölçülür. Bu ölçüm yeni bir denemedir (kural 10): aile aynı, DSR 7 denemeyle (dalga 6'nın 6'sı + bu).
+# Gerekçe ve sonuç: docs/turnuva/Dalga-6-Kilit.md §6b.
+
+dalga: 6b
+plan:
+  kimlik: 2026-09-29-d6b-kilit-tavan
+  aile: kilit_kisa
+  hipotez: >-
+    Dalga 6'nın A kolu (açılımdan 7 gün önce token perp kısa + BTC perp uzun, açılım günü kapat), risk motorunun
+    varsayılan tavanlarıyla (BTC bacağı ≤ özkaynağın %50'si, açık brüt ≤ 1x; tavan doluysa yeni olay kırpılır ya da
+    reddedilir) de kapılardan geçer. Sıfır hipotezi: getiri eşzamanlı çok olaylı dönemlerden gelir, tavanla kaybolur.
+
+olay: { kategoriler: [insiders, privateSale], asgari_oran: 0.01 }
+notional: 0.10
+maliyet: { ucret: 0.0005, kayma_token: 0.001, kayma_btc: 0.0001 }
+tavan: { azami_brut: 1.0, azami_btc: 0.5 }     # RiskAyar varsayılanı: kaldirac 1.0, enstruman_tavani 0.5
+donem: { bas: "2021-01-01", is_bitis: "2025-01-01", bit: "2026-09-20" }
+izgara: { giris: [-7], cikis: [0] }             # tek deneme: dalga 6'da seçilen kol, parametre değişmez
+onceki_dalgalar: [dalga6]                        # DSR için ailenin önceki denemeleri (data/turnuva/dalga6/*.json)
+olcut: { dsr_a: 0.95, yil_pozitif: 0.60, stres_maliyet: 2.0, en_kotu_hafta: -0.10, en_kotu_dusus: -0.30,
+         oos_asgari_yillik: 0.0 }

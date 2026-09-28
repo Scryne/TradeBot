@@ -83,10 +83,11 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
         except ValueError:
             pass
     kollar = []
+    tavan = d.get("tavan") or {}
     for p in izgara(d["izgara"]):
         t0 = time.perf_counter()
-        a = kl.KilitAyar(giris=p["giris"], cikis=p["cikis"], **(d.get("maliyet") or {}), notional=d["notional"])
-        a2 = kl.KilitAyar(giris=p["giris"], cikis=p["cikis"], notional=d["notional"],
+        a = kl.KilitAyar(giris=p["giris"], cikis=p["cikis"], **(d.get("maliyet") or {}), notional=d["notional"], **tavan)
+        a2 = kl.KilitAyar(giris=p["giris"], cikis=p["cikis"], notional=d["notional"], **tavan,
                           **{k: v * o["stres_maliyet"] for k, v in (d.get("maliyet") or {}).items()})
         seri, olay = kl.kos(ev, barlar, fundingler, btc, btc_f, a, bas, bit)
         seri2, _ = kl.kos(ev, barlar, fundingler, btc, btc_f, a2, bas, bit)
@@ -110,11 +111,16 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
                                 if kurulan.height > 2 else None},
                        "sure": time.perf_counter() - t0})
     sr = [k["tam"].get("sr_haftalik", 0.0) for k in kollar]
+    # Aynı ailenin önceki dalgaları (ör. 6b → 6): DSR bütün denemelerle sayılır (kural 10)
+    for onceki in d.get("onceki_dalgalar") or []:
+        for f in sorted((Path(veri_dizini) / "turnuva" / onceki).glob("*.json")):
+            sr.append(json.loads(f.read_text(encoding="utf-8"))["tam"].get("sr_haftalik", 0.0))
+    deneme_sayisi = len(sr)
     v = float(np.var(sr, ddof=1)) if len(sr) > 1 else 0.0
     out = []
     for k in kollar:
         g3, g4 = carpiklik_basiklik(k["h"])
-        dd = dsr(k["tam"].get("sr_haftalik", 0.0), len(k["h"]), len(kollar), v, g3, g4)
+        dd = dsr(k["tam"].get("sr_haftalik", 0.0), len(k["h"]), deneme_sayisi, v, g3, g4)
         yp = float(np.mean([x > 0 for x in k["yillik"].values()]))
         temel = (yp >= o["yil_pozitif"] and k["tam"].get("en_kotu_hafta", -1) >= o["en_kotu_hafta"]
                  and k["tam"].get("en_kotu_dusus", -1) >= o["en_kotu_dusus"] and k["stres"].get("yillik_bilesik", -1) > 0
@@ -124,7 +130,7 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
         ad = f"kilit(giris={k['p']['giris']},cikis={k['p']['cikis']})"
         sonuc = {"plan": plan["kimlik"], "kol": f"{ad}@BINANCEF:kilit@1d", "karar": kr,
                  "en_iyi": {"varyant": ad, "sharpe": k["tam"].get("sharpe"), "yillik_bilesik": k["tam"].get("yillik_bilesik")},
-                 "dsr": {"dsr": dd, "deneme": len(kollar), "sr_esik": beklenen_max_sr(len(kollar), v)},
+                 "dsr": {"dsr": dd, "deneme": deneme_sayisi, "sr_esik": beklenen_max_sr(deneme_sayisi, v)},
                  "tam": k["tam"], "orneklem_ici": k["is"], "kor": k["kor"], "stres_2x": k["stres"], "yillik": k["yillik"],
                  "yil_pozitif_orani": yp, "olay": k["olay"], "veri_hash": vh}
         if defter is not None:

@@ -38,7 +38,7 @@ def test_kisa_bacak_dususten_kazanir_funding_alir_btc_notr():
     birim = 7 * 0.01 + 7 * 0.0001 - 2 * (a.ucret + a.kayma_token) - 2 * (a.ucret + a.kayma_btc)
     assert o["getiri"][0] == pytest.approx(birim, rel=1e-3)
     assert seri["getiri"].sum() == pytest.approx(0.10 * birim, rel=1e-3)   # portföy: notional × birim
-    assert len(seri) == 7 and seri["brut"].max() == pytest.approx(0.2)
+    assert len(seri) == 8 and seri["brut"].max() == pytest.approx(0.2)   # 7 gün + çıkış günü (maliyet)
 
 
 def test_eksik_perp_fiyat_ve_tavan():
@@ -67,3 +67,51 @@ def test_defillama_sayfasi_ve_carpanli_sembol():
                          "status": "TRADING"}]}
     p = bv.usdt_perpler(lambda u: json.dumps(info).encode())
     assert p["PEPE"]["sembol"] == "1000PEPEUSDT" and p["TIA"]["sembol"] == "TIAUSDT"
+
+
+# --- saf karar çekirdeği (cekirdek/kilit.py): backtest ve paper aynı fonksiyon ---
+from tradebot.cekirdek import kilit as ck  # noqa: E402
+
+
+def _olay(s, gun):
+    return ck.Olay(s, T0 + gun * G, 0.05)
+
+
+def test_cekirdek_giris_cikis_ve_islem_gormeyen():
+    k = ck.KilitKural(giris=-7, cikis=0, notional=0.1)
+    g = ck.gun_karari(T0 + 3 * G, [_olay("A", 10), _olay("B", 10), _olay("C", 11)], [], {"A"}, k)
+    assert [p.sembol for p in g.ac] == ["A"] and g.ac[0].cikis_ms == T0 + 10 * G
+    assert [(o.sembol, n) for o, n in g.red] == [("B", "islem_gormuyor")]          # C bugün değil
+    # aynı olay ikinci kez açılmaz; çıkış günü gelince kapanır; işlem görmez olan erken kapanır
+    g2 = ck.gun_karari(T0 + 3 * G, [_olay("A", 10)], g.acik, {"A"}, k)
+    assert not g2.ac and g2.acik == g.acik
+    assert [n for _, n in ck.gun_karari(T0 + 10 * G, [], g.acik, {"A"}, k).kapat] == ["cikis"]
+    assert [n for _, n in ck.gun_karari(T0 + 5 * G, [], g.acik, set(), k).kapat] == ["islem_gormuyor"]
+
+
+def test_cekirdek_tavanlar_btc_ve_brut():
+    k = ck.KilitKural(notional=0.1, azami_brut=1.0, azami_btc=0.25)
+    olaylar = [_olay(s, 10) for s in "ABCD"]
+    g = ck.gun_karari(T0 + 3 * G, olaylar, [], set("ABCD"), k)
+    assert [round(p.notional, 9) for p in g.ac] == [0.1, 0.1, 0.05]                # BTC ≤ 0,25: üçüncü kırpılır
+    assert [(o.sembol, n) for o, n in g.red] == [("D", "tavan")]
+    k2 = ck.KilitKural(notional=0.1, azami_brut=0.3)
+    assert [round(p.notional, 9) for p in ck.gun_karari(T0 + 3 * G, olaylar, [], set("ABCD"), k2).ac] == [0.1, 0.05]
+
+
+def test_cekirdek_durdurma_hepsini_kapatir_fren_yeni_acmaz():
+    k = ck.KilitKural()
+    acik = ck.gun_karari(T0 + 3 * G, [_olay("A", 10)], [], {"A", "B"}, k).acik
+    g = ck.gun_karari(T0 + 4 * G, [_olay("B", 11)], acik, {"A", "B"}, k, hepsini_kapat=True)
+    assert [n for _, n in g.kapat] == ["durdur"] and not g.acik and g.red[0][1] == "yeni_risk_yok"
+    g = ck.gun_karari(T0 + 4 * G, [_olay("B", 11)], acik, {"A", "B"}, k, yeni_risk=False)
+    assert not g.kapat and g.acik == acik and g.red[0][1] == "yeni_risk_yok"       # fren: mevcut kalır, yeni yok
+
+
+def test_cekirdek_kural_dogrulama():
+    with pytest.raises(ValueError):
+        ck.KilitKural(azami_brut=5.0)              # ≥ 5x hiçbir modda yok (kural 6)
+    with pytest.raises(ValueError):
+        ck.KilitKural(giris=0, cikis=0)
+    with pytest.raises(ValueError):
+        ck.gun_karari(T0 + 5, [], [], set(), ck.KilitKural())
