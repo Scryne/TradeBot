@@ -1,0 +1,27 @@
+# Dalga 3 sınıf kırılımı: BİLGİ (ön kayıtta vaat edildi, docs/turnuva/Dalga-3.md › Raporlanacak). Aday değildir; hiçbir
+# sonucu paper'a giremez. Varyant dalga 3'ün en iyisi (ma_yon 25/200), sınıflar ayrı gruplar. 3 deneme defterde sayılır.
+dalga: 3k
+veri_bitis: "2026-01-01"
+frenler: true
+boyut: { hedef_vol: 0.20, kaldirac: 3.0, vol_pencere_gun: 90, bant: 0.25 }
+walk_forward: { is_yil: 3, oos_yil: 1 }
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0, risksiz_yillik: 0.0 }
+planlar:
+  trend:
+    kimlik: 2026-09-28-d3-kirilim
+    hipotez: >-
+      Bilgi amaçlı: dalga 3'ün en iyi varyantı (ma_yon 25/200) sınıf başına (endeks, metal, döviz) ayrı koşulur;
+      hangi sınıfın sepeti taşıdığı ya da batırdığı görülür. Aday değildir.
+gruplar:
+  endeks: { kimlikler: [VADELI:ES, VADELI:NQ, VADELI:YM], asgari_gecmis_gun: 60, yon: long_short, zd: [1d] }
+  metal:  { kimlikler: [VADELI:XAU, VADELI:XAG], asgari_gecmis_gun: 60, yon: long_short, zd: [1d] }
+  doviz:
+    kimlikler: [VADELI:EURUSD, VADELI:GBPUSD, VADELI:USDJPY, VADELI:AUDUSD, VADELI:USDCAD, VADELI:USDCHF]
+    asgari_gecmis_gun: 60
+    yon: long_short
+    zd: [1d]
+kollar:
+  - strateji: ma_yon
+    gruplar: [endeks, metal, doviz]
+    zd: [1d]
+    izgara: { hizli_gun: [25], yavas_gun: [200] }
