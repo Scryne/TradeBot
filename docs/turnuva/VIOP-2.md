@@ -35,6 +35,10 @@ Izgara (8): ufuk 0 / 20 / 60 / 120 × oynaklık filtresi yok / var. `ufuk 0, pen
 `VIOP:doviz_vadeli`: komisyon 4 bps + BSMV, yarım spread 1 bps (ölçülen ~0,3), kayma 1 bps; aylık devir yıllık %1,5.
 Stres 2 kat.
 
+**Değişiklik (2026-09-28, koşudan önce, sonuç görülmeden):** Spike 08 demo işleminde komisyon ölçüldü (F_USDTRY 1
+kontrat, taraf başı 7,91 TL = 1,5 bps + BSMV); model 4 → 2 bps + BSMV oldu. Taraf başı maliyet 6,2 → 4,1 bps. 2 kat stres
+(8,2 bps) ön kayıttaki maliyetin üstünde kalır: stres testini geçen bir varyant ön kayıt maliyetinde de geçer.
+
 ## Raporlanacak (kapı değil, bilgi)
 
 En iyi varyantın paper kollarıyla (BTC/ETH trend backtest'i) haftalık korelasyonu ve 50/50 karışımın Sharpe'ı.
