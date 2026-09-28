@@ -126,6 +126,19 @@ services:
     depends_on:
       goc: { condition: service_completed_successfully }
 
+  pano:
+    <<: *ortak
+    # Faz 10: salt okunur web pano. Port yalnız 127.0.0.1'e açılır (LAN'a değil); telefona/ana bilgisayara Tailscale
+    # taşır: host'ta bir kez `tailscale serve --bg 8080` (tools/host/pano_tailscale.ps1). Yedek dizini sağlık için.
+    command: ["tradebot", "pano", "calis", "--port", "8080"]
+    ports: ["127.0.0.1:8080:8080"]
+    volumes:
+      - veri:/app/data
+      - log:/app/log
+      - ../yedek:/yedek:ro
+    depends_on:
+      goc: { condition: service_completed_successfully }
+
   paper:
     <<: *ortak
     # Faz 7: paper düğümü (Nautilus sandbox, Binance canlı veri). Kararlar her 1h kapanışında; defter PostgreSQL'de.

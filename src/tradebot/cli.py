@@ -754,3 +754,48 @@ def telegram_calis() -> None:
 
     kur(ayarlar())
     calistir()
+
+
+pano_uygulama = typer.Typer(help="Web pano (Faz 10): salt okunur, yalnız Tailscale", no_args_is_help=True)
+uygulama.add_typer(pano_uygulama, name="pano")
+
+
+@pano_uygulama.command("calis")
+def pano_calis(
+    port: int = typer.Option(8080, help="Dinlenecek port"),
+    adres: str = typer.Option("0.0.0.0", help="Konteyner içinde tüm arayüzler; compose portu yalnız 127.0.0.1'e açar"),
+    arayuz: str = typer.Option("pano/dist", help="Derlenmiş arayüz dizini (vite build)"),
+    ornek: bool = typer.Option(False, help="Yerel geliştirme: sentetik SQLite veriyle çalış (canlıya dokunmaz)"),
+) -> None:
+    """Pano sunucusu (compose `pano`)."""
+    import uvicorn
+
+    from tradebot.pano.sunucu import uygulama as pano_app
+
+    a = ayarlar()
+    kur(a)
+    if ornek:
+        import tempfile
+
+        from tradebot.pano.ornek import kur as ornek_kur
+
+        dizin = Path(tempfile.mkdtemp(prefix="pano_ornek_"))
+        m = ornek_kur(f"sqlite:///{dizin / 'ornek.db'}", int(time.time() * 1000), veri_dizini=dizin)
+        a = a.model_copy(update={"veri_dizini": dizin})
+
+        from tradebot.pano.sunucu import SaglikOnbellek
+        from tradebot.saglik import Sonuc
+
+        saglik_ = SaglikOnbellek(a, kontrol=lambda _a: [
+            Sonuc("dns", "OK", "en yavaş data.binance.vision 0.42 sn"), Sonuc("saat", "OK", "en büyük kayma +0.017 sn"),
+            Sonuc("veritabani", "OK", "PostgreSQL 17 · zincir sağlam"), Sonuc("disk", "OK", "boş 980 GB"),
+            Sonuc("sirlar", "OK", "tümü tanımlı"), Sonuc("paper", "OK", "son özkaynak işareti 8 dk önce"),
+            Sonuc("gece_isi", "UYARI", "son gece işi kaydı 27 saat önce"), Sonuc("yedek", "OK", "son yedek 9 saat önce"),
+            Sonuc("mt5", "OK", "forex bağlı · viop bağlı")])
+    else:
+        from tradebot.db import motor as db_motor
+
+        m = db_motor(a)
+        saglik_ = None
+    app = pano_app(m, a, Path(arayuz), saglik_onbellek=saglik_)
+    uvicorn.run(app, host=adres, port=port, log_level="warning")

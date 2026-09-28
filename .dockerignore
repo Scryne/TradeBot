@@ -9,3 +9,5 @@ runs
 .env
 .env.*
 !.env.example
+pano/node_modules
+pano/dist

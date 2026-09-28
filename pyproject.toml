@@ -11,6 +11,7 @@ dependencies = [
     "alembic>=1.20.0",
     "borsapy>=0.11.0",
     "exchange-calendars>=4.13.2",
+    "fastapi>=0.141.1",
     "httpx>=0.28.1",
     "nautilus-trader==2.0.0rc5",
     "pandas>=3.0.6",
@@ -23,6 +24,7 @@ dependencies = [
     "structlog>=26.1.0",
     "typer>=0.27.2",
     "typesafe-sdk==0.7.1",
+    "uvicorn>=0.54.0",
 ]
 
 [project.scripts]

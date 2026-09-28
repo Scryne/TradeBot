@@ -25,7 +25,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 7 | Paper canlı — kripto + ABD ETF | ✅ Tamamlandı | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
 | 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | 🔄 Devam Ediyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
 | 9 | Operasyon: gözetmen, Telegram, raporlar | 🔄 Devam Ediyor | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
-| 10 | Web pano | ⏳ Bekliyor | DESIGN.md dolu; PnL, pozisyon, turnuva tablosu, veto geçmişi, sağlık; Tailscale üzerinden telefondan erişim |
+| 10 | Web pano | 🔄 Devam Ediyor | DESIGN.md dolu; PnL, pozisyon, turnuva tablosu, veto geçmişi, sağlık; Tailscale üzerinden telefondan erişim |
 | 11 | Paper turnuvası — 12 hafta | 🔄 Devam Ediyor | 12 hafta kesintisiz paper; kademeli sermaye çalıştı; hangi kolların kapıyı geçtiği ve Jev katkısı raporlandı; maliyet varsayımları ölçüldü |
 | 12 | Gerçek para (koşullu) | ⏳ Bekliyor | Kanıt kapısı (DSR ≥ 0,95 ya da paper PSR(0) ≥ 0,95; mikro pilot yalnız Scryne'ın açık kararıyla) + aracı kurum/borsa + anahtar (çekim kapalı, IP kısıtlı) + vergi netliği; sabit tavanlı mikro sermaye; ilk emir Scryne onayıyla |
 | 13 | Sonraki dalgalar (koşullu) | ⏳ Bekliyor | Ölçüm fırsat gösterirse: ABD tek hisseleri (ücretli veri), CME vadelileri (Databento), VİOP; her biri ayrı kararla |
@@ -381,6 +381,16 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 - **İşler:** `DESIGN.md` (create-design-md + ui-ux-pro-max); FastAPI + arayüz; frontend denetim pasları.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
+  - 2026-09-28: `DESIGN.md` dolduruldu (Haliç gecesi paleti, Big Shoulders / Onest / Azeret Mono, imza öğe karar
+    şeridi). Pano yazıldı: `src/tradebot/pano/` (FastAPI, yalnız GET; POST/PUT/DELETE 405; sır ve ham ölçüm yanıta girmez;
+    CSP), `pano/` (Vite + React + Tailwind v4 + shadcn/Base UI). Bölümler: durum cümlesi + 12 haftalık turnuva
+    cetveli, karar şeridi (72 saat × kol: maruziyet, veto, fren, dolum), kollar (Jev'li/Jev'siz ikiz çizgi), pozisyon ve
+    tavanlar, Jev vetoları, araştırma defteri (plan + turnuva sonuç dosyaları), sağlık. Kol çekmecesi: saatlik getiri,
+    son kararlar ve dolumlar. Salt okunur: buton, durdurma, ayar yok (Scryne'la konuşuldu).
+  - Yerel geliştirme: `tradebot pano calis --ornek` (sentetik SQLite; canlıya yazmaz) + `npm run dev` (pano/).
+    Testler `tests/test_pano.py`. Görsel doğrulama 4 genişlikte temiz; `soluk` renk AA için açıldı (4,5:1).
+  - Kalan: host'a dağıtım + `tools/host/pano_tailscale.ps1`; Scryne'ın telefonuna Tailscale (aynı hesap) → telefondan
+    erişim bitti kriterinin son parçası.
 
 ### Faz 11: Paper turnuvası — 12 hafta
 - **İşler:** Sistem kendi başına çalışır; haftalık raporlar okunur; arızalar düzeltilir; kademeli sermaye
