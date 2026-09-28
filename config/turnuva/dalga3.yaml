@@ -1,0 +1,47 @@
+# Turnuva dalga 3 — çok varlıklı vadeli trend: ÖN KAYIT (koşudan önce commit edilir, koşu sırasında değişmez).
+# Gerekçe: docs/turnuva/Dalga-3.md. Seriler: veri/vadeli.py (`tradebot veri vadeli`); getiri nakit üstü (fazla getiri).
+# Izgaralar ve boyut dalga 2 ile AYNI (yeni ayar araması yok); değişen yalnız enstrüman kümesi.
+
+dalga: 3
+veri_bitis: "2026-01-01"        # Dukascopy günlük spot 2025-12-31'de bitiyor; 2026 kör bekletme (Dalga-3.md)
+frenler: true
+boyut:
+  hedef_vol: 0.20
+  kaldirac: 3.0
+  vol_pencere_gun: 90
+  bant: 0.25
+walk_forward: { is_yil: 3, oos_yil: 1 }
+# risksiz_yillik 0: seriler vadeli fazla getirisidir (faiz farkı serinin içinde; Dalga-1 ek 4)
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0, risksiz_yillik: 0.0 }
+
+planlar:
+  trend:
+    kimlik: 2026-09-28-d3-vadeli-trend
+    hipotez: >-
+      ABD endeks vadelileri, altın, gümüş ve altı majör döviz vadelisinden oluşan sepette zaman serisi trendi (iki
+      yönlü, oynaklık hedefli), maliyet ve kurum payı sonrası pozitif ve walk-forward'da kalıcıdır; kripto trend
+      kollarıyla haftalık korelasyonu düşüktür. Dalga 2'deki ETF sürümünden farkı: döviz eklenir, kısa pozisyon
+      taşımayı kazanır, endeks tarafı gerçek vadeli fazla getirisidir. Sıfır hipotezi: vermez.
+
+gruplar:
+  vadeli_sepet:
+    kimlikler: [VADELI:ES, VADELI:NQ, VADELI:YM, VADELI:XAU, VADELI:XAG, VADELI:EURUSD, VADELI:GBPUSD,
+                VADELI:USDJPY, VADELI:AUDUSD, VADELI:USDCAD, VADELI:USDCHF]
+    asgari_gecmis_gun: 60
+    yon: long_short
+    zd: [1d]
+
+# 16 deneme (dalga 2 ızgaraları)
+kollar:
+  - strateji: tsmom
+    gruplar: [vadeli_sepet]
+    zd: [1d]
+    izgara: { ufuk_gun: [20, 60, 120, 250] }
+  - strateji: ma_yon
+    gruplar: [vadeli_sepet]
+    zd: [1d]
+    izgara: { hizli_gun: [10, 25], yavas_gun: [50, 100, 200] }
+  - strateji: donchian_ls
+    gruplar: [vadeli_sepet]
+    zd: [1d]
+    izgara: { giris_gun: [20, 55, 100], cikis_gun: [10, 20] }

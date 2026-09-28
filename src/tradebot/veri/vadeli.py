@@ -125,6 +125,9 @@ def kur(depo, motor, faiz_csv: bytes) -> dict:
         if v.is_empty() or sp.is_empty():
             rapor[ad] = {"atlandi": "kaynak yok"}
             continue
+        # spotun olmadığı dönemde geçiş ayıklanamaz: seri spotun kapsadığı aralığa kırpılır (YM spotu 2013'ten;
+        # Dukascopy günlük dosyaları yıllık yayımlanır, 2026 henüz yok)
+        v = v.filter(pl.col("acilis_ms").is_between(sp["acilis_ms"].min(), sp["acilis_ms"].max()))
         vadeler = cme_vadeleri(int(v["acilis_ms"].min()), int(v["acilis_ms"].max()) + 30 * GUN_MS)
         seri, r = pencere_ayari(v, sp, vadeler)
         rapor[ad] = r
