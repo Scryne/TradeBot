@@ -79,6 +79,7 @@ def saglik_komutu(
     izleyici = saglik.DurumIzleyici()
     bildirici = Bildirici(a)
     triyaj = saglik.LogTriyaj(a.log_dizini) if dongu and a.log_dizini is not None else None
+    gozetmen = _gozetmen_kur(a) if dongu and a.ortam == "host" and a.veritabani_url is not None else None
     while True:
         sonuclar = saglik.hepsi(a)
         if json_cikti:
@@ -101,6 +102,8 @@ def saglik_komutu(
             bildirici.gonder("KRITIK", f"{h['dosya']} · {h['bilesen']} · {h['olay']}\n"
                              f"{json.dumps(h['ozet'], ensure_ascii=False, default=str)[:600]}",
                              anahtar=f"log:{h['bilesen']}:{h['olay']}")
+        if gozetmen is not None:
+            _gozetmen_tur(gozetmen, bildirici, kayitci)
         if dongu and saglik.olu_adam(a, sonuclar) is False:
             kayitci.warning("olu_adam_sinyali_gitmedi")
         if dongu and a.ortam == "host" and a.veritabani_url is not None:
@@ -109,6 +112,48 @@ def saglik_komutu(
         if not dongu:
             raise typer.Exit(saglik.cikis_kodu(sonuclar))
         time.sleep(dongu)
+
+
+def _gozetmen_kur(a, **ayar):
+    from tradebot.arastirma.defter import kod_surumu
+    from tradebot.canli.gozetmen import Gozetmen, binance_kotasyon
+    from tradebot.db import motor as db_motor
+    from tradebot.veri.http import NazikIstemci
+
+    return Gozetmen(db_motor(a), binance_kotasyon(NazikIstemci("gozetmen", deneme=3, zaman_asimi=15).al), kod_surumu(),
+                    **ayar)
+
+
+def _gozetmen_tur(g, bildirici, kayitci) -> dict:
+    """Bağımsız gözetmen turu (katman 5): donma varsa kapatır ve KRİTİK bildirir; hata da KRİTİK (kapatılamadı)."""
+    try:
+        r = g.kontrol()
+    except Exception as e:  # noqa: BLE001
+        kayitci.error("gozetmen_hatasi", hata=f"{type(e).__name__}: {e}"[:300])
+        bildirici.gonder("KRITIK", f"Gözetmen kontrol edemedi ya da kapatamadı: {type(e).__name__}: {e}"[:400],
+                         anahtar="gozetmen_hata")
+        return {"durum": "hata"}
+    if r["durum"] == "donma_suphesi":
+        kayitci.warning("gozetmen_donma_suphesi", **r)
+    elif r["durum"] == "donma" and (r.get("kapatilan") or r.get("durdurulan")) and not r.get("kuru"):
+        parca = [f"{kol} {kim.split(':')[-1]} {v['adet']:+.5g}" for kol, p in r["kapatilan"].items()
+                 for kim, v in p.items()]
+        bildirici.gonder("KRITIK", f"Paper motoru {r['yas_dk']:.0f} dakikadır kalp atışı yazmıyor: donmuş sayıldı.\n"
+                         f"Pozisyonlar defterde kapatıldı: {'; '.join(parca) or 'açık pozisyon yoktu'}\n"
+                         f"{len(r['durdurulan'])} kol durduruldu; yeniden açmak için /devam <kol> (onaylı).")
+    return r
+
+
+@uygulama.command("gozetmen")
+def gozetmen_komutu(
+    kuru: bool = typer.Option(True, "--kuru/--gercek", help="Tatbikat: tespit et, yazma (varsayılan)"),
+    esik_dk: float = typer.Option(125.0, help="Kalp atışı bu kadar dakikadan eskiyse donma"),
+) -> None:
+    """Bağımsız gözetmenin tek turu (tatbikat için; bekçi bunu her turda kendisi yapar). Isınma ve tur onayı atlanır."""
+    a = ayarlar()
+    kur(a)
+    g = _gozetmen_kur(a, kuru=kuru, donma_ms=int(esik_dk * 60_000), onay_tur=1, isinma_sn=0)
+    _yazdir(g.kontrol())
 
 
 def gunluk_ozet_zamani(simdi_ms: int, sessiz_bitis_saat: int, veri_dizini) -> Path | None:

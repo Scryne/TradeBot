@@ -56,6 +56,7 @@ from tradebot.canli import dagitici as dg
 from tradebot.canli import karar as kr
 from tradebot.canli.bar_akisi import CanliBarlar
 from tradebot.canli.defter import PaperDefter
+from tradebot.canli.gozetmen import NEDEN as GOZETMEN_NEDEN
 from tradebot.canli.kollar import AGRESIF, PORTFOY, PaperKol
 from tradebot.kayit import log
 from tradebot.risk.motor import Durum, EmirIstegi, Piyasa, Portfoy, RiskAyar, RiskMotoru
@@ -137,6 +138,13 @@ class Beyin:
             if o.kol in self.durum and o.tur == "durdur" and o.ayrinti.get("neden") != "mutabakat":
                 self.durdurulan.add(o.kol)
                 _log.warning("kol_elle_durduruldu", kol=o.kol, neden=o.ayrinti.get("neden"))
+                if o.ayrinti.get("neden") == GOZETMEN_NEDEN:
+                    # Bağımsız gözetmen motor donmuş sanıp kolun pozisyonunu defterde kapattı; motor sonradan çözüldü.
+                    # Defter kaynaktır: bellek defterden yeniden kurulur, sandbox toparlanmayla deftere eşitlenir.
+                    kol = next(k for k in self.kollar if k.ad == o.kol)
+                    self.durum[o.kol] = self.defter.durum(kol)
+                    self.toparla([o.kol])
+                    _log.error("gozetmen_kapatmasi_uygulandi", kol=o.kol)
             elif o.kol in self.durum and o.tur == "devam":
                 self.durdurulan.discard(o.kol)
                 _log.warning("kol_elle_devam", kol=o.kol)
@@ -266,13 +274,16 @@ class Beyin:
                 _log.error("mutabakat_farki_kol_durdu", kol=kol_ad, fark=f)
         return farklar
 
-    def toparla(self) -> None:
-        """Sandbox boş açılır: defterdeki pozisyonları kurar (tur=toparlanma)."""
+    def toparla(self, kol_adlari: list[str] | None = None) -> None:
+        """Sandbox'ı deftere eşitler (tur=toparlanma): açılışta boş sandbox'a defterdeki pozisyonlar kurulur; gözetmen
+        kapatmasından sonra sandbox'ta kalan pozisyon kapatılır (bu yüzden bütün enstrümanlarda fark alınır)."""
         for kol in self.kollar:
+            if kol_adlari is not None and kol.ad not in kol_adlari:
+                continue
             d = self.durum[kol.ad]
             s = self.stratejiler[kol.ad]
-            for kim, a in d.adet.items():
-                fark = a - s.pozisyon(kim)
+            for kim in sorted(set(self.kimlikler) | set(d.adet)):
+                fark = d.adet.get(kim, 0.0) - s.pozisyon(kim)
                 if abs(fark) >= s.adim(kim):
                     self.emir_ver(kol, None, kim, fark, self.son_fiyat.get(kim, 0.0) or 1.0, 0, Durum.NORMAL, set(),
                                   "toparlanma")
