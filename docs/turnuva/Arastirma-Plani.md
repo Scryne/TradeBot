@@ -35,6 +35,17 @@ ve 50/50 karışımın Sharpe'ını da raporlar (kapı değil, bilgi).
 | 2 | **Dalga 3 — çok varlıklı vadeli trend** | Yönetilen vadeli fonların klasik kaynağı: endeks, emtia, metal, döviz vadelilerinde zaman serisi trendi. Kripto trendiyle korelasyonu düşük, kriz dönemlerinde pozitif. Dalga 1'in CFD sürümü finansmanda boğuldu; vadelide finansman yok (faiz farkı serinin içinde). | NCM sürekli grafikler (`ES!`, `NQ!`, `YM!`, `CL!`; geçiş ayarı gerekir), GOLD/SILVER, FX, VİOP XU030 sürekli | ⏳ |
 | 3 | **Olay tabanlı (Jev)** | C1 ölçümü: A1 vetosu sonrası 7 günde varlık BTC'ye göre −%21. Spot'ta açığa satış yok; kullanım alanı veto (zaten canlı) ve gelecekte vadeli/perp. | Jev olayları + Binance | ⏳ (araç gelince) |
 
+### Dalga 3 tasarım notu (veri)
+
+- NCM'nin `ES!`/`NQ!`/`YM!`/`CL!` sürekli grafiklerinde vade geçişinin ayarlı olup olmadığı bilinmiyor; CME kontratları
+  3. Cuma'da vadelenir (VİOP takvim kuralı uygulanamaz); tek kontrat geçmişi yalnız birkaç ay. Önce ölçülür (spotla
+  geçiş günlerinde sıçrama var mı).
+- Yedek yol, **fazla getiri vekili:** vadeli getirisi ≈ spot getiri − (risksiz faiz − temettü/depolama). Dukascopy'nin
+  2010'dan endeks/emtia/metal/FX saatlik verisi + günlük risksiz faiz serisi (FRED T-bill; FX'te iki ülke faizi) ile
+  vekil seri kurulur. Dalga 1'in CFD kolları finansmanı hem uzun hem kısa pozisyona aynı yönde (%6) yazdı; vadelide kısa
+  pozisyon taşımayı kazanır. Bu fark dalga 1'in "CFD'de trend finansmanda boğuldu" sonucunun vadeliye taşınamayacağını
+  gösterir: dalga 3 bunu ayrıca sınar.
+
 Bir dalgadan B çıkarsa: MT5 canlı bar akışı paper düğümüne bağlanır (Faz 8'in kalan işi), kol paper'a girer. Bu iş
 B çıkmadan yapılmaz (kullanılmayan kod yazılmaz).
 

@@ -52,6 +52,8 @@ Betikler: `tools/host/baslangic.ps1` (bir kez, elle), `tools/host/kurulum.ps1` (
   düz metin yok). Microsoft hesabında "yalnız Windows Hello ile giriş" kapatıldı (`DevicePasswordLessBuildVersion=0`).
   Yeniden başlatma testi: açılış → otomatik oturum → servisler 57 sn'de geri.
 - Host: 192.168.1.4 (yerel), Tailscale 100.83.56.99. SSH takma adı `tradebot-host`.
+- Ev dışından yönetim (2026-09-28): ana bilgisayara Tailscale (aynı hesap) + host'ta bir kez `tools/host/tailscale_ssh.ps1`
+  (SSH'a 100.64.0.0/10'dan izin). Takma ad `tradebot-host-ts`; `guncelle.ps1 -Hedef tradebot-host-ts`.
 
 ## Yedek ve bekçi (2026-09-27 denetimi)
 
