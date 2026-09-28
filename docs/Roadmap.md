@@ -24,7 +24,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 6 | Zekâ katmanı (Jev) | 🔄 Devam Ediyor | Toplayıcılar (Binance, KAP, RSS, Fed/ECB/TCMB); Jev servisi + NVIDIA yükseltme; A1, A2 canlı; B1 çapraz kontrolü; yargılar dondurulabiliyor; C1–C2 ölçüldü (A4, A5, D3, B2, B4 girdilerinin doğduğu faza taşındı, 2026-09-27) |
 | 7 | Paper canlı — kripto + ABD ETF | ✅ Tamamlandı | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
 | 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | 🔄 Devam Ediyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
-| 9 | Operasyon: gözetmen, Telegram, raporlar | 🔄 Devam Ediyor | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
+| 9 | Operasyon: gözetmen, Telegram, raporlar | ✅ Tamamlandı | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
 | 10 | Web pano | 🔄 Devam Ediyor | DESIGN.md dolu; PnL, pozisyon, turnuva tablosu, veto geçmişi, sağlık; Tailscale üzerinden telefondan erişim |
 | 11 | Paper turnuvası — 12 hafta | 🔄 Devam Ediyor | 12 hafta kesintisiz paper; kademeli sermaye çalıştı; hangi kolların kapıyı geçtiği ve Jev katkısı raporlandı; maliyet varsayımları ölçüldü |
 | 12 | Gerçek para (koşullu) | ⏳ Bekliyor | Kanıt kapısı (DSR ≥ 0,95 ya da paper PSR(0) ≥ 0,95; mikro pilot yalnız Scryne'ın açık kararıyla) + aracı kurum/borsa + anahtar (çekim kapalı, IP kısıtlı) + vergi netliği; sabit tavanlı mikro sermaye; ilk emir Scryne onayıyla |
@@ -384,7 +384,12 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - 2026-09-28 "habere kör" mod ✅ (Final Doküman katman 5): zekâ servisi her tur `data/nabiz/zeka.json` yazar; paper
     karar anında okur. Nabız 15 dk'dan eski, Binance duyuruları çekilemiyor ya da son Jev çağrısı hatalıysa Jev'li
     kollarda yeni risk yarım boyut (mevcut pozisyon korunur). Karar kaydında `habere_kor`. Parity varsayılanla korunur.
-  - Faz 9'da kalan: arıza tatbikatları (donma tatbikatı 2026-09-28 21:00), D1 Jev log triyajı.
+  - 2026-09-28 arıza tatbikatı ✅ (`docs/host/Tatbikat-2026-09-28.md`): donma (gözetmen yakaladı), paper öldürme,
+    veritabanı kesintisi. İki açık bulundu ve düzeltildi: kaçan kapanış (websocket yeniden bağlanınca kaçan bar olayı
+    gelmiyordu → dakikalık denetim) ve PID 1'in sinyali yok sayması (`init: true`, paper `SIGINT`).
+  - D1 Jev log triyajı ertelendi (kullanılmayan kod yazılmaz): host log'unda yalnız 7 hata, hepsi Dukascopy 503; mevcut
+    `LogTriyaj` + 1 saatlik susturma yetiyor. Hata çeşitliliği artınca gerçek örneklerle kurulur.
+  - **Faz 9 kapandı (2026-09-28).**
 
 ### Faz 10: Web pano
 - **İşler:** `DESIGN.md` (create-design-md + ui-ux-pro-max); FastAPI + arayüz; frontend denetim pasları.
