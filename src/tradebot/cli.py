@@ -361,6 +361,18 @@ def veri_deribit(
     _yazdir(ozet)
 
 
+@veri_uygulama.command("kilit")
+def veri_kilit() -> None:
+    """Dalga 6: DefiLlama kilit açılım takvimi + olaylı token'ların Binance perp günlük mumu ve funding'i → data/kilit/."""
+    from tradebot.arastirma.kilit_dalga import hazirla
+    from tradebot.veri.depo import HamDepo
+    from tradebot.veri.http import NazikIstemci
+
+    a, m = _veri_baglam()
+    _yazdir(hazirla(a.veri_dizini, HamDepo(a.veri_dizini, m), NazikIstemci("binancef", aralik_sn=0.25, zaman_asimi=120).al,
+                    log("veri.kilit")))
+
+
 @veri_uygulama.command("mt5")
 def veri_mt5(butce_dk: float = typer.Option(60.0, help="Zaman bütçesi (dakika)")) -> None:
     """NCM MT5 (forex CFD + VİOP) barları köprüden kataloğa (1m, 1h, 1d)."""
@@ -505,6 +517,22 @@ def arastirma_opsiyon(
                    f"DD {k['en_kotu_dusus']:.0%}  en kötü hf {k['en_kotu_hafta']:+.1%}  DSR {r['dsr']['dsr']:.2f}  "
                    f"kör yıllık {o.get('yillik_bilesik', float('nan')):+.1%}  stres {r['stres_2x']['yillik_bilesik']:+.1%}  "
                    f"trend kor {r['trend_korelasyonu'] if r['trend_korelasyonu'] is None else round(r['trend_korelasyonu'], 2)}")
+
+
+@arastirma_uygulama.command("kilit")
+def arastirma_kilit(dosya: str = typer.Option("config/turnuva/dalga6_kilit.yaml")) -> None:
+    """Dalga 6 — kilit açılımı öncesi perp kısa (BTC ile nötr): ön kayıtlı ızgara → defter ve data/turnuva/."""
+    from tradebot.arastirma import kilit_dalga
+    from tradebot.arastirma.defter import Defter
+
+    a, m = _veri_baglam()
+    for r in kilit_dalga.kos(Path(dosya), a.veri_dizini, Defter(m)):
+        k, o, ol = r["tam"], r["kor"], r["olay"]
+        typer.echo(f"{r['karar']:<5} {r['kol']:<40} Sharpe {k.get('sharpe', 0):.2f}  yıllık {k.get('yillik_bilesik', 0):+.1%}  "
+                   f"DD {k.get('en_kotu_dusus', 0):.0%}  DSR {r['dsr']['dsr']:.2f}  "
+                   f"kör {o.get('yillik_bilesik', float('nan')):+.1%}  "
+                   f"stres {r['stres_2x'].get('yillik_bilesik', 0):+.1%}  olay {ol['kurulan']}/{ol['toplam']}  "
+                   f"birim ort {ol['birim_ort'] or 0:+.2%} t {ol['birim_t'] or 0:+.1f} isabet {ol['isabet'] or 0:.0%}")
 
 
 @arastirma_uygulama.command("turnuva")
