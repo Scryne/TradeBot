@@ -19,7 +19,7 @@ import time
 from pathlib import Path
 
 import yaml
-from sqlalchemy import select, tuple_
+from sqlalchemy import func, select, tuple_
 from sqlalchemy.engine import Engine
 
 from tradebot.db import jev_yargi, metin
@@ -188,18 +188,38 @@ class Zeka:
             son = (parca[-1].yayin_ms, parca[-1].id)
 
     def tur(self) -> dict:
-        yeni, olay_sayisi = 0, 0
+        """Döndürür: yeni metin, olay sayısı ve `basarili` (toplaması ve yargılaması hatasız biten kaynaklar; nabız
+        için, `zeka/nabiz.py`)."""
+        yeni, olay_sayisi, basarili = 0, 0, set()
         for t in self.toplayicilar:
             try:
                 yeni += len(t.canli(self.ayar))
+                basarili.add(t.KAYNAK)
             except Exception as e:  # noqa: BLE001 — bir kaynak düşerse diğerleri sürer
                 _log.error("toplayici_hatasi", kaynak=t.KAYNAK, hata=f"{type(e).__name__}: {e}"[:300])
         for t in self.toplayicilar:
             if t.KAYNAK not in ROLLER:  # rolü olmayan kaynak (RSS): yalnız toplanır, C özellikleri için birikir
                 continue
             sinir = int(((self.ayar.get("tarama") or {}).get(t.KAYNAK)) or 200)
-            olay_sayisi += self.isle(t.KAYNAK, sinir)
-        return {"yeni_metin": yeni, "olay": olay_sayisi}
+            try:
+                olay_sayisi += self.isle(t.KAYNAK, sinir)
+            except Exception as e:  # noqa: BLE001
+                basarili.discard(t.KAYNAK)
+                _log.error("isleme_hatasi", kaynak=t.KAYNAK, hata=f"{type(e).__name__}: {e}"[:300])
+        return {"yeni_metin": yeni, "olay": olay_sayisi, "basarili": basarili}
+
+    def jev_son(self, simdi_ms: int, pencere_ms: int = 6 * 3_600_000) -> tuple[int | None, int | None]:
+        """Son başarılı ve son hatalı yargının zamanı (ms; `pencere_ms` içinde)."""
+        from datetime import UTC, datetime
+
+        bas = datetime.fromtimestamp((simdi_ms - pencere_ms) / 1000, UTC)
+        with self.motor.connect() as b:
+            iyi = b.execute(select(func.max(jev_yargi.c.zaman)).where(jev_yargi.c.zaman >= bas,
+                                                                        jev_yargi.c.hata.is_(None))).scalar()
+            kotu = b.execute(select(func.max(jev_yargi.c.zaman)).where(jev_yargi.c.zaman >= bas,
+                                                                         jev_yargi.c.hata.is_not(None))).scalar()
+        ms = lambda z: None if z is None else int((z if z.tzinfo else z.replace(tzinfo=UTC)).timestamp() * 1000)  # noqa: E731
+        return ms(iyi), ms(kotu)
 
 
 def toplayicilar(motor: Engine, a, ayar: dict) -> list:

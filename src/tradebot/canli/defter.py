@@ -94,7 +94,8 @@ class PaperDefter:
         maliyeti değildir; maliyet ölçümünde ayrılır)."""
         ayr = {"kimlikler": list(k.kimlikler), "hedef": _liste(k.hedef), "etkin": _liste(k.etkin_hedef),
                "kaymis": _liste(k.kaymis), "yeni": _liste(k.yeni), "islem": [bool(x) for x in k.islem],
-               "fiyat": _liste(k.fiyat), "veto": list(k.veto), "miktar": k.miktar, "gecikmeli": gecikmeli}
+               "fiyat": _liste(k.fiyat), "veto": list(k.veto), "miktar": k.miktar, "gecikmeli": gecikmeli,
+               "habere_kor": k.habere_kor}
         with self.motor.begin() as b:
             return int(b.execute(insert(paper_karar).values(
                 kol=k.kol, bar_ms=k.bar_ms, karar_ms=int(time.time() * 1000), kod_surumu=self.kod,

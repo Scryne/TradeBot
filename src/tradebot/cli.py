@@ -700,12 +700,16 @@ def zeka_calis(dongu: int = typer.Option(0, help="Saniye; 0 ise config/zeka.yaml
     z = zeka_kur(m, a)
     kayitci = log("zeka")
     bekle = dongu or int(z.ayar.get("dongu_sn", 60))
+    from tradebot.zeka import nabiz
+
     while True:
         try:
             r = z.tur()
+            simdi = int(time.time() * 1000)
+            nabiz.yaz(a.veri_dizini, simdi, r.pop("basarili"), *z.jev_son(simdi))   # paper "habere kör" modu okur
             if r["yeni_metin"] or r["olay"]:
                 kayitci.info("zeka_turu", **r)
-        except Exception as e:  # noqa: BLE001 — servis ayakta kalır, hata log'a
+        except Exception as e:  # noqa: BLE001 — servis ayakta kalır, hata log'a (nabız yazılmaz: paper kör olur)
             kayitci.error("zeka_tur_hatasi", hata=f"{type(e).__name__}: {e}"[:300])
         time.sleep(bekle)
 

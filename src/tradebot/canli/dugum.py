@@ -61,6 +61,7 @@ from tradebot.canli.kollar import AGRESIF, PORTFOY, PaperKol
 from tradebot.kayit import log
 from tradebot.risk.motor import Durum, EmirIstegi, Piyasa, Portfoy, RiskAyar, RiskMotoru
 from tradebot.veri.takvim import ZAMAN_DILIMI_MS
+from tradebot.zeka import nabiz
 from tradebot.zeka.olay import aktif_vetolar
 
 SAAT_MS = 3_600_000
@@ -81,8 +82,11 @@ def sinir_doldu(zd: str, kapanis_ms: int) -> bool:
 class Beyin:
     """Kolların durumu, kararlar, emir dağıtımı, işaretleme ve mutabakat. Nautilus olay döngüsünde çalışır."""
 
-    def __init__(self, motor, kollar: list[PaperKol], defter: PaperDefter, barlar: CanliBarlar, kayit: dict) -> None:
+    def __init__(self, motor, kollar: list[PaperKol], defter: PaperDefter, barlar: CanliBarlar, kayit: dict,
+                 nabiz_dizini=None) -> None:
         self.motor, self.kollar, self.defter, self.barlar, self.kayit = motor, kollar, defter, barlar, kayit
+        self.nabiz_dizini = nabiz_dizini   # zekâ nabzı (habere kör mod); None: kontrol yok (testler, duman)
+        self.kor: tuple[bool, str] = (False, "")
         self.kimlikler = sorted({k for kol in kollar for k in kol.grup["kimlikler"]})
         self.durum = {k.ad: defter.durum(k) for k in kollar}
         self.risk = {k.ad: RiskMotoru(RiskAyar(kaldirac=k.ayar.kaldirac)) for k in kollar}
@@ -111,6 +115,10 @@ class Beyin:
         if any(v < beklenen for v in son.values()):
             return False
         vetolu = aktif_vetolar(self.motor, simdi)
+        kor = nabiz.kor_mu(self.nabiz_dizini, simdi) if self.nabiz_dizini is not None else (False, "")
+        if kor[0] != self.kor[0]:
+            (_log.error if kor[0] else _log.warning)("habere_kor" if kor[0] else "habere_kor_bitti", neden=kor[1])
+        self.kor = kor
         self._olaylari_uygula()
         self._dagitim_guncelle(kapanis_ms)
         for kol in self.kollar:
@@ -123,7 +131,7 @@ class Beyin:
                     _log.warning("karar_kacirildi", kol=kol.ad, sinir_ms=sinir)
                 continue
             try:
-                self._kol_karar(kol, vetolu, gecikmeli, sinir)
+                self._kol_karar(kol, vetolu, gecikmeli, sinir, kor[0])
             except Exception as e:  # noqa: BLE001 — bir kolun hatası diğerlerini durdurmaz
                 _log.error("kol_karar_hatasi", kol=kol.ad, hata=f"{type(e).__name__}: {e}"[:300])
         self._isaretle(kapanis_ms)
@@ -170,7 +178,7 @@ class Beyin:
             self.dagitim = {"hafta_ms": hafta, "kollar": {}, "kaldirac": 0.0, "hata": str(e)[:300]}
             _log.error("dagitim_hatasi_portfoy_duz", hata=f"{type(e).__name__}: {e}"[:300])
 
-    def _kol_karar(self, kol: PaperKol, vetolu: set[str], gecikmeli: bool, sinir_ms: int) -> None:
+    def _kol_karar(self, kol: PaperKol, vetolu: set[str], gecikmeli: bool, sinir_ms: int, kor: bool = False) -> None:
         h = kr.hazirla(self.barlar.canli, self.kayit, kol, bit_ms=sinir_ms)  # yalnız tamamlanmış zd barları
         bar_ms = int(h.g.t[-1])
         if self.defter.karar_var(kol.ad, bar_ms):
@@ -184,7 +192,7 @@ class Beyin:
             katsayi = {k: v["katsayi"] for k, v in (self.dagitim or {}).get("kollar", {}).items()}
             hedef = dg.portfoy_hedef(katsayi, {k: self.durum[k].onceki_h for k in katsayi}, list(h.g.kimlikler),
                                      RiskAyar(kaldirac=kol.ayar.kaldirac).enstruman_tavani, kol.yon == "long_short")
-        k = kr.karar_ver(kol, h, d, vetolu, hedef)
+        k = kr.karar_ver(kol, h, d, vetolu, hedef, habere_kor=kor)
         kid = self.defter.karar_yaz(k, h.g.veri_hash, gecikmeli)
         d.onceki_h = dict(zip(k.kimlikler, (float(x) for x in k.etkin_hedef), strict=True))
         d.ilk = False
@@ -480,7 +488,7 @@ def calistir(sure_sn: float | None = None, duman: bool = False) -> None:
             _log.info("kol_acildi", kol=kol.ad)
     barlar = CanliBarlar(BarDepo(a.veri_dizini), BarDepo(canli_dizin), HamDepo(a.veri_dizini, m))
     kayit = {k["kimlik"]: k for k in en.hepsi(m)}
-    beyin = Beyin(m, ks, defter, barlar, kayit)
+    beyin = Beyin(m, ks, defter, barlar, kayit, nabiz_dizini=None if duman else a.veri_dizini)
     barlar.hazirla(beyin.kimlikler, simdi)
     dns_isit()
     node = kur(beyin)

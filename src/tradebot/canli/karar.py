@@ -48,6 +48,7 @@ class Karar:
     durum: str                  # normal | fren_* | acil_durdurma
     veto: tuple[str, ...]
     miktar: dict[str, float]    # emir miktarı (işaretli adet)
+    habere_kor: bool = False    # Jev yokken verildi: yeni giriş yarım boyut (katman 5)
 
 
 def izleyici_kur(kol: PaperKol, gecmis: list[tuple[int, float]],
@@ -103,9 +104,23 @@ def agresif_hedef(depo: BarDepo, kayit: dict[str, dict], kol: PaperKol, kaynakla
                    tavan)
 
 
-def karar_ver(kol: PaperKol, h: tv.HazirGrup, d: KolDurum, vetolu: set[str], hedef: np.ndarray | None = None) -> Karar:
+def habere_kor_hedef(hedef: np.ndarray, kaymis: np.ndarray) -> np.ndarray:
+    """"Habere kör" mod (Final Doküman risk katmanı 5: Jev yoksa yeni giriş yarım boyut). Mevcut pozisyonun ötesindeki
+    yeni risk yarıya iner: hedef büyüklüğü en çok max(aynı yöndeki mevcut, |hedef|/2). Mevcut pozisyon zorla
+    küçültülmez (yalnız yeni risk kısılır); pozisyon yarıya varınca hedef ona eşit kalır, her barda yeniden işlem olmaz.
+    Yalnız riski azaltır: |sonuç| ≤ |hedef|, işaret aynı."""
+    hedef = np.asarray(hedef, dtype=float)
+    ayni = np.sign(hedef) == np.sign(kaymis)
+    mevcut = np.where(ayni, np.abs(kaymis), 0.0)
+    sinir = np.maximum(mevcut, 0.5 * np.abs(hedef))
+    return np.where(np.abs(hedef) > mevcut, np.sign(hedef) * np.minimum(np.abs(hedef), sinir), hedef)
+
+
+def karar_ver(kol: PaperKol, h: tv.HazirGrup, d: KolDurum, vetolu: set[str], hedef: np.ndarray | None = None,
+              habere_kor: bool = False) -> Karar:
     """Son kapanmış bar için dengeleme kararı. `vetolu`: şu an geçerli vetolar (yalnız Jev'li kopya kullanır).
-    Fren durumu, işlem yapılacak barın açılış anında güncellenir (backtest `calistir_panel` ile aynı an)."""
+    Fren durumu, işlem yapılacak barın açılış anında güncellenir (backtest `calistir_panel` ile aynı an).
+    `habere_kor`: Jev servisi yok (yalnız Jev'li kopyada uygulanır; backtest'te hiç yok, parity varsayılanla korunur)."""
     g = h.g
     t_islem = int(g.t[-1]) + g.bar_ms
     ks = list(g.kimlikler)
@@ -118,10 +133,12 @@ def karar_ver(kol: PaperKol, h: tv.HazirGrup, d: KolDurum, vetolu: set[str], hed
         durum = d.izleyici.guncelle(oz / kol.baslangic_ozkaynak, t_islem).value
     veto = np.array([kol.jev and k in vetolu for k in ks])
     hedef = hedef_son(h, kol) if hedef is None else np.asarray(hedef, dtype=float)
+    kor = habere_kor and kol.jev
+    hedef_uyg = habere_kor_hedef(np.nan_to_num(hedef), kaymis) if kor else hedef
     onceki = np.array([d.onceki_h.get(k, 0.0) for k in ks])
-    yeni, etkin, islem = dengele_adim(hedef, kaymis, onceki, d.ilk, g.bar_var[-1] | g.bitti[-1], g.bitti[-1], durum,
+    yeni, etkin, islem = dengele_adim(hedef_uyg, kaymis, onceki, d.ilk, g.bar_var[-1] | g.bitti[-1], g.bitti[-1], durum,
                                       veto if veto.any() else None, kol.ayar.bant)
     miktar = {k: float((yeni[j] - kaymis[j]) * oz / fiyat[j]) for j, k in enumerate(ks) if islem[j] and fiyat[j] > 0
               and abs(yeni[j] - kaymis[j]) > 1e-12}
     return Karar(kol.ad, int(g.t[-1]), tuple(ks), hedef, etkin, kaymis, yeni, islem, fiyat, durum,
-                 tuple(k for k, v in zip(ks, veto, strict=True) if v), miktar)
+                 tuple(k for k, v in zip(ks, veto, strict=True) if v), miktar, kor)
