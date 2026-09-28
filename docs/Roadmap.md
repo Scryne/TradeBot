@@ -338,6 +338,9 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - VİOP seansları barlardan: TR 09:40–18:10, endeks ve USD altında akşam 19:15–23:00 (`viop`, `viop_aksam` takvimleri).
   - MT5 verisi kataloğa (`tradebot veri mt5`, gece işinde): NCMFX GOLD/SILVER/FX/`ES!`/`NQ!`/`YM!`/`CL!`, VİOP
     `XU30_YAKINVADE` + vadeli kontratlar (önekle); 1m/1h/1d, ham yanıtlar HamDepo'da.
+  - 2026-09-28 VİOP sürekli seri ✅ (`VIOP:XU030_SUREKLI`, `veri/viop.py`): kurumun yakın vade serisi geçişlerde +%7–15
+    sıçrıyor (2024'te toplam +%50 sahte getiri). Geçiş günü spot getirisiyle ayıklanır; toplam getiri ham +%2.878 →
+    ayarlı +%334. Backtest dönemi 2007-06 → 2025-10-31 (sonrasında 186 günlük kurum deliği).
   - Sırada: spike sonucu (spread, emir) → maliyet modelleri → VİOP/altın backtest dalgası (ön kayıtla) → canlı
     bar akışı (paper düğümüne MT5 kaynağı).
 
