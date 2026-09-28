@@ -1,7 +1,7 @@
 {
   "proje_adi": "TradeBot",
   "asama": "uygulama",
-  "guncellendi": "2026-09-27",
+  "guncellendi": "2026-09-28",
   "roadmap": "docs/Roadmap.md",
-  "not": "Faz 0-5, 7 tamam. Faz 6 ve 11 suruyor. Faz 11 paper turnuvasi 2026-09-27 basladi (~2026-12-20): 5 kol x Jev A/B + agresif + portfoy; dagitici, terfi degerlendirmesi, haftalik rapor, bekci + yedek canli. Denetim: docs/Denetim-2026-09-27.md. Telegram bekci bildirimleri canli (@ScryneTrade_bot, 2026-09-27). Altin M15 turnuvasi on kayitli; XAUUSD dakikalik indirme (tradebot-xau-dk) 2023-09'a ulasinca kosulacak. KAP geri doldurma ~2026-10-07."
+  "not": "Faz 0-5, 7 tamam. Faz 6, 8, 9, 11 suruyor. Faz 11 paper turnuvasi 2026-09-27 basladi (~2026-12-20). Faz 8: NCM MT5 demo (forex 316722, viop 316723) kopru canli (host Windows, 8765/8766), sunucu farki +3 sa; MT5 verisi katalogda (38 enstruman), VIOP:XU030_SUREKLI (vade gecisi ayiklanmis). Spike08 canli spread + demo emir testi 2026-09-28 10:00 TR zamanli; sonra NCMFX maliyet modeli. VIOP 1 ve Altin M15 dalgalari: hicbiri gecmedi. Faz 9: gunluk ozet, bildirim seviyeleri, dis olu adam tamam; kalan motor-donma kapatma (gercek parayla konusulacak). KAP geri doldurma ~2026-10-07 (B1)."
 }
