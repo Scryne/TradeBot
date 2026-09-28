@@ -1,0 +1,48 @@
+# Turnuva dalga 5 — meme coin sepeti trendi: ÖN KAYIT (koşudan önce commit edilir, koşu sırasında değişmez).
+# Gerekçe: docs/turnuva/Dalga-5-Meme.md. Izgaralar ve boyut dalga 2 ile AYNI (yeni ayar araması yok); değişen yalnız
+# sepet. Liste 2026-09-29'da Binance spot'ta işlem gören meme coin'lerdir: hayatta kalan yanlılığı (delist olanlar
+# yok) sonucu iyimser yapar; geçerse şüpheyle, kalırsa sağlam okunur.
+
+dalga: 5
+veri_bitis: "2026-09-01"
+frenler: true
+boyut:
+  hedef_vol: 0.20
+  kaldirac: 3.0
+  vol_pencere_gun: 90
+  bant: 0.25
+walk_forward: { is_yil: 3, oos_yil: 1 }
+# USD (USDT) sepeti: çıta ABD T-bill (Dalga-1 ek 4), nakitte beklemenin getirisi
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0, risksiz_yillik: 0.045 }
+
+planlar:
+  trend:
+    kimlik: 2026-09-29-d5-meme-trend
+    hipotez: >-
+      Binance spot'taki meme coin'lerde (yalnız uzun) oynaklık hedefli zaman serisi trendi, çok yüksek oynaklığın
+      verdiği uzun trendleri yakalar ve maliyet, frenler ve nakit getirisi sonrası pozitif, walk-forward'da kalıcıdır.
+      Dalga 1–2'de kripto sepeti genişledikçe trend kötüleşti; sıfır hipotezi: meme sepetinde de kötüleşir.
+
+gruplar:
+  kripto_meme:
+    kimlikler: [BINANCE:DOGEUSDT, BINANCE:SHIBUSDT, BINANCE:PEPEUSDT, BINANCE:FLOKIUSDT, BINANCE:BONKUSDT,
+                BINANCE:WIFUSDT, BINANCE:MEMEUSDT, BINANCE:BOMEUSDT, BINANCE:1000SATSUSDT, BINANCE:TURBOUSDT,
+                BINANCE:NEIROUSDT, BINANCE:PEOPLEUSDT, BINANCE:TRUMPUSDT, BINANCE:PNUTUSDT]
+    asgari_gecmis_gun: 60
+    yon: long
+    zd: [4h, 1d]
+
+# 32 deneme (dalga 2 ızgaraları × 2 zaman dilimi)
+kollar:
+  - strateji: tsmom
+    gruplar: [kripto_meme]
+    zd: [4h, 1d]
+    izgara: { ufuk_gun: [20, 60, 120, 250] }
+  - strateji: ma_yon
+    gruplar: [kripto_meme]
+    zd: [4h, 1d]
+    izgara: { hizli_gun: [10, 25], yavas_gun: [50, 100, 200] }
+  - strateji: donchian_ls
+    gruplar: [kripto_meme]
+    zd: [4h, 1d]
+    izgara: { giris_gun: [20, 55, 100], cikis_gun: [10, 20] }
