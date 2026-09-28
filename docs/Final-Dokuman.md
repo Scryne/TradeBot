@@ -143,9 +143,15 @@ içeren ücretli veri), CME vadelileri (Databento; 125 $ kredi, Nautilus'ta yerl
 - **Paper'a giriş iki sınıftır (Scryne kararı 2026-09-26):**
   - **B (sermayesiz paper gözlem):** tam dönem ve walk-forward örneklem dışı kapıları, yılların ≥ %60'ı pozitif,
     rejim ve stres testleri. DSR şartı yok; paper'ın kendisi seçimle kirlenmemiş örneklem dışı testtir.
-  - **A (sermayeli paper) ve gerçek para:** B'ye ek olarak DSR ≥ 0,95 + plato, ya da paper'da kanıtlanmış
-    performans (terfi ölçütü Faz 7 planında yazılır).
-  - Ayrıntı: `docs/turnuva/Dalga-1.md` ek 3.
+  - **A (sermayeli paper):** B'ye ek olarak DSR ≥ 0,95 + plato, ya da paper terfi ölçütü (8 hafta; yürütme çalışıyor
+    ve backtest'le çelişmiyor; `docs/Paper-Tasarim.md`).
+  - **Gerçek para (2026-09-28 kararı, Denetim-2026-09-28):** DSR ≥ 0,95 + plato, **ya da** paper'ın kendi (seçimle
+    kirlenmemiş) haftalarında PSR(0) ≥ 0,95. Paper terfisi tek başına yetmez: 8–12 haftalık paper Sharpe ~1'lik bir
+    kolun üstünlüğünü kanıtlayamaz (PSR 0,95 için ~2,7 yıl). **Mikro sermaye pilotu** (Faz 12, sabit tavan) bu kanıt
+    olmadan ancak Scryne'ın bilerek verdiği açık kararla ve 12 hafta paper kapılarından sonra (kural 7).
+  - Başarı çıtası: yeni dalgalarda walk-forward OOS yıllık getirisi risksiz faizi geçmeli (`olcut.risksiz_yillik`;
+    geçmiş dalgalar 0 ile ölçüldü, geriye dönük değişmez).
+  - Ayrıntı: `docs/turnuva/Dalga-1.md` ek 3–4.
 
 **Sermaye dağıtıcı:**
 - Oynaklık eşitleme (risk paritesi) ve üstünlüğe göre ağırlık (küçültülmüş tahmin).

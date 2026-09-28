@@ -127,3 +127,12 @@ planında yazılacak.
     - Gerçek paraya giden yol gevşemez.
   - Bu, sonuç görüldükten sonra yapılmış bir kural değişikliğidir (kural 10). Açıkça kaydedildi. Etkisi yalnız
     sermayesiz gözleme giriştir.
+- **2026-09-28, ek 4: A, gerçek para ve çıta (Claude kararı; Scryne yetkiyi devretti: "sen en iyi şekilde planla, tüm
+  yetki sende").** Denetim (`docs/Denetim-2026-09-28.md`) ek 3 ile terfi kodu arasında çelişki buldu: ek 3 "A için DSR ≥
+  0,95" diyordu, `canli/terfi.py` 8 hafta paper sonunda DSR'sız terfi ediyordu.
+  - A (sermayeli paper): DSR ≥ 0,95 ya da paper terfi ölçütü. Gerekçe: para riski yok; dağıtıcı ve kademe gerçek
+    veride sınanmadan gerçek paraya geçilemez. Kod değişmedi.
+  - Gerçek para: DSR ≥ 0,95 ya da paper haftalarında PSR(0) ≥ 0,95 (Final Doküman §Puan ve kapılar). Mikro sermaye
+    pilotu yalnız Scryne'ın açık kararıyla. Yol gevşemedi, netleşti.
+  - Çıta: yeni dalgalarda OOS yıllık > risksiz faiz (`olcut.risksiz_yillik`). İleriye dönük; kayıtlı sonuçlar değişmez.
+

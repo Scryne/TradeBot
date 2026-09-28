@@ -76,6 +76,10 @@ class Olcut:
     yil_pozitif: float = 0.60
     rejim_t: float = -2.0
     stres_maliyet: float = 2.0
+    # Walk-forward OOS yıllık getirinin geçmesi gereken çıta (2026-09-28 kararı, Denetim-2026-09-28): risksiz faiz.
+    # Varsayılan 0 = eski dalgaların ölçütü (geriye dönük değişmez, kural 10). USD dalgalarında T-bill; vadeli
+    # sürekli seriler faiz farkını zaten içerdiği için orada 0.
+    risksiz_yillik: float = 0.0
 
 
 @dataclass
@@ -246,7 +250,7 @@ def karar(r: dict, o: Olcut) -> str:
     e, w, st = r["en_iyi"], r["walk_forward"], r["stres"]
     tam = e["kapilar_gecti"]
     wf = bool(w.get("pencere")) and w["oos_en_kotu_hafta"] >= mt.KAPI_EN_KOTU_HAFTA \
-        and w["oos_en_kotu_dusus"] >= mt.KAPI_EN_KOTU_DUSUS and w["oos_yillik"] > 0
+        and w["oos_en_kotu_dusus"] >= mt.KAPI_EN_KOTU_DUSUS and w["oos_yillik"] > o.risksiz_yillik
     yil = r["yil_pozitif_orani"] >= o.yil_pozitif
     rejim = all(v["t"] > o.rejim_t for v in r["rejim"].values())
     stres = st["maliyet_2x_puan"] > 0 and st["gecikme_puan"] > 0

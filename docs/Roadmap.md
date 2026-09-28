@@ -27,7 +27,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 9 | Operasyon: gözetmen, Telegram, raporlar | 🔄 Devam Ediyor | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
 | 10 | Web pano | ⏳ Bekliyor | DESIGN.md dolu; PnL, pozisyon, turnuva tablosu, veto geçmişi, sağlık; Tailscale üzerinden telefondan erişim |
 | 11 | Paper turnuvası — 12 hafta | 🔄 Devam Ediyor | 12 hafta kesintisiz paper; kademeli sermaye çalıştı; hangi kolların kapıyı geçtiği ve Jev katkısı raporlandı; maliyet varsayımları ölçüldü |
-| 12 | Gerçek para (koşullu) | ⏳ Bekliyor | Scryne'ın kararı + aracı kurum/borsa + anahtar (çekim kapalı, IP kısıtlı) + vergi netliği; sabit tavanlı mikro sermaye; ilk emir Scryne onayıyla |
+| 12 | Gerçek para (koşullu) | ⏳ Bekliyor | Kanıt kapısı (DSR ≥ 0,95 ya da paper PSR(0) ≥ 0,95; mikro pilot yalnız Scryne'ın açık kararıyla) + aracı kurum/borsa + anahtar (çekim kapalı, IP kısıtlı) + vergi netliği; sabit tavanlı mikro sermaye; ilk emir Scryne onayıyla |
 | 13 | Sonraki dalgalar (koşullu) | ⏳ Bekliyor | Ölçüm fırsat gösterirse: ABD tek hisseleri (ücretli veri), CME vadelileri (Databento), VİOP; her biri ayrı kararla |
 
 ## Faz Detayları
@@ -387,6 +387,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   (4/8/12 hafta); gerçek maliyet (spread, maker dolum oranı) ölçülür; Jev katkısı raporlanır.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
+  - 2026-09-28 araştırma planı (`docs/turnuva/Arastirma-Plani.md`): hedef, turnuva bitmeden BTC/ETH trendiyle
+    ilişkisiz (< 0,3) en az bir B kolu. Sıra: VİOP 2 (TL taşıma) → dalga 3 (çok varlıklı vadeli trend) → olay tabanlı.
   - Sayaç 2026-09-27'de başladı (paper düğümü canlı, Faz 7 kapandı); 12 hafta ~2026-12-20. Faz 8–10 bununla paralel.
   - Takvim: ilk gölge dağıtım ~2026-10-26 (28 gün); ilk olası terfi ~2026-11-22 (56 gün, %50 kademe).
 

@@ -284,6 +284,9 @@ def test_karar_kurallari():
     assert tv.karar(temel | {"rejim": {"yukari": {"t": 3.0}, "asagi": {"t": -2.5}}}, o) == "KALDI"
     assert tv.karar(temel | {"en_iyi": {"kapilar_gecti": False}}, o) == "KALDI"
     assert tv.karar(temel | {"en_fazla": "B"}, o) == "B"  # yanlılığı bilinen grup
+    # risksiz faiz çıtası (2026-09-28): OOS %4 < T-bill %4,5 → kalır; varsayılan 0 eski dalgalarla aynı
+    dusuk = temel | {"walk_forward": temel["walk_forward"] | {"oos_yillik": 0.04}}
+    assert tv.karar(dusuk, o) == "A" and tv.karar(dusuk, tv.Olcut(risksiz_yillik=0.045)) == "KALDI"
 
 
 def test_evren_saatlik_bar_bitmemis_gunu_gormez(tmp_path):
