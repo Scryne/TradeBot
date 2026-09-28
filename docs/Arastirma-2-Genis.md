@@ -140,7 +140,7 @@ Fiyat deseni aramayı bırakıp **farklı getiri kaynakları** eklemek:
    raporlanır.
 2. **Dalga 5 — token kilit açılımı kısa (öncelik 2).** Açılımdan 30 gün önce perp kısa, açılımdan sonra kapat; kural
    koddan. Açılım takvimi verisi ücretli; önce ücretsiz kaynak aranır, yoksa bütçe kararı.
-3. **Hızlı kontrol — meme sepeti trendi.** Mevcut hattı kullanır, maliyeti düşük; önsel zayıf, bir koşuda kapanır ya
+3. **Hızlı kontrol — meme sepeti trendi.** ❌ 2026-09-29 KALDI (`turnuva/Dalga-5-Meme.md`): en iyisi Donchian 1d bütün kapıları geçti ama OOS yıllık +%3,7 < T-bill; BTC trendiyle korelasyon ~0,5. Mevcut hattı kullanır, maliyeti düşük; önsel zayıf, bir koşuda kapanır ya
    da açılır.
 4. Paper'daki BTC/ETH trendi aynen sürer.
 
