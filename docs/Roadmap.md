@@ -202,6 +202,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - 2026-09-27 not: dalga 1'in BIST kolları, sonradan temizlenen verilerle (kapalı gün bayat barları, imkânsız
     sıçra-dönler) koşmuştu. Hepsi KALDI; temiz veri kolları ancak iyileştirebilirdi, ama sonuca bakıp yeniden koşmak
     yeni denemedir (kural 10). Sonraki BIST dalgası temiz veriyle koşar.
+  - 2026-09-28 altın M15 (`docs/turnuva/Altin-M15.md`, 32 deneme, satılan EA'nın profesyonel karşılığı): **hepsi KALDI.**
+    EA gibi birleşik kol en kötülerden (Sharpe −1,43, OOS −%15,5/yıl); haber filtresinin katkısı yok.
 
 ### Faz 6: Zekâ katmanı (Jev)
 - **İşler:** Spike 04-B: NVIDIA yükseltme modelinin seçimi (anahtar gelince). Metin toplayıcılar (ilk yayın zamanıyla); tek Jev servisi (uzun ömürlü istemci, kayıt,

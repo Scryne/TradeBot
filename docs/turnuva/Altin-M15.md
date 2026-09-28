@@ -74,3 +74,29 @@ Dalga 1 ile aynı (A: DSR ≥ 0,95 + OOS + stres; B: sermayesiz paper gözlem). 
 
 Dukascopy XAUUSD dakikalık BID, son 3 yıl (2023-09 → 2026-09). Dukascopy hız sınırı nedeniyle indirme ~8 saat
 sürüyor. 15m bar dakikalıktan kurulur. ASK dakikalık yok: spread maliyet modelinin varsayılanından (aleyhte).
+
+## Sonuç (2026-09-28, koşu `dalgaaltin_m15`)
+
+Veri: Dukascopy XAUUSD dakikalık, 2023-09-01 → 2026-09-25 (ön kayıttaki dönem; ilk indirme zaman bütçesiyle
+2023-11-09'da durmuştu, eksik 6 hafta koşudan önce tamamlandı).
+
+**Hiçbir aile geçmedi; sıfır hipotezi ayakta. EA'nın yapısı gün içi altında maliyet sonrası kâr üretmiyor.**
+
+| Aile | Sharpe | DD | OOS yıllık | DSR |
+| --- | --- | --- | --- | --- |
+| seans_kirilim | −0,08 | −%13 | −%1,4 | 0,28 |
+| kanal_kirilim | −0,18 | −%19 | −%1,0 | 0,19 |
+| sikisma_kirilim | −0,63 | −%15 | −%5,7 | 0 |
+| trend_geri_cekilme | −1,34 | −%15 | −%7,7 | 0 |
+| ea_birlesik (EA gibi, beşi birlikte) | −1,43 | −%37 | −%15,5 | 0 |
+| bant_donus | −1,98 | −%32 | −%18,1 | 0 |
+
+- **Birleştirmek kurtarmıyor:** beş zayıf stratejiyi birlikte çalıştıran `ea_birlesik` en kötülerden biri. Çok
+  strateji, çok işlem demek (yılda ~4.000); her işlem maliyet öder.
+- **Haber filtresinin katkısı yok:** 32 varyantta filtre kapalı ortalama −%0,161/hafta, açık (±60 dk) −%0,160/hafta.
+- En iyi iki aile (seans ve kanal kırılımı) sıfıra yakın ama negatif: kırılım fikrinde zayıf bir iz var, maliyeti
+  karşılamıyor.
+- Videodaki iddia (bölüm 1, `research/altin/sonuc/iddia_2026-09-27.json`): 0,20 $ spread'le tek işlemde 2 katlama
+  olasılığı %37–47, art arda 5 katlama ~%0,7 (1.000 kişiden ~7), işlem başı beklenen değer −0,25 $. Kumar; strateji değil.
+
+Sonuca bakıp ızgara ya da filtre değiştirilmedi (kural 10). Bu 32 deneme ilgili ailelerin defterinde sayılı.
