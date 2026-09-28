@@ -27,14 +27,21 @@ def hazirla(veri_dizini: Path, ham, http_al, kayitci=None) -> dict:
     tablo.write_parquet(d / "olaylar.parquet")
     perp = bv.usdt_perpler(http_al, ham)
     semboller = sorted(set(tablo["sembol"].to_list()) & set(perp)) + ["BTC"]
+    hatali = []
     for i, s in enumerate(semboller):
         k = perp[s]["sembol"]
-        bv.gunluk(http_al, ham, k).write_parquet(d / "perp" / f"{s}_1d.parquet")
-        bv.funding(http_al, ham, k).write_parquet(d / "perp" / f"{s}_funding.parquet")
+        if (d / "perp" / f"{s}_funding.parquet").exists():   # kaldığı yerden devam
+            continue
+        try:
+            bv.gunluk(http_al, ham, k).write_parquet(d / "perp" / f"{s}_1d.parquet")
+            bv.funding(http_al, ham, k).write_parquet(d / "perp" / f"{s}_funding.parquet")
+        except Exception as e:  # noqa: BLE001 — henüz işlem görmeyen / kaldırılmış kontrat (400): atla
+            hatali.append({"sembol": s, "hata": f"{type(e).__name__}: {e}"[:120]})
         if kayitci is not None and i % 20 == 0:
             kayitci.info("ilerleme", bitti=i + 1, toplam=len(semboller))
     (d / "perp_listesi.json").write_text(json.dumps({s: perp[s] for s in semboller}, ensure_ascii=False), encoding="utf-8")
-    return {"olay": tablo.height, "token": tablo["sembol"].n_unique(), "perp_eslesen": len(semboller) - 1}
+    return {"olay": tablo.height, "token": tablo["sembol"].n_unique(), "perp_eslesen": len(semboller) - 1,
+            "hatali": hatali}
 
 
 def _ms(s: str) -> int:
