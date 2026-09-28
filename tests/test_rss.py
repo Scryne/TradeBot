@@ -68,6 +68,6 @@ def test_rolsuz_kaynak_servis_turunu_bozmaz(ayar):
     http = SahteHttp({"https://fed/rss": RSS, "https://fed/a": SAYFA})
     t = rss.RssToplayici(HamDepo(ayar.veri_dizini, m), m, [{"ad": "fed", "url": "https://fed/rss"}], http)
     z = Zeka(m, None, None, [t], {"jev": {"esik": 0.5}})
-    assert z.tur() == {"yeni_metin": 2, "olay": 0}
-    assert z.tur() == {"yeni_metin": 0, "olay": 0}  # aralık dolmadı: akış yeniden istenmez
+    assert z.tur() == {"yeni_metin": 2, "olay": 0, "basarili": {"rss"}}
+    assert z.tur() == {"yeni_metin": 0, "olay": 0, "basarili": {"rss"}}  # aralık dolmadı: akış yeniden istenmez
     assert http.istenen.count("https://fed/rss") == 1
