@@ -303,6 +303,64 @@ def veri_vadeli() -> None:
     _yazdir({"faiz_yeni": yeni} | vadeli.kur(BarDepo(a.veri_dizini), m, icerik))
 
 
+@veri_uygulama.command("deribit")
+def veri_deribit(
+    para: str = typer.Option("BTC,ETH", help="Virgüllü"),
+    bas: str = typer.Option("2020-06-01"),
+    bit: str = typer.Option("", help="Boş: bugün"),
+    is_parcacigi: int = typer.Option(4, help="Eşzamanlı pencere (tarihsel sunucu istek başına ~13 sn)"),
+) -> None:
+    """Dalga 4: haftalık opsiyon oynaklık yüzeyi (her Cuma, bir sonraki Cuma vadesi) + teslim fiyatları →
+    data/opsiyon/. Kaldığı yerden devam eder (hesaplanmış haftalar atlanır, indirilmiş sayfalar ham depodan okunur)."""
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    from datetime import UTC, datetime
+
+    import polars as pl
+
+    from tradebot.veri.depo import HamDepo
+    from tradebot.veri.deribit import DeribitGecmis, cumalar
+    from tradebot.veri.http import NazikIstemci
+
+    a, m = _veri_baglam()
+    kayitci = log("veri.deribit")
+    dizin = a.veri_dizini / "opsiyon"
+    dizin.mkdir(parents=True, exist_ok=True)
+    son = datetime.fromisoformat(bit).replace(tzinfo=UTC) if bit else datetime.now(UTC)
+    ham = HamDepo(a.veri_dizini, m)
+    ozet = {}
+    for p in [x.strip().upper() for x in para.split(",") if x.strip()]:
+        dg = DeribitGecmis(ham, NazikIstemci("deribit", deneme=6, zaman_asimi=120).al)
+        teslim = dg.teslim_fiyatlari(p)
+        (dizin / f"{p}_teslim.json").write_text(json.dumps(teslim), encoding="utf-8")
+        yol = dizin / f"{p}_haftalik.parquet"
+        eski = pl.read_parquet(yol) if yol.exists() else None
+        bitti = set(eski["giris_ms"].to_list()) if eski is not None else set()
+        haftalar = [c for c in cumalar(datetime.fromisoformat(bas).replace(tzinfo=UTC), son)
+                    if c.timestamp() * 1000 + 5 * 60_000 not in bitti and (son - c).days >= 7]
+        satirlar = []
+
+        def is_(c, p=p):
+            return DeribitGecmis(ham, NazikIstemci("deribit", deneme=6, zaman_asimi=120).al).haftalik(p, c)
+
+        with ThreadPoolExecutor(is_parcacigi) as h:
+            for i, f in enumerate(as_completed([h.submit(is_, c) for c in haftalar])):
+                try:
+                    satirlar.append(f.result())
+                except Exception as e:  # noqa: BLE001 — bir hafta düşerse diğerleri sürer; sonraki koşu yeniden dener
+                    kayitci.error("hafta_hatasi", para=p, hata=f"{type(e).__name__}: {e}"[:200])
+                if i % 20 == 0:
+                    kayitci.info("ilerleme", para=p, bitti=i + 1, toplam=len(haftalar))
+                if len(satirlar) >= 20:   # ara kayıt: uzun koşu yarıda kalırsa emek kaybolmasın
+                    eski = pl.concat([x for x in (eski, pl.DataFrame(satirlar)) if x is not None], how="diagonal_relaxed")
+                    eski.sort("giris_ms").write_parquet(yol)
+                    satirlar = []
+        if satirlar:
+            eski = pl.concat([x for x in (eski, pl.DataFrame(satirlar)) if x is not None], how="diagonal_relaxed")
+            eski.sort("giris_ms").write_parquet(yol)
+        ozet[p] = {"hafta": 0 if eski is None else len(eski), "teslim_gunu": len(teslim)}
+    _yazdir(ozet)
+
+
 @veri_uygulama.command("mt5")
 def veri_mt5(butce_dk: float = typer.Option(60.0, help="Zaman bütçesi (dakika)")) -> None:
     """NCM MT5 (forex CFD + VİOP) barları köprüden kataloğa (1m, 1h, 1d)."""
