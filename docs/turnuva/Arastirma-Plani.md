@@ -40,6 +40,15 @@ ve 50/50 karışımın Sharpe'ını da raporlar (kapı değil, bilgi).
 - NCM'nin `ES!`/`NQ!`/`YM!`/`CL!` sürekli grafiklerinde vade geçişinin ayarlı olup olmadığı bilinmiyor; CME kontratları
   3. Cuma'da vadelenir (VİOP takvim kuralı uygulanamaz); tek kontrat geçmişi yalnız birkaç ay. Önce ölçülür (spotla
   geçiş günlerinde sıçrama var mı).
+- **Ölçüldü (2026-09-28): ayarsız.** NCM günlük kapanışı / Dukascopy spot (2012–2025): ES!, NQ!, YM!'de oran 14 yılda
+  birikimli kaymıyor (toplam log fark ~0) ve seviyesi taşımayı izliyor (sıfır faiz yıllarında 0,997, 2023–25'te
+  1,004–1,005). Baz vade Cuması çevresinde sıçrıyor: 2024-03 ~0 → +110 bps (15–18 Mart), 2024-09 ~0 → +100 bps (18–19
+  Eylül). Yani seri ön ay fiyatıdır; uzun pozisyon vadeli fazla getirisi yerine spot fiyat getirisini görür (2023–25'te
+  yılda ~%4 fazla). Sıçrama iki güne yayılabiliyor: iki kaynağın günlük kapanış saati farklı (günlük fark oynaklığı
+  ~30 bps). CL!'yi ölçmek için spot yok (Dukascopy LIGHTCMDUSD de vadeli tabanlı, oran tam 1,000).
+- Ayar yolu: VİOP 1 kuralı (`veri/viop.py surekli`) CME takvimiyle: pencere 3. Cuma −3 … +2 iş günü; geçiş sıçraması
+  pencerenin toplam fazla getirisi olarak çıkarılır (tek gün yetmez). Aynı saatte kesilmiş spot için Dukascopy saatlik
+  endeks verisi (21:00 UTC) gerekir; indirmesi sürüyor.
 - Yedek yol, **fazla getiri vekili:** vadeli getirisi ≈ spot getiri − (risksiz faiz − temettü/depolama). Dukascopy'nin
   2010'dan endeks/emtia/metal/FX saatlik verisi + günlük risksiz faiz serisi (FRED T-bill; FX'te iki ülke faizi) ile
   vekil seri kurulur. Dalga 1'in CFD kolları finansmanı hem uzun hem kısa pozisyona aynı yönde (%6) yazdı; vadelide kısa
