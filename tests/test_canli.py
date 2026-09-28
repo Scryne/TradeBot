@@ -227,6 +227,16 @@ def test_beyin_karar_emir_defter_ve_mutabakat(tmp_path, ayar, monkeypatch):
     assert s1.gonderilen[-1][2] == "toparlanma" and df.durum(k1).adet == pytest.approx(b.durum[k1.ad].adet)
 
 
+def test_kacan_kapanis():
+    from tradebot.canli.dugum import kacan_kapanis
+    h = 1_790_604_000_000                               # saat başı
+    assert kacan_kapanis(h + 60_000, h - SAAT, None) is None          # 1 dk: bar olayı bekleniyor
+    assert kacan_kapanis(h + 3 * 60_000, h - SAAT, None) == h         # 3 dk: kaçtı, REST'ten işle
+    assert kacan_kapanis(h + 3 * 60_000, h, None) is None             # işlendi
+    assert kacan_kapanis(h + 3 * 60_000, h - SAAT, h) is None         # deneniyor (bar REST'te yok, yeniden)
+    assert kacan_kapanis(h + SAAT + 5 * 60_000, h - SAAT, None) == h + SAAT   # uzun donma: son kapanış
+
+
 def test_sinir_doldu():
     from tradebot.canli.dugum import sinir_doldu
     gun = 1_700_000_000_000 - 1_700_000_000_000 % 86_400_000

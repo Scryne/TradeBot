@@ -74,6 +74,20 @@ def nautilus_id(kimlik: str) -> InstrumentId:
     return InstrumentId.from_str(f"{kimlik.removeprefix('BINANCE:')}.BINANCE")
 
 
+KACAN_KAPANIS_MS = 2 * 60_000   # bar olayı bu kadar gecikirse kapanış REST'ten işlenir (Tetik._kacan_kontrol)
+
+
+def kacan_kapanis(simdi_ms: int, son_kapanis_ms: int, bekleyen: int | None) -> int | None:
+    """Bar olayı gelmemiş (websocket koptu, süreç dondu/çözüldü) kapanış: işlenmesi gereken kapanış ya da None.
+    2026-09-28 donma tatbikatı: konteyner saat başında donuk kaldı, çözülünce websocket 2 sn'de yeniden bağlandı ama
+    kaçan barın olayı hiç gelmedi; düğüm bir sonraki saati bekledi (1h kolları bir karar atladı, kalp atışı gözetmen
+    eşiğine 5 dk kala yenilendi)."""
+    son = simdi_ms - simdi_ms % SAAT_MS
+    if bekleyen is not None or son <= son_kapanis_ms or simdi_ms - son < KACAN_KAPANIS_MS:
+        return None
+    return son
+
+
 def sinir_doldu(zd: str, kapanis_ms: int) -> bool:
     """Bu kapanış anında zd barı tamamlandı mı (1h her saat, 4h UTC 00/04/…, 1d 00:00)."""
     return kapanis_ms % ZAMAN_DILIMI_MS[zd] == 0
@@ -317,12 +331,23 @@ class Tetik(Strategy):
         for bt in self.bar_tipleri:
             self.subscribe_bars(bt)
         self.clock.set_time_alert("toparlanma", self.clock.utc_now() + dt.timedelta(seconds=30), self._baslangic)
+        self._basladi = False
+        self.clock.set_timer("kacan-kapanis", dt.timedelta(minutes=1), callback=self._kacan_kontrol)
 
     def on_quote(self, q) -> None:
         kim = f"BINANCE:{q.instrument_id.symbol.value}"
         self.beyin.son_fiyat[kim] = (float(q.bid_price) + float(q.ask_price)) / 2
 
+    def _kacan_kontrol(self, _event) -> None:
+        if not self._basladi:
+            return
+        k = kacan_kapanis(int(time.time() * 1000), self.beyin.son_kapanis_ms, self._bekleyen)
+        if k is not None:
+            _log.warning("kacan_kapanis_islendi", kapanis_ms=k)
+            self._dene(k, gecikmeli=True)
+
     def _baslangic(self, _event) -> None:
+        self._basladi = True
         self.beyin.toparla()
         simdi = int(time.time() * 1000)
         son_kapanis = simdi - simdi % SAAT_MS
