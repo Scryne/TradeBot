@@ -341,6 +341,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - 2026-09-28 VİOP sürekli seri ✅ (`VIOP:XU030_SUREKLI`, `veri/viop.py`): kurumun yakın vade serisi geçişlerde +%7–15
     sıçrıyor (2024'te toplam +%50 sahte getiri). Geçiş günü spot getirisiyle ayıklanır; toplam getiri ham +%2.878 →
     ayarlı +%334. Backtest dönemi 2007-06 → 2025-10-31 (sonrasında 186 günlük kurum deliği).
+  - 2026-09-28 VİOP 1 dalgası (`docs/turnuva/VIOP-1.md`, 30 deneme, dalga 1 aileleri): **hepsi KALDI.** En yakını tsmom
+    (Sharpe 0,54, OOS +%0,7/yıl; OOS düşüş −%41 kapıyı geçemedi). VİOP maliyet modeli `VIOP:endeks_vadeli` eklendi.
   - Sırada: spike sonucu (spread, emir) → maliyet modelleri → VİOP/altın backtest dalgası (ön kayıtla) → canlı
     bar akışı (paper düğümüne MT5 kaynağı).
 

@@ -46,3 +46,21 @@ DSR'ın deneme sayısı ailenin defterindeki bütün taramalardır (dalga 1–2 
 - 2016 öncesi gün içi zaman damgaları belirsiz; dalga yalnız günlük barla koşar.
 - VİOP demo hesabı 10.000 TL; bir XU030 kontratının teminatı ~19.600 TL. Paper yürütmesi simüle olduğu için bu,
   boyutu değil yalnız emir testlerini sınırlar.
+
+## Sonuç (2026-09-28, koşu `dalgaviop1`)
+
+**Hiçbir kol geçmedi; sıfır hipotezi ayakta.**
+
+| Kol | Sharpe | DD | OOS yıllık | Kalma nedeni |
+| --- | --- | --- | --- | --- |
+| tsmom | 0,54 | −%22 | +%0,7 | OOS en kötü düşüş −%41 (kapı −%30). Diğer bütün kapılar geçti (yılların %71'i pozitif, rejim ve stres pozitif). |
+| ay_donumu | 0,41 | −%21 | −%0,4 | OOS negatif (DSR 0,60, en yüksek) |
+| donchian_ls | 0,33 | −%38 | −%0,5 | Tam dönem kapıları, OOS negatif |
+| ma_yon | 0,30 | −%27 | +%2,0 | Tam dönem kapıları, OOS düşüş −%33 |
+| zskor_donus | −0,03 | −%38 | −%2,9 | Negatif |
+| rsi_donus | −0,11 | −%18 | −%1,5 | Negatif, stres negatif |
+
+Okuma: BIST30 vadelisinde tek enstrümanlık trend, faiz farkı ve maliyet sonrası TL mevduatını ancak sınırda geçiyor ve
+uzun düşüşler veriyor. Ortalamaya dönüş aileleri maliyeti karşılamıyor. Sonuca bakıp eşik ya da ızgara değiştirilmedi
+(kural 10). Sonraki VİOP denemesi yeni bir ön kayıtla ve yeni bir fikirle olur (ör. TL taşıma getirisi, çok varlıklı
+VİOP sepeti); bu dalganın denemeleri defterde sayılı.
