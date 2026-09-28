@@ -246,6 +246,18 @@ def veri_dukascopy(butce_dk: float = typer.Option(60.0, help="Zaman bütçesi (d
     _yazdir(is_akisi.dukascopy(a, m, butce_dk))
 
 
+@veri_uygulama.command("vadeli")
+def veri_vadeli() -> None:
+    """Dalga 3 vadeli serileri: OECD faizini indirir, VADELI:* serilerini katalogdan baştan kurar (veri/vadeli.py)."""
+    from tradebot.veri import faiz, vadeli
+    from tradebot.veri.depo import BarDepo, HamDepo
+    from tradebot.veri.http import NazikIstemci
+
+    a, m = _veri_baglam()
+    icerik, yeni = faiz.indir(HamDepo(a.veri_dizini, m), NazikIstemci("oecd", zaman_asimi=120).al)
+    _yazdir({"faiz_yeni": yeni} | vadeli.kur(BarDepo(a.veri_dizini), m, icerik))
+
+
 @veri_uygulama.command("mt5")
 def veri_mt5(butce_dk: float = typer.Option(60.0, help="Zaman bütçesi (dakika)")) -> None:
     """NCM MT5 (forex CFD + VİOP) barları köprüden kataloğa (1m, 1h, 1d)."""

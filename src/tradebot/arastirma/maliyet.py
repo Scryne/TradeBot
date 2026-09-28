@@ -73,6 +73,12 @@ MODELLER = {
     "NCMFX:fx": MaliyetModeli("ncm_fx", 0.0, 1.0, 1.0, finansman_yillik=0.02, spread_veriden=True),
     "NCMFX:metal": MaliyetModeli("ncm_metal", 0.0, 1.0, 1.0, finansman_yillik=0.06, spread_veriden=True,
                                  aciga_satis_yillik=0.12),
+    # Dalga 3 türetilmiş vadeli serileri (veri/vadeli.py; getiri zaten nakit üstü). Uygulama NCM'de: endeks vadeli CFD'si
+    # (ES6Z…, çeyreklik devir), metal ve döviz spot CFD'si (swap ≈ faiz farkı + kurum payı). Finansman alanı yalnız
+    # kurum payını taşır: döviz %1, metal %1,5 (GOLD swap'ı 2026-09-28: uzun −%5,1, kısa +%1,9; adil fark ~±%4,3).
+    "VADELI:endeks": MaliyetModeli("vadeli_endeks", 0.5, 0.5, 1.0, finansman_yillik=0.005),
+    "VADELI:fx": MaliyetModeli("vadeli_fx", 0.0, 1.0, 1.0, finansman_yillik=0.01),
+    "VADELI:metal": MaliyetModeli("vadeli_metal", 0.0, 1.0, 1.0, finansman_yillik=0.015),
     # vadeli: çeyreklik devir 4 × 2 taraf × ~1,5 bps ≈ %0,1; sürekli seri ayarı doğrulanana kadar %0,5 (dalga 3)
     "NCMFX:endeks": MaliyetModeli("ncm_endeks_vadeli", 0.5, 0.5, 1.0, finansman_yillik=0.005, spread_veriden=True),
     # petrol vadelisi aylık devreder: 12 × 2 × ~2 bps ≈ %0,5; aleyhte %1
