@@ -1,0 +1,22 @@
+# Turnuva dalga 6 — token kilit açılımı öncesi perp kısa (BTC ile piyasa nötr): ÖN KAYIT (koşudan önce commit edilir).
+# Gerekçe: docs/turnuva/Dalga-6-Kilit.md. Veri: `tradebot veri kilit`. Kural takvimden (kod), Jev'den değil (kural 8).
+
+dalga: 6
+plan:
+  kimlik: 2026-09-29-d6-kilit-kisa
+  aile: kilit_kisa
+  hipotez: >-
+    Ekip ve yatırımcı token'larının büyük cliff açılımlarından (azami arzın ≥ %1'i) önce token fiyatı piyasaya göre
+    düşer (arz baskısı, alıcıların perp ile korunması). Açılımdan önce token perp'inde kısa, aynı büyüklükte BTC perp'inde
+    uzun pozisyon, ücret, kayma ve funding sonrası pozitif getiri verir ve Keyrock çalışmasının (Aralık 2024) yayımından
+    sonraki kör dönemde (2025+) sürer. Sıfır hipotezi: etki bilinir ve fiyatlanmıştır, maliyet sonrası getiri yoktur.
+
+olay: { kategoriler: [insiders, privateSale], asgari_oran: 0.01 }
+notional: 0.10                   # olay başına bacak nominali / özkaynak (açık brüt toplam ≤ 3x)
+maliyet: { ucret: 0.0005, kayma_token: 0.001, kayma_btc: 0.0001 }
+donem: { bas: "2021-01-01", is_bitis: "2025-01-01", bit: "2026-09-20" }
+# 6 deneme: giriş 30/14/7 gün önce × çıkış açılım günü / 7 gün sonra
+izgara: { giris: [-30, -14, -7], cikis: [0, 7] }
+# Kapılar dalga 4 ile aynı; çıta 0 (piyasa nötr perp: teminat nakitte kalır, getiri fazla getiridir)
+olcut: { dsr_a: 0.95, yil_pozitif: 0.60, stres_maliyet: 2.0, en_kotu_hafta: -0.10, en_kotu_dusus: -0.30,
+         oos_asgari_yillik: 0.0 }
