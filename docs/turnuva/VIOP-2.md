@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-09-28
 type: turnuva-plani
-durum: ön kayıt (koşudan önce commit edildi)
+durum: sonuçlandı — KALDI (2026-09-28)
 ---
 # Turnuva — VİOP 2: TL taşıma (ön kayıt)
 
@@ -49,3 +49,34 @@ En iyi varyantın paper kollarıyla (BTC/ETH trend backtest'i) haftalık korelas
 - Seri tek kurumun yakın vade serisi; 2026-02 sonrası donmuş (kontratlarla uzatılabilir, bu dalgada yok).
 - Gerçek parada TL taşıma bir **kur pozisyonudur**: hesabın para birimine göre sonuç değişir (USD hesap için USDTRY
   kısa = TL uzun). Portföyde TL riski ayrıca ele alınır.
+
+## Sonuç (2026-09-28, koşu `dalgaviop2`)
+
+**Hiçbir varyant geçmedi; sıfır hipotezi ayakta. TL taşıma bu seride maliyet ve çöküşler sonrası prim vermiyor.**
+
+Seri: `VIOP:USDTRY_SUREKLI`, 2015-07 → 2026-02, 2 519 gün, 128 vade geçişi ayıklandı, 9 bozuk tik atıldı; kaynak zaten
+USDTRY yönünde kote (ters çevrilmedi). Ham seri +%1.552 (≈ spot), ayarlı +%139: aradaki fark faiz primidir. Primi
+toplayan kısa pozisyon bile TL'nin değer kaybını karşılamadı. Spot saatliği (15:00 UTC) Dukascopy'den bu koşu için
+indirildi (host'un indirmesi 503'lerle takıldı; dosyalar ana bilgisayardan çekilip ham depoya aynı anahtarla girdi).
+
+| Varyant (ufuk, oynaklık penceresi) | Yıllık | Sharpe | En kötü düşüş | Maruziyet | Kapılar |
+| --- | --- | --- | --- | --- | --- |
+| 20, 20 (en iyi) | +%0,5 | 0,13 | −%21 | %16 | geçti |
+| 60, 20 | +%0,0 | 0,03 | −%18 | %15 | geçti |
+| 20, yok | −%1,8 | −0,20 | −%33 | %21 | — |
+| 120, 20 | −%2,1 | −0,48 | −%23 | %11 | — |
+| yok, 20 | −%2,5 | −0,41 | −%36 | %29 | — |
+| 60, yok | −%2,5 | −0,30 | −%29 | %18 | — |
+| 120, yok | −%4,1 | −0,54 | −%39 | %15 | — |
+| yok, yok (saf taşıma) | −%8,2 | −0,56 | −%64 | %40 | — |
+
+- En iyi varyant: DSR 0,21 (kapı 0,95), plato yok (komşuların ortalaması negatif), walk-forward dışı yıllık +%0,5
+  (Sharpe 0,12, 7 pencerede 3 farklı seçim). Yılların %60'ı pozitif; 2022 −%8, 2023 −%6, 2024 +%12. 2 kat maliyet
+  +%0,2, bir bar gecikme −%0,4.
+- Filtreler işini yapıyor ama kurtarmıyor: saf taşımanın −%64 düşüşü −%21'e iniyor, fakat kalan maruziyet (%16) primi
+  de kesiyor. Oynaklık filtresi olmayan her varyant negatif.
+- Paper kollarıyla korelasyon raporu atlandı: kol KALDI, karışımın Sharpe'ı anlamlı değil.
+
+Okuma: TL taşıması 2015–2026'da, TL faizinin çoğu yıl enflasyonun ve kur kaybının altında kaldığı bir dönemde ölçüldü;
+prim var ama değer kaybı daha büyük. Sonuca bakıp filtre ya da eşik değiştirilmedi (kural 10). Fikir kapanan
+fikirlere girer; yeni bir gerekçe olmadan (ör. pozitif reel faiz rejiminin kalıcılaşması) tekrar denenmez.
