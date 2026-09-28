@@ -11,6 +11,10 @@ Varsayımlar (2026-09; paper aşamasında gerçek dolumlarla ölçülüp güncel
   yıllık FX %2, metal %4, emtia %4, endeks %6 (≈ gösterge faiz + aracı kurum payı).
 - ABD ETF: komisyon 1 bps, yarım spread 1 bps, kayma 1 bps; açığa satışta yıllık %1 ödünç maliyeti.
 - BIST hisse: komisyon 4 bps + BSMV (%5), yarım spread 5 bps, kayma 5 bps.
+- VİOP endeks vadeli (NCM, 2026-09-28): komisyon 4 bps + BSMV (%5) (kurumun gerçek oranı bilinmiyor, aleyhte tahmin),
+  yarım spread 2 bps (1 dk barlarda medyan ~0,3, p90 ~1,9), kayma 2 bps. Vade devri: yılda 6 geçiş × 2 taraf ×
+  ~10 bps ≈ yıllık %1,2 (elde tutma süresine orantılı, finansman alanıyla). Faiz farkı sürekli serinin kendisinde
+  (baz erimesi), ayrıca finansman yok.
 """
 from __future__ import annotations
 
@@ -44,6 +48,7 @@ MODELLER = {
     "ARCA": MaliyetModeli("abd_etf", 1.0, 1.0, 1.0, aciga_satis_yillik=0.01),
     "BIST:hisse": MaliyetModeli("bist_hisse", 4.0, 5.0, 5.0, ucret_vergisi=0.05),
     "BIST:endeks": MaliyetModeli("bist_endeks_vadeli_vekil", 2.0, 2.0, 2.0),  # endeks doğrudan alınamaz; VİOP vekili
+    "VIOP:endeks_vadeli": MaliyetModeli("viop_endeks", 4.0, 2.0, 2.0, finansman_yillik=0.012, ucret_vergisi=0.05),
 }
 
 

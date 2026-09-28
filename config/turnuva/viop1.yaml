@@ -1,0 +1,60 @@
+# Turnuva VİOP 1: ÖN KAYIT (Faz 8). Koşudan ÖNCE commit edilir, koşu sırasında değişmez. Gerekçe: docs/turnuva/VIOP-1.md
+# Seri: VIOP:XU030_SUREKLI (NCM MT5 yakın vade, vade geçişi sıçraması ayıklanmış; veri/viop.py). Faiz farkı serinin
+# içinde: getiriler TL mevduatı üzerindeki getiridir. Aileler ve ızgaralar dalga 1 ile AYNI (yeni ayar araması yok).
+
+dalga: viop1
+veri_bitis: "2025-10-31"          # sonrasında kurum serisinde 186 günlük delik (2025-10-31 → 2026-05-05)
+frenler: true
+boyut:
+  hedef_vol: 0.20
+  kaldirac: 3.0
+  vol_pencere_gun: 90              # dalga 2'nin boyut ayarı
+  bant: 0.25
+walk_forward: { is_yil: 3, oos_yil: 1 }
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0 }
+
+planlar:
+  trend:
+    kimlik: 2026-09-28-viop1-trend
+    hipotez: >-
+      BIST30 vadelisinde zaman serisi trendi (TSMOM, hareketli ortalama yönü, Donchian) oynaklık hedefli, iki yönlü
+      kolda, maliyet, vade devri ve frenler sonrası TL mevduatının üzerinde pozitif haftalık log büyüme verir.
+      Sıfır hipotezi: vermez.
+  ortalamaya_donus:
+    kimlik: 2026-09-28-viop1-donus
+    hipotez: >-
+      BIST30 vadelisinde kısa vadeli aşırılıklar (z-skor, trend yönünde RSI(2)) maliyet sonrası geri döner.
+  takvim:
+    kimlik: 2026-09-28-viop1-takvim
+    hipotez: >-
+      Ay dönümü etkisi BIST30 vadelisinde maliyet sonrası pozitif getiri verir.
+
+gruplar:
+  viop_xu030: { kimlikler: [VIOP:XU030_SUREKLI], asgari_gecmis_gun: 60, yon: long_short, zd: [1d] }
+
+kollar:
+  - strateji: tsmom
+    gruplar: [viop_xu030]
+    zd: [1d]
+    izgara: { ufuk_gun: [20, 60, 120, 250] }
+  - strateji: ma_yon
+    gruplar: [viop_xu030]
+    zd: [1d]
+    izgara: { hizli_gun: [10, 25], yavas_gun: [50, 100, 200] }
+  - strateji: donchian_ls
+    gruplar: [viop_xu030]
+    zd: [1d]
+    izgara: { giris_gun: [20, 55, 100], cikis_gun: [10, 20] }
+  - strateji: zskor_donus
+    gruplar: [viop_xu030]
+    zd: [1d]
+    izgara: { pencere: [20, 50], giris: [1.5, 2.0, 2.5], cikis: [0.5] }
+  - strateji: rsi_donus
+    gruplar: [viop_xu030]
+    zd: [1d]
+    izgara: { n: [2], alt: [5, 10], trend: [100, 200], cikis_ma: [5] }
+  - strateji: ay_donumu
+    gruplar: [viop_xu030]
+    zd: [1d]
+    yon: long
+    izgara: { son_gun: [2, 4], ilk_gun: [2, 3] }
