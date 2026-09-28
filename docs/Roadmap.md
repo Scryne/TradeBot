@@ -389,8 +389,11 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     son kararlar ve dolumlar. Salt okunur: buton, durdurma, ayar yok (Scryne'la konuşuldu).
   - Yerel geliştirme: `tradebot pano calis --ornek` (sentetik SQLite; canlıya yazmaz) + `npm run dev` (pano/).
     Testler `tests/test_pano.py`. Görsel doğrulama 4 genişlikte temiz; `soluk` renk AA için açıldı (4,5:1).
-  - Kalan: host'a dağıtım + `tools/host/pano_tailscale.ps1`; Scryne'ın telefonuna Tailscale (aynı hesap) → telefondan
-    erişim bitti kriterinin son parçası.
+  - Host'a dağıtıldı (b92700a). Tailscale: `http://scryne.tailca7928.ts.net/` (yalnız tailnet; `tailscale serve --http=80`,
+    `tools/host/pano_tailscale.ps1`). Tailnet'te HTTPS sertifikası kapalı: WireGuard zaten şifreli, HTTPS isteğe bağlı.
+    Canlı veride bulunan: paper yeniden başlayınca `toparlanma` kayıtları (sandbox kurulumu) dolum sanılıyordu, ayrıldı.
+  - Kalan: Scryne'ın telefonuna Tailscale (aynı hesap) → telefondan erişim bitti kriterinin son parçası; Scryne geri
+    bildirimi.
 
 ### Faz 11: Paper turnuvası — 12 hafta
 - **İşler:** Sistem kendi başına çalışır; haftalık raporlar okunur; arızalar düzeltilir; kademeli sermaye
