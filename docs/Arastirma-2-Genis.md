@@ -133,7 +133,8 @@ eklenebilecek ilk gerçekten farklı kaynak.
 
 Fiyat deseni aramayı bırakıp **farklı getiri kaynakları** eklemek:
 
-1. **Dalga 4 — BTC/ETH opsiyon oynaklık primi (öncelik 1).** Tanımlı riskli yapı (put spread / iron condor), küçük
+1. **Dalga 4 — BTC/ETH opsiyon oynaklık primi (öncelik 1).** ❌ 2026-09-29 KALDI (`turnuva/Dalga-4.md`): haftalık
+   tanımlı riskli satışın altı kolu da negatif; call'lar yükselişte ucuz kaldı, put fazlalığı anlamlı değil. Ön plan:** Tanımlı riskli yapı (put spread / iron condor), küçük
    boyut, haftalık/aylık vade. Önce ön kayıtlı backtest: DVOL + çarpıklık varsayımıyla (aleyhte) fiyatlama, 2024+ kör.
    Deribit'in ücretsiz testnet'i gerçek emir akışıyla paper verir. Trend kollarıyla korelasyon ve birleşik portföy
    raporlanır.
