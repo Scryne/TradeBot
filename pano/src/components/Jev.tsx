@@ -6,8 +6,9 @@ import type { Pano } from '@/lib/tip'
 const ROL: Record<string, string> = {
   A1_binance: 'Binance duyuruları',
   A2_kap: 'KAP bildirimleri',
+  manuel: 'Elle',
 }
-const TUR: Record<string, string> = { veto: 'veto', uyari: 'uyarı', kurumsal: 'kurumsal işlem' }
+const TUR: Record<string, string> = { veto: 'veto', uyari: 'uyarı', kurumsal: 'kurumsal işlem', kaldir: 'kaldırma' }
 
 export function Jev({ p }: { p: Pano }) {
   const o = p.olaylar

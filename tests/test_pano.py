@@ -44,6 +44,22 @@ def test_pano_ozeti_defterle_tutarli(ortam):
     assert plan["2026-09-25-d1-trend"]["karar"] == "B"
 
 
+def test_toparlanma_dolum_sayilmaz(tmp_path):
+    from sqlalchemy import insert
+
+    from tradebot.db import paper_emir_olay
+
+    m = kur(f"sqlite:///{tmp_path / 'o.db'}", SIMDI, gun=4)
+    kol = "ma_yon@kripto_btc_eth@1h"
+    once = veri.pano(m, SIMDI)["serit"]["satirlar"]
+    with m.begin() as b:
+        b.execute(insert(paper_emir_olay).values(emir_id=0, kol=kol, tur="toparlanma", enstruman="BINANCE:BTCUSDT",
+                                                 miktar=1.0, fiyat=1.0, ucret=0.0, zaman_ms=SIMDI - 1000, ayrinti={}))
+    sonra = veri.pano(m, SIMDI)["serit"]["satirlar"]
+    assert once == sonra
+    assert all(d["tur"] == "dolum" for d in veri.kol(m, kol, SIMDI)["dolumlar"])
+
+
 def test_bayat_veri_isaretlenir(ortam):
     m, d = ortam
     p = veri.pano(m, SIMDI + 3 * veri.SAAT_MS, d)

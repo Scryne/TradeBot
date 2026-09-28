@@ -2,7 +2,8 @@
 
 Kol getirileri haftalık raporla aynı hesaptır (`canli/rapor.ozetle`): pano ile Telegram raporu aynı sayıyı gösterir.
 Karar şeridi saatliktir: hücre = o saatin son özkaynak işaretindeki brüt maruziyet (Σ|adet × fiyat| / özkaynak); veto ve
-fren o saatte verilen kararlardan, işlem o saatteki dolumlardan gelir.
+fren o saatte verilen kararlardan, işlem o saatteki dolumlardan gelir. `toparlanma` kayıtları (paper yeniden başlayınca
+sandbox'ın defterdeki pozisyonu yeniden kurması; defter hesabına girmez) dolum sayılmaz.
 """
 from __future__ import annotations
 
@@ -100,7 +101,7 @@ def _serit(motor: Engine, isaret: dict[str, list], kollar: list[str], simdi_ms: 
         kararlar = b.execute(select(paper_karar.c.kol, paper_karar.c.karar_ms, paper_karar.c.durum, paper_karar.c.ayrinti)
                              .where(paper_karar.c.karar_ms >= ilk)).all()
         dolumlar = b.execute(select(paper_emir_olay.c.kol, paper_emir_olay.c.zaman_ms)
-                             .where(paper_emir_olay.c.zaman_ms >= ilk, paper_emir_olay.c.tur != "ret")).all()
+                             .where(paper_emir_olay.c.zaman_ms >= ilk, paper_emir_olay.c.tur == "dolum")).all()
     veto, fren, islem = defaultdict(int), {}, defaultdict(int)
     for r in kararlar:
         h = (r.kol, int(r.karar_ms) // SAAT_MS * SAAT_MS)
@@ -268,7 +269,8 @@ def kol(motor: Engine, ad: str, simdi_ms: int) -> dict | None:
         dolumlar = b.execute(select(paper_emir_olay, paper_emir.c.karar_fiyati, paper_emir.c.gonderim_fiyati,
                                     paper_emir.c.risk)
                              .join(paper_emir, paper_emir.c.id == paper_emir_olay.c.emir_id)
-                             .where(paper_emir_olay.c.kol == ad).order_by(paper_emir_olay.c.zaman_ms.desc()).limit(40)).all()
+                             .where(paper_emir_olay.c.kol == ad, paper_emir_olay.c.tur == "dolum")
+                             .order_by(paper_emir_olay.c.zaman_ms.desc()).limit(40)).all()
     tanim = dict(r.tanim or {})
     return {
         **b_, "ikiz": ikiz if seriler.get(ikiz) else None, "sinif": r.sinif, "tanim": tanim,
