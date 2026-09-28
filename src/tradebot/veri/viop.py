@@ -83,18 +83,64 @@ def surekli(vadeli: pl.DataFrame, spot: pl.DataFrame, vadeler: list[int], pencer
                  "ham_toplam_getiri": float(cv[-1] / cv[0] - 1), "ayarli_toplam_getiri": float(cv[-1] / (cv[0] * carpan[0]) - 1)}
 
 
-def xu030_surekli(depo, motor) -> dict:
-    """VIOP:XU30_YAKINVADE + BIST:XU030 → VIOP:XU030_SUREKLI (1d). Katalogdan türetilir, her koşuda baştan kurulur."""
+AYLIK = tuple(range(1, 13))   # döviz vadelileri her ay vadelenir
+
+
+def ters_mi(vadeli: pl.DataFrame, spot: pl.DataFrame) -> bool:
+    """Kaynak seri spotla ters yönde mi kote (ör. TRY/USD)? Ortak günlerin günlük log getirisi korelasyonu < 0 ise."""
+    j = vadeli.select("acilis_ms", pl.col("close").alias("v")).join(
+        spot.select("acilis_ms", pl.col("close").alias("s")), on="acilis_ms").sort("acilis_ms")
+    if j.height < 30:
+        raise ValueError("ters kote tespiti için ortak gün yetersiz")
+    rv, rs = np.diff(np.log(j["v"].to_numpy())), np.diff(np.log(j["s"].to_numpy()))
+    ok = np.isfinite(rv) & np.isfinite(rs)
+    return float(np.corrcoef(rv[ok], rs[ok])[0, 1]) < 0
+
+
+def ters_cevir(df: pl.DataFrame) -> pl.DataFrame:
+    """1/fiyat: yüksek ve düşük yer değiştirir."""
+    return df.with_columns((1 / pl.col("open")).alias("open"), (1 / pl.col("low")).alias("high"),
+                           (1 / pl.col("high")).alias("low"), (1 / pl.col("close")).alias("close"))
+
+
+def saatlik_kapanis_gunluk(saatlik: pl.DataFrame, saat_utc: int) -> pl.DataFrame:
+    """Saatlik barlardan günlük seri: her günün `saat_utc`'de biten barının kapanışı, gün başı etiketli. VİOP döviz
+    vadelisi TR 18:10'da (15:10 UTC) kapanır; spotun da aynı anki kapanışı karşılaştırılır (gece FX hareketi karışmasın)."""
+    return saatlik.filter((pl.col("acilis_ms") // 3_600_000) % 24 == saat_utc - 1).select(
+        (pl.col("acilis_ms") // GUN_MS * GUN_MS).alias("acilis_ms"), "close")
+
+
+def surekli_kur(depo, motor, kaynak: str, spot: pl.DataFrame, hedef: str, sinif: str, takvim_adi: str,
+                para: str, aylar: tuple[int, ...]) -> dict:
+    """Kaynak yakın vade (1d) + spot → `hedef` (1d) sürekli seri; enstrüman kaydı. Katalogdan türetilir, her koşuda
+    baştan kurulur. Kaynak spotla ters kote ise önce çevrilir."""
     from tradebot.veri import enstruman as en
 
-    v, s = depo.oku("VIOP:XU30_YAKINVADE", "1d"), depo.oku("BIST:XU030", "1d")
-    if v.is_empty() or s.is_empty():
+    v = depo.oku(kaynak, "1d")
+    if v.is_empty() or spot.is_empty():
         return {"atlandi": "kaynak seri yok"}
+    ters = ters_mi(v, spot)
+    if ters:
+        v = ters_cevir(v)
     t0, t1 = int(v["acilis_ms"].min()), int(v["acilis_ms"].max())
-    seri, r = surekli(v, s, vade_sonlari(gun_basi(t0), t1 + GUN_MS))
-    depo.yaz("VIOP:XU030_SUREKLI", "1d", seri, birlestir=False)
-    en.kaydet(motor, [en.Enstruman("VIOP", "XU030_SUREKLI", "endeks_vadeli", "viop_aksam", "TRY", "turetilmis",
-                                   {"kaynak": ["VIOP:XU30_YAKINVADE", "BIST:XU030"], "gecis": r["gecis"],
+    seri, r = surekli(v, spot, vade_sonlari(gun_basi(t0), t1 + GUN_MS, aylar))
+    kimlik = f"VIOP:{hedef}"
+    depo.yaz(kimlik, "1d", seri, birlestir=False)
+    en.kaydet(motor, [en.Enstruman("VIOP", hedef, sinif, takvim_adi, para, "turetilmis",
+                                   {"kaynak": [kaynak], "ters_cevrildi": ters, "gecis": r["gecis"],
                                     "delikler": r["delikler"], "kural": "veri/viop.py surekli"})])
-    en.sinir_guncelle(motor, "VIOP:XU030_SUREKLI", t0, t1)
-    return {k: v for k, v in r.items() if k != "gecisler"}
+    en.sinir_guncelle(motor, kimlik, t0, t1)
+    return {k: x for k, x in r.items() if k != "gecisler"} | {"ters_cevrildi": ters}
+
+
+def xu030_surekli(depo, motor) -> dict:
+    """VIOP:XU30_YAKINVADE + BIST:XU030 (Yahoo günlük) → VIOP:XU030_SUREKLI."""
+    return surekli_kur(depo, motor, "VIOP:XU30_YAKINVADE", depo.oku("BIST:XU030", "1d"), "XU030_SUREKLI",
+                       "endeks_vadeli", "viop_aksam", "TRY", BIST30_AYLARI)
+
+
+def usdtry_surekli(depo, motor) -> dict:
+    """VIOP:TRYUSD_YAKINVADE + Dukascopy USDTRY (15:00 UTC kapanışı) → VIOP:USDTRY_SUREKLI (VİOP 2, TL taşıma)."""
+    spot = saatlik_kapanis_gunluk(depo.oku("DUKASCOPY:USDTRY", "1h"), 15)
+    return surekli_kur(depo, motor, "VIOP:TRYUSD_YAKINVADE", spot, "USDTRY_SUREKLI", "doviz_vadeli", "viop", "TRY",
+                       AYLIK)

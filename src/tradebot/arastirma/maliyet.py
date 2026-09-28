@@ -15,6 +15,7 @@ Varsayımlar (2026-09; paper aşamasında gerçek dolumlarla ölçülüp güncel
   yarım spread 2 bps (1 dk barlarda medyan ~0,3, p90 ~1,9), kayma 2 bps. Vade devri: yılda 6 geçiş × 2 taraf ×
   ~10 bps ≈ yıllık %1,2 (elde tutma süresine orantılı, finansman alanıyla). Faiz farkı sürekli serinin kendisinde
   (baz erimesi), ayrıca finansman yok.
+- VİOP USDTRY vadeli: komisyon 4 bps + BSMV, yarım spread 1 bps (ölçülen ~0,3), kayma 1 bps, aylık devir ≈ yıllık %1,5.
 """
 from __future__ import annotations
 
@@ -49,6 +50,9 @@ MODELLER = {
     "BIST:hisse": MaliyetModeli("bist_hisse", 4.0, 5.0, 5.0, ucret_vergisi=0.05),
     "BIST:endeks": MaliyetModeli("bist_endeks_vadeli_vekil", 2.0, 2.0, 2.0),  # endeks doğrudan alınamaz; VİOP vekili
     "VIOP:endeks_vadeli": MaliyetModeli("viop_endeks", 4.0, 2.0, 2.0, finansman_yillik=0.012, ucret_vergisi=0.05),
+    # USDTRY vadeli: 1 dk barlarda tam spread medyan ~0,6 bps, p90 ~1,8 (yarım 1 bps aleyhte); aylık devir: 12 × 2 taraf
+    # × ~6 bps ≈ yıllık %1,5. Komisyon endeksle aynı (bilinmiyor, aleyhte).
+    "VIOP:doviz_vadeli": MaliyetModeli("viop_doviz", 4.0, 1.0, 1.0, finansman_yillik=0.015, ucret_vergisi=0.05),
 }
 
 

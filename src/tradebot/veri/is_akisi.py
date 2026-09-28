@@ -52,12 +52,21 @@ def mt5(a: Ayarlar, m: Engine, butce_dk: float = 60.0) -> dict:
     istemciler = {h: Mt5Istemci(u) for h, u in (("forex", a.mt5_kopru_forex), ("viop", a.mt5_kopru_viop)) if u}
     if not istemciler:
         return {"atlandi": "köprü tanımsız"}
-    from tradebot.veri.viop import xu030_surekli
+    from tradebot.veri.viop import usdtry_surekli, xu030_surekli
 
     r = Mt5Veri(a.veri_dizini, m, istemciler).guncelle(butce_dk)
     return {"enstruman": len({x["kimlik"] for x in r}), "yeni_bar": sum(x.get("yeni", 0) for x in r),
             "hata": [x for x in r if "hata" in x and x["hata"]][:5],
-            "xu030_surekli": xu030_surekli(BarDepo(a.veri_dizini), m)}
+            "xu030_surekli": xu030_surekli(BarDepo(a.veri_dizini), m),
+            "usdtry_surekli": _guvenli(lambda: usdtry_surekli(BarDepo(a.veri_dizini), m))}
+
+
+def _guvenli(f) -> dict:
+    """Türetilmiş seri adımı: hatası MT5 adımının sonucunu silmesin."""
+    try:
+        return f()
+    except Exception as e:  # noqa: BLE001
+        return {"hata": f"{type(e).__name__}: {e}"[:300]}
 
 
 def _zaman_dilimleri(kayit: dict) -> list[str]:

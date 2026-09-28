@@ -9,6 +9,7 @@ Aile → fonksiyonlar:
 - ortalamaya_donus: zskor_donus, rsi_donus
 - takvim: ay_donumu
 - kesitsel_momentum: kesitsel_momentum (Panel)
+- tasima: tasima (VİOP 2, TL taşıma; docs/turnuva/VIOP-2.md)
 """
 from __future__ import annotations
 
@@ -50,6 +51,35 @@ def donchian_ls(b: Barlar, giris: int = 20, cikis: int = 10) -> np.ndarray:
             elif c < alt[i]:
                 poz = -1.0
         out[i] = poz
+    return out
+
+
+# ---------------------------------------------------------------- taşıma
+def tasima(b: Barlar, ufuk: int = 0, pencere: int = 0, uzun: int = 250, kat: float = 1.5) -> np.ndarray:
+    """TL taşıma (VİOP 2): USDTRY vadeli sürekli serisinde KISA (−1). Seri faiz farkını içerir (baz erimesi): kısa
+    pozisyon TL–USD faiz primini toplar, TL'nin değer kaybını öder.
+
+    Filtreler (her biri kapatır, 0; ısınmada da 0 — bilinmeyen durumda pozisyon yok):
+    - `ufuk` > 0: serinin son `ufuk` bar getirisi > 0 → TL taşımadan hızlı değer kaybediyor (prim yetmiyor).
+    - `pencere` > 0: son `pencere` barın getiri oynaklığı, son `uzun` bardaki oynaklıkların medyanının `kat` katını
+      aşarsa → kriz (2018, 2021 tipi sıçrama). Boyutsuz: yıllıklaştırma gerekmez.
+    """
+    n = len(b)
+    out = np.full(n, -1.0)
+    c = b.close
+    if ufuk > 0:
+        gecmis = np.full(n, np.nan)
+        gecmis[ufuk:] = c[ufuk:] / c[:-ufuk] - 1.0
+        out[~(gecmis <= 0)] = 0.0                      # NaN (ısınma) ya da pozitif → kapalı
+    if pencere > 0:
+        r = np.r_[np.nan, np.diff(np.log(c))]
+        sd = kayan_std(r, pencere)
+        med = np.full(n, np.nan)
+        for t in range(uzun - 1, n):                   # nedensel: [t − uzun + 1, t]
+            w = sd[t - uzun + 1: t + 1]
+            if np.isfinite(w).sum() >= uzun // 2:
+                med[t] = np.nanmedian(w)
+        out[~(sd <= kat * med)] = 0.0                  # NaN ya da kriz → kapalı
     return out
 
 

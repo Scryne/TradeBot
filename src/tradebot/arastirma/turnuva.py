@@ -58,6 +58,7 @@ STRATEJILER = {
     "ay_donumu": ("takvim", al.ay_donumu, "tek"),
     "kesitsel_momentum": ("kesitsel_momentum", al.kesitsel_momentum, "panel"),
     "acilis_araligi": ("gun_ici_kirilim", al.acilis_araligi_kirilim, "tek"),
+    "tasima": ("tasima", al.tasima, "tek"),   # VİOP 2: TL taşıma (docs/turnuva/VIOP-2.md)
     # Altın M15 (EA karşılığı; docs/turnuva/Altin-M15.md): giriş ailesi + EA risk katmanları
     "seans_kirilim": ("altin_m15", altin.seans_kirilim, "tek"),
     "kanal_kirilim": ("altin_m15", altin.kanal_kirilim, "tek"),

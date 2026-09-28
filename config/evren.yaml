@@ -73,5 +73,6 @@ mt5:
         # Vadeli kontratlar önekle bulunur (bugün listelenen her vade); kendi sürekli serimiz bunlardan kurulur
         endeks_vadeli: { takvim: viop_aksam, para: TRY, on_ek: [F_XU030] }
         altin_usd:     { takvim: viop_aksam, para: USD, on_ek: [F_XAUUSD] }
-        doviz_vadeli:  { takvim: viop, para: TRY, on_ek: [F_USDTRY] }
+        # TRYUSD_YAKINVADE: yakın vade sürekli döviz (2015-07 → 2026-02'de donmuş; VİOP 2'nin geçmişi)
+        doviz_vadeli:  { takvim: viop, para: TRY, liste: [TRYUSD_YAKINVADE], on_ek: [F_USDTRY] }
         altin_try:     { takvim: viop, para: TRY, on_ek: [F_XAUTRYM] }

@@ -1,0 +1,35 @@
+# Turnuva VİOP 2 — TL taşıma: ÖN KAYIT (koşudan ÖNCE commit edilir, koşu sırasında değişmez). Gerekçe: docs/turnuva/VIOP-2.md
+# Seri: VIOP:USDTRY_SUREKLI (NCM TRYUSD_YAKINVADE, ters kote çevrilmiş, vade geçişi sıçraması spotla ayıklanmış;
+# veri/viop.py). Faiz farkı serinin içinde: kısa pozisyonun getirisi TL–USD faiz primi eksi TL değer kaybıdır.
+# Parametreler bar (gün) cinsinden: `*_gun` adı 0'ı 1'e yuvarlardı (filtre yok = 0).
+
+dalga: viop2
+veri_bitis: "2026-02-28"          # kaynak seri 2026-02-27'de donmuş (NCM)
+frenler: true
+boyut:
+  hedef_vol: 0.20
+  kaldirac: 3.0
+  vol_pencere_gun: 90
+  bant: 0.25
+walk_forward: { is_yil: 3, oos_yil: 1 }
+# risksiz_yillik 0: vadeli seri faiz farkını içerir (getiri zaten mevduat üzeri; Dalga-1 ek 4)
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0, risksiz_yillik: 0.0 }
+
+planlar:
+  tasima:
+    kimlik: 2026-09-28-viop2-tasima
+    hipotez: >-
+      USDTRY vadelisi TL–USD faiz farkı kadar primlidir; kısa pozisyon bu primi toplar. Saf taşıma çöküşlerde (2018,
+      2021) büyük düşüş verir; son 20–120 günlük seri getirisi pozitifken (TL primden hızlı değer kaybediyor) ya da
+      kısa vadeli oynaklık uzun vadeli medyanın 1,5 katını aşınca kapatmak düşüşü keser ve primi korur. Oynaklık
+      hedefli kolda maliyet, devir ve frenler sonrası pozitif ve walk-forward'da kalıcı. Sıfır hipotezi: vermez.
+
+gruplar:
+  viop_usdtry: { kimlikler: [VIOP:USDTRY_SUREKLI], asgari_gecmis_gun: 60, yon: long_short, zd: [1d] }
+
+# 8 deneme: ufuk 0 (trend filtresi yok) / 20 / 60 / 120 × oynaklık filtresi yok / 20 gün (kat 1,5; uzun 250 sabit)
+kollar:
+  - strateji: tasima
+    gruplar: [viop_usdtry]
+    zd: [1d]
+    izgara: { ufuk: [0, 20, 60, 120], pencere: [0, 20], kat: [1.5], uzun: [250] }
