@@ -1,0 +1,24 @@
+# Turnuva dalga 4 — opsiyon oynaklık primi: ÖN KAYIT (koşudan önce commit edilir, koşu sırasında değişmez).
+# Gerekçe: docs/turnuva/Dalga-4.md. Veri: `tradebot veri deribit` (haftalık yüzey + teslim fiyatları).
+# Parametre araması yok: 3 yapı × 2 para = 6 kol, her biri tek varyant (deltalar, risk ve maliyet sabit).
+
+dalga: 4
+plan:
+  kimlik: 2026-09-29-d4-opsiyon-vrp
+  aile: opsiyon_vrp
+  hipotez: >-
+    BTC ve ETH haftalık opsiyonlarında örtük oynaklık gerçekleşenden sistematik olarak yüksektir (oynaklık primi). Her
+    Cuma 08:05 UTC'de bir sonraki Cuma vadeli, %25 delta satılıp %10 delta kanatla korunan tanımlı riskli yapı (iron
+    condor, put spread, call spread), gerçek işlemlerden alınan oynaklıkla, aleyhte spread ve Deribit ücretleriyle,
+    haftalık azami kayıp özkaynağın %2'si olacak boyutta, maliyet sonrası pozitif getiri verir ve kör dönemde (2025+)
+    sürer. Sıfır hipotezi: vermez (prim, kuyruk kayıpları ve maliyetle silinir).
+
+paralar: [BTC, ETH]
+yapilar: [iron_condor, put_spread, call_spread]
+risk: 0.02                     # haftalık azami kayıp / özkaynak
+maliyet: { yarim_spread_25: 1.5, yarim_spread_10: 2.0, islem_ucreti: 0.0003, teslim_ucreti: 0.00015 }
+donem: { bas: "2020-06-01", is_bitis: "2025-01-01", bit: "2026-09-26" }
+# Kapılar (dalga 1–3 ile aynı ruh): yılların %60'ı pozitif, en kötü hafta ≥ −%10, en kötü düşüş ≥ −%30, 2 kat maliyette
+# pozitif, kör dönem pozitif ve düşüşü ≥ −%30. A ayrıca DSR ≥ 0,95 (6 deneme). Nakit getirisi ayrıca yok: çıta 0.
+olcut: { dsr_a: 0.95, yil_pozitif: 0.60, stres_maliyet: 2.0, en_kotu_hafta: -0.10, en_kotu_dusus: -0.30,
+         oos_asgari_yillik: 0.0 }

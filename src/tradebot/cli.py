@@ -485,6 +485,28 @@ def arastirma_tara(
     typer.echo("yıllık: " + "  ".join(f"{y}:{v * 100:+.0f}%" for y, v in r["yillik"].items()))
 
 
+@arastirma_uygulama.command("opsiyon")
+def arastirma_opsiyon(
+    dosya: str = typer.Option("config/turnuva/dalga4.yaml", help="Dalga 4 ön kayıt dosyası"),
+    trend: str = typer.Option("data/turnuva/dalga2/donchian_ls__kripto_btc_eth__4h.json",
+                              help="Korelasyon için trend kolu sonuç dosyası (bilgi)"),
+) -> None:
+    """Dalga 4 — opsiyon oynaklık primi: ön kayıtlı yapı × para kollarını koşar, deftere ve data/turnuva/'ya yazar."""
+    from tradebot.arastirma import opsiyon_dalga
+    from tradebot.arastirma.defter import Defter
+
+    a, m = _veri_baglam()
+    t = Path(trend)
+    if not t.is_absolute():
+        t = a.veri_dizini / Path(*t.parts[1:]) if t.parts and t.parts[0] == "data" else t
+    for r in opsiyon_dalga.kos(Path(dosya), a.veri_dizini, Defter(m), t):
+        k, o = r["tam"], r["kor"]
+        typer.echo(f"{r['karar']:<5} {r['kol']:<34} Sharpe {k['sharpe']:.2f}  yıllık {k['yillik_bilesik']:+.1%}  "
+                   f"DD {k['en_kotu_dusus']:.0%}  en kötü hf {k['en_kotu_hafta']:+.1%}  DSR {r['dsr']['dsr']:.2f}  "
+                   f"kör yıllık {o.get('yillik_bilesik', float('nan')):+.1%}  stres {r['stres_2x']['yillik_bilesik']:+.1%}  "
+                   f"trend kor {r['trend_korelasyonu'] if r['trend_korelasyonu'] is None else round(r['trend_korelasyonu'], 2)}")
+
+
 @arastirma_uygulama.command("turnuva")
 def arastirma_turnuva(
     dosya: str = typer.Option("config/turnuva/dalga1.yaml", help="Dalga ön kayıt dosyası"),
