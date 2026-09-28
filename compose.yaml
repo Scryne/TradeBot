@@ -6,6 +6,9 @@ name: tradebot
 x-ortak: &ortak
   build: .
   image: tradebot:yerel
+  # tini PID 1 olur, sinyalleri servise iletir. 2026-09-28 tatbikatı: Python PID 1 iken işleyicisiz SIGTERM yok sayılıyordu;
+  # `docker stop` (her dağıtım) 10 sn bekleyip SIGKILL ile öldürüyordu.
+  init: true
   dns: [1.1.1.1, 8.8.8.8]
   # Sabit DNS Docker Desktop'ın host.docker.internal kaydını gizliyor (MT5 köprüsü için gerekli): /etc/hosts'a yazılır
   extra_hosts: ["host.docker.internal:host-gateway"]
@@ -144,6 +147,8 @@ services:
     # Faz 7: paper düğümü (Nautilus sandbox, Binance canlı veri). Kararlar her 1h kapanışında; defter PostgreSQL'de.
     # Duman testi 2026-09-27: 1h kolları karar → risk → sandbox dolum → defter uçtan uca çalıştı.
     command: ["tradebot", "paper", "calis"]
+    # SIGINT → KeyboardInterrupt → asyncio.run iptal → node.dispose() (düzgün kapanış; defter zaten emirden önce yazılır)
+    stop_signal: SIGINT
     depends_on:
       goc: { condition: service_completed_successfully }
 
