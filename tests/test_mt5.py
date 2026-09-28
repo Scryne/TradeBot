@@ -284,3 +284,17 @@ def test_yogun_baslangic_seyrek_gecmisi_keser():
     t = seri(datetime(2016, 1, 4, tzinfo=UTC), datetime(2025, 10, 1, tzinfo=UTC), saat) + \
         seri(datetime(2026, 4, 1, tzinfo=UTC), datetime(2026, 9, 1, tzinfo=UTC), saat)
     assert yogun_baslangic(pl.Series(t)) == int(datetime(2016, 1, 1, tzinfo=UTC).timestamp() * 1000)
+
+
+def test_her_mt5_grubunun_maliyet_modeli_var():
+    """Evrene eklenen her MT5 grubu backtest'te maliyet modelsiz kalmamalı (spike 08: NCMFX modelleri)."""
+    from tradebot.arastirma.maliyet import model
+    from tradebot.veri.enstruman import evren_yukle
+    eksik = []
+    for h in evren_yukle()["mt5"]["hesaplar"].values():
+        for sinif in h["gruplar"]:
+            try:
+                model(h["piyasa"], sinif)
+            except KeyError:
+                eksik.append(f"{h['piyasa']}:{sinif}")
+    assert not eksik, eksik

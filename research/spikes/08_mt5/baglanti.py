@@ -1,7 +1,7 @@
 """Spike 08: NCM MT5 demo hesaplarına Python'dan bağlantı (Faz 8'in ilk riskli adımı). HOST WINDOWS'TA çalışır.
 
     uv run --no-project --python 3.12 --with MetaTrader5 research/spikes/08_mt5/baglanti.py <forex|viop>
-        [--gecmis] [--ornekle <dk> <sembol,sembol>] [--emir <sembol>]
+        [--gecmis] [--ornekle <dk> <sembol,sembol>] [--emir <sembol>] [--islemler]
 
 MT5 terminali grafik arayüzlüdür: SSH oturumundan değil, kullanıcı oturumundaki zamanlanmış görevden çalıştırılır
 (`calistir.ps1`). Şifre `C:\\TradeBot\\app\\.env`'den okunur; çıktıya sır girmez. Sonuç: C:\\TradeBot\\log\\mt5_<hesap>.json
@@ -12,6 +12,7 @@ Beklentiler (sonuca bakmadan yazıldı, 2026-09-27):
   B3 VİOP hesabında BIST30 endeks vadelisi ve USDTRY vadelisi var (sembol adları bilinmiyor; listeden bulunur).
   B4 XAUUSD M15 geçmişi terminalden en az 1 yıl çekilebilir (Dukascopy ile karşılaştırma için).
   B5 --emir: piyasa açıkken en küçük hacimle al-kapat demo emri dolar (retcode 10009); kapalıyken ret kodu okunur.
+  --islemler (2026-09-28, B5 sonrası): son 7 günün işlem geçmişi (komisyon, ücret, swap alanları). Yalnız okur.
 """
 from __future__ import annotations
 
@@ -156,6 +157,13 @@ def main() -> None:
         if "--emir" in sys.argv:
             hedef = sys.argv[sys.argv.index("--emir") + 1] if len(sys.argv) > sys.argv.index("--emir") + 1 else None
             out["emir"] = emir_testi(hedef) if hedef else {"hata": "sembol verilmedi"}
+        if "--islemler" in sys.argv:
+            simdi = datetime.now(UTC).timestamp()
+            # sunucu saati UTC+3: aralık iki yana geniş tutulur
+            r = mt5.history_deals_get(datetime.fromtimestamp(simdi - 7 * 86_400, UTC),
+                                      datetime.fromtimestamp(simdi + 86_400, UTC)) or ()
+            out["islemler"] = [ad(x) for x in r]
+            out["islemler_hata"] = mt5.last_error()
     finally:
         mt5.shutdown()
     yaz(hesap, out)
@@ -217,7 +225,7 @@ def gecmis(hesap: str) -> dict:
 
 
 def yaz(hesap: str, out: dict) -> None:
-    ek = "_emir" if "emir" in out else ("_ornek" if "ornek" in out else "")
+    ek = "_islemler" if "islemler" in out else ("_emir" if "emir" in out else ("_ornek" if "ornek" in out else ""))
     yol = KOK / "log" / f"mt5_{hesap}{ek}.json"
     yol.write_text(json.dumps(out, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
     print(yol)
