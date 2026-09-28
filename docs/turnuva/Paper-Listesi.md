@@ -28,6 +28,10 @@ deneme sayılmaz, çünkü kural önceden yazılıdır. Kural değişikliği yen
   (`arastirma portfoy`).
 - 2017–2020'deki güçlü kripto trendi sonrasında zayıfladı. Paper bunun bugün de sürüp sürmediğini ölçecek.
 - Gözlemde her kol Jev vetolu ve vetosuz iki kopya olarak koşar (Faz 6–7).
+- **Seçim yanlılığı (2026-09-28 denetimi):** `kripto_btc_eth` grubu bugünden bakılarak seçildi: BTC ve ETH bugünün
+  hayatta kalan en büyükleri. Point-in-time gruplar (ilk 5, ilk 10, ilk 30) daha kötü sonuç verdi ("sepet genişledikçe
+  kötüleşme"). Bunun bir kısmı gerçek (likidite, maliyet), bir kısmı bu seçim olabilir. Paper haftaları bu yanlılıktan
+  bağımsız ölçümdür; backtest Sharpe'ı (~1) iyimser okunmalı.
 
 **Bekleyen (Faz 5 kuyruğu, veri geldikçe koşar):**
 - Dukascopy 1h/4h kolları.
