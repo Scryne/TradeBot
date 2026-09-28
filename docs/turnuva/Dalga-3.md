@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-09-28
 type: turnuva-plani
-durum: ön kayıt (koşudan önce commit edildi)
+durum: sonuçlandı — KALDI (2026-09-28)
 ---
 # Turnuva — Dalga 3: çok varlıklı vadeli trend (ön kayıt)
 
@@ -71,3 +71,33 @@ B çıkarsa: MT5 canlı bar akışı paper düğümüne bağlanır (Faz 8'in kal
 - En iyi varyantın paper kollarıyla (BTC/ETH trend backtest'i) haftalık korelasyonu ve 50/50 karışımın Sharpe'ı.
 - Sınıf kırılımı: endeks, metal, döviz ayrı katkı.
 - 2022 (faiz şoku) ve 2020 Mart ayrı.
+
+## Sonuç (2026-09-28, koşu `dalga3`, ön kayıt 9315440)
+
+**Üç aile de kaldı; sıfır hipotezi ayakta. Tahvil ve enerjisiz çok varlıklı vadeli trend bu sepette prim vermiyor.**
+
+| Aile | En iyi varyant | Yıllık | Sharpe | En kötü düşüş | OOS yıllık | Yıllar + | 2x maliyet |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ma_yon | 25/200 | +%3,2 | 0,27 | −%38 | +%1,5 | %71 | +%3,0 |
+| tsmom | 120 gün | −%0,2 | 0,07 | −%46 | −%2,2 | %43 | −%1,6 |
+| donchian_ls | 100/10 | −%1,2 | 0,00 | −%50 | −%4,2 | %21 | −%2,5 |
+
+- DSR üçünde de 0; plato yok (komşu varyantlar daha kötü). 16 varyantın Sharpe'ı −0,38 ile 0,27 arası.
+- **Kaldıraç tavanda:** sepetin çoğu düşük oynaklıklı (döviz ~%8). %20 hedef için brüt maruziyet ortalama 2,8 (tavan
+  3); tsmom yılda ~70 kat devir yapıyor, maliyet getirinin önemli kısmını yiyor.
+- **2022 zayıf:** trend fonlarının en iyi yılında ma_yon +%11, tsmom +%2, donchian −%10. O yılın kazananları tahvil ve
+  enerjiydi; bu sepette yoklar.
+
+**Sınıf kırılımı** (bilgi, aday değil; `config/turnuva/dalga3_kirilim.yaml`, 3 deneme defterde):
+
+| Sınıf | Sharpe | En kötü düşüş | OOS yıllık |
+| --- | --- | --- | --- |
+| Endeks (ES, NQ, YM) | 0,47 | −%36 | +%5,9 |
+| Metal (altın, gümüş) | 0,25 | −%58 | −%2,3 |
+| Döviz (6 majör) | −0,10 | −%48 | −%1,6 |
+
+Okuma: sepeti döviz batırıyor (majör döviz trendi 2012 sonrası literatürde de zayıf), metal çok sert düşüyor. Endeksteki
+0,47 büyük olasılıkla 2012–2025 hisse yükselişinin uzun tarafıdır, trend becerisi değil (ETF dalgası da aynı).
+Sonuca bakıp sepet ya da ızgara değiştirilmedi (kural 10); "yalnız endeks" ayrı bir aday değildir, kırılım bilgi amaçlı.
+
+Kör bekletme (2026-01 → 09) kullanılmadı: seçilen varyant yok. Veri ileride yeni bir ön kayıt için dokunulmamış kalır.
