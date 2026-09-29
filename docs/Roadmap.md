@@ -433,6 +433,23 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   sermaye; paper ↔ gerçek sapma ölçümü; otonomi seviyesinin yeniden konuşulması.
 - **Bitti Kriteri:** tablodaki gibi.
 - **Notlar:**
+  - **2026-09-29 kararlar (Scryne + Claude):**
+    - Scryne sistemi aktif kullanmak istiyor, ama "gerçek paraya geçmeden önce kazanacağımdan emin olmak" şartıyla.
+      Kapı: kolun kendi paper haftalarında PSR(0) ≥ 0,95 ve ≥ 26 hafta (Final Doküman §kapılar). Haftalık rapor ve
+      Telegram özeti kapıyı gösterir (`rapor.kanit_kapisi`, tahmini hafta dahil).
+    - Aday yalnız kilit kolu. Trend kolları walk-forward OOS'ta 2025 −%8, 2026 −%6 (5 kolun ortalaması); aynı
+      oynaklıktaki BTC al-tut −%2 / −%2. 2020–24'ün iyi sonuçları bugüne taşınmıyor, paper'da gözlem sürer.
+    - Beklenen süre (dürüst): kilit kolunun kör dönem Sharpe'ı (1,6) sürerse ~54 hafta, tam dönem Sharpe'ı (0,9) ise
+      ~180 hafta. Kısa paper hiçbir kolu kanıtlayamaz; kapı bunu bilerek sert.
+    - Borsa: Binance global USDT-M (Scryne hesabı açacak). Yerli lisanslı platformlarda türev yasak (SPK III-35/B.1,
+      13 Mart 2025); 7518'in yaptırımları platformlara yönelik, bireysel yurt dışı borsa kullanımı gri alan.
+      Stablecoin transferinde MASAK limiti (günlük 3.000 $). İşlem vergisi teklifi 27 Mart 2026'da geri çekildi;
+      kazanç beyanı ve "ticari kazanç" riski için mali müşavir.
+    - Gerçek yürütme katmanı kapı yaklaşınca yazılır (kullanılmayan kod yazılmaz). Tasarım notları: net BTC koruması
+      (BTCUSDT adımı 0,001 ≈ 100 $: olay başına bacak küçük sermayede yuvarlanamaz), `newClientOrderId` ile tekil
+      emir, açılışta borsa ↔ defter mutabakatı (fark → kol durur + KRİTİK), anahtarda çekim izni açık ya da IP kısıtı
+      yoksa düğüm çalışmaz (`/sapi/v1/account/apiRestrictions`), kodda sabit sermaye tavanı, funding
+      `/fapi/v1/income`'dan, önce Binance vadeli testnet'i.
 
 ### Faz 13: Sonraki dalgalar (koşullu)
 - **İşler:** Ücretli veriyle ABD tek hisseleri; Databento ile CME vadelileri; VİOP; gerekirse IB bağlantısı;

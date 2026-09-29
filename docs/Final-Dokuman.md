@@ -149,6 +149,12 @@ içeren ücretli veri), CME vadelileri (Databento; 125 $ kredi, Nautilus'ta yerl
     kirlenmemiş) haftalarında PSR(0) ≥ 0,95. Paper terfisi tek başına yetmez: 8–12 haftalık paper Sharpe ~1'lik bir
     kolun üstünlüğünü kanıtlayamaz (PSR 0,95 için ~2,7 yıl). **Mikro sermaye pilotu** (Faz 12, sabit tavan) bu kanıt
     olmadan ancak Scryne'ın bilerek verdiği açık kararla ve 12 hafta paper kapılarından sonra (kural 7).
+  - **2026-09-29 (Scryne):** "gerçek paraya geçmeden önce gerçekten para kazancım olacağından emin olmak isterim."
+    Buna göre gerçek para **yalnız paper yoluyla**: kolun kendi paper haftalarında PSR(0) ≥ 0,95 **ve en az 26 hafta**
+    (backtest DSR'ı tek başına yetmez; kilit kolunun DSR'ı 0,96 olsa da). Kapı haftalık raporda ve Telegram özetinde
+    izlenir (`canli/rapor.kanit_kapisi`). Aday yalnız kilit kolu (trend kolları 2025 ve 2026'da negatif); borsa Binance
+    global USDT-M (yerli platformlarda türev yasak, SPK III-35/B.1; yurt dışı borsa bireysel kullanıcı için gri alan,
+    Scryne hesabı kendisi açar). Ayrıntı: Roadmap Faz 12.
   - Başarı çıtası: yeni dalgalarda walk-forward OOS yıllık getirisi risksiz faizi geçmeli (`olcut.risksiz_yillik`;
     geçmiş dalgalar 0 ile ölçüldü, geriye dönük değişmez).
   - Ayrıntı: `docs/turnuva/Dalga-1.md` ek 3–4.

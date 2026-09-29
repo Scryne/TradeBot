@@ -114,3 +114,23 @@ def test_gunluk_ozet(tmp_path):
     yol.parent.mkdir(parents=True)
     yol.write_text("x")
     assert gunluk_ozet_zamani(sabah + 3 * SAAT, 5, tmp_path) is None
+
+
+def test_kanit_kapisi():
+    """Gerçek para kapısı: haftalık getiri Pazartesi sınırlarından, açılış yarım haftası atlanır, ≥ 26 hafta + PSR."""
+    import numpy as np
+
+    hf = dg.HAFTA_MS
+    bas = H + 3 * 86_400_000  # hafta ortasında açılış: ilk sınır H + hf
+    assert rapor.kanit_kapisi([], H)["gecti"] is False
+    rng = np.random.default_rng(0)
+    g = 0.01 + 0.01 * rng.standard_normal(40)            # haftalık Sharpe ~1: güçlü
+    oz = 100 * np.exp(np.concatenate([[0.0], np.cumsum(g)]))
+    isaret = [(bas, 100.0)] + [(H + (i + 1) * hf - SAAT, float(o)) for i, o in enumerate(oz)]
+    k = rapor.kanit_kapisi(isaret, H + 41 * hf)
+    assert k["hafta"] == 40 and k["sr"] > 0.5 and k["psr"] > 0.95 and k["gecti"]
+    kisa = rapor.kanit_kapisi(isaret[:12], H + 11 * hf)   # aynı güçlü seri, 10 hafta: asgari hafta yüzünden geçmez
+    assert kisa["hafta"] == 10 and not kisa["gecti"] and kisa["gerekli_hafta"] == rapor.KANIT_ASGARI_HAFTA
+    zayif = [(t, 100.0 * (1 + 0.02 * ((i % 2) * 2 - 1))) for i, (t, _) in enumerate(isaret)]
+    z = rapor.kanit_kapisi(zayif, H + 41 * hf)
+    assert not z["gecti"] and (z["sr"] is None or z["sr"] <= 0.1)

@@ -87,6 +87,43 @@ def _kol_ozet(kol: str, bilgi: dict, isaret: list[tuple[int, float]], hafta_ms: 
             "olay": [o["tur"] for o in olaylar]}
 
 
+KANIT_ASGARI_HAFTA = 26     # PSR kısa örneklemde şansla geçebilir: en az yarım yıl paper (2026-09-29, Scryne:
+KANIT_PSR = 0.95            # "gerçek paraya geçmeden önce kazanacağımdan emin olmak isterim"; Final Doküman §kapılar)
+_Z95 = 1.6448536269514722
+
+
+def kanit_kapisi(isaret: list[tuple[int, float]], bit_ms: int) -> dict:
+    """Gerçek para kanıt kapısı: kolun kendi paper haftalarında PSR(0) (seçimle kirlenmemiş örneklem dışı).
+
+    Haftalık getiri, Pazartesi 00:00 UTC sınırlarındaki son özkaynak işaretlerinden; kolun açıldığı yarım hafta
+    atlanır. `gerekli_hafta`: bugünkü haftalık Sharpe sürerse PSR'ın 0,95'e ulaşacağı toplam hafta (normal yaklaşım,
+    √(T−1)·SR ≥ 1,645); Sharpe ≤ 0 ise None. Geçmek için ayrıca en az `KANIT_ASGARI_HAFTA` hafta gerekir."""
+    import numpy as np
+
+    from tradebot.arastirma.dogrulama import carpiklik_basiklik, psr
+
+    if not isaret:
+        return {"hafta": 0, "sr": None, "psr": None, "gerekli_hafta": None, "gecti": False}
+    sinir = dg.hafta_basi(isaret[0][0]) + dg.HAFTA_MS
+    deger, i = [], 0
+    while sinir <= bit_ms:
+        while i < len(isaret) and isaret[i][0] < sinir:
+            i += 1
+        if i == 0:
+            break
+        deger.append(isaret[i - 1][1])
+        sinir += dg.HAFTA_MS
+    g = np.diff(np.log(np.asarray(deger, dtype=float))) if len(deger) > 1 else np.zeros(0)
+    t = len(g)
+    if t < 2 or g.std(ddof=1) == 0:
+        return {"hafta": t, "sr": None, "psr": None, "gerekli_hafta": None, "gecti": False}
+    sr = float(g.mean() / g.std(ddof=1))
+    p = psr(sr, 0.0, t, *carpiklik_basiklik(g))
+    gerekli = int(np.ceil((_Z95 / sr) ** 2 + 1)) if sr > 0 else None
+    return {"hafta": t, "sr": sr, "psr": p, "gerekli_hafta": max(gerekli, KANIT_ASGARI_HAFTA) if gerekli else None,
+            "gecti": bool(t >= KANIT_ASGARI_HAFTA and p == p and p >= KANIT_PSR)}
+
+
 def ozetle(v: dict) -> dict:
     """Ham kayıtlardan rapor (saf)."""
     h = v["hafta_ms"]
@@ -102,8 +139,10 @@ def ozetle(v: dict) -> dict:
                 "toplam": ad[k]["toplam"], "kaynak_ort_toplam": sum(x["toplam"] for x in kaynaklar) / len(kaynaklar),
                 "en_kotu_dusus": ad[k]["en_kotu_dusus"]}
                for k in ad if k.startswith("agresif@") and kaynaklar]
+    kanit = [{"kol": k, **kanit_kapisi(v["isaret"].get(k, []), h + dg.HAFTA_MS)} for k, b in sorted(v["kollar"].items())
+             if b["sinif"] in ("A", "B") and not k.endswith("+jev")]
     return {"hafta_ms": h, "hafta": datetime.fromtimestamp(h / 1000, UTC).date().isoformat(), "kollar": kollar, "jev_ab": jev,
-            "agresif": agresif, "dagitim": v["dagitim"]}
+            "agresif": agresif, "dagitim": v["dagitim"], "kanit": kanit}
 
 
 def _yuzde(x: float | None, basamak: int = 2) -> str:
@@ -131,6 +170,15 @@ def markdown(r: dict) -> str:
               "| --- | --- | --- | --- |"]
         s += [f"| `{j['kol']}` | {_yuzde(j['hafta_fark'], 3)} | {_yuzde(j['toplam_fark'], 3)} | {j['veto']} |"
               for j in r["jev_ab"]]
+    if r.get("kanit"):
+        s += ["", "## Gerçek para kanıt kapısı", "",
+              f"Kolun kendi paper haftalarında PSR(0) ≥ {KANIT_PSR} ve en az {KANIT_ASGARI_HAFTA} hafta. Tahmini hafta: "
+              "bugünkü haftalık Sharpe sürerse kapının açılacağı toplam paper haftası (garanti değil).", "",
+              "| Kol | Hafta | Haftalık Sharpe | PSR(0) | Tahmini hafta | Durum |", "| --- | --- | --- | --- | --- | --- |"]
+        for k in r["kanit"]:
+            s.append(f"| `{k['kol']}` | {k['hafta']} | {'—' if k['sr'] is None else format(k['sr'], '.2f')} | "
+                     f"{'—' if k['psr'] is None else format(k['psr'], '.2f')} | {k['gerekli_hafta'] or '—'} | "
+                     f"{'GEÇTİ' if k['gecti'] else 'bekliyor'} |")
     for a in r["agresif"]:
         s += ["", "## Agresif gözlem kolu", "",
               f"`{a['kol']}`: hafta {_yuzde(a['hafta'])} (kaynak kolların ortalaması {_yuzde(a['kaynak_ort'])}), "
@@ -162,6 +210,11 @@ def telegram_ozeti(r: dict) -> str:
     olay = [f"{k['kol']}: {', '.join(k['olay'])}" for k in r["kollar"] if k["olay"]]
     if olay:
         satir += ["Olaylar:"] + olay
+    kanit = [k for k in r.get("kanit", []) if k["hafta"] >= 2]
+    if kanit:
+        satir.append("Gerçek para kapısı (PSR ≥ 0,95, ≥ 26 hafta):")
+        satir += [f"{k['kol'].split('@')[0]}: {k['hafta']} hf, PSR {'—' if k['psr'] is None else format(k['psr'], '.2f')}"
+                  f"{' · GEÇTİ' if k['gecti'] else ''}" for k in kanit]
     return "\n".join(satir)
 
 
