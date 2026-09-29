@@ -78,3 +78,33 @@ nominaline oranla, günlük açılıştan açılışa) eşiğe ulaşınca bir so
 `zarar_kes`, paper ile ortak çekirdek). Gün içi sıçramalar görülmez (aleyhte: gerçek zarar eşiği aşabilir, ölçülen de
 aşar). **Dürüstlük:** kural ve kör dönem sonuca bakıldıktan sonra; kör sonuç bağımsız kanıt sayılmaz, B/A çıkarsa asıl
 kanıt paper'dır.
+
+## 7b sonucu (2026-09-29, koşu `dalga7b`, ön kayıt c533f17)
+
+**Altı kol da KALDI.** Aile DSR'ı 12 denemeyle.
+
+| Varyant | Sharpe | Yıllık | Kötü hafta | Düşüş | DSR | Kör yıllık | Olay (t) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| giriş 1 / çıkış 14 / kes %50 | 0,87 | +%28,4 | −%17 | −%35 | 0,80 | +%44 | +%5,0 (2,4) |
+| giriş 1 / çıkış 14 / kes %30 | 0,69 | +%21,1 | — | −%47 | 0,67 | +%29 | +%3,9 (1,9) |
+| giriş 1 / çıkış 14 / kes %100 | 0,52 | +%13,6 | — | −%53 | 0,51 | +%7 | +%3,4 (1,5) |
+| giriş 1 / çıkış 30 / kes %30–100 | 0,40–0,46 | +%7–9 | — | −%69–77 | ≤ 0,45 | −%19 … +%3 | t ≤ 1,2 |
+
+**Kapılar çok mu sıkı? (Scryne'ın sorusu, ölçüldü):** en iyi kol yalnız en kötü hafta ve düşüş kapılarında kaldı; bu
+kapılar sabit nominalde uygulanıyor. Kol, kapıya sığacak küçük nominallerle yeniden ölçüldü (bilgi, aday değil):
+
+| Nominal | Sharpe | Yıllık | Kötü hafta | Düşüş |
+| --- | --- | --- | --- | --- |
+| %10 (ön kayıt) | 0,87 | +%28,4 | −%17 | −%35 |
+| %7 | 0,61 | +%14,7 | −%13 | −%42 |
+| %6 | 0,72 | +%17,1 | −%12 | −%38 |
+| %5 | 0,40 | +%7,0 | −%14 | −%40 |
+
+Küçük nominalde tavan (BTC ≤ %50, brüt ≤ 1x) daha çok eşzamanlı olayı kabul ediyor ve eklenen olaylar sonucu bozuyor:
+0,87, tavana takılan olayların seçimine bağlı şanslı bir sonuçtur. Kapı burada bir kırılganlığı yakaladı; kapı kuralı
+değişmedi. Olay düzeyinde etki (ilk hafta, medyan pozitif) gerçek görünüyor ama kuyruk riskiyle birlikte portföy olarak
+güvenilir değil. Paper'a girmez.
+
+**İleriye dönük sınama (ön kayıt):** strateji günlük açılış fiyatı ve kontrat kaydıyla kurulduğu için paper olmadan da
+bağımsız ölçülebilir: 2027-01-01'de `giris 1 / çıkış 14 / kes %50` (nominal %10, aynı tavanlar) yalnız 2026-09-20 →
+2026-12-31 listelemeleriyle yeniden koşulur. Olay ortalaması ≤ 0 ise fikir kapanır.
