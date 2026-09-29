@@ -32,3 +32,19 @@ def test_motorla_giris_listelemeden_sonra_cikis_bitis_gununde():
     seri, o = kl.kos(ev, {"NEW": token}, {}, btc, pl.DataFrame(), a, T0, T0 + n * G)
     assert o["getiri"][0] == pytest.approx(7 * 0.02 - 2 * (a.ucret + a.kayma_token) - 2 * (a.ucret + a.kayma_btc), rel=1e-3)
     assert seri["gun_ms"].min() == T0 + G and seri["gun_ms"].max() == T0 + 8 * G
+
+
+def test_zarar_kes_sikismada_erken_kapatir():
+    n = 40
+    fiyat = list(100 * 1.10 ** np.arange(n))                  # kısa sıkıştırması: her gün +%10
+    token = pl.DataFrame({"acilis_ms": [T0 + i * G for i in range(n)], "open": fiyat, "high": fiyat, "low": fiyat,
+                          "close": fiyat, "volume": [1.0] * n})
+    btc = token.with_columns(pl.lit(1.0).alias("open"))
+    ev = ls.olaylar({"NEW": {"liste_ms": T0}}, {"NEW": T0}, giris_gun=1, bitis_gun=30, bas_ms=T0)
+    tam = kl.kos(ev, {"NEW": token}, {}, btc, pl.DataFrame(), kl.KilitAyar(giris=-29, cikis=0), T0, T0 + n * G)[1]
+    kes = kl.kos(ev, {"NEW": token}, {}, btc, pl.DataFrame(), kl.KilitAyar(giris=-29, cikis=0, zarar_kes=0.3),
+                 T0, T0 + n * G)
+    g = kes[1]["getiri"][0]
+    assert tam["getiri"][0] < -2.0                            # kesmeden: 29 gün × −%10
+    assert -0.35 < g <= -0.3                                  # 3 gün × −%10 + maliyet: eşik aşıldı, bir sonraki açılışta çıkış
+    assert kes[0]["gun_ms"].max() == T0 + 4 * G               # giriş gün 1 açılışı, çıkış gün 4 açılışı

@@ -1,0 +1,26 @@
+# Turnuva dalga 7b — yeni listeleme kısası + zarar-kes: ÖN KAYIT (koşudan önce commit edilir).
+# Neden: dalga 7'nin giriş-1 kolları her yıl pozitif (olay medyanı +%11–15) ama kısa sıkıştırmaları düşüş kapısını
+# deliyor (37 olayda bacak zararı > %50, en kötü −%298). Kısa pozisyonun standart korunması zarar-kestir; riski azaltır.
+# DÜRÜSTLÜK: kural sonuca bakıldıktan sonra eklendi → yeni deneme (kural 10); aile DSR'ı dalga 7'nin 6 denemesiyle
+# birlikte 12 denemeyle sayılır. Kör dönem dalga 7'de de görüldü: kör sonuç bu dalgada bağımsız kanıt DEĞİLDİR; asıl
+# bağımsız ölçüm paper'dır. Gerekçe: docs/turnuva/Dalga-7-Listeleme.md §7b.
+
+dalga: 7b
+kaynak: listeleme
+plan:
+  kimlik: 2026-09-29-d7b-listeleme-kes
+  aile: listeleme_kisa
+  hipotez: >-
+    Dalga 7'nin listelemeden 1 gün sonra giren kısa kolları, olay zararı bacak nominalinin %30/%50/%100'üne ulaşınca
+    ertesi açılışta kapatılırsa (zarar-kes) kısa sıkıştırmalarının kuyruğu kesilir ve kol düşüş kapısını geçer. Sıfır
+    hipotezi: getiri sıkışmadan sonra dönen olaylardan gelir; zarar-kes getiriyi de keser.
+
+notional: 0.10
+maliyet: { ucret: 0.0005, kayma_token: 0.002, kayma_btc: 0.0001 }
+tavan: { azami_brut: 1.0, azami_btc: 0.5 }
+donem: { bas: "2021-01-01", is_bitis: "2025-01-01", bit: "2026-09-20" }
+# 6 deneme: giriş 1 × çıkış 14 / 30 × zarar-kes %30 / %50 / %100 (bacak nominaline oranla, günlük açılıştan)
+izgara: { giris_gun: [1], bitis_gun: [14, 30], zarar_kes: [0.3, 0.5, 1.0] }
+onceki_dalgalar: [dalga7]
+olcut: { dsr_a: 0.95, yil_pozitif: 0.60, stres_maliyet: 2.0, en_kotu_hafta: -0.10, en_kotu_dusus: -0.30,
+         oos_asgari_yillik: 0.0 }

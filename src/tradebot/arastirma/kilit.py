@@ -31,6 +31,7 @@ class KilitAyar:
     kayma_btc: float = 0.0001
     azami_brut: float = KALDIRAC_TAVANI      # ön kayıt (e088b94): yalnız 3x brüt tavanı
     azami_btc: float = float("inf")          # paper kolu: risk motorunun enstrüman tavanı (0,5)
+    zarar_kes: float | None = None           # olay zararı (bacak nominaline oranla) bu eşiğe ulaşınca ertesi açılışta kapat
 
     def kural(self) -> ck.KilitKural:
         return ck.KilitKural(self.giris, self.cikis, self.notional, self.azami_brut, self.azami_btc)
@@ -92,7 +93,8 @@ def kos(ev: pl.DataFrame, barlar: dict[str, pl.DataFrame], fundingler: dict[str,
             continue
         gerek = {o.sembol for o in bugun} | {p.sembol for p in acik}
         islem = {s for s in gerek if d in rt[s]} if d in rb else set()
-        k = ck.gun_karari(d, bugun, acik, islem, kural)
+        kes = frozenset(p.anahtar for p in acik if a.zarar_kes is not None and birim[p.anahtar] <= -a.zarar_kes)
+        k = ck.gun_karari(d, bugun, acik, islem, kural, zarar_kes=kes)
         for p, _ in k.kapat:
             gun_pnl[d] = gun_pnl.get(d, 0.0) - p.notional * maliyet_birim / 2
         for o, neden in k.red:

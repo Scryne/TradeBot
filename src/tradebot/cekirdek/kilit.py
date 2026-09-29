@@ -2,8 +2,9 @@
 (`canli/kilit.py`) günlük kararı bu fonksiyonla verir. I/O yok; yalnız karar anında bilinenleri görür.
 
 Gün kararı (00:00 UTC açılışı, gün `g`):
-1. Kapat: çıkış günü gelen (`cikis_ms <= g`) ya da artık işlem görmeyen pozisyonlar; `hepsini_kapat` (kol durduruldu,
-   acil durdurma) varsa hepsi. Kapatma önce yapılır, açılışa yer açar.
+1. Kapat: çıkış günü gelen (`cikis_ms <= g`), artık işlem görmeyen ya da zarar-kes eşiğine ulaşmış (`zarar_kes`:
+   çağıran, önceki kapanışa kadarki olay zararından hesaplar) pozisyonlar; `hepsini_kapat` (kol durduruldu, acil
+   durdurma) varsa hepsi. Kapatma önce yapılır, açılışa yer açar.
 2. Aç: açılım günü `T` için `T + giris == g` olan olaylar (sembol sırasıyla), token perp'i işlem görüyorsa ve aynı olay
    zaten açık değilse. `yeni_risk` yanlışsa (fren, durdurma) açılmaz. Çıkış günü girişte sabitlenir (`T + cikis`):
    takvim sonradan kayarsa pozisyon ilk planla kapanır.
@@ -64,11 +65,13 @@ class GunKarari:
     kapat: tuple[tuple[Pozisyon, str], ...]      # (pozisyon, neden: cikis | islem_gormuyor | durdur)
     ac: tuple[Pozisyon, ...]
     red: tuple[tuple[Olay, str], ...]            # (olay, neden: islem_gormuyor | tavan | yeni_risk_yok)
+    # kapat nedenleri: cikis | islem_gormuyor | zarar_kes | durdur
     acik: tuple[Pozisyon, ...]                   # karardan sonra açık kalanlar + yeniler
 
 
 def gun_karari(gun_ms: int, olaylar: Iterable[Olay], acik: Iterable[Pozisyon], islem_goren: set[str], k: KilitKural,
-               yeni_risk: bool = True, hepsini_kapat: bool = False) -> GunKarari:
+               yeni_risk: bool = True, hepsini_kapat: bool = False,
+               zarar_kes: frozenset[tuple[str, int]] = frozenset()) -> GunKarari:
     if gun_ms % GUN_MS:
         raise ValueError("gun_ms UTC gün başı olmalı")
     kalan, kapat = [], []
@@ -79,6 +82,8 @@ def gun_karari(gun_ms: int, olaylar: Iterable[Olay], acik: Iterable[Pozisyon], i
             kapat.append((p, "cikis"))
         elif p.sembol not in islem_goren:
             kapat.append((p, "islem_gormuyor"))
+        elif p.anahtar in zarar_kes:
+            kapat.append((p, "zarar_kes"))
         else:
             kalan.append(p)
     acik_anahtar = {p.anahtar for p in kalan} | {p.anahtar for p, _ in kapat}

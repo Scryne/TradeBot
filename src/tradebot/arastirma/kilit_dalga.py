@@ -100,10 +100,12 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
         else:
             ev = listeleme.olaylar(perpler, ilk_mum, p["giris_gun"], p["bitis_gun"], _ms(d["donem"]["bas"]))
             giris, cikis = -(p["bitis_gun"] - p["giris_gun"]), 0
-            ad = f"listeleme(giris={p['giris_gun']},bitis={p['bitis_gun']})"
-            dosya_adi = f"listeleme_g{p['giris_gun']}_b{p['bitis_gun']}"
-        a = kl.KilitAyar(giris=giris, cikis=cikis, **(d.get("maliyet") or {}), notional=d["notional"], **tavan)
-        a2 = kl.KilitAyar(giris=giris, cikis=cikis, notional=d["notional"], **tavan,
+            zk = f",zarar_kes={p['zarar_kes']}" if "zarar_kes" in p else ""
+            ad = f"listeleme(giris={p['giris_gun']},bitis={p['bitis_gun']}{zk})"
+            dosya_adi = f"listeleme_g{p['giris_gun']}_b{p['bitis_gun']}" + (f"_z{p['zarar_kes']}" if zk else "")
+        zk_ = {"zarar_kes": p["zarar_kes"]} if "zarar_kes" in p else {}
+        a = kl.KilitAyar(giris=giris, cikis=cikis, **(d.get("maliyet") or {}), notional=d["notional"], **tavan, **zk_)
+        a2 = kl.KilitAyar(giris=giris, cikis=cikis, notional=d["notional"], **tavan, **zk_,
                           **{k: v * o["stres_maliyet"] for k, v in (d.get("maliyet") or {}).items()})
         seri, olay = kl.kos(ev, barlar, fundingler, btc, btc_f, a, bas, bit)
         seri2, _ = kl.kos(ev, barlar, fundingler, btc, btc_f, a2, bas, bit)

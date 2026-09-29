@@ -48,3 +48,33 @@ bilgi: kilit koluyla haftalık korelasyon ve 50/50 karışım.
 - Günlük mum: giriş/çıkış 00:00 açılışında; listeleme günü (gün 0) yüksek oynaklıklı ilk saatler ölçülmez.
 - Kısa pozisyonun borsa riski (ADL, likidasyon) modellenmedi; %10 nominal ve BTC bacağı riski küçültür.
 - Kilit koluyla aynı token'lar çakışabilir (listelemeden sonraki ilk kilit açılımları): korelasyon raporlanır.
+
+## Sonuç (2026-09-29, koşu `dalga7`, ön kayıt 6ec60c3)
+
+**Altı kol da KALDI; hepsi düşüş kapısından.** Olay: 582 nitelikli listeleme (2021-01 → 2026-09).
+
+| Varyant | Sharpe | Yıllık | Düşüş | DSR | Kör yıllık | Olay (t) | İsabet | Kilitle kor. |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| giriş 1 / çıkış 14 | 0,72 | +%23,1 | −%61 | 0,70 | +%35 | +%4,7 (2,1) | %64 | +0,18 |
+| giriş 1 / çıkış 30 | 0,64 | +%19,6 | −%57 | 0,64 | +%31 | +%6,9 (1,9) | %66 | +0,19 |
+| giriş 7 / çıkış 30 | 0,57 | +%15,3 | −%45 | 0,57 | +%60 | +%5,3 (1,7) | %66 | +0,22 |
+| giriş 1 / çıkış 60 | 0,16 | −%3,2 | −%68 | 0,22 | +%24 | +%2,9 (0,5) | %61 | +0,18 |
+| giriş 7 / çıkış 60 | −0,01 | −%12,0 | −%68 | 0,12 | +%4 | −%0,2 (0,0) | %64 | +0,15 |
+| giriş 7 / çıkış 14 | −0,18 | −%16,2 | −%82 | 0,05 | −%42 | −%0,6 (−0,3) | %59 | +0,07 |
+
+Okuma:
+- **Yön doğru, kuyruk öldürücü.** Giriş 1 / çıkış 14: olay medyanı +%10,8, yıllar 2021 +%14, 2022 +%13, 2023 +%39,
+  2024 +%6, 2025 +%43, 2026 +%21 (hepsi pozitif). Ama 37 olayda kısa bacak nominalinin yarısından fazlasını kaybetti
+  (AVNT 2025-09 −%298, GAS 2023-11 −%168, STBL, M, Q 2025 ~−%155): tipik kısa sıkıştırması.
+- Etki ilk haftada: giriş 7 / çıkış 14 negatif.
+- Kilit koluyla korelasyon düşük (+0,18); 50/50 karışım (giriş 1 / çıkış 30) Sharpe 0,86, düşüş −%24.
+
+Sonuca bakıp dalga 7 değiştirilmedi. Kuyruğu kesen zarar-kes kuralı ayrı ve yeni bir denemedir: §7b.
+
+## 7b — zarar-kes (ön kayıt, `config/turnuva/dalga7b_listeleme_kes.yaml`)
+
+Giriş 1 × çıkış 14/30 × zarar-kes %30/%50/%100 (6 deneme; aile DSR'ı 12 denemeyle). Olayın birikmiş zararı (bacak
+nominaline oranla, günlük açılıştan açılışa) eşiğe ulaşınca bir sonraki açılışta iki bacak kapanır (`cekirdek/kilit.py`
+`zarar_kes`, paper ile ortak çekirdek). Gün içi sıçramalar görülmez (aleyhte: gerçek zarar eşiği aşabilir, ölçülen de
+aşar). **Dürüstlük:** kural ve kör dönem sonuca bakıldıktan sonra; kör sonuç bağımsız kanıt sayılmaz, B/A çıkarsa asıl
+kanıt paper'dır.
