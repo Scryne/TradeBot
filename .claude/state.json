@@ -1,7 +1,7 @@
 {
   "proje_adi": "TradeBot",
   "asama": "uygulama",
-  "guncellendi": "2026-09-28",
+  "guncellendi": "2026-09-29",
   "roadmap": "docs/Roadmap.md",
-  "not": "Faz 0-5, 7, 9 tamam; 6 (B1 ~2026-10-07), 8, 10, 11 suruyor. Paper turnuvasi 2026-09-27 basladi (~2026-12-20), 5 kol tek fikir (BTC/ETH trend). 2026-09-28: Spike08 bitti; VIOP 2 ve Dalga 3 (vadeli trend) KALDI -> Arastirma-Plani'ndaki siralı dalgalar tukendi. Faz 10 pano: http://scryne.tailca7928.ts.net:8080/ (tailnet). Faz 9: bagimsiz gozetmen + habere kor mod + ariza tatbikati (docs/host/Tatbikat-2026-09-28.md). SIRADAKI: yeni arastirma yonu Scryne'la konusulmali (ucretli vadeli veri: tahvil/enerji; ya da yalniz paper'i izlemek). Scryne telefona Tailscale ve Telegram token yenileme yapmayacak (acik karar)."
+  "not": "Faz 0-5, 7, 9 tamam; 6 (B1 ~2026-10-07), 8, 10, 11 suruyor. Paper turnuvasi 2026-09-27 basladi (~2026-12-20). 2026-09-29: Arastirma-2 dalgalari: 4 (opsiyon) ve 5 (meme trend) KALDI; Dalga 6 kilit acilimi -7/0 A, 6b (risk motoru tavanlariyla) A: Sharpe 0,89, DSR 0,96. Kilit kolu paper'da: d6b:kilit_kisa@kilit_perp@1d, ayri dugum canli/kilit.py (compose kilit), ilk karar 2026-09-30 00:05 UTC, ilk girisler 2 Ekim'den. Gozetmen/saglik dugum basina. Pano: http://scryne.tailca7928.ts.net:8080/ (tailscale serve --tcp). SIRADAKI: kilit dugumunun ilk kararlarini izle; Jev vetosu (v1'de yok); takvim anlik goruntuleriyle PIT sapmasi olcumu; yeni arastirma dalgasi. Scryne telefona Tailscale ve Telegram token yenileme yapmayacak (acik karar)."
 }
