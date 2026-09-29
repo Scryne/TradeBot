@@ -61,4 +61,4 @@ B çıkmadan yapılmaz (kullanılmayan kod yazılmaz).
 ## Kapanan fikirler (tekrar denenmez, yeni gerekçe olmadan)
 
 FX/metal/endeks CFD trendi (finansman), ABD ETF trend ve dönüş, BIST hisse (yanlı veri), kripto kesitsel momentum,
-kripto funding carry (2022'den beri eşik altı), BIST30 vadeli tek enstrüman (VİOP 1), TL taşıma (VİOP 2), tahvil/enerjisiz vadeli trend sepeti (dalga 3; döviz ve metal trendi), altın M15 gün içi (EA karşılığı).
+kripto funding carry (2022'den beri eşik altı), BIST30 vadeli tek enstrüman (VİOP 1), TL taşıma (VİOP 2), tahvil/enerjisiz vadeli trend sepeti (dalga 3; döviz ve metal trendi), altın M15 gün içi (EA karşılığı), yalnız altın günlük trend (dalga 8), yeni listeleme perp kısası (dalga 7/7b; 2027-01 ileriye dönük sınama hariç).
