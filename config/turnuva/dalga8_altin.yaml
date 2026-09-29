@@ -1,0 +1,46 @@
+# Turnuva dalga 8 — yalnız altın günlük trend: ÖN KAYIT (koşudan önce commit edilir, koşu sırasında değişmez).
+# Gerekçe: docs/turnuva/Dalga-8-Altin.md. Seri VADELI:XAU (spot − ABD kısa faizi; dalga 3 ile aynı), ızgara ve boyut
+# dalga 3 ile AYNI. Dürüstlük notu: altının 2023–26 yükselişi biliniyor ve dalga 3'ün metal kırılımı görüldükten sonra
+# kuruldu (kural 10: yeni deneme, trend ailesinin DSR'ında sayılır). 2026 kör: seçim 2026-01-01'e kadar, seçilen varyant
+# ayrıca 2026-01 → 09'da ölçülür.
+
+dalga: 8
+veri_bitis: "2026-01-01"
+frenler: true
+boyut:
+  hedef_vol: 0.20
+  kaldirac: 3.0
+  vol_pencere_gun: 90
+  bant: 0.25
+walk_forward: { is_yil: 3, oos_yil: 1 }
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0, risksiz_yillik: 0.0 }
+
+planlar:
+  trend:
+    kimlik: 2026-09-29-d8-altin-trend
+    hipotez: >-
+      Altın vadelisinde (fazla getiri) zaman serisi trendi, iki yönlü ve oynaklık hedefli, maliyet sonrası pozitif ve
+      walk-forward'da kalıcıdır; gümüşle aynı sepette ölçüldüğünde (dalga 3 metal, Sharpe 0,25, düşüş −%58) gümüşün
+      oynaklığı sonucu bozmuştur. Sıfır hipotezi: altın tek başına da kapıları geçmez ya da getirisi al-tut'tan gelir.
+
+gruplar:
+  altin:
+    kimlikler: [VADELI:XAU]
+    asgari_gecmis_gun: 60
+    yon: long_short
+    zd: [1d]
+
+# 16 deneme (dalga 2/3 ızgaraları)
+kollar:
+  - strateji: tsmom
+    gruplar: [altin]
+    zd: [1d]
+    izgara: { ufuk_gun: [20, 60, 120, 250] }
+  - strateji: ma_yon
+    gruplar: [altin]
+    zd: [1d]
+    izgara: { hizli_gun: [10, 25], yavas_gun: [50, 100, 200] }
+  - strateji: donchian_ls
+    gruplar: [altin]
+    zd: [1d]
+    izgara: { giris_gun: [20, 55, 100], cikis_gun: [10, 20] }

@@ -1,4 +1,5 @@
-"""Dalga 6 veri hazırlığı ve koşucu: kilit açılımı olayları + perp verisi → ön kayıtlı ızgara → defter, sonuç dosyası."""
+"""Olay tabanlı piyasa nötr perp dalgaları (6: kilit açılımı, 7: yeni listeleme) — veri hazırlığı ve koşucu: olaylar +
+perp verisi → ön kayıtlı ızgara → defter, sonuç dosyası. Olay kaynağı ön kayıttaki `kaynak` (varsayılan `kilit`)."""
 from __future__ import annotations
 
 import hashlib
@@ -12,6 +13,7 @@ import polars as pl
 import yaml
 
 from tradebot.arastirma import kilit as kl
+from tradebot.arastirma import listeleme
 from tradebot.arastirma.dogrulama import beklenen_max_sr, carpiklik_basiklik, dsr, izgara
 from tradebot.veri import binance_vadeli as bv
 from tradebot.veri import kilit as vk
@@ -63,9 +65,8 @@ def _ozet(h: np.ndarray) -> dict:
 def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
     d = yaml.safe_load(Path(dosya).read_text(encoding="utf-8"))
     o = d["olcut"]
-    kd = Path(veri_dizini) / "kilit"
-    tablo = pl.read_parquet(kd / "olaylar.parquet")
-    ev = kl.olaylar(tablo, d["olay"]["kategoriler"], d["olay"]["asgari_oran"])
+    kaynak = d.get("kaynak", "kilit")
+    kd = Path(veri_dizini) / kaynak
     barlar, fundingler = {}, {}
     for y in (kd / "perp").glob("*_1d.parquet"):
         s = y.name[: -len("_1d.parquet")]
@@ -73,7 +74,14 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
         f = kd / "perp" / f"{s}_funding.parquet"
         fundingler[s] = pl.read_parquet(f) if f.exists() else pl.DataFrame()
     btc, btc_f = barlar.pop("BTC"), fundingler.pop("BTC", pl.DataFrame())
-    vh = hashlib.sha256((kd / "olaylar.parquet").read_bytes()).hexdigest()
+    if kaynak == "kilit":
+        tablo = pl.read_parquet(kd / "olaylar.parquet")
+        ev_sabit = kl.olaylar(tablo, d["olay"]["kategoriler"], d["olay"]["asgari_oran"])
+        vh = hashlib.sha256((kd / "olaylar.parquet").read_bytes()).hexdigest()
+    else:   # listeleme: olay günü ızgara noktasına bağlı (çıkış günü = listeleme + bitis_gun)
+        perpler = json.loads((kd / "perp_listesi.json").read_text(encoding="utf-8"))
+        ilk_mum = {s: int(b["acilis_ms"].min()) for s, b in barlar.items() if b.height}
+        vh = hashlib.sha256((kd / "perp_listesi.json").read_bytes()).hexdigest()
     bas, is_bit, bit = _ms(d["donem"]["bas"]), _ms(d["donem"]["is_bitis"]), _ms(d["donem"]["bit"])
     plan = d["plan"]
     if defter is not None:
@@ -86,8 +94,16 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
     tavan = d.get("tavan") or {}
     for p in izgara(d["izgara"]):
         t0 = time.perf_counter()
-        a = kl.KilitAyar(giris=p["giris"], cikis=p["cikis"], **(d.get("maliyet") or {}), notional=d["notional"], **tavan)
-        a2 = kl.KilitAyar(giris=p["giris"], cikis=p["cikis"], notional=d["notional"], **tavan,
+        if kaynak == "kilit":
+            ev, giris, cikis = ev_sabit, p["giris"], p["cikis"]
+            ad, dosya_adi = f"kilit(giris={giris},cikis={cikis})", f"kilit_g{giris}_c{cikis}"
+        else:
+            ev = listeleme.olaylar(perpler, ilk_mum, p["giris_gun"], p["bitis_gun"], _ms(d["donem"]["bas"]))
+            giris, cikis = -(p["bitis_gun"] - p["giris_gun"]), 0
+            ad = f"listeleme(giris={p['giris_gun']},bitis={p['bitis_gun']})"
+            dosya_adi = f"listeleme_g{p['giris_gun']}_b{p['bitis_gun']}"
+        a = kl.KilitAyar(giris=giris, cikis=cikis, **(d.get("maliyet") or {}), notional=d["notional"], **tavan)
+        a2 = kl.KilitAyar(giris=giris, cikis=cikis, notional=d["notional"], **tavan,
                           **{k: v * o["stres_maliyet"] for k, v in (d.get("maliyet") or {}).items()})
         seri, olay = kl.kos(ev, barlar, fundingler, btc, btc_f, a, bas, bit)
         seri2, _ = kl.kos(ev, barlar, fundingler, btc, btc_f, a2, bas, bit)
@@ -109,7 +125,7 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
                                 "isabet": float((kurulan["getiri"] > 0).mean()) if kurulan.height else None,
                                 "birim_t": float(kurulan["getiri"].mean() / (kurulan["getiri"].std() / np.sqrt(kurulan.height)))
                                 if kurulan.height > 2 else None},
-                       "sure": time.perf_counter() - t0})
+                       "sure": time.perf_counter() - t0, "ad": ad, "dosya": dosya_adi})
     sr = [k["tam"].get("sr_haftalik", 0.0) for k in kollar]
     # Aynı ailenin önceki dalgaları (ör. 6b → 6): DSR bütün denemelerle sayılır (kural 10)
     for onceki in d.get("onceki_dalgalar") or []:
@@ -127,18 +143,19 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
                  and k["kor"].get("yillik_bilesik", -1) > o["oos_asgari_yillik"]
                  and k["kor"].get("en_kotu_dusus", -1) >= o["en_kotu_dusus"])
         kr = "KALDI" if not temel else ("A" if dd >= o["dsr_a"] else "B")
-        ad = f"kilit(giris={k['p']['giris']},cikis={k['p']['cikis']})"
-        sonuc = {"plan": plan["kimlik"], "kol": f"{ad}@BINANCEF:kilit@1d", "karar": kr,
+        ad = k["ad"]
+        sonuc = {"plan": plan["kimlik"], "kol": f"{ad}@BINANCEF:{kaynak}@1d", "karar": kr,
                  "en_iyi": {"varyant": ad, "sharpe": k["tam"].get("sharpe"), "yillik_bilesik": k["tam"].get("yillik_bilesik")},
                  "dsr": {"dsr": dd, "deneme": deneme_sayisi, "sr_esik": beklenen_max_sr(deneme_sayisi, v)},
                  "tam": k["tam"], "orneklem_ici": k["is"], "kor": k["kor"], "stres_2x": k["stres"], "yillik": k["yillik"],
-                 "yil_pozitif_orani": yp, "olay": k["olay"], "veri_hash": vh}
+                 "yil_pozitif_orani": yp, "olay": k["olay"], "veri_hash": vh,
+                 "haftalik": {"bas_ms": bas, "getiri": [float(x) for x in k["h"]]}}
         if defter is not None:
-            defter.kaydet(plan["kimlik"], "tarama", "kilit_kisa", plan["aile"], k["p"], "BINANCEF:kilit", "1d", vh,
+            defter.kaydet(plan["kimlik"], "tarama", plan["aile"], plan["aile"], k["p"], f"BINANCEF:{kaynak}", "1d", vh,
                           {x: sonuc[x] for x in ("karar", "dsr", "tam", "kor", "olay")}, k["sure"])
         dz = Path(veri_dizini) / "turnuva" / f"dalga{d['dalga']}"
         dz.mkdir(parents=True, exist_ok=True)
-        (dz / f"kilit_g{k['p']['giris']}_c{k['p']['cikis']}.json").write_text(json.dumps(sonuc, ensure_ascii=False, indent=1),
+        (dz / f"{k['dosya']}.json").write_text(json.dumps(sonuc, ensure_ascii=False, indent=1),
                                                                             encoding="utf-8")
         out.append(sonuc)
     return out

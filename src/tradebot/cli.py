@@ -378,6 +378,21 @@ def veri_kilit() -> None:
                     log("veri.kilit")))
 
 
+@veri_uygulama.command("listeleme")
+def veri_listeleme(bas: str = typer.Option("2020-12-01", help="Bu tarihten sonra listelenen perp'ler")) -> None:
+    """Dalga 7: listeleme anı `bas`'tan sonra olan her Binance USDT-M perp'in günlük mumu + funding'i → data/listeleme/."""
+    from datetime import UTC, datetime
+
+    from tradebot.arastirma.listeleme import hazirla
+    from tradebot.veri.depo import HamDepo
+    from tradebot.veri.http import NazikIstemci
+
+    a, m = _veri_baglam()
+    bas_ms = int(datetime.fromisoformat(bas).replace(tzinfo=UTC).timestamp() * 1000)
+    _yazdir(hazirla(a.veri_dizini, HamDepo(a.veri_dizini, m), NazikIstemci("binancef", aralik_sn=0.25, zaman_asimi=120).al,
+                    bas_ms, log("veri.listeleme")))
+
+
 @veri_uygulama.command("mt5")
 def veri_mt5(butce_dk: float = typer.Option(60.0, help="Zaman bütçesi (dakika)")) -> None:
     """NCM MT5 (forex CFD + VİOP) barları köprüden kataloğa (1m, 1h, 1d)."""
@@ -526,7 +541,7 @@ def arastirma_opsiyon(
 
 @arastirma_uygulama.command("kilit")
 def arastirma_kilit(dosya: str = typer.Option("config/turnuva/dalga6_kilit.yaml")) -> None:
-    """Dalga 6 — kilit açılımı öncesi perp kısa (BTC ile nötr): ön kayıtlı ızgara → defter ve data/turnuva/."""
+    """Olay tabanlı perp kısa (BTC ile nötr; dalga 6 kilit, dalga 7 listeleme): ön kayıtlı ızgara → defter, data/turnuva/."""
     from tradebot.arastirma import kilit_dalga
     from tradebot.arastirma.defter import Defter
 

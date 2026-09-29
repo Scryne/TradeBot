@@ -1,0 +1,23 @@
+# Turnuva dalga 7 — yeni listelenen token perp kısası (BTC ile piyasa nötr): ÖN KAYIT (koşudan önce commit edilir).
+# Gerekçe: docs/turnuva/Dalga-7-Listeleme.md. Veri: `tradebot veri listeleme`. Motor kilit ile aynı (kural 3).
+
+dalga: 7
+kaynak: listeleme
+plan:
+  kimlik: 2026-09-29-d7-listeleme-kisa
+  aile: listeleme_kisa
+  hipotez: >-
+    Binance USDT-M'de yeni perp'i açılan token'lar (çoğu düşük dolaşım / yüksek FDV, airdrop ve erken yatırımcı arzı)
+    listelemeden sonraki haftalarda BTC'ye göre düşer. Listelemeden sonra token perp kısa + aynı büyüklükte BTC perp uzun,
+    ücret, kayma ve funding sonrası pozitif getiri verir ve kör dönemde (2025+) sürer. Sıfır hipotezi: etki yoktur ya da
+    funding (kalabalık kısa) ve maliyet onu siler.
+
+notional: 0.10
+# Yeni listelemelerde spread geniş: token kayması kilit kolunun 2 katı (aleyhte, koşudan önce sabit)
+maliyet: { ucret: 0.0005, kayma_token: 0.002, kayma_btc: 0.0001 }
+tavan: { azami_brut: 1.0, azami_btc: 0.5 }     # paper risk motorunun varsayılanları (dalga 6b ile aynı)
+donem: { bas: "2021-01-01", is_bitis: "2025-01-01", bit: "2026-09-20" }
+# 6 deneme: giriş listelemeden 1 / 7 gün sonra × çıkış listelemenin 14. / 30. / 60. günü
+izgara: { giris_gun: [1, 7], bitis_gun: [14, 30, 60] }
+olcut: { dsr_a: 0.95, yil_pozitif: 0.60, stres_maliyet: 2.0, en_kotu_hafta: -0.10, en_kotu_dusus: -0.30,
+         oos_asgari_yillik: 0.0 }
