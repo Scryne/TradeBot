@@ -152,6 +152,15 @@ services:
     depends_on:
       goc: { condition: service_completed_successfully }
 
+  kilit:
+    <<: *ortak
+    # Dalga 6b kilit açılımı kolu (canli/kilit.py): Nautilus dışı ayrı süreç. Günde bir karar 00:05 UTC (DefiLlama takvimi
+    # ham depoya, Binance USDT-M perp kotasyonu, risk motoru), saatte bir işaret + funding. Kalp atışı ayrı izlenir
+    # (gözetmen `kilit` düğümü). Defter emirden önce yazılır; yeniden başlatmada eksik emirler tamamlanır.
+    command: ["tradebot", "paper", "kilit"]
+    depends_on:
+      goc: { condition: service_completed_successfully }
+
 volumes:
   pg:
   veri:

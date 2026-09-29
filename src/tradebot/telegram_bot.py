@@ -46,6 +46,9 @@ YARDIM = ("Sorabileceklerin: genel durum, bir kolun ya da tüm kolların durumu,
 def kol_aciklamasi(k: PaperKol) -> str:
     if k.strateji in (AGRESIF, PORTFOY):
         return STRATEJI[k.strateji]
+    if k.strateji == "kilit_kisa":
+        return ("token unlock arm: shorts a token's perpetual future 7 days before a large team/investor token unlock "
+                "and hedges with a long BTC perpetual, daily decisions, without Jev veto")
     dalga = "wave 2 (slow volatility estimate)" if k.ad.startswith("d2:") else "wave 1"
     return f"{STRATEJI.get(k.strateji, k.strateji)}, {ZD.get(k.zd, k.zd)}, BTC+ETH, {dalga}, " \
            f"{'with' if k.jev else 'without'} Jev veto"
@@ -192,7 +195,7 @@ class Bot:
         from tradebot.ayar import ayarlar
 
         a = ayarlar()
-        kontrol = [f(a) for f in (saglik.paper_kontrol, saglik.gece_kontrol)] + \
+        kontrol = [f(a) for f in (saglik.paper_kontrol, saglik.kilit_kontrol, saglik.gece_kontrol)] + \
                   ([saglik.yedek_kontrol(a)] if a.yedek_dizini else [])
         isaret = self._isaretler()
         ana = [k for k in self.ad if not k.endswith("+jev")]
@@ -277,7 +280,10 @@ def calistir() -> None:
         y = jev.sor("D4_telegram", "telegram", state, s)
         return None if y.hata else y.cevap
 
-    bot = Bot(m, a.veri_dizini, kollar(), sor)
+    from tradebot.canli.kilit import ayarlar as kilit_ayarlari
+
+    kilit = kilit_ayarlari()
+    bot = Bot(m, a.veri_dizini, kollar() + ([kilit.kol] if kilit else []), sor)
     tg = Telegram(a.telegram_token.get_secret_value())
     offset = 0
     _log.info("telegram_basladi")

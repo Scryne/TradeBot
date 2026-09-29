@@ -79,7 +79,8 @@ def saglik_komutu(
     izleyici = saglik.DurumIzleyici()
     bildirici = Bildirici(a)
     triyaj = saglik.LogTriyaj(a.log_dizini) if dongu and a.log_dizini is not None else None
-    gozetmen = _gozetmen_kur(a) if dongu and a.ortam == "host" and a.veritabani_url is not None else None
+    gozetmen_var = dongu and a.ortam == "host" and a.veritabani_url is not None
+    gozetmenler = [_gozetmen_kur(a, dugum=d) for d in DUGUMLER] if gozetmen_var else []
     while True:
         sonuclar = saglik.hepsi(a)
         if json_cikti:
@@ -102,8 +103,8 @@ def saglik_komutu(
             bildirici.gonder("KRITIK", f"{h['dosya']} · {h['bilesen']} · {h['olay']}\n"
                              f"{json.dumps(h['ozet'], ensure_ascii=False, default=str)[:600]}",
                              anahtar=f"log:{h['bilesen']}:{h['olay']}")
-        if gozetmen is not None:
-            _gozetmen_tur(gozetmen, bildirici, kayitci)
+        for g in gozetmenler:
+            _gozetmen_tur(g, bildirici, kayitci)
         if dongu and saglik.olu_adam(a, sonuclar) is False:
             kayitci.warning("olu_adam_sinyali_gitmedi")
         if dongu and a.ortam == "host" and a.veritabani_url is not None:
@@ -112,6 +113,9 @@ def saglik_komutu(
         if not dongu:
             raise typer.Exit(saglik.cikis_kodu(sonuclar))
         time.sleep(dongu)
+
+
+DUGUMLER = ("paper", "kilit")   # her süreç ayrı gözetmen (kalp atışı ayrı)
 
 
 def _gozetmen_kur(a, **ayar):
@@ -129,16 +133,17 @@ def _gozetmen_tur(g, bildirici, kayitci) -> dict:
     try:
         r = g.kontrol()
     except Exception as e:  # noqa: BLE001
-        kayitci.error("gozetmen_hatasi", hata=f"{type(e).__name__}: {e}"[:300])
-        bildirici.gonder("KRITIK", f"Gözetmen kontrol edemedi ya da kapatamadı: {type(e).__name__}: {e}"[:400],
-                         anahtar="gozetmen_hata")
+        kayitci.error("gozetmen_hatasi", dugum=g.dugum, hata=f"{type(e).__name__}: {e}"[:300])
+        bildirici.gonder("KRITIK", f"Gözetmen ({g.dugum}) kontrol edemedi ya da kapatamadı: {type(e).__name__}: {e}"[:400],
+                         anahtar=f"gozetmen_hata:{g.dugum}")
         return {"durum": "hata"}
     if r["durum"] == "donma_suphesi":
-        kayitci.warning("gozetmen_donma_suphesi", **r)
+        kayitci.warning("gozetmen_donma_suphesi", dugum=g.dugum, **r)
     elif r["durum"] == "donma" and (r.get("kapatilan") or r.get("durdurulan")) and not r.get("kuru"):
         parca = [f"{kol} {kim.split(':')[-1]} {v['adet']:+.5g}" for kol, p in r["kapatilan"].items()
                  for kim, v in p.items()]
-        bildirici.gonder("KRITIK", f"Paper motoru {r['yas_dk']:.0f} dakikadır kalp atışı yazmıyor: donmuş sayıldı.\n"
+        ad = "Paper motoru" if g.dugum == "paper" else f"{g.dugum} düğümü"
+        bildirici.gonder("KRITIK", f"{ad} {r['yas_dk']:.0f} dakikadır kalp atışı yazmıyor: donmuş sayıldı.\n"
                          f"Pozisyonlar defterde kapatıldı: {'; '.join(parca) or 'açık pozisyon yoktu'}\n"
                          f"{len(r['durdurulan'])} kol durduruldu; yeniden açmak için /devam <kol> (onaylı).")
     return r
@@ -152,8 +157,8 @@ def gozetmen_komutu(
     """Bağımsız gözetmenin tek turu (tatbikat için; bekçi bunu her turda kendisi yapar). Isınma ve tur onayı atlanır."""
     a = ayarlar()
     kur(a)
-    g = _gozetmen_kur(a, kuru=kuru, donma_ms=int(esik_dk * 60_000), onay_tur=1, isinma_sn=0)
-    _yazdir(g.kontrol())
+    _yazdir({d: _gozetmen_kur(a, dugum=d, kuru=kuru, donma_ms=int(esik_dk * 60_000), onay_tur=1, isinma_sn=0).kontrol()
+             for d in DUGUMLER})
 
 
 def gunluk_ozet_zamani(simdi_ms: int, sessiz_bitis_saat: int, veri_dizini) -> Path | None:
@@ -847,6 +852,30 @@ def paper_calis(
     from tradebot.canli.dugum import calistir
 
     calistir(sure_sn or None, duman)
+
+
+@paper_uygulama.command("kilit")
+def paper_kilit(
+    sure_sn: float = typer.Option(0, help="Saniye; 0 = süresiz (servis)"),
+    tek: bool = typer.Option(False, help="Tek tur çalıştır ve sonucu yazdır"),
+) -> None:
+    """Kilit açılımı kolu düğümü (Dalga 6b): günde bir karar 00:05 UTC, saatte bir işaret (compose `kilit`)."""
+    from tradebot.canli import kilit
+
+    if tek:
+        import os
+
+        from tradebot.canli.defter import PaperDefter
+        from tradebot.veri.depo import HamDepo
+        from tradebot.veri.http import NazikIstemci
+
+        a, m = _veri_baglam()
+        d = kilit.KilitDugumu(PaperDefter(m, os.environ.get("TRADEBOT_KOD_SURUMU", "yerel")), kilit.ayarlar(),
+                              kilit.Borsa(NazikIstemci("kilit", deneme=3, zaman_asimi=60).al, HamDepo(a.veri_dizini, m)))
+        d.ac()
+        _yazdir(d.tur())
+        return
+    kilit.calistir(sure_sn or None)
 
 
 @paper_uygulama.command("dagitim")

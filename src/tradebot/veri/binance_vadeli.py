@@ -26,8 +26,12 @@ def usdt_perpler(http_al, ham=None) -> dict[str, dict]:
                 if taban.startswith(on) and len(taban) > len(on):
                     taban = taban[len(on):]
                     break
+            filtre = {f.get("filterType"): f for f in x.get("filters") or []}
             out.setdefault(taban, {"sembol": x["symbol"], "durum": x["status"], "liste_ms": x.get("onboardDate"),
-                                   "carpan": x["baseAsset"][: len(x["baseAsset"]) - len(taban)] or "1"})
+                                   "carpan": x["baseAsset"][: len(x["baseAsset"]) - len(taban)] or "1",
+                                   "adim": float((filtre.get("MARKET_LOT_SIZE") or filtre.get("LOT_SIZE") or {})
+                                                 .get("stepSize", 0) or 0),
+                                   "asgari_notional": float((filtre.get("MIN_NOTIONAL") or {}).get("notional", 0) or 0)})
     return out
 
 

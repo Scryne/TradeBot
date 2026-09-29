@@ -94,3 +94,26 @@ Okuma:
 **Sonraki adım:** kol paper turnuvasına girer (Final Doküman: A → paper; gerçek para ancak paper kanıtıyla). Gerekenler:
 günlük takvim çekimi (anlık görüntü dondurulur: PIT), Binance USDT-M perp canlı veri, sandbox yürütme, risk motoru
 (kural 5), kısa pozisyon ve kaldıraç denetimleri.
+
+## 6b — risk motorunun tavanlarıyla (2026-09-29, ön kayıt 17ef343, `config/turnuva/dalga6b_kilit_tavan.yaml`)
+
+**Neden:** paper'da emre giden tek yol risk motorudur. Varsayılan tavanları (tek enstrüman ≤ özkaynağın %50'si, kol brütü
+≤ 1x) BTC uzun bacağını en çok 5 açık olayla sınırlar; dalga 6 yalnız 3x brüt tavanıyla ölçülmüştü (azami 11 açık olay).
+Tavanı yükseltmek riski artırır (kural 7, Scryne onayı); onun yerine kol tavanlarla yeniden ölçüldü. Yeni deneme (kural
+10): aile aynı, DSR 7 denemeyle.
+
+Önce karar mantığı saf çekirdeğe ayrıldı (`cekirdek/kilit.py`, paper düğümüyle ortak). Refaktör dalga 6'nın 6 kolunu
+birebir üretti (Sharpe, düşüş, DSR, olay sayısı aynı; −14/0 Sharpe 0,783 → 0,784 yuvarlama).
+
+| Varyant | Karar | Sharpe | Yıllık | En kötü düşüş | DSR (7) | Örneklem içi | Kör yıllık | 2x maliyet | Olay (t) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **−7 / 0, tavanlı** | **A** | 0,89 | +%13,8 | −%20 | 0,96 | +%2,9 (Sharpe 0,33) | +%44 (Sharpe 1,62) | +%10,7 | +%2,15 (2,4) |
+
+Yıllar: 2021 −%11, 2022 +%1, 2023 +%8, 2024 +%15, 2025 +%23, 2026 (Eylül'e kadar) +%54. 382 olay kuruldu, 61'i tavan
+yüzünden kurulmadı. En kötü hafta −%9,4. Tavan getiriyi biraz kırptı (kör +%52 → +%44), kapıların hiçbirini düşürmedi.
+
+**Paper (2026-09-29):** kol `d6b:kilit_kisa@kilit_perp@1d`, düğüm `canli/kilit.py` (compose `kilit`). Günde bir karar
+00:05 UTC: takvimin o anki hali ham depoya (hash kararın `veri_hash`'i), çekirdek → karar deftere emirden önce → her bacak
+risk motorundan. Dolum aleyhte: alış ask, satış bid, üstüne kayma ve taker ücreti (yukarıdaki maliyet). Saatte bir
+gerçekleşen funding tahakkuku + işaret fiyatıyla özkaynak. BTC bacağı reddedilir ya da eksik kalırsa token bacağı geri
+alınır. Takvim alınamazsa gün yalnız kapanışlarla geçer. Jev yok (v1).

@@ -420,6 +420,13 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     ilişkisiz (< 0,3) en az bir B kolu. Sıra: VİOP 2 (TL taşıma) → dalga 3 (çok varlıklı vadeli trend) → olay tabanlı.
   - Sayaç 2026-09-27'de başladı (paper düğümü canlı, Faz 7 kapandı); 12 hafta ~2026-12-20. Faz 8–10 bununla paralel.
   - Takvim: ilk gölge dağıtım ~2026-10-26 (28 gün); ilk olası terfi ~2026-11-22 (56 gün, %50 kademe).
+  - 2026-09-29: araştırma planının sıralı dalgaları (VİOP 2, 3, 4, 5) kaldı; **Dalga 6 kilit açılımı kolu A** (trendle
+    korelasyon −0,21: hedeflenen ilişkisiz kol). Paper öncesi risk motoru tavanlarıyla yeniden ölçüldü (Dalga 6b, ön kayıt
+    17ef343): A, Sharpe 0,89, DSR 0,96 (7 deneme). Paper'a ayrı düğümle girdi: `canli/kilit.py`, compose `kilit`, kol
+    `d6b:kilit_kisa@kilit_perp@1d` (sınıf A, dağıtıcıya girmez). Karar çekirdeği backtest ile ortak (`cekirdek/kilit.py`;
+    refaktör ön kayıtlı 6 kolun sonucunu birebir üretti). Gözetmen ve sağlık bekçisi düğüm başına: kilit düğümünün
+    işareti Nautilus düğümünün donmasını gizlemez. Telegram "her şeyi durdur" bu kolu da kapsar. Açık: Jev vetosu (v1'de
+    yok), DefiLlama takviminin günlük anlık görüntüleri biriktikçe backtest takvimiyle karşılaştırma (PIT sapması).
 
 ### Faz 12: Gerçek para (koşullu)
 - **İşler:** Scryne kararı; aracı kurum/borsa seçimi; anahtar güvenliği; vergi; sabit tavanlı mikro

@@ -55,3 +55,15 @@ portfoy:
     "d2:donchian_ls@kripto_btc_eth@1d+jev": 0.831
     "d2:tsmom@kripto_btc_eth@4h+jev": 0.958
   dagitici: {onsel_indirim: 0.5, onsel_gun: 365, asgari_gun: 28, pencere_gun: 180, kelly_kesri: 0.5}
+
+# Kilit açılımı kolu (Dalga 6b, karar A; docs/turnuva/Dalga-6-Kilit.md). Ayrı düğüm (canli/kilit.py, compose `kilit`):
+# Nautilus dışı, günde bir karar 00:05 UTC, saatte bir işaret. Açılımdan 7 gün önce token perp kısa + aynı nominalde BTC
+# perp uzun, açılım günü kapanır. Risk motoru varsayılan tavanları: kol brütü ≤ 1x, BTC bacağı ≤ özkaynağın %50'si
+# (en çok 5 açık olay). Dağıtıcıya girmez (portföy kolu yalnız BTC/ETH grubunu taşır). Jev vetosuz (v1).
+kilit:
+  ad: "d6b:kilit_kisa@kilit_perp@1d"
+  sinif: A
+  kural: {giris: -7, cikis: 0, notional: 0.10}
+  olay: {kategoriler: [insiders, privateSale], asgari_oran: 0.01}
+  maliyet: {ucret: 0.0005, kayma_token: 0.001, kayma_btc: 0.0001}
+  risk: {kaldirac: 1.0}

@@ -173,19 +173,31 @@ def _yas_sinifla(ad: str, yas_sn: float | None, uyari_sn: float, hata_sn: float,
     return Sonuc(ad, _sinifla(yas_sn, uyari_sn, hata_sn), metin, {"yas_sn": round(yas_sn)})
 
 
-def paper_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
-    """Kalp atışı: paper düğümü her saat kapanışında özkaynak işareti yazar. > 70 dk uyarı, > 2 saat hata."""
-    from sqlalchemy import func, select
-
-    from tradebot.db import motor, paper_ozkaynak
+def paper_kontrol(a: Ayarlar, simdi_ms: int | None = None, dugum: str = "paper") -> Sonuc:
+    """Kalp atışı: paper düğümü her saat kapanışında özkaynak işareti yazar. > 70 dk uyarı, > 2 saat hata. Düğüm başına
+    (gozetmen.dugum_kollari): kilit düğümünün saatlik işareti Nautilus düğümünün donmasını gizlemez."""
+    from tradebot.canli.gozetmen import son_isaret_ms
+    from tradebot.db import motor
 
     try:
-        with motor(a).connect() as b:
-            son = b.execute(select(func.max(paper_ozkaynak.c.zaman_ms))).scalar()
+        son = son_isaret_ms(motor(a), dugum)
     except Exception as e:  # noqa: BLE001
-        return Sonuc("paper", "HATA", f"{type(e).__name__}: {e}"[:200])
+        return Sonuc(dugum, "HATA", f"{type(e).__name__}: {e}"[:200])
     simdi_ms = simdi_ms or int(time.time() * 1000)
-    return _yas_sinifla("paper", None if son is None else (simdi_ms - son) / 1000, 70 * 60, 120 * 60, "özkaynak işareti")
+    return _yas_sinifla(dugum, None if son is None else (simdi_ms - son) / 1000, 70 * 60, 120 * 60, "özkaynak işareti")
+
+
+def kilit_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
+    """Kilit düğümünün kalp atışı (canli/kilit.py, saatte bir işaret). Kol henüz açılmadıysa bilgi: çalışmıyor."""
+    from tradebot.canli.gozetmen import dugum_kollari
+    from tradebot.db import motor
+
+    try:
+        if not dugum_kollari(motor(a)).get("kilit"):
+            return Sonuc("kilit", "OK", "kilit kolu henüz açılmadı")
+    except Exception as e:  # noqa: BLE001
+        return Sonuc("kilit", "HATA", f"{type(e).__name__}: {e}"[:200])
+    return paper_kontrol(a, simdi_ms, "kilit")
 
 
 def gece_kontrol(a: Ayarlar, simdi: datetime | None = None) -> Sonuc:
@@ -260,7 +272,7 @@ class LogTriyaj:
         return out
 
 
-KRITIK = ("paper", "gece_isi", "yedek", "veritabani")
+KRITIK = ("paper", "kilit", "gece_isi", "yedek", "veritabani")
 ORTAM = ("dns", "saat", "disk", "mt5")   # anlık dalgalanan ortam ölçümleri: bildirim için art arda onay ister
 _AGIRLIK = {"OK": 0, "UYARI": 1, "HATA": 2}
 
@@ -317,7 +329,7 @@ def olu_adam(a: Ayarlar, sonuclar: list[Sonuc], zaman_asimi: float = 10.0) -> bo
 def hepsi(a: Ayarlar) -> list[Sonuc]:
     kontroller = [dns_kontrol, saat_kontrol, veritabani_kontrol, disk_kontrol, sir_kontrol]
     if a.ortam == "host" and a.veritabani_url is not None:
-        kontroller += [paper_kontrol, gece_kontrol]
+        kontroller += [paper_kontrol, kilit_kontrol, gece_kontrol]
     if a.yedek_dizini is not None:
         kontroller.append(yedek_kontrol)
     if a.mt5_kopru_forex or a.mt5_kopru_viop:

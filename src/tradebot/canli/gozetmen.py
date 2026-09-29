@@ -44,16 +44,46 @@ FiyatAl = Callable[[list[str]], dict[str, tuple[float, float]]]   # kimlikler �
 
 
 def binance_kotasyon(http_al) -> FiyatAl:
-    """Binance spot `bookTicker` (herkese açık uç, anahtar yok). `http_al(url) -> bytes`."""
+    """Binance `bookTicker` (herkese açık uç, anahtar yok): `BINANCE:` spot, `BINANCEF:` USDT-M perp. `http_al(url) -> bytes`."""
     import json
 
     def al(kimlikler: list[str]) -> dict[str, tuple[float, float]]:
         out = {}
         for k in kimlikler:
-            r = json.loads(http_al(f"https://api.binance.com/api/v3/ticker/bookTicker?symbol={k.split(':', 1)[1]}"))
+            borsa, sembol = k.split(":", 1)
+            kok = "https://fapi.binance.com/fapi/v1" if borsa == "BINANCEF" else "https://api.binance.com/api/v3"
+            r = json.loads(http_al(f"{kok}/ticker/bookTicker?symbol={sembol}"))
             out[k] = (float(r["bidPrice"]), float(r["askPrice"]))
         return out
     return al
+
+
+def dugum_kollari(motor: Engine) -> dict[str, list[str]]:
+    """Kollar süreçlerine göre: `paper` (Nautilus düğümü, saatlik) ve ayrı düğümler (tanımda `grup_tanim.dugum`, ör.
+    `kilit`). Her düğümün kalp atışı ayrı izlenir: birinin işareti ötekinin donmasını gizlemesin."""
+    with motor.connect() as b:
+        rows = b.execute(select(paper_kol.c.kol, paper_kol.c.tanim)).all()
+    out: dict[str, list[str]] = defaultdict(list)
+    for kol, t in rows:
+        out[((t or {}).get("grup_tanim") or {}).get("dugum", "paper")].append(kol)
+    return dict(out)
+
+
+def son_isaret_ms(motor: Engine, dugum: str) -> int | None:
+    """Düğümün son özkaynak işareti. `paper`: başka düğüme ait olmayan bütün işaretler (kaydı olmayan kol dahil);
+    diğerleri: yalnız kendi kolları."""
+    g = dugum_kollari(motor)
+    q = select(func.max(paper_ozkaynak.c.zaman_ms))
+    if dugum == "paper":
+        baska = [k for d, ks in g.items() if d != "paper" for k in ks]
+        q = q.where(paper_ozkaynak.c.kol.not_in(baska)) if baska else q
+    elif g.get(dugum):
+        q = q.where(paper_ozkaynak.c.kol.in_(g[dugum]))
+    else:
+        return None
+    with motor.connect() as b:
+        son = b.execute(q).scalar()
+    return None if son is None else int(son)
 
 
 def net_pozisyonlar(motor: Engine) -> dict[str, dict[str, float]]:
@@ -75,6 +105,7 @@ class Gozetmen:
     fiyat_al: FiyatAl
     kod_surumu: str = "bilinmiyor"
     kuru: bool = False                      # tatbikat: tespit eder, raporlar, yazmaz
+    dugum: str = "paper"                    # izlenen süreç (dugum_kollari); her düğüme ayrı gözetmen
     donma_ms: int = DONMA_MS
     onay_tur: int = ONAY_TUR
     isinma_sn: float = ISINMA_SN
@@ -88,9 +119,8 @@ class Gozetmen:
     def kontrol(self) -> dict:
         """Bir tur. Döndürür: durum (`paper_yok` | `canli` | `donma_suphesi` | `donma`) ve ayrıntı."""
         simdi_ms = int(self.saat() * 1000)
-        with self.motor.connect() as b:
-            son = b.execute(select(func.max(paper_ozkaynak.c.zaman_ms))).scalar()
-            kollar = [r[0] for r in b.execute(select(paper_kol.c.kol))]
+        kollar = dugum_kollari(self.motor).get(self.dugum, [])
+        son = son_isaret_ms(self.motor, self.dugum)
         if son is None or not kollar:
             return {"durum": "paper_yok"}
         yas_dk = round((simdi_ms - int(son)) / 60_000, 1)
