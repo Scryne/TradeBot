@@ -228,10 +228,16 @@ class Kopru:
         m = self.mt5
         out = {}
         for s in semboller:
-            if s not in self.izlenen:
+            yeni = s not in self.izlenen
+            if yeni:
                 m.symbol_select(s, True)
                 self.izlenen.add(s)
             t = m.symbol_info_tick(s)
+            for _ in range(5 if yeni else 0):   # yeni seçilen sembolün ilk tiki gecikebilir (2026-09-30: AUDUSD boş döndü)
+                if t is not None and t.time_msc:
+                    break
+                time.sleep(0.2)
+                t = m.symbol_info_tick(s)
             out[s] = None if t is None or not t.time_msc else {
                 "bid": t.bid, "ask": t.ask, "last": t.last, "tik_ms": t.time_msc - self.fark_ms}
         return {"kotasyon": out, "simdi_ms": self.saat(), "fark_sn": self.fark_ms // 1000}
