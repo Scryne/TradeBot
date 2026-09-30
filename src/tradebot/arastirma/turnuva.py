@@ -15,7 +15,7 @@ from __future__ import annotations
 import json
 import math
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from functools import partial
 from pathlib import Path
 
@@ -41,6 +41,7 @@ from tradebot.arastirma.panel import (
 )
 from tradebot.cekirdek import StratejiTanimi, altin, nedensellik_testi, ornek
 from tradebot.cekirdek import aileler as al
+from tradebot.cekirdek import doviz_akis as da
 from tradebot.cekirdek.boyut import kaldirac_dogrula, panel_oynaklik_hedefi, yarim_kelly_tavani
 from tradebot.risk.motor import PortfoyIzleyici, RiskAyar
 from tradebot.veri.depo import BarDepo
@@ -65,6 +66,10 @@ STRATEJILER = {
     "doviz_momentum": ("doviz_kesitsel", partial(al.doviz_kesitsel, olcut="momentum"), "panel"),
     "doviz_birlesik": ("doviz_kesitsel", partial(al.doviz_kesitsel, olcut="birlesik"), "panel"),
     "doviz_dolar": ("doviz_kesitsel", partial(al.doviz_kesitsel, olcut="dolar"), "panel"),
+    # Dalga 10: döviz akış ve olay primleri (docs/turnuva/Dalga-10-Akis.md); üç strateji tek aile
+    "fomc_dolar": ("doviz_akis", da.fomc_dolar, "panel"),
+    "ay_sonu_hedge": ("doviz_akis", da.ay_sonu_hedge, "panel"),
+    "seans_para": ("doviz_akis", da.seans_para, "panel"),
     # Altın M15 (EA karşılığı; docs/turnuva/Altin-M15.md): giriş ailesi + EA risk katmanları
     "seans_kirilim": ("altin_m15", altin.seans_kirilim, "tek"),
     "kanal_kirilim": ("altin_m15", altin.kanal_kirilim, "tek"),
@@ -155,6 +160,7 @@ class HazirGrup:
     veto: np.ndarray | None = None  # [n, k] zekâ katmanı vetoları (point-in-time)
     tasima: np.ndarray | None = None  # [n, k] döviz grubu: yıllık faiz farkı (dalga 9)
     para_yon: np.ndarray | None = None  # [k] döviz grubu: +1 XXXUSD, −1 USDXXX
+    paralar: tuple[str, ...] | None = None  # [k] döviz akış grubu (dalga 10): USD dışındaki para
 
 
 def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bit_ms: int | None = None,
@@ -181,7 +187,12 @@ def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bi
         evrende &= takvim(tanim["seans"]).acik_maske(g.t)[:, None]
     if tanim.get("kur"):
         g = kur_cevir(g, depo, tanim["kur"])
-    modeller = [model(kayit[k]["piyasa"], kayit[k]["sinif"]) for k in g.kimlikler]
+    if tanim.get("maliyet_modeli"):  # dalga 10: uygulama aracı kurumunun (NCM) sabit maliyeti, veri spread'i yerine
+        from tradebot.arastirma.maliyet import MODELLER
+
+        modeller = [MODELLER[tanim["maliyet_modeli"]] for _ in g.kimlikler]
+    else:
+        modeller = [model(kayit[k]["piyasa"], kayit[k]["sinif"]) for k in g.kimlikler]
     ek = kripto_ek_kayma_bps(lik) * np.array([kayit[k]["piyasa"] == "BINANCE" for k in g.kimlikler])
     takvimler = {kayit[k]["takvim"] for k in g.kimlikler}
     # Karışık takvim (ör. kripto 7/24 + ABD ETF): tek takvimin yıllık bar sayısı yanlış olur; ızgaradan ölçülür.
@@ -195,8 +206,41 @@ def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bi
 
         tas = np.column_stack([vd.tasima_farki(depo, k, g.t) for k in g.kimlikler])
         yon_ = np.array([vd.para_yonu(k) for k in g.kimlikler])
+    paralar = None
+    if tanim.get("para"):  # dalga 10: USD karşılı spot pariteler (DUKASCOPY:EURUSD …)
+        yon_, paralar = para_bilgisi(g.kimlikler)
+    if tanim.get("endeksler"):  # dalga 10 ay sonu: hisse endeksi günlük kapanışları (çekirdeğe dışarıdan verilir)
+        g = replace(g, veri_hash=_endeks_yukle(depo, tanim["endeksler"], bit_ms, g.veri_hash))
     return HazirGrup(g, evrende, taraf_matrisi(g, modeller, ek), modeller, sorted(takvimler)[0], olcu, yl, vm, tas,
-                     yon_)
+                     yon_, paralar)
+
+
+def para_bilgisi(kimlikler: list[str]) -> tuple[np.ndarray, tuple[str, ...]]:
+    """USD karşılı paritelerde yabancı paranın yönü ve adı: EURUSD → (+1, EUR), USDJPY → (−1, JPY)."""
+    yon, ad = [], []
+    for k in kimlikler:
+        s = k.split(":")[-1]
+        if len(s) != 6 or "USD" not in (s[:3], s[3:]):
+            raise ValueError(f"{k}: USD karşılı parite değil")
+        yon.append(1.0 if s[3:] == "USD" else -1.0)
+        ad.append(s[:3] if s[3:] == "USD" else s[3:])
+    return np.array(yon), tuple(ad)
+
+
+def _endeks_yukle(depo: BarDepo, endeksler: dict[str, str], bit_ms: int | None, veri_hash: str) -> str:
+    import hashlib
+
+    import polars as pl
+
+    seriler, hashler = {}, [veri_hash]
+    for para, kimlik in sorted(endeksler.items()):
+        df = depo.oku(kimlik, "1d").sort("acilis_ms")
+        if bit_ms is not None:
+            df = df.filter(pl.col("acilis_ms") < bit_ms)
+        seriler[para] = (df["acilis_ms"].to_numpy(), df["close"].to_numpy())
+        hashler.append(f"{kimlik}:{hashlib.sha256(depo.yol(kimlik, '1d').read_bytes()).hexdigest()}")
+    da.endeks_ayarla(seriler)
+    return hashlib.sha256("|".join(hashler).encode()).hexdigest()
 
 
 # ------------------------------------------------------------------ koşu
@@ -212,7 +256,7 @@ def hedef_uret(h: HazirGrup, strateji: str, p: dict, yon: str, ayar: Ayar, neden
         s = np.column_stack([izgaraya(g, j, tanim.sinyal(b)) for j, b in enumerate(g.barlar)])
         olcekle = True
     else:
-        pn = al.Panel(g.t, g.kapanis, h.evrende, h.tasima, h.para_yon)
+        pn = al.Panel(g.t, g.kapanis, h.evrende, h.tasima, h.para_yon, h.paralar)
         if nedensellik:
             al.panel_nedensellik_testi(fonk, pn, deneme=3, **p)
         s = fonk(pn, **p)
@@ -396,7 +440,16 @@ def dalga_oku(yol: Path) -> dict:
         from tradebot.veri.haber_takvimi import yukle
 
         altin.haber_ayarla(yukle())
+    if d.get("fomc_takvimi"):  # dalga 10: planlı FOMC karar günleri (önceden ilan edilir; olağanüstüler yok)
+        da.fomc_ayarla(fomc_gunleri(Path(d["fomc_takvimi"])))
     return d
+
+
+def fomc_gunleri(yol: Path) -> list[int]:
+    from datetime import UTC, datetime
+
+    g = yaml.safe_load(Path(yol).read_text(encoding="utf-8"))["gunler"]
+    return [int(datetime.strptime(str(x), "%Y%m%d").replace(tzinfo=UTC).timestamp() * 1000) for x in g]
 
 
 def kollar(d: dict) -> list[dict]:

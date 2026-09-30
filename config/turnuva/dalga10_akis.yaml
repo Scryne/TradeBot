@@ -1,0 +1,54 @@
+# Turnuva dalga 10 — döviz akış ve olay primleri (FOMC günü dolar, ay sonu hedge dengelemesi, seans saati): ÖN KAYIT
+# (koşudan önce commit edilir, koşu sırasında değişmez). Gerekçe: docs/turnuva/Dalga-10-Akis.md. Saatlik Dukascopy
+# spot (BID) + NCM sabit maliyeti (taraf başı 2 bps). Boyut canlı risk motorunun varsayılan tavanlarıyla (brüt 1x,
+# enstrüman 0,5): backtest canlıdan gevşek olamaz.
+
+dalga: 10
+veri_bitis: "2026-01-01"        # 2026-01 → 08 kör (seçilen varyant sonradan ölçülür; bilgi, kapı değil)
+fomc_takvimi: config/fomc_planli.yaml
+frenler: true
+boyut:
+  hedef_vol: 0.10
+  kaldirac: 1.0
+  vol_pencere_gun: 90
+  bant: 0.25
+walk_forward: { is_yil: 3, oos_yil: 1 }
+# Çıta 0: seri kaldıraçlı spot döviz kâr/zararıdır (sermaye sepete yatırılmaz; nakit üstü getiri tanımı gereği).
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0, risksiz_yillik: 0.0 }
+
+planlar:
+  doviz_akis:
+    kimlik: 2026-09-30-d10-doviz-akis
+    hipotez: >-
+      G10 dövizlerinde (USD karşısında EUR, GBP, JPY, AUD, CAD, CHF, NZD) belgelenmiş akış ve olay primleri: planlı
+      FOMC karar günlerinde USD'nin değer kaybı (Mueller-Tahbaz-Salehi-Vedolin 2017), ay sonu Londra fixing'inde hisse
+      getirisi farkına bağlı hedge dengelemesi (Melvin-Prins 2015), paraların kendi işlem saatlerinde değer kaybı
+      (Ranaldo 2009, Breedon-Ranaldo 2013); NCM maliyeti (taraf başı 2 bps) sonrası pozitif ve walk-forward'da
+      kalıcıdır. Sıfır hipotezi: vermez.
+
+gruplar:
+  g10_saatlik:
+    kimlikler: [DUKASCOPY:EURUSD, DUKASCOPY:GBPUSD, DUKASCOPY:USDJPY, DUKASCOPY:AUDUSD, DUKASCOPY:USDCAD,
+                DUKASCOPY:USDCHF, DUKASCOPY:NZDUSD]
+    para: true
+    maliyet_modeli: NCMFX:fx_sabit
+    endeksler: { USD: DUKASCOPY:USA500IDXUSD, EUR: DUKASCOPY:DEUIDXEUR, GBP: DUKASCOPY:GBRIDXGBP,
+                 JPY: DUKASCOPY:JPNIDXJPY }
+    asgari_gecmis_gun: 60
+    yon: long_short
+    zd: [1h]
+
+# 9 deneme (tek aile: doviz_akis)
+kollar:
+  - strateji: fomc_dolar
+    gruplar: [g10_saatlik]
+    zd: [1h]
+    izgara: { pencere: [on, gun, iki] }
+  - strateji: ay_sonu_hedge
+    gruplar: [g10_saatlik]
+    zd: [1h]
+    izgara: { gun: [1, 2], olcut: [sepet, kendi] }
+  - strateji: seans_para
+    gruplar: [g10_saatlik]
+    zd: [1h]
+    izgara: { tur: [abd, tam] }

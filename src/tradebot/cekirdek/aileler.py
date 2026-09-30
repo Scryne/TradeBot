@@ -176,13 +176,15 @@ class Panel:
     # `para_yon[j]` = +1 (XXXUSD: uzun = yabancı para uzun) ya da −1 (USDXXX). Diğer gruplarda None.
     tasima: np.ndarray | None = None
     para_yon: np.ndarray | None = None
+    # Döviz akış grubu (dalga 10): `paralar[j]` = j'nin USD dışındaki parası (ör. "EUR", "JPY").
+    paralar: tuple[str, ...] | None = None
 
     def __len__(self) -> int:
         return len(self.t)
 
     def kes(self, n: int) -> Panel:
         return Panel(self.t[:n], self.close[:n], self.evrende[:n],
-                     None if self.tasima is None else self.tasima[:n], self.para_yon)
+                     None if self.tasima is None else self.tasima[:n], self.para_yon, self.paralar)
 
 
 def hafta_basi(t_ms: np.ndarray) -> np.ndarray:
@@ -296,7 +298,7 @@ def panel_nedensellik_testi(fonk, p: Panel, deneme: int = 10, tohum: int = 0, **
         if p.tasima is not None:
             ts = p.tasima.copy()
             ts[t + 1:] += rng.normal(0.0, 0.05, ts[t + 1:].shape)
-        yeni = fonk(Panel(p.t, c, p.evrende, ts, p.para_yon), **param)
+        yeni = fonk(Panel(p.t, c, p.evrende, ts, p.para_yon, p.paralar), **param)
         if not np.array_equal(yeni[: t + 1], temel[: t + 1]):
             raise AssertionError(f"{getattr(fonk, '__name__', fonk)} geleceği görüyor (t={t})")
 

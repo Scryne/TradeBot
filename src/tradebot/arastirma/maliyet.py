@@ -71,6 +71,10 @@ MODELLER = {
     "VIOP:altin_try": MaliyetModeli("viop_altin_try", 2.0, 2.5, 2.0, finansman_yillik=0.012, ucret_vergisi=0.05),
     # NCM forex hesabı (spike 08): komisyon 0 (GOLD ölçüldü), spread MT5 barından; vadeli CFD'lerde komisyon ölçülmedi
     "NCMFX:fx": MaliyetModeli("ncm_fx", 0.0, 1.0, 1.0, finansman_yillik=0.02, spread_veriden=True),
+    # Dalga 10 (gün içi/olay döviz kolları, Dukascopy verisiyle NCM'de uygulanacak): veri spread'i (Dukascopy, yarım
+    # ~0,2–0,5 bps) NCM'den dar olduğu için kullanılmaz; NCM canlı tik tam spread medyanı 1,3–1,8 bps → yarım 1 bps
+    # (aleyhte yuvarlandı) + kayma 1 bps = taraf başı 2 bps, gidiş-dönüş 4 bps. Finansman %2 (tutulan süreye orantılı).
+    "NCMFX:fx_sabit": MaliyetModeli("ncm_fx_sabit", 0.0, 1.0, 1.0, finansman_yillik=0.02),
     "NCMFX:metal": MaliyetModeli("ncm_metal", 0.0, 1.0, 1.0, finansman_yillik=0.06, spread_veriden=True,
                                  aciga_satis_yillik=0.12),
     # Dalga 3 türetilmiş vadeli serileri (veri/vadeli.py; getiri zaten nakit üstü). Uygulama NCM'de: endeks vadeli CFD'si
