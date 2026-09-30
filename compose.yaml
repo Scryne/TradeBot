@@ -178,6 +178,15 @@ services:
     depends_on:
       goc: { condition: service_completed_successfully }
 
+  akis:
+    <<: *ortak
+    # FOMC günü dolar gözlem kolu (canli/akis.py; dalga 10 B): NCM forex DEMO hesabına MT5 emri (köprü gerçek hesapta
+    # reddeder). Saatlik karar (yalnız takvim sinyali ya da açık pozisyon varken), saatte bir işaret. Kalp atışı ayrı
+    # izlenir (bekçi `akis`).
+    command: ["tradebot", "paper", "akis"]
+    depends_on:
+      goc: { condition: service_completed_successfully }
+
 volumes:
   pg:
   veri:

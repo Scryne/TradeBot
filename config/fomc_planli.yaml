@@ -5,6 +5,8 @@
 # Tarih = toplantının son günü (karar açıklaması). Kaynak (2026-09-30): federalreserve.gov/monetarypolicy/
 # fomchistoricalYYYY.htm başlıkları ("… Meeting - YYYY", unscheduled ve Conference Call hariç) 2010–2020;
 # fomccalendars.htm karar metni bağlantıları (monetaryYYYYMMDDa.htm) 2021–2026, toplantı dışı 2025-08-22 metni hariç.
+# İleriye dönük (canlı düğüm için): fomccalendars.htm toplantı takvimi, 2026-10 → 2027-12 (2026-09-30'da ilan edilmiş
+# planlı toplantılar). Takvim her yıl Fed'in yayımladığı yeni yılla uzatılır.
 # Açıklama saati 14:00 New York (2013 öncesi 14:15 ya da SEP'li toplantılarda 12:30); dalga 10 pencereleri saatten
 # bağımsız ya da her durumda öncesinde biter (Dalga-10-Akis.md).
 gunler:
@@ -141,3 +143,13 @@ gunler:
   - '20260617'
   - '20260729'
   - '20260916'
+  - '20261028'
+  - '20261209'
+  - '20270127'
+  - '20270317'
+  - '20270428'
+  - '20270609'
+  - '20270728'
+  - '20270915'
+  - '20271027'
+  - '20271208'

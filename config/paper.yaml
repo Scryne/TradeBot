@@ -105,3 +105,26 @@ altin:
   risk: {kaldirac: 1.0}
   magic: 910
   baslangic_ozkaynak: 10000
+
+# FOMC günü dolar kolu (Dalga 10 B; ön kayıt gereği demo GÖZLEM kolu, docs/turnuva/Dalga-10-Akis.md). Ayrı düğüm
+# (canli/akis.py, compose `akis`): NCM forex DEMO hesabında MT5 emri, döviz ve altın kollarıyla aynı hesap (sihirli
+# sayı ayrı). Planlı FOMC karar gününden önceki gün → karar günü, yedi yabancı paranın eşit sepeti uzun (USD kısa); yılda
+# 8 olay. Karar bir bar gecikmeli (21:00 UTC gün devri spread'inden kaçınır; ön kayıtlı gecikme stresiyle aynı).
+# Finansman backtest modeli (NCMFX:fx_sabit, %2; taşıma yok). Risk motoru varsayılan tavanları (brüt 1x, enstrüman 0,5).
+akis:
+  ad: "d10:fomc_dolar@g10_saatlik@1h"
+  sinif: B
+  strateji: fomc_dolar
+  parametre: {pencere: "gun"}
+  fomc_takvimi: config/fomc_planli.yaml
+  semboller: {"DUKASCOPY:EURUSD": EURUSD, "DUKASCOPY:GBPUSD": GBPUSD, "DUKASCOPY:USDJPY": USDJPY,
+              "DUKASCOPY:AUDUSD": AUDUSD, "DUKASCOPY:USDCAD": USDCAD, "DUKASCOPY:USDCHF": USDCHF,
+              "DUKASCOPY:NZDUSD": NZDUSD}
+  boyut: {hedef_vol: 0.10, vol_pencere_gun: 90, bant: 0.25}
+  maliyet: {kayma_bps: 1.0, finansman_yillik: 0.02}
+  risk: {kaldirac: 1.0}
+  gecikme_bar: 1
+  azami_spread_bps: 4.0
+  spread_bekle_dk: 30
+  magic: 911
+  baslangic_ozkaynak: 10000

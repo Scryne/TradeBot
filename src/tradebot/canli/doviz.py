@@ -282,6 +282,8 @@ def durum_kur(defter: PaperDefter, kol: str, baslangic: float) -> DovizDurum:
 
 # ---------------------------------------------------------------------------------------------------- düğüm
 class DovizDugumu:
+    EMIR_ONEK = "DV"   # MT5 emir yorumu öneki (alt sınıflar kendi önekini verir)
+
     def __init__(self, defter: PaperDefter, ay: DovizAyarlari, kaynak: Kaynak, saat: Callable[[], float] = time.time):
         self.defter, self.ay, self.kaynak, self.saat = defter, ay, kaynak, saat
         self.m: Engine = defter.motor
@@ -536,6 +538,11 @@ class DovizDugumu:
             if lot == 0:
                 continue
             q = p.lot_para(lot, orta)
+            if hedef_para[p.para] == 0.0:
+                # Tam kapanış para uzayında TAM adettir: USDXXX'te lot_para fiyata bağlı, girişten sonra fiyat oynadıysa
+                # q açık adedi aşar ve risk motoru ters dönüş görüp durdurulmuş kolun kapanışını reddeder (2026-09-30
+                # testte yakalandı). MT5 emri yine lotun tamamıdır; kalan bakiye dolumda USD'ye çevrilir.
+                q = -mevcut
             acik = d.lot.get(p.sembol, 0.0)
             planlar.append((abs(acik + lot) < abs(acik), p, kim, lot, q, orta))
         out = {"dolum": 0, "ret": []}
@@ -547,7 +554,7 @@ class DovizDugumu:
               kot: tuple[float, float, int], zaman: int, onek: str, out: dict, neden: str | None) -> None:
         bid, ask, tik_ms = kot
         u = p.usd(orta)
-        eid_ist = f"DV{onek}{zaman // SAAT_MS}-{p.para}"[:31]
+        eid_ist = f"{self.EMIR_ONEK}{onek}{zaman // SAAT_MS}-{p.para}"[:31]
         simdi = int(self.saat() * 1000)
         r = self.risk.onayla(EmirIstegi(kim, SINIF, q, u, self.kol.ad, simdi, eid_ist),
                              Piyasa(u, tik_ms, SAAT_MS, True), pf)

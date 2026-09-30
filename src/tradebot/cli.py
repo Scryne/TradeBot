@@ -115,8 +115,8 @@ def saglik_komutu(
         time.sleep(dongu)
 
 
-DUGUMLER = ("paper", "kilit", "doviz", "altin")   # her süreç ayrı gözetmen (kalp atışı ayrı)
-MT5_DUGUMLER = ("doviz", "altin")                  # gözetmen bunlarda köprüden gerçek kapatma emri verir
+DUGUMLER = ("paper", "kilit", "doviz", "altin", "akis")   # her süreç ayrı gözetmen (kalp atışı ayrı)
+MT5_DUGUMLER = ("doviz", "altin", "akis")                  # gözetmen bunlarda köprüden gerçek kapatma emri verir
 
 
 def _gozetmen_kur(a, **ayar):
@@ -126,10 +126,10 @@ def _gozetmen_kur(a, **ayar):
     from tradebot.veri.http import NazikIstemci
 
     if ayar.get("dugum") in MT5_DUGUMLER:
-        from tradebot.canli import altin, doviz
+        from tradebot.canli import akis, altin, doviz
         from tradebot.mt5.istemci import Mt5Istemci
 
-        ay = (doviz if ayar["dugum"] == "doviz" else altin).ayarlar()
+        ay = {"doviz": doviz, "altin": altin, "akis": akis}[ayar["dugum"]].ayarlar()
         if ay is not None and a.mt5_kopru_forex:
             ayar |= {"mt5": Mt5Istemci(a.mt5_kopru_forex, zaman_asimi=60), "magic": ay.magic}
     return Gozetmen(db_motor(a), binance_kotasyon(NazikIstemci("gozetmen", deneme=3, zaman_asimi=15).al), kod_surumu(),
@@ -953,6 +953,31 @@ def paper_altin(
         _yazdir(d.hesap_degisimi(hesap_degisti) if hesap_degisti else d.tur())
         return
     altin.calistir(sure_sn or None)
+
+
+@paper_uygulama.command("akis")
+def paper_akis(
+    sure_sn: float = typer.Option(0, help="Saniye; 0 = süresiz (servis)"),
+    tek: bool = typer.Option(False, help="Tek tur çalıştır ve sonucu yazdır"),
+    hesap_degisti: str = typer.Option("", help="Demo hesap değişti: defterdeki açık lotları kapat (gerekçe yaz)"),
+) -> None:
+    """FOMC günü dolar gözlem kolu (Dalga 10 B): NCM forex DEMO hesabında MT5 emri; saatlik karar (yalnız sinyal ya
+    da açık pozisyon varken), saatte bir işaret (compose `akis`)."""
+    from tradebot.canli import akis
+
+    if tek or hesap_degisti:
+        import os
+
+        from tradebot.canli.defter import PaperDefter
+        from tradebot.mt5.istemci import Mt5Istemci
+
+        a, m = _veri_baglam()
+        d = akis.AkisDugumu(PaperDefter(m, os.environ.get("TRADEBOT_KOD_SURUMU", "yerel")), akis.ayarlar(),
+                            akis.Kaynak(Mt5Istemci(a.mt5_kopru_forex)))
+        d.ac()
+        _yazdir(d.hesap_degisimi(hesap_degisti) if hesap_degisti else d.tur())
+        return
+    akis.calistir(sure_sn or None)
 
 
 @paper_uygulama.command("dagitim")

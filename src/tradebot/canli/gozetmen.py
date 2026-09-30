@@ -17,7 +17,7 @@ donmadan kendiliğinden çözülürse `durdur` olayını görüp belleğini deft
 
 Gerçek para (Faz 12): `fiyat_al` + defter yazımı yerine aracı kurum API'si üzerinden reduce-only emir (aynı akış).
 
-MT5 düğümleri (`doviz`, `altin`; 2026-09-30): aracı kurum (MT5 demo hesabı) düğümden bağımsızdır ve donmada da
+MT5 düğümleri (`doviz`, `altin`, `akis`; 2026-09-30): aracı kurum (MT5 demo hesabı) düğümden bağımsızdır ve donmada da
 erişilebilir. Gözetmen bu düğümlerde deftere yazmaz; kolun sihirli sayısıyla açık pozisyonları köprüden GERÇEKTEN
 kapatır (ters emir, riski azaltan) ve kolu durdurur. Düğüm geri gelince bu kapanış işlemlerini bilet numarasıyla
 deftere işler (`_benimse`): defter tek kaynaktan, MT5'ten beslenir.
