@@ -42,6 +42,7 @@ from tradebot.arastirma.panel import (
 from tradebot.cekirdek import StratejiTanimi, altin, nedensellik_testi, ornek
 from tradebot.cekirdek import aileler as al
 from tradebot.cekirdek import doviz_akis as da
+from tradebot.cekirdek import endeks_takvim as et
 from tradebot.cekirdek.boyut import kaldirac_dogrula, panel_oynaklik_hedefi, yarim_kelly_tavani
 from tradebot.risk.motor import PortfoyIzleyici, RiskAyar
 from tradebot.veri.depo import BarDepo
@@ -70,6 +71,11 @@ STRATEJILER = {
     "fomc_dolar": ("doviz_akis", da.fomc_dolar, "panel"),
     "ay_sonu_hedge": ("doviz_akis", da.ay_sonu_hedge, "panel"),
     "seans_para": ("doviz_akis", da.seans_para, "panel"),
+    # Dalga 11: ABD endeksi olay ve takvim primleri (docs/turnuva/Dalga-11-Endeks.md). Ay dönümü dalga 1'in `takvim`
+    # ailesinde sayılır (aynı fikir, yeni maliyet yapısı): DSR önceki denemelerle birlikte.
+    "fomc_oncesi": ("endeks_olay", et.fomc_oncesi, "tek"),
+    "gece_kaymasi": ("endeks_olay", et.gece_kaymasi, "tek"),
+    "ay_donumu_saat": ("takvim", et.ay_donumu_saat, "tek"),
     # Altın M15 (EA karşılığı; docs/turnuva/Altin-M15.md): giriş ailesi + EA risk katmanları
     "seans_kirilim": ("altin_m15", altin.seans_kirilim, "tek"),
     "kanal_kirilim": ("altin_m15", altin.kanal_kirilim, "tek"),

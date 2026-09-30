@@ -1,0 +1,56 @@
+# Turnuva dalga 11 — ABD hisse endeksi olay ve takvim primleri (FOMC öncesi kayma, ay dönümü, gece kayması): ÖN KAYIT
+# (koşudan önce commit edilir, koşu sırasında değişmez). Gerekçe: docs/turnuva/Dalga-11-Endeks.md. Saatlik Dukascopy
+# spot endeks (BID) + NCM endeks vadeli maliyeti (taraf başı 2 bps + vadeli taşıması %5/yıl). Yalnız uzun. Boyut canlı
+# risk motorunun varsayılan tavanlarıyla (brüt 1x, enstrüman 0,5).
+
+dalga: 11
+veri_bitis: "2026-01-01"        # 2026-01 → 08 kör (seçilen varyant sonradan ölçülür; bilgi, kapı değil)
+fomc_takvimi: config/fomc_planli.yaml
+frenler: true
+boyut:
+  hedef_vol: 0.10
+  kaldirac: 1.0
+  vol_pencere_gun: 90
+  bant: 0.25
+walk_forward: { is_yil: 3, oos_yil: 1 }
+# Çıta 0: finansman alanı vadeli taşımasını (faiz) zaten düşüyor; seri vadeli fazla getirisinin aleyhte vekilidir.
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0, risksiz_yillik: 0.0 }
+
+planlar:
+  endeks_olay:
+    kimlik: 2026-09-30-d11-endeks-olay
+    hipotez: >-
+      ABD hisse endekslerinde (S&P 500, Nasdaq 100) planlı FOMC açıklamasından önceki 24 saatte olağandışı pozitif
+      getiri (Lucca-Moench 2015) ve nakit seans dışında biriken getiri (gece kayması; Cliff-Cooper-Gulen 2008,
+      Lou-Polk-Skouras 2019), NCM endeks vadeli maliyeti ve vadeli taşıması sonrası pozitif ve walk-forward'da kalıcıdır.
+      Sıfır hipotezi: vermez.
+  takvim:
+    kimlik: 2026-09-30-d11-takvim-vadeli
+    hipotez: >-
+      Ay dönümü etkisi (ayın son iş günü + yeni ayın ilk iş günleri; Lakonishok-Smidt 1988, McConnell-Xu 2008) ABD
+      endeks vadelisinde (finansman yerine vadeli taşıması; dalga 1 CFD'de %6 finansmanla ölçmüştü) maliyet sonrası
+      pozitif ve walk-forward'da kalıcıdır. Aile dalga 1 takvim ailesiyle aynı (DSR önceki denemelerle). Sıfır hipotezi:
+      vermez.
+
+gruplar:
+  abd_endeks_saatlik:
+    kimlikler: [DUKASCOPY:USA500IDXUSD, DUKASCOPY:USATECHIDXUSD]
+    maliyet_modeli: NCMFX:endeks_sabit
+    asgari_gecmis_gun: 60
+    yon: long
+    zd: [1h]
+
+# 5 deneme (endeks_olay 3, takvim 2)
+kollar:
+  - strateji: fomc_oncesi
+    gruplar: [abd_endeks_saatlik]
+    zd: [1h]
+    izgara: { pencere: ["on", "gun"] }
+  - strateji: gece_kaymasi
+    gruplar: [abd_endeks_saatlik]
+    zd: [1h]
+    izgara: {}
+  - strateji: ay_donumu_saat
+    gruplar: [abd_endeks_saatlik]
+    zd: [1h]
+    izgara: { sonra: [1, 3] }

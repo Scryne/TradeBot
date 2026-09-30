@@ -75,6 +75,10 @@ MODELLER = {
     # ~0,2–0,5 bps) NCM'den dar olduğu için kullanılmaz; NCM canlı tik tam spread medyanı 1,3–1,8 bps → yarım 1 bps
     # (aleyhte yuvarlandı) + kayma 1 bps = taraf başı 2 bps, gidiş-dönüş 4 bps. Finansman %2 (tutulan süreye orantılı).
     "NCMFX:fx_sabit": MaliyetModeli("ncm_fx_sabit", 0.0, 1.0, 1.0, finansman_yillik=0.02),
+    # Dalga 11 (ABD endeksi, Dukascopy spot verisiyle NCM endeks vadeli CFD'sinde uygulanacak; ES/NQ canlı tik tam spread
+    # medyanı 0,8 / 0,5 bps): komisyon 0,5 (ölçülmedi), yarım spread 0,5, kayma 1 → taraf başı 2 bps. Vadeli getirisi
+    # ≈ spot − (faiz − temettü): tutulan süre için yıllık %5 finansman (T-bill üst sınırı, temettü yok sayılır; aleyhte).
+    "NCMFX:endeks_sabit": MaliyetModeli("ncm_endeks_sabit", 0.5, 0.5, 1.0, finansman_yillik=0.05),
     "NCMFX:metal": MaliyetModeli("ncm_metal", 0.0, 1.0, 1.0, finansman_yillik=0.06, spread_veriden=True,
                                  aciga_satis_yillik=0.12),
     # Dalga 3 türetilmiş vadeli serileri (veri/vadeli.py; getiri zaten nakit üstü). Uygulama NCM'de: endeks vadeli CFD'si

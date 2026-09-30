@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-09-30
 type: turnuva-plani
-durum: ön kayıt (koşudan önce commit edildi)
+durum: sonuçlandı — fomc_dolar B, diğerleri KALDI (2026-09-30)
 ---
 # Turnuva — Dalga 10: döviz akış ve olay primleri (ön kayıt)
 
@@ -68,6 +68,29 @@ pozitif + rejim + stres; B için DSR şartı yok.
 hesabında (MT5 emir yolu) ayrı bir gözlem kolu olarak çalışır; gerçek para kapısı değişmez (kolun kendi paper
 haftalarında PSR(0) ≥ 0,95 ve ≥ 26 hafta). Hiçbiri geçmezse: sıfır hipotezi ayakta kalır, yazılır, üç fikir kapanan
 fikirlere eklenir; demo hesaba yeni kol girmez.
+
+## Sonuç (2026-09-30, koşu `dalga10`, ön kayıt 7b3b75d + ek 1 9c7e0dc)
+
+**`fomc_dolar` B; `ay_sonu_hedge` ve `seans_para` KALDI.** 9 deneme; aile DSR'ı nihai 9 denemeyle (seans kolunun çok
+negatif Sharpe'ı Sharpe varyansını büyüttüğü için DSR eşiği yükseldi: B için DSR şartı yok).
+
+| Strateji | En iyi varyant | Yıllık | Sharpe | En kötü düşüş | OOS yıllık | Karar |
+| --- | --- | --- | --- | --- | --- | --- |
+| fomc_dolar | pencere = gun | +%0,40 | 0,25 | −%6,2 | +%0,16 | **B** |
+| ay_sonu_hedge | — | — | −0,31 | −%12 | −%0,6 | KALDI |
+| seans_para | — | — | −2,33 | −%84 | −%11,4 | KALDI |
+
+- **FOMC günü dolar:** önceki gün 21:00 → karar günü 21:00 UTC yabancı sepet uzun. Yıllar: 16 yılın 10'u pozitif
+  (2014 −%3,5, 2025 −%2,3 en kötüler; 2023 +%2,9 en iyi). Stres: 2x maliyette +%0,09/yıl, bir bar gecikmede +%0,38.
+  Rejimden bağımsız (yukarı/aşağı t 0,73 / 0,62). Walk-forward seçimleri çoğunlukla `gun` (12 pencerenin 8'i). `on`
+  (açıklamadan önce çıkış) ~0, `iki` (ertesi gün) negatif: etki açıklama gününe sıkışık, Mueller vd. ile tutarlı.
+  **Ölçek dürüstçe:** yılda 8 olay, olay başına net ~5 bps, 1x tavanla yıllık +%0,4. Beklenen değer pozitif ama tek
+  başına kullanılabilir bir getiri değil.
+- **Ay sonu hedge:** yön işareti ters çalıştı ya da etki yok; walk-forward negatif.
+- **Seans saati:** önceden yazıldığı gibi günlük 1–2 gidiş-dönüş maliyeti (yılda %10–20) etkiyi siliyor.
+
+**Demo hesaba giren (ön kayıttaki kural):** `fomc_dolar(pencere=gun)` NCM forex demo hesabında gözlem kolu olarak
+çalışır (yılda 8 işlem). Gerçek para kapısı değişmez. Ay sonu hedge ve seans saati kapanan fikirlere eklenir.
 
 ## Ek 1 (2026-09-30, sonuç görülmeden): YAML düzeltmesi
 
