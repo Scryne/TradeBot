@@ -364,6 +364,10 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     gösterildi, Scryne kurallar içinde demo kolunu seçti). `canli/altin.py`, compose `altin`, kol
     `am15:kanal_kirilim@xau_m15@15m`: turnuvanın `kanal_kirilim` en iyi varyantı (Sharpe −0,18, KALDI), her M15
     kapanışında karar, sabit 0,01 lot, aynı demo hesap (sihirli sayı 910). Beklenen getirisi negatif; gözlem.
+  - 2026-09-30 21:59 TR: yeni demo 316749 da `Account disabled`. İki hesapta da ortak: bot bağlıyken Scryne aynı hesaba
+    telefondan girdi, ~20–40 dk sonra kapandı (NCM demo sunucusu ikinci cihaz/IP'den girişte hesabı kapatıyor olabilir;
+    doğrulanmadı). Kural: botun hesabına telefondan girilmez; izleme Telegram'dan. Güvenlik ağı eklendi: aracı kurumda
+    acil stop, MT5 işlemlerinin bilet numarasıyla benimsenmesi, gözetmenin MT5 düğümlerini köprüden kapatması. CI kuruldu.
 
 ### Faz 9: Operasyon
 - **İşler:** Bağımsız gözetmen (kalp atışı, özkaynak, pozisyon; motor donarsa kapatma); Telegram bot (3

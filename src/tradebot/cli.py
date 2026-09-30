@@ -935,11 +935,12 @@ def paper_doviz(
 def paper_altin(
     sure_sn: float = typer.Option(0, help="Saniye; 0 = süresiz (servis)"),
     tek: bool = typer.Option(False, help="Tek tur çalıştır ve sonucu yazdır"),
+    hesap_degisti: str = typer.Option("", help="Demo hesap değişti: defterdeki açık lotu kapat (gerekçe yaz)"),
 ) -> None:
     """Altın M15 scalping gözlem kolu (EA tarzı; NCM forex DEMO hesabı, MT5 emri; compose `altin`)."""
     from tradebot.canli import altin
 
-    if tek:
+    if tek or hesap_degisti:
         import os
 
         from tradebot.canli.defter import PaperDefter
@@ -949,7 +950,7 @@ def paper_altin(
         d = altin.AltinDugumu(PaperDefter(m, os.environ.get("TRADEBOT_KOD_SURUMU", "yerel")), altin.ayarlar(),
                               Mt5Istemci(a.mt5_kopru_forex))
         d.ac()
-        _yazdir(d.tur())
+        _yazdir(d.hesap_degisimi(hesap_degisti) if hesap_degisti else d.tur())
         return
     altin.calistir(sure_sn or None)
 

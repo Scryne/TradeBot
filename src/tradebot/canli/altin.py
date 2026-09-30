@@ -330,6 +330,32 @@ class AltinDugumu:
         _log.warning("altin_kurtarma", **out)
         return out
 
+    def hesap_degisimi(self, neden: str) -> dict:
+        """Demo hesap değişti (eskisi aracı kurumca kapatıldı): defterdeki açık lot yeni hesabın orta fiyatıyla, MT5 emri
+        olmadan kapatılır (kayma aleyhte; riski azaltan). Sonraki bar kararı yeni hesapta yeniden açar."""
+        d = self._d()
+        simdi = int(self.saat() * 1000)
+        out: dict = {"kapanan": {}}
+        kot = self._kotasyon()
+        if d.lot and kot:
+            orta = (kot[0] + kot[1]) / 2
+            q = -d.lot * self.ay.ons_lot
+            k = self.ay.kayma_bps / 1e4
+            emir_id = self.defter.emir_yaz(self.kol.ad, None, f"ALH{simdi // 1000}"[:31], self.ay.kimlik, q, q, orta,
+                                           "hesap_degisimi", {"onay": True, "gerekceler": ["hesap değişimi: defter "
+                                                                                          "kapatması"],
+                                                              "risk_azaltan": True, "lot": -d.lot},
+                                           gonderim_fiyati=orta)
+            self.defter.olay_yaz(emir_id, self.kol.ad, "dolum", self.ay.kimlik, q, orta * (1 + k if q > 0 else 1 - k),
+                                 0.0, simdi, {"sembol": self.ay.sembol, "hesap_degisimi": neden,
+                                              "mt5": [{"lot": -d.lot, "fiyat": orta, "islem": None}]})
+            out["kapanan"] = {self.ay.sembol: -d.lot}
+        elif d.lot:
+            raise RuntimeError("kotasyon yok: yeni hesap bağlı mı?")
+        self.defter.kol_olay_yaz(self.kol.ad, "hesap_degisimi", {"neden": neden, **out}, simdi)
+        _log.warning("altin_hesap_degisimi", neden=neden, **out)
+        return out
+
     # ------------------------------------------------------------------ yürütme
     def _yurut(self, d: AltinDurum, karar_id: int | None, zaman: int, hedef_lot: float,
                kot: tuple[float, float, int], onek: str, neden: str | None = None,

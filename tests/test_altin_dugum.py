@@ -261,3 +261,19 @@ def test_gozetmen_donan_mt5_dugumunu_kopruden_kapatir(kur):
     d2 = ad.AltinDugumu(d.defter, d.ay, k, saat=saat)
     d2.tur()
     assert d2._d().lot == 0 and d2._d().durdurulmus and k.poz == 0
+
+
+def test_altin_hesap_degisimi_defteri_kapatir(kur):
+    m, d, saat, k = kur
+    for i in range(1, 300):
+        saat.ms = T0 + i * B + 30_000
+        d.tur()
+        if k.poz:
+            break
+    n = len(k.emirler)
+    k.poz = 0.0                                                         # yeni hesap: MT5'te pozisyon yok
+    r = d.hesap_degisimi("NCM eski demo hesabı kapattı")
+    assert list(r["kapanan"]) == ["GOLD"] and len(k.emirler) == n        # MT5'e emir gitmedi
+    assert d._d().lot == 0 and d._d().adet == 0
+    saat.ms = (saat.ms // S + 1) * S + 1000
+    assert d.tur()["isaret"]["mutabakat"] == {"tamam": True}
