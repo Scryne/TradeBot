@@ -161,6 +161,15 @@ services:
     depends_on:
       goc: { condition: service_completed_successfully }
 
+  doviz:
+    <<: *ortak
+    # Dalga 9 döviz taşıma gözlem kolu (canli/doviz.py): NCM forex DEMO hesabına MT5 köprüsünden gerçek emir (köprü
+    # gerçek hesapta emri reddeder). İş günü 07:00 UTC karar, saatte bir işaret + taşıma tahakkuku. Kalp atışı ayrı
+    # izlenir (bekçi `doviz`). Defter emirden önce yazılır; yeniden başlatmada MT5 işlem geçmişinden kurtarılır.
+    command: ["tradebot", "paper", "doviz"]
+    depends_on:
+      goc: { condition: service_completed_successfully }
+
 volumes:
   pg:
   veri:

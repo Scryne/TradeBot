@@ -67,3 +67,23 @@ kilit:
   olay: {kategoriler: [insiders, privateSale], asgari_oran: 0.01}
   maliyet: {ucret: 0.0005, kayma_token: 0.001, kayma_btc: 0.0001}
   risk: {kaldirac: 1.0}
+
+
+# Döviz taşıma kolu (Dalga 9 KALDI; ön kayıt gereği ileriye dönük GÖZLEM kolu, docs/turnuva/Dalga-9-Doviz.md). Ayrı
+# düğüm (canli/doviz.py, compose `doviz`): NCM forex DEMO hesabında gerçek MT5 emri. İş günü 07:00 UTC'de günde bir karar
+# (NCM günlük barları + OECD faizi, backtest'in aynı fonksiyonları), saatte bir işaret + taşıma tahakkuku (demo swap 0:
+# defter faiz farkı − kurum payı ile tahakkuk eder). Risk motoru varsayılan tavanları (brüt 1x, enstrüman 0,5).
+# Başlangıç özkaynağı demo bakiyesi (9.999,40 USD, 2026-09-30). Dağıtıcıya girmez. Jev vetosuz (v1).
+doviz:
+  ad: "d9:doviz_tasima@g10_doviz@1d"
+  sinif: B
+  strateji: doviz_tasima
+  parametre: {n: 1}
+  semboller: {"VADELI:EURUSD": EURUSD, "VADELI:GBPUSD": GBPUSD, "VADELI:USDJPY": USDJPY, "VADELI:AUDUSD": AUDUSD,
+              "VADELI:USDCAD": USDCAD, "VADELI:USDCHF": USDCHF}
+  boyut: {hedef_vol: 0.10, vol_pencere_gun: 90, bant: 0.25}
+  maliyet: {kayma_bps: 1.0, kurum_payi_yillik: 0.01}
+  risk: {kaldirac: 1.0}
+  yurutme_saat_utc: 7
+  magic: 909
+  baslangic_ozkaynak: 10000

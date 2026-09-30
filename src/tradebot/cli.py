@@ -893,6 +893,35 @@ def paper_kilit(
     kilit.calistir(sure_sn or None)
 
 
+@paper_uygulama.command("doviz")
+def paper_doviz(
+    sure_sn: float = typer.Option(0, help="Saniye; 0 = süresiz (servis)"),
+    tek: bool = typer.Option(False, help="Tek tur çalıştır ve sonucu yazdır"),
+) -> None:
+    """Döviz taşıma kolu düğümü (Dalga 9 gözlem kolu): NCM forex DEMO hesabında MT5 emri; iş günü 07:00 UTC karar,
+    saatte bir işaret + taşıma tahakkuku (compose `doviz`)."""
+    from tradebot.canli import doviz
+
+    if tek:
+        import os
+
+        from tradebot.canli.defter import PaperDefter
+        from tradebot.mt5.istemci import Mt5Istemci
+        from tradebot.veri import faiz
+        from tradebot.veri.depo import HamDepo
+        from tradebot.veri.http import NazikIstemci
+
+        a, m = _veri_baglam()
+        http = NazikIstemci("oecd", zaman_asimi=120)
+        kaynak = doviz.Kaynak(Mt5Istemci(a.mt5_kopru_forex), lambda: http.al(faiz.URL.format(ulkeler="+".join(faiz.ULKELER))),
+                              HamDepo(a.veri_dizini, m))
+        d = doviz.DovizDugumu(PaperDefter(m, os.environ.get("TRADEBOT_KOD_SURUMU", "yerel")), doviz.ayarlar(), kaynak)
+        d.ac()
+        _yazdir(d.tur())
+        return
+    doviz.calistir(sure_sn or None)
+
+
 @paper_uygulama.command("dagitim")
 def paper_dagitim(hafta: int = typer.Option(0, help="Kaç hafta önce (0 = bu hafta)")) -> None:
     """Portföy kolunun haftalık sermaye dağıtımı (paper_dagitim; yoksa hafta başına kadarki defterle hesaplanıp yazılır)."""

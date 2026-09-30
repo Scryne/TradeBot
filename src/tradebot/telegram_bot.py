@@ -49,6 +49,9 @@ def kol_aciklamasi(k: PaperKol) -> str:
     if k.strateji == "kilit_kisa":
         return ("token unlock arm: shorts a token's perpetual future 7 days before a large team/investor token unlock "
                 "and hedges with a long BTC perpetual, daily decisions, without Jev veto")
+    if k.strateji == "doviz_tasima":
+        return ("forex carry arm on the demo account: long the highest-interest G10 currency and short the lowest, "
+                "daily decisions, real orders to the MT5 demo account, observation only")
     dalga = "wave 2 (slow volatility estimate)" if k.ad.startswith("d2:") else "wave 1"
     return f"{STRATEJI.get(k.strateji, k.strateji)}, {ZD.get(k.zd, k.zd)}, BTC+ETH, {dalga}, " \
            f"{'with' if k.jev else 'without'} Jev veto"
