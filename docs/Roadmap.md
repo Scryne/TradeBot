@@ -347,6 +347,15 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     (Sharpe 0,54, OOS +%0,7/yıl; OOS düşüş −%41 kapıyı geçemedi). VİOP maliyet modeli `VIOP:endeks_vadeli` eklendi.
   - Sırada: spike sonucu (spread, emir) → maliyet modelleri → VİOP/altın backtest dalgası (ön kayıtla) → canlı
     bar akışı (paper düğümüne MT5 kaynağı).
+  - 2026-09-30 **MT5 emir yolu (yalnız demo)**: köprüye `/hesap`, `/pozisyonlar`, `/islemler`, `POST /emir`. Hesap türü
+    demo değilse köprü emri reddeder (`gercek_hesap_kapali`, kural 7); emri yalnız risk onayı almış düğüm gönderir.
+    Forex demo: 9.999,40 USD, hedging, 1:10; majör swap'ları 0 (defter taşımayı kendisi tahakkuk eder).
+  - 2026-09-30 **Forex'e geçiş (Scryne kararı: "forex trading'e geçiyoruz, tüm yetki sende"; gerçek para: önce demo,
+    kapıdan sonra).** Dalga 9 G10 döviz kesitseli (taşıma, momentum, birleşik, dolar taşıması; 9 deneme) **KALDI**: en
+    iyi taşıma n=1 Sharpe 0,04, OOS −%0,2/yıl (`docs/turnuva/Dalga-9-Doviz.md`). Ön kayıt gereği taşıma n=1 demo
+    hesapta ileriye dönük gözlem kolu: `canli/doviz.py`, compose `doviz`, kol `d9:doviz_tasima@g10_doviz@1d` (B).
+    İlk emirler 2026-09-30 17:36 UTC: AUDUSD 0,07 lot alış (AUD uzun), USDCHF 0,05 lot alış (CHF kısa).
+    Açık: bağımsız gözetmen bu düğümün MT5 pozisyonlarını kapatamaz (bekçi kalp atışını izler); Jev vetosu yok.
 
 ### Faz 9: Operasyon
 - **İşler:** Bağımsız gözetmen (kalp atışı, özkaynak, pozisyon; motor donarsa kapatma); Telegram bot (3
@@ -427,6 +436,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     refaktör ön kayıtlı 6 kolun sonucunu birebir üretti). Gözetmen ve sağlık bekçisi düğüm başına: kilit düğümünün
     işareti Nautilus düğümünün donmasını gizlemez. Telegram "her şeyi durdur" bu kolu da kapsar. Açık: Jev vetosu (v1'de
     yok), DefiLlama takviminin günlük anlık görüntüleri biriktikçe backtest takvimiyle karşılaştırma (PIT sapması).
+  - 2026-09-30: forex'e geçiş (Faz 8 notu). Paper'da üç düğüm: `paper` (BTC/ETH trend), `kilit` (gerçek para adayı),
+    `doviz` (NCM forex demo, gözlem). Kapı hepsinde aynı: kolun kendi paper haftalarında PSR(0) ≥ 0,95 ve ≥ 26 hafta.
 
 ### Faz 12: Gerçek para (koşullu)
 - **İşler:** Scryne kararı; aracı kurum/borsa seçimi; anahtar güvenliği; vergi; sabit tavanlı mikro

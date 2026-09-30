@@ -28,6 +28,7 @@ Bilinen boşluk (v1): bağımsız gözetmen (katman 5) bu düğümün MT5 pozisy
 """
 from __future__ import annotations
 
+import hashlib
 import math
 import time
 from collections import defaultdict
@@ -183,25 +184,27 @@ class Kaynak:
         self.ist, self.faiz_al, self.ham = ist, faiz_al, ham
         self._aylik: dict | None = None
         self._faiz_gun: int | None = None
+        self._sha = ""
 
     def aylik(self, gun: int) -> tuple[dict, str]:
         """OECD aylık faiz; günde bir indirilir, ham depoya yazılır (hash = kimlik). İndirilemezse son kayıtlı sürüm."""
-        sha = ""
         if self._faiz_gun != gun:
             try:
                 icerik = self.faiz_al()
                 if self.ham is not None:
-                    sha = self.ham.kaydet("oecd", "IR3TIB/aylik", icerik, "csv")[1]
+                    self._sha = self.ham.kaydet("oecd", "IR3TIB/aylik", icerik, "csv")[1]
+                else:
+                    self._sha = hashlib.sha256(icerik).hexdigest()
                 self._aylik, self._faiz_gun = fz.coz(icerik), gun
             except Exception as e:  # noqa: BLE001
                 _log.warning("faiz_indirilemedi", hata=f"{type(e).__name__}: {e}"[:200])
                 if self._aylik is None and self.ham is not None:
                     son = self.ham.dosyalar("oecd", "IR3TIB/aylik")
                     if son:
-                        self._aylik, sha = fz.coz(son[-1][1].read_bytes()), son[-1][2]
+                        self._aylik, self._sha = fz.coz(son[-1][1].read_bytes()), son[-1][2]
         if self._aylik is None:
             raise RuntimeError("faiz verisi yok")
-        return self._aylik, sha
+        return self._aylik, self._sha
 
     def gunluk(self, paralar: tuple[Para, ...], simdi_ms: int) -> dict[str, pl.DataFrame]:
         from tradebot.veri.mt5 import katalog_barlari
@@ -417,8 +420,9 @@ class DovizDugumu:
                 veri_hash=veri_hash[:64], durum=durum, ayrinti=ayr)).inserted_primary_key[0])
         hedef_para = {p.para: float(yeni[j] * p.yon) for j, p in enumerate(self.ay.paralar) if islem[j]}
         sonuc = self._yurut(d, kid, gun, hedef_para, fiyat, ham, "D")
-        _log.info("doviz_karar", gun=gun, durum=durum, hedef=[round(x, 3) for x in hedef], islem=int(islem.sum()))
-        return {"karar_id": kid, "hedef": [round(x, 3) for x in hedef], **sonuc}
+        hedef_l = [round(float(x), 3) for x in hedef]
+        _log.info("doviz_karar", gun=gun, durum=durum, hedef=hedef_l, islem=int(islem.sum()))
+        return {"karar_id": kid, "hedef": hedef_l, **sonuc}
 
     def _devam(self, karar_id: int) -> dict | None:
         """Karar yazılıp emir sonucu deftere geçmeden süreç durduysa: emri yazılmış ama olayı olmayan her emir için MT5
