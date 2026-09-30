@@ -1,0 +1,27 @@
+# Her push ve PR'da lint + testler (2026-09-30; sağlık nöbeti alarmı: "CI yok — kırılma fark edilmez").
+# Testler ağa ve sırlara dokunmaz: veritabanı sqlite, MT5/Binance/OECD sahte. Sır gerekmez.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Bağımlılıklar
+        run: uv sync --frozen
+      - name: Lint
+        run: uv run ruff check src tests
+      - name: Testler
+        run: uv run pytest -q
