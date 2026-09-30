@@ -33,8 +33,8 @@ sonra fark açıldı). Literatürdeki primlerin çoğu 48+ paralı, gelişmekte 
   farkı, iki ay gecikmeli; PIT). USD puanı 0 olan yedinci para.
 - Para puanı t'de bilinenle; en yüksek `n` para uzun, en düşük `n` kısa, her biri 1/n (para uzayında dolar-nötr).
   Enstrüman ağırlığı = yön × para ağırlığı (USDJPY'de JPY kısa = USDJPY uzun). Yalnız haftanın ilk barında yenilenir.
-- Boyut dalga 3 ile aynı: %20 oynaklık hedefi (90 gün), 3x brüt tavan, bant 0,25, frenler açık. Karar kapanmış
-  barla, dolum ertesi barın açılışında.
+- Boyut: %10 oynaklık hedefi (90 gün), **1x brüt tavan**, enstrüman 0,5, bant 0,25, frenler açık (ek 1). Karar
+  kapanmış barla, dolum ertesi barın açılışında.
 - Dönem 2010 → 2025-12-31. Walk-forward IS 3 yıl → OOS 1 yıl. Çıta 0 (seri nakit üstü getiri).
 
 ## Izgara (9 deneme, tek aile `doviz_kesitsel`)
@@ -62,6 +62,13 @@ yolu, Faz 8) paper kolu olarak çalışır; gerçek para kapısı değişmez (pa
 Hiçbiri geçmezse: sıfır hipotezi ayakta kalır, bu yazılır; ailenin DSR'ı en yüksek varyantı yine demo hesapta
 **ileriye dönük gözlem kolu** olarak çalışır (sermayesi sanal, kapı sayacı aynı). Bu, geçmiş testin yerine geçmez:
 kapı yalnız ileriye dönük haftalarla açılır.
+
+## Ek 1 (2026-09-30, koşudan önce): boyut canlı tavanlarına çekildi
+
+İlk ön kayıt (e8acbd9) dalga 3'ün boyutunu taşıyordu (%20 hedef, 3x). Demo düğümü risk motorunun varsayılan
+tavanlarıyla çalışacak (kol brütü 1x, tek enstrüman özkaynağın %50'si; kilit kolu da böyle). Tavanı yükseltmek
+Scryne'ın açık onayını ister (kural 7) ve backtest canlıdan gevşek olamaz. Hiçbir sonuç görülmeden değiştirildi:
+%10 hedef, 1x tavan. Sharpe ve DSR ölçekten büyük ölçüde bağımsızdır; getiri ve düşüş ~%10 oynaklıkla okunmalı.
 
 ## Raporlanacak (kapı değil, bilgi)
 

@@ -1,13 +1,15 @@
 # Turnuva dalga 9 — G10 döviz kesitseli (taşıma, momentum, birleşik, dolar taşıması): ÖN KAYIT (koşudan önce commit
 # edilir, koşu sırasında değişmez). Gerekçe: docs/turnuva/Dalga-9-Doviz.md. Seriler dalga 3'ün döviz vekilleri
-# (veri/vadeli.py: spot + PIT faiz farkı; getiri nakit üstü). Boyut ve ölçüt dalga 3 ile AYNI (yeni ayar araması yok).
+# (veri/vadeli.py: spot + PIT faiz farkı; getiri nakit üstü). Ölçüt dalga 3 ile aynı. Boyut canlı risk motorunun
+# varsayılan tavanlarıyla (brüt 1x, enstrüman 0,5; tavanı yükseltmek Scryne onayı ister, kural 7): backtest canlıdan
+# gevşek olamaz. Değişiklik koşudan ÖNCE yapıldı (ek 1, Dalga-9-Doviz.md).
 
 dalga: 9
 veri_bitis: "2026-01-01"        # Dukascopy günlük spot 2025-12-31'de bitiyor; 2026 kör (Dalga-9-Doviz.md)
 frenler: true
 boyut:
-  hedef_vol: 0.20
-  kaldirac: 3.0
+  hedef_vol: 0.10
+  kaldirac: 1.0
   vol_pencere_gun: 90
   bant: 0.25
 walk_forward: { is_yil: 3, oos_yil: 1 }
