@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-09-30
 type: turnuva-plani
-durum: ön kayıt (koşudan önce commit edildi)
+durum: sonuçlandı — KALDI (2026-09-30)
 ---
 # Turnuva — Altın M15 aynası: "kaybeden stratejinin tersi" (ön kayıt)
 
@@ -48,3 +48,24 @@ Altın M15 ile aynı (A: DSR ≥ 0,95 + OOS + stres; B: sermayesiz paper gözlem
 
 **Demo'ya ne girer (sonuçtan önce yazıldı):** B ya da A çıkan en iyi ayna, demo hesaptaki altın gözlem kolunun yerine
 geçer (kanal_kirilim kapanır; aynı düğüm, yeni kol adı). Hiçbiri geçmezse demo kolu değişmez.
+
+## Sonuç (2026-09-30, koşu `dalgaaltin_m15_ters`, ön kayıt 44476f9)
+
+**KALDI: altı aynanın hiçbiri geçmedi; iki taraf da kaybediyor.** Aile DSR'ı 64 denemeyle; hepsinde 0.
+
+| Ayna | Sharpe | En kötü düşüş | OOS yıllık | Orijinal Sharpe |
+| --- | --- | --- | --- | --- |
+| ters_trend_geri_cekilme | 0,19 | −%9 | +%2,1 | −1,34 |
+| ters_bant_donus | 0,01 | −%18 | +%2,1 | −1,98 |
+| ters_kanal_kirilim | −1,58 | −%28 | −%12,8 | −0,18 |
+| ters_ea_birlesik | −1,65 | −%39 | −%12,7 | −1,43 |
+| ters_seans_kirilim | −1,76 | −%22 | −%11,9 | −0,08 |
+| ters_sikisma_kirilim | −2,95 | −%29 | −%14,5 | −0,63 |
+
+- **Hem strateji hem aynası kaybediyor:** maliyetten önceki getiri her ailede sıfıra yakın; kayıp maliyetten geliyor.
+  M15 altında yılda binlerce işlem, spread ve kaymayla her iki yönü de eksiye çeker. "Tersini al" yalnız maliyetten
+  önce sistematik kaybeden bir stratejide işe yarar; burada öyle bir strateji yok.
+- **Koşudan önceki kaba hesap yanlıştı (bizim hatamız):** `maliyet_payi` sütunu yıllık maliyet sanıldı; oysa tanımı
+  toplam maliyet / toplam |brüt getiri| (`arastirma/metrik.py`). Gerçek yıllık maliyet çok daha büyük. Ön kayıt bu hatayı
+  olduğu gibi taşıyor; sonuç ölçütle verildi, tahminle değil.
+- Demo'daki altın gözlem kolu değişmez (ön kayıttaki kural).
