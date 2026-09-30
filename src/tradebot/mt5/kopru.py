@@ -12,8 +12,10 @@ Uç noktalar (JSON):
 - `/kotasyon?semboller=A,B`: son bid/ask, tik zamanı UTC ms.
 - `/hesap`: bakiye, özkaynak, marjin, hesap türü (demo/gerçek), marjin modu (netting/hedging).
 - `/pozisyonlar?magic=N`: açık pozisyonlar (yalnız bu sihirli sayı).
-- `/islemler?magic=N&bas_ms=..`: gerçekleşen işlemler (deal), UTC ms.
-- `POST /emir` {sembol, hacim (işaretli lot), yorum, magic, sapma}: piyasa emri (dalga 9 döviz kolu, 2026-09-30).
+- `/islemler?magic=N&bas_ms=..`: gerçekleşen işlemler (deal), UTC ms. Bu sihirli sayıyla açılmış pozisyonların BÜTÜN
+  işlemleri döner (aracı kurum stop'u, telefondan elle kapatma gibi başka sihirli sayılı kapanışlar dahil).
+- `POST /emir` {sembol, hacim (işaretli lot), yorum, magic, sapma, sl_mesafe}: piyasa emri. `sl_mesafe` (fiyat birimi)
+  verilirse YENİ açılan pozisyona aracı kurumda acil stop konur (düğüm donarsa zararı sınırlar; kapanışlara konmaz).
 
 Emir yolu yalnız DEMO hesapta çalışır: hesap türü demo değilse köprü emri reddeder (`gercek_hesap_kapali`). Gerçek
 paraya geçiş Scryne'ın açık onayını ister (kural 7); bu kilit ayrı bir kararla ve kodla kaldırılır. Köprü emrin
@@ -268,14 +270,17 @@ class Kopru:
         bas = datetime.fromtimestamp((bas_ms + self.fark_ms) / 1000, UTC)
         bit = datetime.fromtimestamp((self.saat() + self.fark_ms) / 1000 + 86_400, UTC)
         ds = m.history_deals_get(bas, bit) or ()
+        bizim = {d.position_id for d in ds if d.magic == magic}
         return {"islemler": [
             {"bilet": d.ticket, "emir": d.order, "pozisyon": d.position_id, "sembol": d.symbol,
              "hacim": d.volume if d.type == m.DEAL_TYPE_BUY else -d.volume, "fiyat": d.price,
              "komisyon": d.commission, "swap": d.swap, "ucret": getattr(d, "fee", 0.0), "kar": d.profit,
-             "yorum": d.comment, "giris": d.entry, "zaman_ms": d.time_msc - self.fark_ms}
-            for d in ds if d.magic == magic], "simdi_ms": self.saat()}
+             "yorum": d.comment, "giris": d.entry, "neden": getattr(d, "reason", None), "magic": d.magic,
+             "zaman_ms": d.time_msc - self.fark_ms}
+            for d in ds if d.magic == magic or (d.position_id and d.position_id in bizim)], "simdi_ms": self.saat()}
 
-    def emir(self, sembol: str, hacim: float, yorum: str, magic: int, sapma: int = 20) -> dict:
+    def emir(self, sembol: str, hacim: float, yorum: str, magic: int, sapma: int = 20,
+             sl_mesafe: float | None = None) -> dict:
         """Piyasa emri (işaretli lot). Yalnız demo hesap. Dönüş: gönderilen her işlemin sonucu."""
         m = self.mt5
         h = m.account_info()
@@ -305,6 +310,9 @@ class Kopru:
                      "type_time": m.ORDER_TIME_GTC, "type_filling": dolum}
             if bilet is not None:
                 istek["position"] = bilet
+            elif sl_mesafe and sl_mesafe > 0:
+                sl = istek["price"] - sl_mesafe if lot > 0 else istek["price"] + sl_mesafe
+                istek["sl"] = round(sl, int(getattr(s, "digits", 5)))
             r = m.order_send(istek)
             kayit = {"bilet_kapat": bilet, "lot": lot, "bid": t.bid, "ask": t.ask,
                      "tik_ms": t.time_msc - self.fark_ms, "retcode": None if r is None else r.retcode,
@@ -340,7 +348,8 @@ def isleyici(k: Kopru, cagri_sn: float = 60.0):
                     return self._yaz(404, {"hata": "yok"})
                 boy = int(self.headers.get("Content-Length") or 0)
                 g = json.loads(self.rfile.read(boy) or b"{}")
-                args = (str(g["sembol"]), float(g["hacim"]), str(g["yorum"]), int(g["magic"]), int(g.get("sapma", 20)))
+                args = (str(g["sembol"]), float(g["hacim"]), str(g["yorum"]), int(g["magic"]), int(g.get("sapma", 20)),
+                        float(g["sl_mesafe"]) if g.get("sl_mesafe") else None)
                 self._yaz(200, k.isci.calistir(lambda: k.emir(*args), cagri_sn))
             except EmirReddi as e:
                 self._yaz(403, {"hata": str(e)})

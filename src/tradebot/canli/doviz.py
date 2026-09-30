@@ -23,8 +23,10 @@ kurum payı demo özkaynağında yok. Defter bunu backtest'le aynı modelle taha
 − |V| × kurum_payi × dt (V: pozisyonun USD değeri; faiz OECD, iki ay gecikmeli). Bu yüzden kolun özkaynağı MT5 demo
 özkaynağından farklıdır; kapı defterle ölçülür.
 
-Bilinen boşluk (v1): bağımsız gözetmen (katman 5) bu düğümün MT5 pozisyonlarını kapatamaz; donma bekçi kalp atışıyla
-(Telegram) bildirilir. Demo hesap: kayıp sanal.
+Güvenlik ağı (2026-09-30): her yeni pozisyona aracı kurumda acil stop (`ACIL_STOP` = giriş fiyatından %8; G10'da günlük
+oynaklığın ~15 katı, yalnız felaket için). Düğüm donarsa bağımsız gözetmen MT5 pozisyonlarını köprüden kapatır. MT5'te
+defterin bilmediği her işlem (acil stop, gözetmen kapatması, telefondan elle kapatma) saat başı ve kararda işlem
+biletiyle deftere işlenir (`_benimse`): defter MT5'i izler, kâr/zarar kaybolmaz.
 """
 from __future__ import annotations
 
@@ -62,6 +64,7 @@ LOT = 100_000.0
 GUN_MS = 86_400_000
 SAAT_MS = 3_600_000
 YIL_MS = 365.25 * GUN_MS
+ACIL_STOP = 0.08                       # aracı kurum acil stopu: giriş fiyatından oran (felaket sınırı)
 ASGARI_GECMIS = 60                     # evren: en az 60 günlük bar (dalga 9 grup tanımı)
 GECMIS_GUN = 500                       # karar için istenen geçmiş (vol 90 + ısınma)
 _log = log("doviz")
@@ -233,6 +236,7 @@ class DovizDurum:
     son_fiyat: dict[str, float] = field(default_factory=dict)
     etkin: dict[str, float] = field(default_factory=dict)        # son kararın etkin hedefi (çift ağırlığı)
     lot: dict[str, float] = field(default_factory=dict)          # MT5 sembolü → defterdeki net lot (dolumlardan)
+    biletler: set = field(default_factory=set)                   # deftere işlenmiş MT5 işlem biletleri
 
     def ozkaynak(self, fiyat: dict[str, float]) -> float:
         return self.nakit + sum(a * fiyat.get(k, self.son_fiyat.get(k, 0.0)) for k, a in self.adet.items())
@@ -249,7 +253,7 @@ def durum_kur(defter: PaperDefter, kol: str, baslangic: float) -> DovizDurum:
                                    .where(paper_ozkaynak.c.kol == kol).order_by(paper_ozkaynak.c.zaman_ms)))
         kararlar = list(b.execute(select(paper_karar.c.bar_ms, paper_karar.c.id, paper_karar.c.ayrinti)
                                   .where(paper_karar.c.kol == kol).order_by(paper_karar.c.bar_ms)))
-    nakit, adet, son_fon, lot = baslangic, defaultdict(float), 0, defaultdict(float)
+    nakit, adet, son_fon, lot, biletler = baslangic, defaultdict(float), 0, defaultdict(float), set()
     for tur, kim, q, p, u, ay in olay:
         ay = ay or {}
         if tur == "fonlama":
@@ -260,6 +264,8 @@ def durum_kur(defter: PaperDefter, kol: str, baslangic: float) -> DovizDurum:
         nakit -= q * p + u
         for x in ay.get("mt5", []):
             lot[ay["sembol"]] += float(x["lot"])
+            if x.get("islem"):
+                biletler.add(int(x["islem"]))
     son_elle = None
     for o in defter.kol_olaylari(kol):
         if o.tur == "devam" or (o.tur == "durdur" and o.ayrinti.get("neden") != "mutabakat"):
@@ -271,7 +277,7 @@ def durum_kur(defter: PaperDefter, kol: str, baslangic: float) -> DovizDurum:
     return DovizDurum(nakit, {k: v for k, v in adet.items() if abs(v) > 1e-9}, [(int(t), float(o)) for t, o, _ in isaretler],
                       son_fon, son_elle == "durdur", {int(g): int(i) for g, i, _ in kararlar},
                       dict(isaretler[-1][2] or {}) if isaretler else {}, etkin,
-                      {s: round(v, 8) for s, v in lot.items() if abs(v) > 1e-9})
+                      {s: round(v, 8) for s, v in lot.items() if abs(v) > 1e-9}, biletler)
 
 
 # ---------------------------------------------------------------------------------------------------- düğüm
@@ -324,7 +330,30 @@ class DovizDugumu:
         return fiyat, ham
 
     # ------------------------------------------------------------------ saatlik
+    def _benimse(self) -> dict:
+        """MT5'te bu kolun pozisyonlarına ait olup defterde olmayan işlemler (acil stop, gözetmen, elle kapatma) bilet
+        numarasıyla deftere işlenir. Dönüş: işlenen bilet sayısı."""
+        d = self._d()
+        bas = (self.defter.kol_baslangic(self.kol.ad) or 0) - GUN_MS
+        try:
+            islemler = self.kaynak.ist.islemler(self.ay.magic, bas)
+        except Exception as e:  # noqa: BLE001
+            return {"hata": f"{type(e).__name__}: {e}"[:120]}
+        semboller = {p.sembol: p for p in self.ay.paralar}
+        yeni = [x for x in islemler if int(x["bilet"]) not in d.biletler and x["sembol"] in semboller]
+        for x in sorted(yeni, key=lambda x: x["zaman_ms"]):
+            self._dolum_yaz(0, semboller[x["sembol"]], [{"lot": float(x["hacim"]), "fiyat": float(x["fiyat"]),
+                                                         "islem": int(x["bilet"])}],
+                            {"benimseme": True, "neden_mt5": x.get("neden"), "yorum": x.get("yorum"),
+                             "magic_mt5": x.get("magic")})
+        if yeni:
+            _log.warning("doviz_mt5_islemi_benimsendi", biletler=[int(x["bilet"]) for x in yeni])
+        return {"benimsenen": len(yeni)} if yeni else {}
+
     def _saatlik(self, d: DovizDurum, saat_bas: int) -> dict:
+        ben = self._benimse()
+        if ben.get("benimsenen"):
+            d = self._d()
         fiyat, ham = self._fiyatlar()
         fon = self._fonlama(d, fiyat, saat_bas)
         if fon:
@@ -339,8 +368,8 @@ class DovizDugumu:
             kapat = self._yurut(d, None, saat_bas, {p.para: 0.0 for p in self.ay.paralar}, fiyat, ham, "K", neden)
             if neden == "acil_durdurma":
                 denetim.kaydet(self.m, "doviz", "acil_durdurma_kapatma", {"kol": self.kol.ad, "ozkaynak": oz})
-        return {"ozkaynak": round(oz, 2), "fonlama": round(fon, 4), "mutabakat": self._mutabakat(d),
-                **({"kapatilan": kapat} if kapat else {})}
+        return {"ozkaynak": round(oz, 2), "fonlama": round(fon, 4), "mutabakat": self._mutabakat(self._d()),
+                **({"kapatilan": kapat} if kapat else {}), **ben}
 
     def _fonlama(self, d: DovizDurum, fiyat: dict[str, float], bit: int) -> float:
         """Son işaretten `bit`'e kadar taşıma − kurum payı (backtest modeli; pozisyon aralıkta sabit sayılır). Faiz yoksa
@@ -393,6 +422,8 @@ class DovizDugumu:
 
     # ------------------------------------------------------------------ günlük
     def _gunluk(self, d: DovizDurum, gun: int, simdi: int) -> dict:
+        if self._benimse().get("benimsenen"):
+            d = self._d()
         aylik, sha = self.kaynak.aylik(gun)
         barlar = self.kaynak.gunluk(self.ay.paralar, simdi)
         t, close, tas, evrende = seriler(barlar, self.ay.paralar, aylik)
@@ -437,11 +468,16 @@ class DovizDugumu:
         if not eksik:
             return None
         islemler = self.kaynak.ist.islemler(self.ay.magic, gun - GUN_MS)
+        biletler = self._d().biletler
         out = {"kurtarilan": 0, "bulunamayan": 0}
         for eid, ist_id, kim, _ in eksik:
             p = next(x for x in self.ay.paralar if ONEK + x.para == kim)
             ds = [x for x in islemler if x["yorum"] == ist_id and x["sembol"] == p.sembol]
-            if ds:
+            if ds and all(int(x["bilet"]) in biletler for x in ds):   # saatlik benimseme zaten işledi
+                self.defter.olay_yaz(eid, self.kol.ad, "benimsendi", kim, 0.0, None, 0.0, int(self.saat() * 1000),
+                                     {"biletler": [int(x["bilet"]) for x in ds]})
+                out["kurtarilan"] += 1
+            elif ds:
                 self._dolum_yaz(eid, p, [{"lot": x["hacim"], "fiyat": x["fiyat"], "islem": x["bilet"]} for x in ds],
                                 {"kurtarma": True})
                 out["kurtarilan"] += 1
@@ -528,7 +564,7 @@ class DovizDugumu:
             out["ret"].append({"para": p.para, "gerekce": list(r.gerekceler)})
             return
         try:
-            cevap = self.kaynak.ist.emir(p.sembol, onay_lot, eid_ist, self.ay.magic)
+            cevap = self.kaynak.ist.emir(p.sembol, onay_lot, eid_ist, self.ay.magic, sl_mesafe=ACIL_STOP * orta)
         except Exception as e:  # noqa: BLE001 — ret olarak yazılır; yeniden denemez (çift emir riski)
             self.defter.olay_yaz(emir_id, self.kol.ad, "ret", kim, q, None, 0.0, simdi,
                                  {"gerekceler": [f"köprü: {type(e).__name__}: {e}"[:200]]})

@@ -16,6 +16,11 @@ donmadan kendiliğinden çözülürse `durdur` olayını görüp belleğini deft
 (`dugum.Beyin._olaylari_uygula`). Özkaynak işareti YAZILMAZ: yazılsaydı kalp atışı taze görünür, bekçi donmayı görmezdi.
 
 Gerçek para (Faz 12): `fiyat_al` + defter yazımı yerine aracı kurum API'si üzerinden reduce-only emir (aynı akış).
+
+MT5 düğümleri (`doviz`, `altin`; 2026-09-30): aracı kurum (MT5 demo hesabı) düğümden bağımsızdır ve donmada da
+erişilebilir. Gözetmen bu düğümlerde deftere yazmaz; kolun sihirli sayısıyla açık pozisyonları köprüden GERÇEKTEN
+kapatır (ters emir, riski azaltan) ve kolu durdurur. Düğüm geri gelince bu kapanış işlemlerini bilet numarasıyla
+deftere işler (`_benimse`): defter tek kaynaktan, MT5'ten beslenir.
 """
 from __future__ import annotations
 
@@ -106,6 +111,8 @@ class Gozetmen:
     kod_surumu: str = "bilinmiyor"
     kuru: bool = False                      # tatbikat: tespit eder, raporlar, yazmaz
     dugum: str = "paper"                    # izlenen süreç (dugum_kollari); her düğüme ayrı gözetmen
+    mt5: object | None = None               # MT5 düğümü: köprü istemcisi (Mt5Istemci); kapatma köprüden
+    magic: int | None = None                # MT5 düğümünün sihirli sayısı
     donma_ms: int = DONMA_MS
     onay_tur: int = ONAY_TUR
     isinma_sn: float = ISINMA_SN
@@ -133,8 +140,10 @@ class Gozetmen:
         with self.motor.connect() as b:   # bu donmada zaten durdurulmuş kollar (tekrar yazılmaz)
             durmus = {r[0] for r in b.execute(select(paper_kol_olay.c.kol).where(
                 paper_kol_olay.c.tur == "durdur", paper_kol_olay.c.zaman_ms > int(son)))}
-        acik = {k: v for k, v in net_pozisyonlar(self.motor).items() if k in kollar}
         durdurulacak = [k for k in kollar if k not in durmus]
+        if self.mt5 is not None:
+            return self._mt5_donma(simdi_ms, int(son), yas_dk, durdurulacak)
+        acik = {k: v for k, v in net_pozisyonlar(self.motor).items() if k in kollar}
         if not durdurulacak and not acik:
             return {"durum": "donma", "yas_dk": yas_dk, "kapatilan": {}, "durdurulan": []}
         if self.kuru:
@@ -148,6 +157,34 @@ class Gozetmen:
                        {"son_isaret_ms": int(son), "yas_dk": yas_dk, "kapatilan": kapatilan, "durdurulan": durdurulacak})
         _log.error("motor_donmasi_kapatildi", yas_dk=yas_dk, kapatilan=kapatilan, durdurulan=durdurulacak)
         return {"durum": "donma", "yas_dk": yas_dk, "kapatilan": kapatilan, "durdurulan": durdurulacak}
+
+    def _mt5_donma(self, simdi_ms: int, son: int, yas_dk: float, durdurulacak: list[str]) -> dict:
+        """MT5 düğümü dondu: kolun sihirli sayısıyla açık net pozisyonlar köprüden kapatılır, kol durdurulur."""
+        net: dict[str, float] = defaultdict(float)
+        for x in self.mt5.pozisyonlar(self.magic):          # hata yükselir: kapatılamadı, bir sonraki tur dener
+            net[x["sembol"]] += float(x["hacim"])
+        net = {s: round(v, 8) for s, v in net.items() if abs(v) > 1e-9}
+        if not net and not durdurulacak:
+            return {"durum": "donma", "yas_dk": yas_dk, "kapatilan": {}, "durdurulan": []}
+        if self.kuru:
+            return {"durum": "donma", "yas_dk": yas_dk, "kuru": True, "kapatilacak": net, "durdurulacak": durdurulacak}
+        kapatilan: dict[str, dict] = {}
+        for sembol, lot in sorted(net.items()):
+            r = self.mt5.emir(sembol, -lot, f"GZ{simdi_ms // 60_000}-{sembol}"[:31], self.magic)
+            tamam = [x for x in r.get("sonuc", []) if x.get("retcode") in (10008, 10009, 10010)]
+            kapatilan[sembol] = {"adet": -lot, "fiyat": tamam[-1].get("fiyat") if tamam else None, "tamam": bool(tamam)}
+        kol = durdurulacak[0] if len(durdurulacak) == 1 else self.dugum
+        for k in durdurulacak:
+            self._olay(k, simdi_ms, {"neden": NEDEN, "son_isaret_ms": son, "kapatilan_mt5": kapatilan})
+        denetim.kaydet(self.motor, "gozetmen", "donma_kapatma_mt5",
+                       {"dugum": self.dugum, "son_isaret_ms": son, "yas_dk": yas_dk, "kapatilan": kapatilan,
+                        "durdurulan": durdurulacak})
+        _log.error("mt5_dugum_donmasi_kapatildi", dugum=self.dugum, yas_dk=yas_dk, kapatilan=kapatilan)
+        eksik = [s for s, v in kapatilan.items() if not v["tamam"]]
+        if eksik:
+            raise RuntimeError(f"MT5 kapatma tamamlanamadı: {eksik}")
+        return {"durum": "donma", "yas_dk": yas_dk, "kapatilan": {kol: kapatilan} if kapatilan else {},
+                "durdurulan": durdurulacak}
 
     def _kapat(self, acik: dict[str, dict[str, float]], fiyat: dict[str, tuple[float, float]], simdi_ms: int,
                son_ms: int) -> dict[str, dict[str, dict]]:

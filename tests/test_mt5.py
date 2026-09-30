@@ -391,3 +391,24 @@ def test_emir_yolu_gercek_hesapta_kapali():
         assert m.gonderilen == []
     finally:
         s.shutdown()
+
+
+def test_acil_stop_yalniz_yeni_pozisyona_ve_islem_gecmisi_pozisyon_bazli():
+    m = SahteEmirMt5(T0 + 60_000)
+    k = kopru.Kopru(m, isci=None, fark_varsayilan_ms=FARK, saat=lambda: m.simdi_ms)
+    k.emir("EURUSD", 0.10, "DV1-EUR", magic=909, sl_mesafe=0.05)
+    assert m.gonderilen[0]["sl"] == pytest.approx(1.1002 - 0.05)             # alış: ask − mesafe
+    k.emir("EURUSD", -0.10, "DV2-EUR", magic=909, sl_mesafe=0.05)
+    assert "sl" not in m.gonderilen[1] and m.gonderilen[1]["position"] == 101  # kapanışa stop konmaz
+    k.emir("EURUSD", -0.10, "DV3-EUR", magic=909, sl_mesafe=0.05)
+    assert m.gonderilen[2]["sl"] == pytest.approx(1.1000 + 0.05)             # satış: bid + mesafe
+    D = NS
+    m.history_deals_get = lambda bas, bit: [
+        D(ticket=1, order=1, position_id=77, symbol="EURUSD", type=0, volume=0.1, price=1.1, commission=0.0, swap=0.0,
+          profit=0.0, comment="DV1", entry=0, reason=3, magic=909, time_msc=T0 + FARK),
+        D(ticket=2, order=2, position_id=77, symbol="EURUSD", type=1, volume=0.1, price=1.05, commission=0.0, swap=0.0,
+          profit=-500.0, comment="[sl 1.05]", entry=1, reason=4, magic=0, time_msc=T0 + FARK + 1),   # aracı kurum stopu
+        D(ticket=3, order=3, position_id=88, symbol="EURUSD", type=0, volume=0.2, price=1.1, commission=0.0, swap=0.0,
+          profit=0.0, comment="elle", entry=0, reason=1, magic=0, time_msc=T0 + FARK + 2)]            # başka pozisyon
+    ds = k.islemler(909, T0 - 1000)["islemler"]
+    assert [d["bilet"] for d in ds] == [1, 2] and ds[1]["hacim"] == -0.1 and ds[1]["neden"] == 4

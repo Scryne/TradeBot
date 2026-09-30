@@ -58,10 +58,12 @@ class Mt5Istemci:
     def islemler(self, magic: int, bas_ms: int) -> list[dict]:
         return self._al("/islemler", magic=magic, bas_ms=bas_ms)["islemler"]
 
-    def emir(self, sembol: str, hacim: float, yorum: str, magic: int, sapma: int = 20) -> dict:
-        """Piyasa emri (işaretli lot). Köprü yalnız demo hesapta kabul eder (403 `gercek_hesap_kapali`)."""
+    def emir(self, sembol: str, hacim: float, yorum: str, magic: int, sapma: int = 20,
+             sl_mesafe: float | None = None) -> dict:
+        """Piyasa emri (işaretli lot). Köprü yalnız demo hesapta kabul eder (403 `gercek_hesap_kapali`). `sl_mesafe`:
+        yeni pozisyona aracı kurumda acil stop (fiyat birimi)."""
         return json.loads(self._ham("/emir", {"sembol": sembol, "hacim": hacim, "yorum": yorum, "magic": magic,
-                                              "sapma": sapma}))
+                                              "sapma": sapma, "sl_mesafe": sl_mesafe}))
 
     def mumlar(self, sembol: str, zd: str, bas_ms: int, bit_ms: int, ham=None,
                hatada_devam: bool = False) -> pl.DataFrame:

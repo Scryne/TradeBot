@@ -115,7 +115,8 @@ def saglik_komutu(
         time.sleep(dongu)
 
 
-DUGUMLER = ("paper", "kilit")   # her süreç ayrı gözetmen (kalp atışı ayrı)
+DUGUMLER = ("paper", "kilit", "doviz", "altin")   # her süreç ayrı gözetmen (kalp atışı ayrı)
+MT5_DUGUMLER = ("doviz", "altin")                  # gözetmen bunlarda köprüden gerçek kapatma emri verir
 
 
 def _gozetmen_kur(a, **ayar):
@@ -124,6 +125,13 @@ def _gozetmen_kur(a, **ayar):
     from tradebot.db import motor as db_motor
     from tradebot.veri.http import NazikIstemci
 
+    if ayar.get("dugum") in MT5_DUGUMLER:
+        from tradebot.canli import altin, doviz
+        from tradebot.mt5.istemci import Mt5Istemci
+
+        ay = (doviz if ayar["dugum"] == "doviz" else altin).ayarlar()
+        if ay is not None and a.mt5_kopru_forex:
+            ayar |= {"mt5": Mt5Istemci(a.mt5_kopru_forex, zaman_asimi=60), "magic": ay.magic}
     return Gozetmen(db_motor(a), binance_kotasyon(NazikIstemci("gozetmen", deneme=3, zaman_asimi=15).al), kod_surumu(),
                     **ayar)
 

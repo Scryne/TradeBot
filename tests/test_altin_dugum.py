@@ -70,7 +70,8 @@ class SahteKopru:
     def islemler(self, magic, bas_ms):
         return [x for x in self.gecmis if x["zaman_ms"] >= bas_ms]
 
-    def emir(self, sembol, hacim, yorum, magic, sapma=20):
+    def emir(self, sembol, hacim, yorum, magic, sapma=20, sl_mesafe=None):
+        self.sl = getattr(self, "sl", []) + [sl_mesafe]
         px = self.fiyat() + (0.1 if hacim > 0 else -0.1)
         self.emirler.append((hacim, yorum))
         self.poz = round(self.poz + hacim, 8)
@@ -207,3 +208,56 @@ def test_doviz_hesap_degisimi_defteri_kapatir(tmp_path):
     durum = d._d()
     assert durum.lot == {} and durum.adet == {}                                      # JPY bakiyesi de çevrildi
     assert [o.tur for o in d.defter.kol_olaylari(d.kol.ad)] == ["hesap_degisimi"]
+
+
+def test_aracı_kurum_stopu_benimsenir_ve_acil_stop_mesafesi(kur):
+    m, d, saat, k = kur
+    for i in range(1, 300):
+        saat.ms = T0 + i * B + 30_000
+        d.tur()
+        if k.poz:
+            break
+    assert k.poz and k.sl[-1] > 0
+    son = k.emirler[-1]
+    b = d._d()
+    # stop mesafesi 3R = 3 × 2 ATR (turnuvanın stop genişliği)
+    c = k.c[(k.t >= d._capa()) & (k.t + B <= saat.ms)]
+    bb = ca.Barlar(k.t[:len(c)], c, c * 1.0008, c * 0.9992, c, np.ones(len(c)))
+    assert k.sl[-1] == pytest.approx(3 * 2.0 * float(ca.atr(bb)[-1]), rel=1e-6)
+    # aracı kurum stopu tetiklendi: MT5'te pozisyon kapandı, defter bilmiyor
+    lot = k.poz
+    k.poz = 0.0
+    k.gecmis.append({"bilet": 999, "sembol": "GOLD", "hacim": -lot, "fiyat": k.fiyat() - 5, "yorum": "[sl]",
+                     "zaman_ms": saat.ms, "neden": 4, "magic": 0})
+    assert b.lot == pytest.approx(lot) and son
+    saat.ms = (saat.ms // S + 1) * S + 1000
+    r = d.tur()
+    assert r["isaret"]["benimsenen"] == 1 and r["isaret"]["mutabakat"] == {"tamam": True}
+    assert d._d().lot == 0 and 999 in d._d().biletler
+    saat.ms += 1000
+    assert "benimsenen" not in (d.tur().get("isaret") or {})           # ikinci kez işlenmez
+
+
+def test_gozetmen_donan_mt5_dugumunu_kopruden_kapatir(kur):
+    from tradebot.canli.gozetmen import Gozetmen
+
+    m, d, saat, k = kur
+    for i in range(1, 300):
+        saat.ms = T0 + i * B + 30_000
+        d.tur()
+        if k.poz:
+            break
+    lot = k.poz
+    saat.ms += 4 * S                                                    # düğüm dondu: kalp atışı yok
+    g = Gozetmen(m, fiyat_al=lambda _: {}, dugum="altin", mt5=k, magic=910, onay_tur=1, isinma_sn=0, saat=saat)
+    r = g.kontrol()
+    assert r["durum"] == "donma" and r["kapatilan"][d.kol.ad]["GOLD"]["adet"] == -lot and k.poz == 0
+    assert r["durdurulan"] == [d.kol.ad]
+    assert _net(m, d.kol.ad) == pytest.approx(lot * 100)                # gözetmen deftere yazmaz
+    n = len(k.emirler)
+    r2 = g.kontrol()
+    assert r2["kapatilan"] == {} and len(k.emirler) == n                   # tekrar kapatmaz
+    saat.ms += 60_000                                                   # düğüm geri geldi: kapanışı benimser, durur
+    d2 = ad.AltinDugumu(d.defter, d.ay, k, saat=saat)
+    d2.tur()
+    assert d2._d().lot == 0 and d2._d().durdurulmus and k.poz == 0

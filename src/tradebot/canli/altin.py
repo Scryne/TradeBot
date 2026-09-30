@@ -21,8 +21,10 @@ ayrı; hesap brütü ~1,5x, sabit 3x tavanın altında).
 Maliyet (aleyhte, kural 4): MT5 dolum fiyatı `kayma_bps` kadar aleyhe kaydırılarak deftere yazılır; finansman backtest
 modeliyle (CFD metal, yıllık %4 brüt maruziyet üzerinden) saatlik tahakkuk eder.
 
-Bilinen boşluk (v1): stop ve hedef backtest gibi bar kapanışında denetlenir; aracı kurumda sunucu tarafı stop yok.
-Düğüm donarsa pozisyon açık kalır; bekçi kalp atışıyla bildirir. Demo hesap: kayıp sanal.
+Stop ve hedef backtest gibi bar kapanışında denetlenir. Güvenlik ağı (2026-09-30): her yeni pozisyona aracı kurumda
+acil stop (`ACIL_STOP_R` = 3R = 3 × stop mesafesi; stratejinin 1R kapanış stopunu bozmaz, yalnız ani sıçrama ve donma
+için). Düğüm donarsa bağımsız gözetmen MT5 pozisyonunu köprüden kapatır. MT5'te defterin bilmediği her işlem (acil stop,
+gözetmen, telefondan elle kapatma) her kararda ve saat başı işlem biletiyle deftere işlenir (`_benimse`).
 """
 from __future__ import annotations
 
@@ -42,6 +44,7 @@ from tradebot.canli.defter import PaperDefter
 from tradebot.canli.karar import KolDurum
 from tradebot.canli.kilit import izleyici
 from tradebot.canli.kollar import PaperKol, oku
+from tradebot.cekirdek import altin as ca
 from tradebot.cekirdek.temel import Barlar
 from tradebot.db import paper_emir, paper_emir_olay, paper_karar, paper_ozkaynak
 from tradebot.kayit import log
@@ -54,6 +57,7 @@ SAAT_MS = 3_600_000
 GUN_MS = 86_400_000
 YIL_MS = 365.25 * GUN_MS
 KARAR_GECIKME_MS = 20_000              # bar kapanışından sonra (köprü yalnız kapanmış barı verir)
+ACIL_STOP_R = 3.0                      # aracı kurum acil stopu: stratejinin stop mesafesinin 3 katı
 CAPA_GUN = 30                          # yol çapası: kol başlangıcından 30 gün önce (ATR/kanal ısınması)
 _log = log("altin")
 
@@ -113,6 +117,7 @@ class AltinDurum:
     durdurulmus: bool
     son_karar_bar: int
     son_fiyat: float
+    biletler: frozenset = frozenset()
 
     def ozkaynak(self, fiyat: float | None) -> float:
         return self.nakit + self.adet * (fiyat if fiyat else self.son_fiyat)
@@ -129,7 +134,7 @@ def durum_kur(defter: PaperDefter, ay: AltinAyarlari) -> AltinDurum:
                                 .where(paper_ozkaynak.c.kol == kol).order_by(paper_ozkaynak.c.zaman_ms)))
         son_karar = b.execute(select(paper_karar.c.bar_ms).where(paper_karar.c.kol == kol)
                               .order_by(paper_karar.c.bar_ms.desc()).limit(1)).scalar()
-    nakit, adet, lot, son_fon, son_px = ay.kol.baslangic_ozkaynak, 0.0, 0.0, 0, 0.0
+    nakit, adet, lot, son_fon, son_px, biletler = ay.kol.baslangic_ozkaynak, 0.0, 0.0, 0, 0.0, set()
     for tur, q, p, u, a in olay:
         a = a or {}
         if tur == "fonlama":
@@ -139,6 +144,7 @@ def durum_kur(defter: PaperDefter, ay: AltinAyarlari) -> AltinDurum:
         adet += q
         nakit -= q * p + u
         lot += sum(float(x["lot"]) for x in a.get("mt5", []))
+        biletler |= {int(x["islem"]) for x in a.get("mt5", []) if x.get("islem")}
         son_px = p
     if isaret and isaret[-1][2]:
         son_px = float(isaret[-1][2].get(ay.kimlik, son_px))
@@ -147,7 +153,7 @@ def durum_kur(defter: PaperDefter, ay: AltinAyarlari) -> AltinDurum:
         if o.tur == "devam" or (o.tur == "durdur" and o.ayrinti.get("neden") != "mutabakat"):
             son_elle = o.tur
     return AltinDurum(nakit, adet if abs(adet) > 1e-9 else 0.0, round(lot, 8), [(int(t), float(o)) for t, o, _ in isaret],
-                      son_fon, son_elle == "durdur", int(son_karar or 0), son_px)
+                      son_fon, son_elle == "durdur", int(son_karar or 0), son_px, frozenset(biletler))
 
 
 class AltinDugumu:
@@ -199,7 +205,34 @@ class AltinDugumu:
         return out
 
     # ------------------------------------------------------------------ saatlik
+    def _benimse(self) -> dict:
+        """MT5'te bu kolun pozisyonuna ait olup defterde olmayan işlemler (acil stop, gözetmen, elle kapatma) bilet
+        numarasıyla deftere işlenir."""
+        d = self._d()
+        bas = (self.defter.kol_baslangic(self.kol.ad) or 0) - GUN_MS
+        try:
+            islemler = self.ist.islemler(self.ay.magic, bas)
+        except Exception as e:  # noqa: BLE001
+            return {"hata": f"{type(e).__name__}: {e}"[:120]}
+        yeni = sorted((x for x in islemler if int(x["bilet"]) not in d.biletler and x["sembol"] == self.ay.sembol),
+                      key=lambda x: x["zaman_ms"])
+        k = self.ay.kayma_bps / 1e4
+        for x in yeni:
+            q = float(x["hacim"]) * self.ay.ons_lot
+            px = float(x["fiyat"])
+            self.defter.olay_yaz(0, self.kol.ad, "dolum", self.ay.kimlik, q, px * (1 + k if q > 0 else 1 - k), 0.0,
+                                 int(x["zaman_ms"]), {"sembol": self.ay.sembol, "fiyat_mt5": px, "benimseme": True,
+                                                      "neden_mt5": x.get("neden"), "yorum": x.get("yorum"),
+                                                      "mt5": [{"lot": float(x["hacim"]), "fiyat": px,
+                                                               "islem": int(x["bilet"])}]})
+        if yeni:
+            _log.warning("altin_mt5_islemi_benimsendi", biletler=[int(x["bilet"]) for x in yeni])
+        return {"benimsenen": len(yeni)} if yeni else {}
+
     def _saatlik(self, d: AltinDurum, saat_bas: int) -> dict:
+        ben = self._benimse()
+        if ben.get("benimsenen"):
+            d = self._d()
         kot = self._kotasyon()
         px = (kot[0] + kot[1]) / 2 if kot else d.son_fiyat
         fon = 0.0
@@ -222,8 +255,8 @@ class AltinDugumu:
             kapat = self._yurut(d, None, saat_bas, 0.0, kot, "K", neden)
             if neden == "acil_durdurma":
                 denetim.kaydet(self.m, "altin", "acil_durdurma_kapatma", {"kol": self.kol.ad, "ozkaynak": oz})
-        return {"ozkaynak": round(oz, 2), "fonlama": round(-fon, 4), "mutabakat": self._mutabakat(d),
-                **({"kapatilan": kapat} if kapat else {})}
+        return {"ozkaynak": round(oz, 2), "fonlama": round(-fon, 4), "mutabakat": self._mutabakat(self._d()),
+                **({"kapatilan": kapat} if kapat else {}), **ben}
 
     def _mutabakat(self, d: AltinDurum) -> dict:
         try:
@@ -241,6 +274,8 @@ class AltinDugumu:
         self._denenen = bar
         if df.is_empty() or int(df["acilis_ms"][-1]) != bar:
             return None                                   # piyasa kapalı ya da bar henüz yok: karar yazılmaz
+        if self._benimse().get("benimsenen"):
+            d = self._d()
         b = barlar_df(df)
         poz = hedef_pozisyon(self.ay, b)
         iz, _ = izleyici(d.gecmis, self.kol.baslangic_ozkaynak, self.ay.risk)
@@ -259,7 +294,8 @@ class AltinDugumu:
         kot = self._kotasyon()
         if kot is None:
             return {"karar_id": kid, "poz": poz, "islem": False, "hata": "kotasyon yok"}
-        sonuc = self._yurut(d, kid, bar, hedef, kot, "D")
+        stop = float(self.ay.parametre.get("sl_atr", 1.5)) * float(ca.atr(b)[-1])
+        sonuc = self._yurut(d, kid, bar, hedef, kot, "D", sl_mesafe=ACIL_STOP_R * stop if stop > 0 else None)
         _log.info("altin_karar", bar=bar, poz=poz, hedef_lot=hedef, lot_once=d.lot, **sonuc)
         return {"karar_id": kid, "poz": poz, "islem": True, **sonuc}
 
@@ -296,7 +332,8 @@ class AltinDugumu:
 
     # ------------------------------------------------------------------ yürütme
     def _yurut(self, d: AltinDurum, karar_id: int | None, zaman: int, hedef_lot: float,
-               kot: tuple[float, float, int], onek: str, neden: str | None = None) -> dict:
+               kot: tuple[float, float, int], onek: str, neden: str | None = None,
+               sl_mesafe: float | None = None) -> dict:
         """Hedefe ulaşmak için gereken lot. Ters yöne geçişte önce kapatma, sonra açılış (iki emir; ilki riski azaltır)."""
         bid, ask, tik_ms = kot
         orta = (bid + ask) / 2
@@ -332,7 +369,7 @@ class AltinDugumu:
                 out["ret"].append(list(r.gerekceler))
                 break
             try:
-                cevap = self.ist.emir(self.ay.sembol, onay_lot, eid, self.ay.magic)
+                cevap = self.ist.emir(self.ay.sembol, onay_lot, eid, self.ay.magic, sl_mesafe=sl_mesafe)
             except Exception as e:  # noqa: BLE001
                 self.defter.olay_yaz(emir_id, self.kol.ad, "ret", self.ay.kimlik, q, None, 0.0, simdi,
                                      {"gerekceler": [f"köprü: {type(e).__name__}: {e}"[:200]]})

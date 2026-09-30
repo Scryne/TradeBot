@@ -85,7 +85,8 @@ class SahteKopru:
     def islemler(self, magic, bas_ms):
         return [x for x in self.islem_gecmisi if x["zaman_ms"] >= bas_ms]
 
-    def emir(self, sembol, hacim, yorum, magic, sapma=20):
+    def emir(self, sembol, hacim, yorum, magic, sapma=20, sl_mesafe=None):
+        self.sl = getattr(self, "sl", []) + [sl_mesafe]
         self.emirler.append((sembol, hacim, yorum))
         self.bilet += 1
         px = self.fiyat(sembol) * (1.00005 if hacim > 0 else 0.99995)
@@ -237,3 +238,20 @@ def test_yeniden_baslatmada_mt5_islemi_kurtarilir(kur):
 
 def test_sabitler():
     assert datetime.fromtimestamp(D0 / 1000, UTC).weekday() == 1           # D0 Salı
+
+
+def test_elle_kapatma_benimsenir_ve_jpy_bakiyesi_cevrilir(kur):
+    m, d, saat, kopru = kur
+    saat.ms = D0 + 7 * S + 60_000
+    d.tur()
+    assert kopru.sl and all(x and x > 0 for x in kopru.sl)             # her yeni pozisyona acil stop
+    lot = kopru.poz["USDJPY"]
+    kopru.poz["USDJPY"] = 0.0                                           # telefondan elle kapatıldı (sihirli sayı 0)
+    kopru.bilet += 1
+    kopru.islem_gecmisi.append({"bilet": kopru.bilet, "sembol": "USDJPY", "hacim": -lot, "fiyat": kopru.fiyat("USDJPY"),
+                                "yorum": "", "zaman_ms": saat.ms, "neden": 1, "magic": 0})
+    saat.ms = D0 + 8 * S + 1000
+    r = d.tur()["isaret"]
+    assert r["benimsenen"] == 1 and r["mutabakat"] == {"tamam": True}
+    durum = d._d()
+    assert "USDJPY" not in durum.lot and "PARA:JPY" not in durum.adet   # JPY bakiyesi USD'ye çevrildi
