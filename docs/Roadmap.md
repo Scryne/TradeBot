@@ -356,6 +356,14 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     hesapta ileriye dönük gözlem kolu: `canli/doviz.py`, compose `doviz`, kol `d9:doviz_tasima@g10_doviz@1d` (B).
     İlk emirler 2026-09-30 17:36 UTC: AUDUSD 0,07 lot alış (AUD uzun), USDCHF 0,05 lot alış (CHF kısa).
     Açık: bağımsız gözetmen bu düğümün MT5 pozisyonlarını kapatamaz (bekçi kalp atışını izler); Jev vetosu yok.
+  - 2026-09-30 20:57 TR: NCM forex demo 316722'yi kapattı (`Account disabled`; sebep bilinmiyor). Scryne NCM sitesinden
+    yeni demo açtı: **316749** (10.000 USD, hedging, 1:10). Döviz kolunun defterdeki açık lotları yeni hesabın orta
+    fiyatıyla kapatıldı (`paper doviz --hesap-degisti`, riski azaltan, MT5 emri yok); ertesi karar yeni hesapta açar.
+  - 2026-09-30 **Altın M15 scalping gözlem kolu** (Scryne: "videolardaki gibi XAUUSD'de sürekli al-sat"; TikTok videosu
+    incelendi: 20 dk'da 14 → 7.183 USD, ~200–850x kaldıraç + aynı yönde 12–13 pozisyon yığma, kural 6 gereği yok; kanıt
+    gösterildi, Scryne kurallar içinde demo kolunu seçti). `canli/altin.py`, compose `altin`, kol
+    `am15:kanal_kirilim@xau_m15@15m`: turnuvanın `kanal_kirilim` en iyi varyantı (Sharpe −0,18, KALDI), her M15
+    kapanışında karar, sabit 0,01 lot, aynı demo hesap (sihirli sayı 910). Beklenen getirisi negatif; gözlem.
 
 ### Faz 9: Operasyon
 - **İşler:** Bağımsız gözetmen (kalp atışı, özkaynak, pozisyon; motor donarsa kapatma); Telegram bot (3

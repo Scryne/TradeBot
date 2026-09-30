@@ -452,6 +452,30 @@ class DovizDugumu:
         _log.warning("doviz_karar_devam", karar_id=karar_id, **out)
         return out
 
+    def hesap_degisimi(self, neden: str) -> dict:
+        """Demo hesap değişti (eskisi aracı kurumca kapatıldı): defterdeki açık lotlar yeni hesabın orta fiyatıyla, MT5
+        emri olmadan kapatılır (kayma aleyhte; riski azaltan). Sonraki günlük karar yeni hesapta yeniden açar."""
+        d = self._d()
+        fiyat, ham = self._fiyatlar()
+        simdi = int(self.saat() * 1000)
+        kapanan = {}
+        for p in self.ay.paralar:
+            lot = d.lot.get(p.sembol, 0.0)
+            if not lot or p.sembol not in ham:
+                continue
+            bid, ask, _ = ham[p.sembol]
+            orta = (bid + ask) / 2
+            q = p.lot_para(-lot, orta)
+            emir_id = self.defter.emir_yaz(self.kol.ad, None, f"DVH{simdi // 1000}-{p.para}"[:31], ONEK + p.para, q, q,
+                                           p.usd(orta), "hesap_degisimi",
+                                           {"onay": True, "gerekceler": ["hesap değişimi: defter kapatması"],
+                                            "risk_azaltan": True, "lot": -lot}, gonderim_fiyati=p.usd(orta))
+            self._dolum_yaz(emir_id, p, [{"lot": -lot, "fiyat": orta, "islem": None}], {"hesap_degisimi": neden})
+            kapanan[p.sembol] = -lot
+        self.defter.kol_olay_yaz(self.kol.ad, "hesap_degisimi", {"neden": neden, "kapanan": kapanan}, simdi)
+        _log.warning("doviz_hesap_degisimi", neden=neden, kapanan=kapanan)
+        return {"kapanan": kapanan}
+
     # ------------------------------------------------------------------ yürütme
     def _yurut(self, d: DovizDurum, karar_id: int | None, zaman: int, hedef_para: dict[str, float],
                fiyat: dict[str, float], ham: dict[str, tuple[float, float, int]], onek: str,

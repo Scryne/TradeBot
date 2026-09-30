@@ -897,12 +897,13 @@ def paper_kilit(
 def paper_doviz(
     sure_sn: float = typer.Option(0, help="Saniye; 0 = süresiz (servis)"),
     tek: bool = typer.Option(False, help="Tek tur çalıştır ve sonucu yazdır"),
+    hesap_degisti: str = typer.Option("", help="Demo hesap değişti: defterdeki açık lotları kapat (gerekçe yaz)"),
 ) -> None:
     """Döviz taşıma kolu düğümü (Dalga 9 gözlem kolu): NCM forex DEMO hesabında MT5 emri; iş günü 07:00 UTC karar,
     saatte bir işaret + taşıma tahakkuku (compose `doviz`)."""
     from tradebot.canli import doviz
 
-    if tek:
+    if tek or hesap_degisti:
         import os
 
         from tradebot.canli.defter import PaperDefter
@@ -917,9 +918,32 @@ def paper_doviz(
                               HamDepo(a.veri_dizini, m))
         d = doviz.DovizDugumu(PaperDefter(m, os.environ.get("TRADEBOT_KOD_SURUMU", "yerel")), doviz.ayarlar(), kaynak)
         d.ac()
-        _yazdir(d.tur())
+        _yazdir(d.hesap_degisimi(hesap_degisti) if hesap_degisti else d.tur())
         return
     doviz.calistir(sure_sn or None)
+
+
+@paper_uygulama.command("altin")
+def paper_altin(
+    sure_sn: float = typer.Option(0, help="Saniye; 0 = süresiz (servis)"),
+    tek: bool = typer.Option(False, help="Tek tur çalıştır ve sonucu yazdır"),
+) -> None:
+    """Altın M15 scalping gözlem kolu (EA tarzı; NCM forex DEMO hesabı, MT5 emri; compose `altin`)."""
+    from tradebot.canli import altin
+
+    if tek:
+        import os
+
+        from tradebot.canli.defter import PaperDefter
+        from tradebot.mt5.istemci import Mt5Istemci
+
+        a, m = _veri_baglam()
+        d = altin.AltinDugumu(PaperDefter(m, os.environ.get("TRADEBOT_KOD_SURUMU", "yerel")), altin.ayarlar(),
+                              Mt5Istemci(a.mt5_kopru_forex))
+        d.ac()
+        _yazdir(d.tur())
+        return
+    altin.calistir(sure_sn or None)
 
 
 @paper_uygulama.command("dagitim")

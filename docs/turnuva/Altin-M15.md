@@ -100,3 +100,12 @@ Veri: Dukascopy XAUUSD dakikalık, 2023-09-01 → 2026-09-25 (ön kayıttaki dö
   olasılığı %37–47, art arda 5 katlama ~%0,7 (1.000 kişiden ~7), işlem başı beklenen değer −0,25 $. Kumar; strateji değil.
 
 Sonuca bakıp ızgara ya da filtre değiştirilmedi (kural 10). Bu 32 deneme ilgili ailelerin defterinde sayılı.
+
+## Ek (2026-09-30): demo gözlem kolu
+
+Scryne bir TikTok "robot scalping" videosu gösterdi (20 dakikada 14 → 7.183 USD). Videoda görülen: aynı yönde, aynı
+fiyattan 12–13 özdeş pozisyon, bakiyeyle büyüyen lot (0,01 → 0,31), ~200–850x kaldıraç; bir karede yığın −111 USD
+zararda. Doğrulanmış kayıt yok. Yöntem kaldıraç ve yığma; kural 6 gereği hiçbir modda yok. Scryne kurallar içinde
+demo kolunu seçti: `kanal_kirilim` (n = 48, 2 ATR, haber filtresi yok; bu turnuvanın en iyi varyantı) NCM forex demo
+hesabında sabit 0,01 lot, her M15 kapanışında karar (`canli/altin.py`). Yeni deneme değil: test edilmiş varyantın
+ileriye dönük ölçümü. Beklenti negatif.

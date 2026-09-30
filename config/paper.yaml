@@ -87,3 +87,21 @@ doviz:
   yurutme_saat_utc: 7
   magic: 909
   baslangic_ozkaynak: 10000
+
+# Altın M15 scalping kolu (EA tarzı gün içi XAUUSD; Scryne 2026-09-30, kanıt gösterildikten sonra demo kararı). Ayrı düğüm
+# (canli/altin.py, compose `altin`): NCM forex DEMO hesabında MT5 emri, döviz koluyla aynı hesap (sihirli sayı ayrı).
+# Strateji Altın M15 turnuvasının `kanal_kirilim` en iyi varyantı (docs/turnuva/Altin-M15.md; Sharpe −0,18, KALDI):
+# ileriye dönük gözlem. Sabit 0,01 lot (1 ons): 10.000 USD'de altının en küçük birimi enstrüman tavanının sınırında.
+# Martingale, pozisyon yığma, ≥ 5x yok (kural 6). Finansman CFD metal modeli (yıllık %4).
+altin:
+  ad: "am15:kanal_kirilim@xau_m15@15m"
+  sinif: B
+  sembol: GOLD
+  strateji: kanal_kirilim
+  parametre: {n: 48, sl_atr: 2.0, haber_dk: 0}
+  lot: 0.01
+  ons_lot: 100
+  maliyet: {kayma_bps: 1.0, finansman_yillik: 0.04}
+  risk: {kaldirac: 1.0}
+  magic: 910
+  baslangic_ozkaynak: 10000

@@ -170,6 +170,14 @@ services:
     depends_on:
       goc: { condition: service_completed_successfully }
 
+  altin:
+    <<: *ortak
+    # Altın M15 scalping gözlem kolu (canli/altin.py): EA tarzı gün içi XAUUSD, NCM forex DEMO hesabına MT5 emri (köprü
+    # gerçek hesapta reddeder). Her M15 kapanışında karar, saatte bir işaret. Kalp atışı ayrı izlenir (bekçi `altin`).
+    command: ["tradebot", "paper", "altin"]
+    depends_on:
+      goc: { condition: service_completed_successfully }
+
 volumes:
   pg:
   veri:

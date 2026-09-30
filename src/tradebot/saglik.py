@@ -213,6 +213,19 @@ def doviz_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
     return paper_kontrol(a, simdi_ms, "doviz")
 
 
+def altin_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
+    """Altın M15 düğümünün kalp atışı (canli/altin.py, saatte bir işaret). Kol henüz açılmadıysa bilgi."""
+    from tradebot.canli.gozetmen import dugum_kollari
+    from tradebot.db import motor
+
+    try:
+        if not dugum_kollari(motor(a)).get("altin"):
+            return Sonuc("altin", "OK", "altın kolu henüz açılmadı")
+    except Exception as e:  # noqa: BLE001
+        return Sonuc("altin", "HATA", f"{type(e).__name__}: {e}"[:200])
+    return paper_kontrol(a, simdi_ms, "altin")
+
+
 def gece_kontrol(a: Ayarlar, simdi: datetime | None = None) -> Sonuc:
     """Gece işi her gün 01:30 UTC'de `gece_isi` denetim kaydı yazar. > 26 saat uyarı, > 50 saat hata."""
     from sqlalchemy import func, select
@@ -342,7 +355,7 @@ def olu_adam(a: Ayarlar, sonuclar: list[Sonuc], zaman_asimi: float = 10.0) -> bo
 def hepsi(a: Ayarlar) -> list[Sonuc]:
     kontroller = [dns_kontrol, saat_kontrol, veritabani_kontrol, disk_kontrol, sir_kontrol]
     if a.ortam == "host" and a.veritabani_url is not None:
-        kontroller += [paper_kontrol, kilit_kontrol, doviz_kontrol, gece_kontrol]
+        kontroller += [paper_kontrol, kilit_kontrol, doviz_kontrol, altin_kontrol, gece_kontrol]
     if a.yedek_dizini is not None:
         kontroller.append(yedek_kontrol)
     if a.mt5_kopru_forex or a.mt5_kopru_viop:
