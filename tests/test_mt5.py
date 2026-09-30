@@ -298,3 +298,96 @@ def test_her_mt5_grubunun_maliyet_modeli_var():
             except KeyError:
                 eksik.append(f"{h['piyasa']}:{sinif}")
     assert not eksik, eksik
+
+
+# ------------------------------------------------------------------ emir yolu (dalga 9 döviz kolu)
+def test_emir_plani_hedging_ve_netting():
+    poz = [(11, 0.30), (12, 0.20)]                          # iki uzun pozisyon (eskiden yeniye)
+    assert kopru.emir_plani(poz, -0.40, hedging=True) == [(11, -0.30), (12, -0.10)]
+    assert kopru.emir_plani(poz, -0.70, hedging=True) == [(11, -0.30), (12, -0.20), (None, -0.20)]
+    assert kopru.emir_plani(poz, 0.10, hedging=True) == [(None, 0.10)]      # aynı yön: yeni pozisyon
+    assert kopru.emir_plani(poz, -0.40, hedging=False) == [(None, -0.40)]   # netting: tek işlem
+    assert kopru.emir_plani([], 0.004, hedging=True) == []                  # lot adımının altı: işlem yok
+
+
+class SahteEmirMt5(SahteMt5):
+    POSITION_TYPE_BUY, POSITION_TYPE_SELL = 0, 1
+    ORDER_TYPE_BUY, ORDER_TYPE_SELL = 0, 1
+    DEAL_TYPE_BUY, DEAL_TYPE_SELL = 0, 1
+    TRADE_ACTION_DEAL, ORDER_TIME_GTC = 1, 0
+    ORDER_FILLING_FOK, ORDER_FILLING_IOC, ORDER_FILLING_RETURN = 0, 1, 2
+
+    def __init__(self, simdi_ms, trade_mode=0):
+        super().__init__(simdi_ms)
+        self.trade_mode, self.poz, self.gonderilen, self.bilet = trade_mode, [], [], 100
+
+    def account_info(self):
+        return NS(login=316722, server="NCM-Demo", currency="USD", trade_mode=self.trade_mode, margin_mode=2,
+                  balance=10_000.0, equity=10_050.0, margin=100.0, margin_free=9_950.0, leverage=100)
+
+    def symbol_info(self, ad):
+        return NS(name=ad, filling_mode=1, volume_step=0.01)
+
+    def symbol_info_tick(self, _):
+        return NS(bid=1.1000, ask=1.1002, last=0.0, time_msc=self.tik_ms)
+
+    def positions_get(self, symbol=None):
+        return [p for p in self.poz if symbol is None or p.symbol == symbol]
+
+    def order_send(self, r):
+        self.gonderilen.append(r)
+        self.bilet += 1
+        v = r["volume"] if r["type"] == 0 else -r["volume"]
+        if "position" in r:
+            p = next(x for x in self.poz if x.ticket == r["position"])
+            kalan = round((p.volume if p.type == 0 else -p.volume) + v, 8)
+            self.poz.remove(p)
+            if kalan:
+                self.poz.append(NS(**{**vars(p), "volume": abs(kalan)}))
+        else:
+            self.poz.append(NS(ticket=self.bilet, symbol=r["symbol"], type=r["type"], volume=r["volume"],
+                               price_open=r["price"], swap=0.0, profit=0.0, magic=r["magic"], comment=r["comment"],
+                               time_msc=self.tik_ms + self.bilet))
+        return NS(retcode=10009, comment="Request executed", price=r["price"], volume=r["volume"], deal=self.bilet,
+                  order=self.bilet)
+
+
+def _emir_sunucusu(m):
+    k = kopru.Kopru(m, kopru.Isci(takilma_sn=60, cik=lambda: None), FARK, saat=lambda: m.simdi_ms)
+    s = ThreadingHTTPServer(("127.0.0.1", 0), kopru.isleyici(k, cagri_sn=2))
+    threading.Thread(target=s.serve_forever, daemon=True).start()
+    return s, Mt5Istemci(f"http://127.0.0.1:{s.server_address[1]}", zaman_asimi=10)
+
+
+def test_emir_yolu_demo_hedging_uctan_uca():
+    m = SahteEmirMt5(T0 + 60_000)
+    s, ist = _emir_sunucusu(m)
+    try:
+        h = ist.hesap()
+        assert h["tur"] == "demo" and h["marjin_modu"] == "hedging" and h["ozkaynak"] == 10_050.0
+        r = ist.emir("EURUSD", 0.30, "DV1-EURUSD", magic=909)
+        assert r["sonuc"][0]["retcode"] == 10009 and r["sonuc"][0]["fiyat"] == 1.1002   # alış ask'tan
+        m.poz.append(NS(ticket=5, symbol="EURUSD", type=0, volume=0.5, price_open=1.0, swap=0.0, profit=0.0,
+                        magic=111, comment="elle", time_msc=0))                       # başka sihirli sayı: dokunulmaz
+        r = ist.emir("EURUSD", -0.50, "DV2-EURUSD", magic=909)
+        assert [x["bilet_kapat"] for x in r["sonuc"]] == [101, None]                   # önce kapat, sonra kısa aç
+        assert m.gonderilen[1]["position"] == 101 and m.gonderilen[1]["volume"] == 0.30
+        assert m.gonderilen[2]["type"] == 1 and m.gonderilen[2]["price"] == 1.1000     # satış bid'den
+        poz = ist.pozisyonlar(909)
+        assert [(p["sembol"], p["hacim"]) for p in poz] == [("EURUSD", -0.20)]
+        assert any(p.magic == 111 and p.volume == 0.5 for p in m.poz)
+        with pytest.raises(KopruHatasi, match="403"):
+            ist.emir("EURUSD", 0.1, "x" * 40, magic=909)                               # yorum > 31 karakter
+    finally:
+        s.shutdown()
+
+
+def test_emir_yolu_gercek_hesapta_kapali():
+    m = SahteEmirMt5(T0 + 60_000, trade_mode=2)
+    s, ist = _emir_sunucusu(m)
+    try:
+        with pytest.raises(KopruHatasi, match="403.*gercek_hesap_kapali"):
+            ist.emir("EURUSD", 0.10, "DV1-EURUSD", magic=909)
+        assert m.gonderilen == []
+    finally:
+        s.shutdown()

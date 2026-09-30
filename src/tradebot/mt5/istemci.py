@@ -28,10 +28,12 @@ class Mt5Istemci:
     def _al(self, yol: str, **q) -> dict:
         return json.loads(self._ham(yol, **q))
 
-    def _ham(self, yol: str, **q) -> bytes:
+    def _ham(self, yol: str, govde: dict | None = None, **q) -> bytes:
         adres = f"{self.url}{yol}" + (f"?{urllib.parse.urlencode(q)}" if q else "")
+        istek = adres if govde is None else urllib.request.Request(
+            adres, data=json.dumps(govde).encode(), headers={"Content-Type": "application/json"}, method="POST")
         try:
-            with urllib.request.urlopen(adres, timeout=self.zaman_asimi) as r:
+            with urllib.request.urlopen(istek, timeout=self.zaman_asimi) as r:
                 return r.read()
         except urllib.error.HTTPError as e:
             raise KopruHatasi(f"{yol}: HTTP {e.code} {e.read()[:300]!r}") from e
@@ -46,6 +48,20 @@ class Mt5Istemci:
 
     def kotasyon(self, semboller: list[str]) -> dict:
         return self._al("/kotasyon", semboller=",".join(semboller))
+
+    def hesap(self) -> dict:
+        return self._al("/hesap")
+
+    def pozisyonlar(self, magic: int) -> list[dict]:
+        return self._al("/pozisyonlar", magic=magic)["pozisyonlar"]
+
+    def islemler(self, magic: int, bas_ms: int) -> list[dict]:
+        return self._al("/islemler", magic=magic, bas_ms=bas_ms)["islemler"]
+
+    def emir(self, sembol: str, hacim: float, yorum: str, magic: int, sapma: int = 20) -> dict:
+        """Piyasa emri (işaretli lot). Köprü yalnız demo hesapta kabul eder (403 `gercek_hesap_kapali`)."""
+        return json.loads(self._ham("/emir", {"sembol": sembol, "hacim": hacim, "yorum": yorum, "magic": magic,
+                                              "sapma": sapma}))
 
     def mumlar(self, sembol: str, zd: str, bas_ms: int, bit_ms: int, ham=None,
                hatada_devam: bool = False) -> pl.DataFrame:
