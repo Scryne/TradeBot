@@ -78,3 +78,14 @@ def test_seans_kirilim_gunde_yon_basina_bir():
     b = elle_barlar(c, bas_ms=0)
     s = altin.seans_kirilim_giris(b)
     assert list(s[28:]) == [1, 0, 0, -1, 0]
+
+
+
+@pytest.mark.parametrize("ad", ["seans_kirilim", "kanal_kirilim", "trend_geri_cekilme", "bant_donus", "sikisma_kirilim",
+                                "ea_birlesik"])
+def test_ayna_tam_ters_ve_nedensel(ad):
+    b = rastgele_barlar(n=1500)
+    f, g = getattr(altin, ad), getattr(altin, f"ters_{ad}")
+    np.testing.assert_array_equal(g(b), -f(b))
+    assert g.__name__ == f"ters_{ad}"
+    nedensellik_testi(StratejiTanimi(g.__name__, "altin_m15", g, {}, yon="long_short"), b, deneme=3)

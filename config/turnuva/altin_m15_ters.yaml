@@ -1,0 +1,59 @@
+# Turnuva — Altın M15 AYNASI: ÖN KAYIT (koşudan önce commit edilir, koşu sırasında değişmez).
+# Gerekçe: docs/turnuva/Altin-M15-Ters.md. Izgara, veri, boyut, ölçüt altin_m15.yaml ile birebir; değişen yalnız strateji
+# adları (ters_*: pozisyonların aynası). 32 yeni deneme, aynı aile.
+
+dalga: altin_m15_ters
+veri_bitis: "2026-09-25"
+frenler: true
+haber_takvimi: true               # config/haber_takvimi.yaml (FOMC/NFP/CPI) → altin.haber_ayarla
+boyut:
+  hedef_vol: 0.20                  # kol yalnız işlem açıkken pozisyonda: gerçekleşen oynaklık hedefin altında kalır
+  kaldirac: 3.0                    # sabit tavan (kural 6); EA'nın videodaki kaldıracı burada imkânsız
+  vol_pencere_gun: 30
+  bant: 0.25
+walk_forward: { is_yil: 1.5, oos_yil: 0.5 }
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0 }
+
+planlar:
+  altin_m15:
+    kimlik: 2026-09-30-altin-m15-ters
+    hipotez: >-
+      Altın M15 turnuvasının altı ailesinin (aynı ızgara, aynı EA risk katmanları) SAF AYNASI (bütün pozisyonlar ters;
+      TP ile SL yer değiştirmiş ters işlemle birebir), maliyet sonrası pozitif ve walk-forward'da kalıcı getiri verir.
+      Kaynak: Scryne'ın gösterdiği video ("kaybeden stratejinin tersini al"). Sonuçlar görüldükten sonra kuruldu: aynı
+      aile (altin_m15), DSR orijinal 32 denemeyle birlikte 64 denemeyle sayılır. Sıfır hipotezi: aynalar da geçmez.
+
+gruplar:
+  xau_m15:
+    kimlikler: [DUKASCOPY:XAUUSD]
+    asgari_gecmis_gun: 30
+    yon: long_short
+    zd: [15m]
+
+# EA varsayılanları sabit: rr 2.0, azami_bar 192, gunluk_r 3, ardisik 3. Izgara yalnız stop genişliği, haber filtresi
+# (açık/kapalı: filtrenin katkısı ölçülür) ve ailenin tek ana parametresi. Toplam 32 deneme.
+kollar:
+  - strateji: ters_seans_kirilim
+    gruplar: [xau_m15]
+    zd: [15m]
+    izgara: { aralik_bit_saat: [7], son_saat: [16], sl_atr: [1.5, 2.0], haber_dk: [0, 60] }
+  - strateji: ters_kanal_kirilim
+    gruplar: [xau_m15]
+    zd: [15m]
+    izgara: { n: [48, 96], sl_atr: [1.5, 2.0], haber_dk: [0, 60] }
+  - strateji: ters_trend_geri_cekilme
+    gruplar: [xau_m15]
+    zd: [15m]
+    izgara: { esik: [30], sl_atr: [1.5, 2.0], haber_dk: [0, 60] }
+  - strateji: ters_bant_donus
+    gruplar: [xau_m15]
+    zd: [15m]
+    izgara: { z: [2.0, 2.5], sl_atr: [1.5, 2.0], haber_dk: [0, 60] }
+  - strateji: ters_sikisma_kirilim
+    gruplar: [xau_m15]
+    zd: [15m]
+    izgara: { sl_atr: [1.5, 2.0], haber_dk: [0, 60] }
+  - strateji: ters_ea_birlesik
+    gruplar: [xau_m15]
+    zd: [15m]
+    izgara: { sl_atr: [1.5, 2.0], haber_dk: [0, 60] }

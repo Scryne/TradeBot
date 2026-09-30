@@ -72,6 +72,13 @@ STRATEJILER = {
     "bant_donus": ("altin_m15", altin.bant_donus, "tek"),
     "sikisma_kirilim": ("altin_m15", altin.sikisma_kirilim, "tek"),
     "ea_birlesik": ("altin_m15", altin.ea_birlesik, "tek"),
+    # Altın M15 aynası (docs/turnuva/Altin-M15-Ters.md): AYNI aile — DSR orijinal 32 denemeyle birlikte sayılır
+    "ters_seans_kirilim": ("altin_m15", altin.ters_seans_kirilim, "tek"),
+    "ters_kanal_kirilim": ("altin_m15", altin.ters_kanal_kirilim, "tek"),
+    "ters_trend_geri_cekilme": ("altin_m15", altin.ters_trend_geri_cekilme, "tek"),
+    "ters_bant_donus": ("altin_m15", altin.ters_bant_donus, "tek"),
+    "ters_sikisma_kirilim": ("altin_m15", altin.ters_sikisma_kirilim, "tek"),
+    "ters_ea_birlesik": ("altin_m15", altin.ters_ea_birlesik, "tek"),
 }
 
 

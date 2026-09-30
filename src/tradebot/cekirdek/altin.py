@@ -211,6 +211,17 @@ bant_donus = _yonetilen(bant_donus_giris)
 sikisma_kirilim = _yonetilen(sikisma_kirilim_giris)
 
 
+def _ters(f):
+    """Aynası (Altın M15 ters dalgası, 2026-09-30): bütün pozisyonları ters çevirir. Stop/hedef seviyeleri aynı kaldığı
+    için bu, "TP ↔ SL yer değiştirmiş ters işlem"le birebir aynıdır (çıkışlar aynı anda). Gün kilidi ve ardışık kayıp
+    sayacı orijinalin gözünden işler (ön kayıtta yazılı: saf ayna)."""
+    def g(b: Barlar, **p) -> np.ndarray:
+        return -f(b, **p)
+    g.__name__ = f"ters_{f.__name__}"
+    g.__doc__ = f"{f.__name__} aynası."
+    return g
+
+
 def ea_birlesik(b: Barlar, sl_atr: float = 1.5, rr: float = 2.0, azami_bar: int = 192, gunluk_r: float = 3.0,
                 ardisik: int = 3, haber_dk: int = 60) -> np.ndarray:
     """EA gibi: beş aile birlikte (her biri varsayılan parametreyle, kendi yönetimiyle), en fazla 3 açık işlem.
@@ -218,3 +229,11 @@ def ea_birlesik(b: Barlar, sl_atr: float = 1.5, rr: float = 2.0, azami_bar: int 
     ortak = dict(sl_atr=sl_atr, rr=rr, azami_bar=azami_bar, gunluk_r=gunluk_r, ardisik=ardisik, haber_dk=haber_dk)
     toplam = sum(f(b, **ortak) for f in (seans_kirilim, kanal_kirilim, trend_geri_cekilme, bant_donus, sikisma_kirilim))
     return np.clip(toplam, -3.0, 3.0) / 3.0
+
+
+ters_seans_kirilim = _ters(seans_kirilim)
+ters_kanal_kirilim = _ters(kanal_kirilim)
+ters_trend_geri_cekilme = _ters(trend_geri_cekilme)
+ters_bant_donus = _ters(bant_donus)
+ters_sikisma_kirilim = _ters(sikisma_kirilim)
+ters_ea_birlesik = _ters(ea_birlesik)
