@@ -92,3 +92,29 @@ def test_oecd_csv_cozulur():
     r = fz.coz(csv.encode())
     assert r.keys() == {"USA", "JPN"} and r["USA"] == {(2024, 1): pytest.approx(0.053)}
     assert r["JPN"] == {(2024, 1): pytest.approx(0.0007)}
+
+
+class _Depo:
+    def __init__(self, seriler):
+        self.seriler = seriler
+
+    def oku(self, kimlik, zd):
+        return self.seriler[kimlik]
+
+
+def test_tasima_farki_gomulu_faizi_geri_verir_ve_para_yonu():
+    t = _is_gunleri(ms(2024, 1, 1), 300)
+    rng = np.random.default_rng(1)
+    c = 150 * np.exp(np.cumsum(rng.normal(0, 0.006, len(t))))
+    rt = np.where(t < ms(2024, 6, 1), 0.05, 0.045)      # USD
+    rk = np.full(len(t), -0.001)                        # JPY
+    seri, _ = vd.fazla_getiri(_bar(t, c), rt, rk)
+    depo = _Depo({"VADELI:USDJPY": seri, "DUKASCOPY:USDJPY": _bar(t, c)})
+    izgara = np.r_[t[0] - GUN, t, t[-1] + 3 * GUN]
+    f = vd.tasima_farki(depo, "VADELI:USDJPY", izgara)
+    assert np.isnan(f[0]) and np.isnan(f[1])            # ızgara başı ve ilk bar (fark tanımsız)
+    np.testing.assert_allclose(f[2:-1], (rt - rk)[1:], atol=1e-9)
+    assert f[-1] == f[-2]                               # son bardan sonra ileri doldurulur
+    assert vd.para_yonu("VADELI:USDJPY") == -1.0 and vd.para_yonu("VADELI:EURUSD") == 1.0
+    with pytest.raises(ValueError):
+        vd.para_yonu("VADELI:XAU")

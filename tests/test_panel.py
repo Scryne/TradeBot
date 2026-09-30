@@ -101,6 +101,64 @@ def test_panel_nedensellik_hileyi_yakalar():
         al.panel_nedensellik_testi(hileli, panel())
 
 
+
+# ------------------------------------------------------------------ döviz kesitseli (dalga 9)
+DOVIZ_YON = np.array([1.0, 1.0, -1.0, 1.0, -1.0, -1.0])  # EUR GBP JPY AUD CAD CHF (USD karşılı)
+
+
+def doviz_panel(faiz, n=400, tohum=3):
+    """faiz: [6] yabancı paranın USD'ye göre yıllık farkı (r_para − r_USD). Enstrüman taşıması = para_yon × fark."""
+    rng = np.random.default_rng(tohum)
+    c = np.exp(np.cumsum(rng.normal(0, 0.006, (n, 6)), axis=0))
+    tas = np.tile(DOVIZ_YON * np.asarray(faiz, float), (n, 1))
+    return al.Panel(T0 + np.arange(n, dtype=np.int64) * GUN, c, np.ones((n, 6), dtype=bool), tas, DOVIZ_YON)
+
+
+@pytest.mark.parametrize("olcut", al.DOVIZ_OLCUTLER)
+def test_doviz_kesitsel_nedensel(olcut):
+    p = doviz_panel([0.01, 0.02, -0.04, 0.03, 0.005, -0.03])
+    p = al.Panel(p.t, p.close, p.evrende, p.tasima + np.random.default_rng(0).normal(0, 0.01, p.tasima.shape),
+                 p.para_yon)
+    al.panel_nedensellik_testi(al.doviz_kesitsel, p, deneme=8, olcut=olcut, n=2, geriye=20)
+
+
+def test_doviz_tasima_uclari_ve_dolar_notr():
+    # sıra: JPY −4 < CHF −3 < USD 0 < CAD 0,5 < EUR 1 < GBP 2 < AUD 3
+    w = al.doviz_kesitsel(doviz_panel([0.01, 0.02, -0.04, 0.03, 0.005, -0.03]), olcut="tasima", n=2)
+    para = w[-1] * DOVIZ_YON                             # para uzayı
+    np.testing.assert_allclose(para, [0, 0.5, -0.5, 0.5, 0, -0.5])
+    np.testing.assert_allclose(w[-1], [0, 0.5, 0.5, 0.5, 0, 0.5])  # kısa JPY = uzun USDJPY
+    assert abs(para.sum()) < 1e-12                       # USD uçlarda değil: örtük USD ağırlığı 0
+
+
+def test_doviz_tasima_usd_ucta_ortuk_bacak():
+    # bütün yabancı faizler USD'nin altında: USD en yüksek, n=1 → yalnız en düşük para kısa, karşı bacak USD uzun
+    w = al.doviz_kesitsel(doviz_panel([-0.01, -0.02, -0.05, -0.005, -0.015, -0.03]), olcut="tasima", n=1)
+    np.testing.assert_allclose(w[-1] * DOVIZ_YON, [0, 0, -1, 0, 0, 0])
+    assert np.flatnonzero(w[-1]).tolist() == [2]
+
+
+def test_doviz_dolar_ve_momentum():
+    w = al.doviz_kesitsel(doviz_panel([0.01, 0.02, -0.01, 0.03, 0.005, -0.01]), olcut="dolar")
+    np.testing.assert_allclose(w[-1] * DOVIZ_YON, np.full(6, 1 / 6))  # ortalama +%0,74 > 0: yabancılar uzun
+    w = al.doviz_kesitsel(doviz_panel([-0.01] * 6), olcut="dolar")
+    np.testing.assert_allclose(w[-1] * DOVIZ_YON, np.full(6, -1 / 6))
+    p = doviz_panel([0.0] * 6, n=100)
+    c = np.ones((100, 6))
+    c[:, 2] = np.linspace(1.0, 0.8, 100)                  # USDJPY düşüyor → JPY en güçlü
+    c[:, 0] = np.linspace(1.0, 0.9, 100)                  # EURUSD düşüyor → EUR en zayıf
+    w = al.doviz_kesitsel(al.Panel(p.t, c, p.evrende, p.tasima, DOVIZ_YON), olcut="momentum", n=1, geriye=20,
+                          haftalik=False)
+    np.testing.assert_allclose(w[-1] * DOVIZ_YON, [-1, 0, 1, 0, 0, 0])
+    assert np.all(w[:20] == 0)                            # ısınmada pozisyon yok
+
+
+def test_doviz_kesitsel_panel_eksikse_hata():
+    p = panel()
+    with pytest.raises(ValueError, match="doviz: true"):
+        al.doviz_kesitsel(p)
+
+
 # ------------------------------------------------------------------ boyut
 def test_panel_oynaklik_hedefi_nedensel_ve_tavanli():
     p = panel(n=600)

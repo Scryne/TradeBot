@@ -16,6 +16,7 @@ import json
 import math
 import time
 from dataclasses import dataclass, field
+from functools import partial
 from pathlib import Path
 
 import numpy as np
@@ -59,6 +60,11 @@ STRATEJILER = {
     "kesitsel_momentum": ("kesitsel_momentum", al.kesitsel_momentum, "panel"),
     "acilis_araligi": ("gun_ici_kirilim", al.acilis_araligi_kirilim, "tek"),
     "tasima": ("tasima", al.tasima, "tek"),   # VİOP 2: TL taşıma (docs/turnuva/VIOP-2.md)
+    # Dalga 9: G10 döviz kesitseli (docs/turnuva/Dalga-9-Doviz.md); dört ölçüt tek aile (DSR bütün denemelerle)
+    "doviz_tasima": ("doviz_kesitsel", partial(al.doviz_kesitsel, olcut="tasima"), "panel"),
+    "doviz_momentum": ("doviz_kesitsel", partial(al.doviz_kesitsel, olcut="momentum"), "panel"),
+    "doviz_birlesik": ("doviz_kesitsel", partial(al.doviz_kesitsel, olcut="birlesik"), "panel"),
+    "doviz_dolar": ("doviz_kesitsel", partial(al.doviz_kesitsel, olcut="dolar"), "panel"),
     # Altın M15 (EA karşılığı; docs/turnuva/Altin-M15.md): giriş ailesi + EA risk katmanları
     "seans_kirilim": ("altin_m15", altin.seans_kirilim, "tek"),
     "kanal_kirilim": ("altin_m15", altin.kanal_kirilim, "tek"),
@@ -140,6 +146,8 @@ class HazirGrup:
     bar_yil_olcu: float | None = None  # karışık takvimli grup: ızgaradaki yıllık bar sayısı (veriden)
     yalniz_long: np.ndarray | None = None  # [k] bu enstrümanlarda negatif ağırlık yok
     veto: np.ndarray | None = None  # [n, k] zekâ katmanı vetoları (point-in-time)
+    tasima: np.ndarray | None = None  # [n, k] döviz grubu: yıllık faiz farkı (dalga 9)
+    para_yon: np.ndarray | None = None  # [k] döviz grubu: +1 XXXUSD, −1 USDXXX
 
 
 def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bit_ms: int | None = None,
@@ -174,7 +182,14 @@ def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bi
     olcu = (len(g.t) - 1) / ((g.t[-1] - g.t[0]) / YIL_MS) if len(takvimler) > 1 and len(g.t) > 1 else None
     yl = np.array([kayit[k]["piyasa"] in YALNIZ_LONG_PIYASALAR for k in g.kimlikler])
     vm = veto_maskesi(g, vetolar) if vetolar is not None else None
-    return HazirGrup(g, evrende, taraf_matrisi(g, modeller, ek), modeller, sorted(takvimler)[0], olcu, yl, vm)
+    tas = yon_ = None
+    if tanim.get("doviz"):  # dalga 9: USD karşılı döviz vekilleri; taşıma farkı serinin kendisinden (veri/vadeli.py)
+        from tradebot.veri import vadeli as vd
+
+        tas = np.column_stack([vd.tasima_farki(depo, k, g.t) for k in g.kimlikler])
+        yon_ = np.array([vd.para_yonu(k) for k in g.kimlikler])
+    return HazirGrup(g, evrende, taraf_matrisi(g, modeller, ek), modeller, sorted(takvimler)[0], olcu, yl, vm, tas,
+                     yon_)
 
 
 # ------------------------------------------------------------------ koşu
@@ -190,7 +205,7 @@ def hedef_uret(h: HazirGrup, strateji: str, p: dict, yon: str, ayar: Ayar, neden
         s = np.column_stack([izgaraya(g, j, tanim.sinyal(b)) for j, b in enumerate(g.barlar)])
         olcekle = True
     else:
-        pn = al.Panel(g.t, g.kapanis, h.evrende)
+        pn = al.Panel(g.t, g.kapanis, h.evrende, h.tasima, h.para_yon)
         if nedensellik:
             al.panel_nedensellik_testi(fonk, pn, deneme=3, **p)
         s = fonk(pn, **p)

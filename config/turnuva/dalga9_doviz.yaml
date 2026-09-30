@@ -1,0 +1,49 @@
+# Turnuva dalga 9 — G10 döviz kesitseli (taşıma, momentum, birleşik, dolar taşıması): ÖN KAYIT (koşudan önce commit
+# edilir, koşu sırasında değişmez). Gerekçe: docs/turnuva/Dalga-9-Doviz.md. Seriler dalga 3'ün döviz vekilleri
+# (veri/vadeli.py: spot + PIT faiz farkı; getiri nakit üstü). Boyut ve ölçüt dalga 3 ile AYNI (yeni ayar araması yok).
+
+dalga: 9
+veri_bitis: "2026-01-01"        # Dukascopy günlük spot 2025-12-31'de bitiyor; 2026 kör (Dalga-9-Doviz.md)
+frenler: true
+boyut:
+  hedef_vol: 0.20
+  kaldirac: 3.0
+  vol_pencere_gun: 90
+  bant: 0.25
+walk_forward: { is_yil: 3, oos_yil: 1 }
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0, risksiz_yillik: 0.0 }
+
+planlar:
+  doviz_kesitsel:
+    kimlik: 2026-09-30-d9-doviz-kesitsel
+    hipotez: >-
+      G10 dövizlerinde (EUR, GBP, JPY, AUD, CAD, CHF ve USD) kesitsel taşıma (yüksek faizli paralar uzun, düşük
+      faizliler kısa), kesitsel momentum, ikisinin birleşimi ya da dolar taşıması; haftalık yenilenir, oynaklık
+      hedefli, maliyet ve kurum payı sonrası pozitif ve walk-forward'da kalıcıdır. Sıfır hipotezi: vermez.
+
+gruplar:
+  g10_doviz:
+    kimlikler: [VADELI:EURUSD, VADELI:GBPUSD, VADELI:USDJPY, VADELI:AUDUSD, VADELI:USDCAD, VADELI:USDCHF]
+    doviz: true
+    asgari_gecmis_gun: 60
+    yon: long_short
+    zd: [1d]
+
+# 9 deneme (tek aile: doviz_kesitsel)
+kollar:
+  - strateji: doviz_tasima
+    gruplar: [g10_doviz]
+    zd: [1d]
+    izgara: { n: [1, 2, 3] }
+  - strateji: doviz_momentum
+    gruplar: [g10_doviz]
+    zd: [1d]
+    izgara: { n: [2], geriye_gun: [21, 63, 252] }
+  - strateji: doviz_birlesik
+    gruplar: [g10_doviz]
+    zd: [1d]
+    izgara: { n: [2], geriye_gun: [63, 252] }
+  - strateji: doviz_dolar
+    gruplar: [g10_doviz]
+    zd: [1d]
+    izgara: { n: [1] }            # dolar ölçütü n kullanmaz (tek varyant)

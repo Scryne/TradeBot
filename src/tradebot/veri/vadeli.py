@@ -114,6 +114,27 @@ def fazla_getiri(spot: pl.DataFrame, r_taban: np.ndarray, r_kote: np.ndarray) ->
     return _olcekle(s, carpan), {"tasima_toplam": float(tasima[-1] - 1), "fark_ort": float(np.mean(fark))}
 
 
+def para_yonu(kimlik: str) -> float:
+    """Döviz vekili için yabancı paranın yönü (dalga 9): XXXUSD'de uzun = yabancı para uzun (+1), USDXXX'te −1."""
+    spot, taban, kote, sinif = VEKIL[kimlik.removeprefix("VADELI:")]
+    if sinif != "fx" or "USD" not in (taban, kote):
+        raise ValueError(f"{kimlik}: USD karşılı döviz vekili değil")
+    return 1.0 if kote == "USD" else -1.0
+
+
+def tasima_farki(depo, kimlik: str, t: np.ndarray) -> np.ndarray:
+    """Vekilin gömülü yıllık faiz farkı (r_taban − r_kote), `t` ızgarasında (dalga 9). Seriyi kuran PIT faizin aynısı
+    geri çıkarılır: fark = (Δlog vekil − Δlog spot) / Δt_yıl. Izgarada o ana kadarki son bar değeri; öncesi NaN."""
+    spot_k = VEKIL[kimlik.removeprefix("VADELI:")][0]
+    v, sp = depo.oku(kimlik, "1d").sort("acilis_ms"), depo.oku(spot_k, "1d").sort("acilis_ms")
+    j = v.join(sp.select("acilis_ms", pl.col("close").alias("spot")), on="acilis_ms", how="inner")
+    tv = j["acilis_ms"].to_numpy()
+    dt_yil = np.diff(tv) / GUN_MS / 365.0
+    fark = np.r_[np.nan, (np.diff(np.log(j["close"].to_numpy())) - np.diff(np.log(j["spot"].to_numpy()))) / dt_yil]
+    konum = np.searchsorted(tv, np.asarray(t, dtype=np.int64), side="right") - 1
+    return np.where(konum >= 0, fark[np.maximum(konum, 0)], np.nan)
+
+
 def kur(depo, motor, faiz_csv: bytes) -> dict:
     """Bütün VADELI:* serilerini katalogdan baştan kurar ve kaydeder. Dönüş: seri başına rapor."""
     from tradebot.veri import enstruman as en

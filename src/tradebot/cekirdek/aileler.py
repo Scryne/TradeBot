@@ -10,6 +10,7 @@ Aile → fonksiyonlar:
 - takvim: ay_donumu
 - kesitsel_momentum: kesitsel_momentum (Panel)
 - tasima: tasima (VİOP 2, TL taşıma; docs/turnuva/VIOP-2.md)
+- doviz_kesitsel: doviz_kesitsel (Panel; dalga 9, G10 taşıma/momentum)
 """
 from __future__ import annotations
 
@@ -171,12 +172,17 @@ class Panel:
     t: np.ndarray
     close: np.ndarray
     evrende: np.ndarray
+    # Döviz grubu (dalga 9): `tasima[t, j]` = j'yi UZUN tutmanın t'de bilinen yıllık faiz farkı (r_taban − r_kote);
+    # `para_yon[j]` = +1 (XXXUSD: uzun = yabancı para uzun) ya da −1 (USDXXX). Diğer gruplarda None.
+    tasima: np.ndarray | None = None
+    para_yon: np.ndarray | None = None
 
     def __len__(self) -> int:
         return len(self.t)
 
     def kes(self, n: int) -> Panel:
-        return Panel(self.t[:n], self.close[:n], self.evrende[:n])
+        return Panel(self.t[:n], self.close[:n], self.evrende[:n],
+                     None if self.tasima is None else self.tasima[:n], self.para_yon)
 
 
 def hafta_basi(t_ms: np.ndarray) -> np.ndarray:
@@ -212,6 +218,71 @@ def kesitsel_momentum(p: Panel, geriye: int = 30, atla: int = 0, ust_n: int = 3,
     return out
 
 
+DOVIZ_OLCUTLER = ("tasima", "momentum", "birlesik", "dolar")
+
+
+def _sira(x: np.ndarray) -> np.ndarray:
+    """Küçükten büyüğe sıra (0..m−1), eşitlikte kararlı."""
+    r = np.empty(len(x))
+    r[np.argsort(x, kind="stable")] = np.arange(len(x))
+    return r
+
+
+def doviz_kesitsel(p: Panel, olcut: str = "tasima", n: int = 2, geriye: int = 63, haftalik: bool = True) -> np.ndarray:
+    """G10 döviz kesitseli (dalga 9; docs/turnuva/Dalga-9-Doviz.md). Her enstrüman bir yabancı paradır (karşısı USD);
+    USD'nin kendisi puanı 0 olan yedinci para olarak sıralamaya girer.
+
+    Para puanı (USD'ye karşı, t'de bilinenle):
+    - `tasima`: r_para − r_USD (Lustig-Verdelhan / Menkhoff 2012 taşıma portföyü).
+    - `momentum`: paranın USD'ye karşı son `geriye` bar log getirisi (seri nakit üstü: taşıma dahil).
+    - `birlesik`: iki sıranın ortalaması.
+    En yüksek `n` para uzun, en düşük `n` kısa, her biri 1/n (para uzayında dolar-nötr). USD uçlardaysa ağırlığı
+    örtüktür (diğer bacakların toplamı). `dolar` (Lustig-Roussanov-Verdelhan 2014): yabancı faizlerin ortalaması USD'nin
+    üstündeyse bütün yabancı paralar uzun, değilse kısa, her biri 1/m.
+    Enstrüman ağırlığı = para_yon × para ağırlığı. `haftalik`: yalnız haftanın ilk barında yenilenir."""
+    if olcut not in DOVIZ_OLCUTLER:
+        raise ValueError(f"bilinmeyen ölçüt: {olcut}")
+    if p.para_yon is None or (olcut != "momentum" and p.tasima is None):
+        raise ValueError("doviz_kesitsel: panelde para_yon/tasima yok (grup tanımında doviz: true)")
+    nb, k = p.close.shape
+    yon = np.asarray(p.para_yon, dtype=float)
+    out = np.zeros((nb, k))
+    yenile = hafta_basi(p.t) if haftalik else np.ones(nb, dtype=bool)
+    son = np.zeros(k)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        lc = np.log(p.close)
+    for i in range(nb):
+        if yenile[i]:
+            son = np.zeros(k)
+            tas = yon * p.tasima[i] if p.tasima is not None else np.full(k, np.nan)
+            mom = yon * (lc[i] - lc[i - geriye]) if i >= geriye else np.full(k, np.nan)
+            if olcut in ("tasima", "dolar"):
+                puan, gerek = tas, np.isfinite(tas)
+            elif olcut == "momentum":
+                puan, gerek = mom, np.isfinite(mom)
+            else:
+                puan, gerek = None, np.isfinite(tas) & np.isfinite(mom)
+            gecerli = p.evrende[i] & gerek
+            aday = np.flatnonzero(gecerli)
+            if olcut == "dolar":
+                if len(aday) > 0:
+                    isaret = 1.0 if tas[aday].mean() > 0 else -1.0
+                    son[aday] = isaret / len(aday)
+            elif len(aday) + 1 >= 2 * n:
+                if olcut == "birlesik":
+                    x = (_sira(np.r_[tas[aday], 0.0]) + _sira(np.r_[mom[aday], 0.0])) / 2.0
+                else:
+                    x = np.r_[puan[aday], 0.0]
+                s = np.argsort(x, kind="stable")      # son eleman (indeks len(aday)) USD
+                para = np.zeros(len(aday) + 1)
+                para[s[-n:]] += 1.0 / n
+                para[s[:n]] -= 1.0 / n
+                son[aday] = para[:-1]
+            son = son * yon
+        out[i] = np.where(p.evrende[i], son, 0.0)
+    return out
+
+
 def panel_nedensellik_testi(fonk, p: Panel, deneme: int = 10, tohum: int = 0, **param) -> None:
     """Panel fonksiyonu için gelecek-bozma testi: t sonrası fiyatlar bozulunca out[: t + 1] değişmemeli."""
     rng = np.random.default_rng(tohum)
@@ -221,7 +292,11 @@ def panel_nedensellik_testi(fonk, p: Panel, deneme: int = 10, tohum: int = 0, **
         t = int(rng.integers(n // 4, n - 2))
         c = p.close.copy()
         c[t + 1:] *= rng.uniform(0.5, 2.0, c[t + 1:].shape)
-        yeni = fonk(Panel(p.t, c, p.evrende), **param)
+        ts = None
+        if p.tasima is not None:
+            ts = p.tasima.copy()
+            ts[t + 1:] += rng.normal(0.0, 0.05, ts[t + 1:].shape)
+        yeni = fonk(Panel(p.t, c, p.evrende, ts, p.para_yon), **param)
         if not np.array_equal(yeni[: t + 1], temel[: t + 1]):
             raise AssertionError(f"{getattr(fonk, '__name__', fonk)} geleceği görüyor (t={t})")
 
