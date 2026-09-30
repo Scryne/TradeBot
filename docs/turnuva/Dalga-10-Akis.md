@@ -90,6 +90,10 @@ negatif Sharpe'ı Sharpe varyansını büyüttüğü için DSR eşiği yükseldi
   **t = 0,98: sıfırdan istatistiksel olarak ayırt edilemiyor.** Dönemler: 2010–15 −3,5 bps (isabet %44), 2016–20 +12,9
   (%59), 2021–25 +7,9 (%60); 2025'in 8 olayının 7'si negatif. B kararı ön kayıtlı ölçütün sonucudur (B için DSR şartı
   yok); kanıt zayıftır, demo kolu bunu ileriye dönük sınar.
+- **Kör dönem 2026-01 → 08 (ön kayıtlı bilgi, kapı değil):** 5 olay, 4'ü negatif: 28 Ocak −31, 18 Mart −85, 29 Nisan
+  −50, 17 Haziran −83, 29 Temmuz +32 bps; toplam −217 bps. 2025 ile birlikte son 13 olayın 11'i negatif: etki son iki
+  yılda tersine dönmüş görünüyor. Kol ön kayıttaki kural gereği demoda gözlem olarak kalır (yılda 8 gün maruziyet);
+  gerçek para adayı değildir.
 - **Ay sonu hedge:** yön işareti ters çalıştı ya da etki yok; walk-forward negatif.
 - **Seans saati:** önceden yazıldığı gibi günlük 1–2 gidiş-dönüş maliyeti (yılda %10–20) etkiyi siliyor.
 
