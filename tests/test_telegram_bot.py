@@ -100,3 +100,11 @@ def test_dugum_elle_durdurmayi_uygular_ve_yeniden_baslatmada_korur(tmp_path, aya
     df.kol_olay_yaz("k1", "devam", {"neden": "telegram"})
     b2._olaylari_uygula()
     assert b2.durdurulan == set() and dugum.Beyin(m, [k1, k2], df, SahteBarlar(depo), KAYIT).durdurulan == set()
+
+
+def test_ayri_dugum_kollari_hepsini_durdura_girer():
+    from tradebot.telegram_bot import ayri_dugum_kollari
+
+    adlar = {k.ad for k in ayri_dugum_kollari()}
+    assert {"d6b:kilit_kisa@kilit_perp@1d", "d9:doviz_tasima@g10_doviz@1d", "am15:kanal_kirilim@xau_m15@15m",
+            "d10:fomc_dolar@g10_saatlik@1h"} <= adlar

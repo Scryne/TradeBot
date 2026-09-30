@@ -368,6 +368,15 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     telefondan girdi, ~20–40 dk sonra kapandı (NCM demo sunucusu ikinci cihaz/IP'den girişte hesabı kapatıyor olabilir;
     doğrulanmadı). Kural: botun hesabına telefondan girilmez; izleme Telegram'dan. Güvenlik ağı eklendi: aracı kurumda
     acil stop, MT5 işlemlerinin bilet numarasıyla benimsenmesi, gözetmenin MT5 düğümlerini köprüden kapatması. CI kuruldu.
+  - 2026-09-30 gece (Scryne: "piyasadaki en iyi botu yap, tüm yetki sende, en iyi sonuca kadar devam et"): NCM yalnız G10
+    + USDTRY/EURTRY (işleme kapalı) sunuyor: gelişmekte olan ülke taşıma sepeti yapılamaz. **Dalga 10** (döviz akış ve
+    olay primleri, 9 deneme, `docs/turnuva/Dalga-10-Akis.md`): FOMC günü dolar **B** (yıllık +%0,4, Sharpe 0,25; olay
+    başına +5,3 bps, t 0,98: zayıf), ay sonu hedge ve seans saati KALDI. Ön kayıt gereği FOMC dolar demo gözlem kolu:
+    `canli/akis.py`, compose `akis`, kol `d10:fomc_dolar@g10_saatlik@1h`, magic 911, saatlik karar (yalnız sinyal ya da
+    açık pozisyonda), bir bar gecikme (21:00 UTC devir spread'i). İlk işlem 2026-10-27 22:00 UTC. FOMC takvimi
+    `config/fomc_planli.yaml` 2027 sonuna kadar (bitmeye 90 gün kala hata logu). Döviz düğümünde güvenlik düzeltmesi:
+    durdurulan kolda USDXXX tam kapanışı reddedilebiliyordu (para uzayında tam adet). **Dalga 11** (ABD endeksi FOMC
+    öncesi, gece kayması, ay dönümü; vadeli maliyeti) ön kayıtlı, saatlik S&P verisi iniyor.
 
 ### Faz 9: Operasyon
 - **İşler:** Bağımsız gözetmen (kalp atışı, özkaynak, pozisyon; motor donarsa kapatma); Telegram bot (3

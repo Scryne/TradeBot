@@ -268,6 +268,14 @@ class Telegram:
         self._cagir("sendMessage", {"chat_id": sohbet, "text": metin[:4000], "disable_web_page_preview": "true"})
 
 
+def ayri_dugum_kollari() -> list[PaperKol]:
+    """Nautilus dışı düğümlerin kolları (kilit, MT5 demo kolları). "Hepsini durdur" bunları da kapsar (kural 7: riski
+    azaltan her şey otomatik); 2026-09-30'a kadar yalnız kilit vardı, MT5 kolları dışarıda kalıyordu."""
+    from tradebot.canli import akis, altin, doviz, kilit
+
+    return [ay.kol for ay in (kilit.ayarlar(), doviz.ayarlar(), altin.ayarlar(), akis.ayarlar()) if ay is not None]
+
+
 def calistir() -> None:
     """compose `telegram` servisi: uzun yoklama, yalnız Scryne'ın sohbeti."""
     from tradebot.ayar import ayarlar
@@ -286,10 +294,7 @@ def calistir() -> None:
         y = jev.sor("D4_telegram", "telegram", state, s)
         return None if y.hata else y.cevap
 
-    from tradebot.canli.kilit import ayarlar as kilit_ayarlari
-
-    kilit = kilit_ayarlari()
-    bot = Bot(m, a.veri_dizini, kollar() + ([kilit.kol] if kilit else []), sor)
+    bot = Bot(m, a.veri_dizini, kollar() + ayri_dugum_kollari(), sor)
     tg = Telegram(a.telegram_token.get_secret_value())
     offset = 0
     _log.info("telegram_basladi")
