@@ -43,7 +43,7 @@ kollar:
   - strateji: fomc_dolar
     gruplar: [g10_saatlik]
     zd: [1h]
-    izgara: { pencere: [on, gun, iki] }
+    izgara: { pencere: ["on", "gun", "iki"] }   # tırnaklı: YAML 1.1'de çıplak on = True (ek 1)
   - strateji: ay_sonu_hedge
     gruplar: [g10_saatlik]
     zd: [1h]

@@ -69,6 +69,12 @@ hesabında (MT5 emir yolu) ayrı bir gözlem kolu olarak çalışır; gerçek pa
 haftalarında PSR(0) ≥ 0,95 ve ≥ 26 hafta). Hiçbiri geçmezse: sıfır hipotezi ayakta kalır, yazılır, üç fikir kapanan
 fikirlere eklenir; demo hesaba yeni kol girmez.
 
+## Ek 1 (2026-09-30, sonuç görülmeden): YAML düzeltmesi
+
+İlk koşu (7b3b75d) `fomc_dolar`'ın ilk varyantında durdu: YAML 1.1'de çıplak `on` değeri `True` okunuyor
+(`bilinmeyen pencere: True`). Hiçbir varyant hesaplanmadı, deftere deneme yazılmadı. Izgara değerleri tırnaklandı;
+tasarım değişmedi.
+
 ## Raporlanacak (kapı değil, bilgi)
 
 - Olay başına brüt ve net ortalama getiri (bps), isabet oranı.
