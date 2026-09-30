@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-09-30
 type: turnuva-plani
-durum: ön kayıt (koşudan önce commit edildi)
+durum: sonuçlandı — KALDI (2026-09-30)
 ---
 # Turnuva — Dalga 9: G10 döviz kesitseli (ön kayıt)
 
@@ -62,6 +62,28 @@ yolu, Faz 8) paper kolu olarak çalışır; gerçek para kapısı değişmez (pa
 Hiçbiri geçmezse: sıfır hipotezi ayakta kalır, bu yazılır; ailenin DSR'ı en yüksek varyantı yine demo hesapta
 **ileriye dönük gözlem kolu** olarak çalışır (sermayesi sanal, kapı sayacı aynı). Bu, geçmiş testin yerine geçmez:
 kapı yalnız ileriye dönük haftalarla açılır.
+
+## Sonuç (2026-09-30, koşu `dalga9`, ön kayıt e8acbd9 + ek 1 1543091)
+
+**KALDI: dört ölçüt de geçmedi; sıfır hipotezi ayakta.** 9 deneme, aile DSR'ı 9 denemeyle.
+
+| Strateji | En iyi varyant | Yıllık | Oynaklık | Sharpe | En kötü düşüş | OOS yıllık | DSR | Maliyet/yıl |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| taşıma | n = 1 | +%0,07 | %5,6 | 0,04 | −%19 | −%0,2 | 0,11 | %1,3 |
+| dolar taşıması | — | −%1,2 | %6,7 | −0,15 | −%37 | −%1,6 | 0,02 | %1,2 |
+| birleşik | 252 gün | −%1,3 | %4,4 | −0,28 | −%27 | −%1,1 | 0,01 | %2,3 |
+| momentum | 252 gün | −%1,7 | %4,5 | −0,37 | −%31 | −%2,3 | 0,00 | %2,2 |
+
+- **Taşıma maliyetten önce de zayıf:** maliyet payı yılda %1,3 (çoğu kurum payı); sıfır kurum payında bile getiri
+  ~%1,4/yıl, Sharpe ~0,25. Önsel doğrulandı: 2010–21 sıfır faiz yıllarında G10 taşıma farkı çok dar; 2023–24 iyi
+  (+%5,6, +%7,6), 2022 ve 2025 kötü (−%5,4, −%3,3). 7 paralı kesit ince.
+- **Momentum ve birleşik:** yılda ~13 kat devir, maliyet getiriyi aşıyor; maliyetsiz de negatif.
+- Walk-forward seçimleri kararsız (taşımada n 1 → 3 arası geziyor): plato yok.
+- Stres (2x maliyet, bir bar gecikme) taşımada sonucu değiştirmiyor (zaten ~0).
+
+**Demo hesaba giren (ön kayıttaki kural):** ailenin DSR'ı en yüksek varyantı `doviz_tasima(n=1)` NCM forex demo
+hesabında ileriye dönük gözlem kolu olarak çalışır (`canli/doviz.py`). Beklenen getirisi sıfıra yakındır; bu kol
+bir kazanç iddiası değil, emir yolunun ve ileriye dönük ölçümün çalışmasıdır. Gerçek para kapısı değişmez.
 
 ## Ek 1 (2026-09-30, koşudan önce): boyut canlı tavanlarına çekildi
 
