@@ -86,6 +86,10 @@ negatif Sharpe'ı Sharpe varyansını büyüttüğü için DSR eşiği yükseldi
   (açıklamadan önce çıkış) ~0, `iki` (ertesi gün) negatif: etki açıklama gününe sıkışık, Mueller vd. ile tutarlı.
   **Ölçek dürüstçe:** yılda 8 olay, olay başına net ~5 bps, 1x tavanla yıllık +%0,4. Beklenen değer pozitif ama tek
   başına kullanılabilir bir getiri değil.
+- **Olay bazında (bilgi, aynı varyantın ayrıştırması):** 124 olay, net ortalama +5,3 bps (medyan +11,4), isabet %54,
+  **t = 0,98: sıfırdan istatistiksel olarak ayırt edilemiyor.** Dönemler: 2010–15 −3,5 bps (isabet %44), 2016–20 +12,9
+  (%59), 2021–25 +7,9 (%60); 2025'in 8 olayının 7'si negatif. B kararı ön kayıtlı ölçütün sonucudur (B için DSR şartı
+  yok); kanıt zayıftır, demo kolu bunu ileriye dönük sınar.
 - **Ay sonu hedge:** yön işareti ters çalıştı ya da etki yok; walk-forward negatif.
 - **Seans saati:** önceden yazıldığı gibi günlük 1–2 gidiş-dönüş maliyeti (yılda %10–20) etkiyi siliyor.
 
