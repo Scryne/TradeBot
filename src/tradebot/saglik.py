@@ -158,9 +158,12 @@ def disk_kontrol(a: Ayarlar) -> Sonuc:
     return Sonuc("disk", durum, f"{yol.resolve()} boş {bos_gb:.0f} GB", {"bos_gb": round(bos_gb, 1)})
 
 
+SECIMLI_SIRLAR = ("binance_anahtar", "binance_gizli")   # yalnız gerçek kol (Faz 12) çalışırken gerekir
+
+
 def sir_kontrol(a: Ayarlar) -> Sonuc:
     tanimli = {ad: getattr(a, ad) is not None for ad in SIR_ALANLARI}
-    eksik = [ad for ad, v in tanimli.items() if not v]
+    eksik = [ad for ad, v in tanimli.items() if not v and ad not in SECIMLI_SIRLAR]
     durum = "OK" if not eksik else "UYARI"
     return Sonuc("sirlar", durum, "tümü tanımlı" if not eksik else f"tanımsız: {', '.join(eksik)}", tanimli)
 
