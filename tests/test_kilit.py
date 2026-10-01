@@ -62,11 +62,12 @@ def test_defillama_sayfasi_ve_carpanli_sembol():
     t = vk.coz(html)
     assert t.height == 1 and t["sembol"][0] == "TIA" and t["oran"][0] == pytest.approx(0.03)
     info = {"symbols": [{"contractType": "PERPETUAL", "quoteAsset": "USDT", "baseAsset": "1000PEPE", "symbol": "1000PEPEUSDT",
-                         "status": "TRADING"},
+                         "status": "TRADING", "deliveryDate": 4133404800000},
                         {"contractType": "PERPETUAL", "quoteAsset": "USDT", "baseAsset": "TIA", "symbol": "TIAUSDT",
-                         "status": "TRADING"}]}
+                         "status": "TRADING", "deliveryDate": 1791014400000}]}
     p = bv.usdt_perpler(lambda u: json.dumps(info).encode())
     assert p["PEPE"]["sembol"] == "1000PEPEUSDT" and p["TIA"]["sembol"] == "TIAUSDT"
+    assert p["PEPE"]["teslim_ms"] is None and p["TIA"]["teslim_ms"] == 1791014400000   # 2100 = planlı kapanış yok
 
 
 # --- saf karar çekirdeği (cekirdek/kilit.py): backtest ve paper aynı fonksiyon ---

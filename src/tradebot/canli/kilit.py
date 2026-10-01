@@ -16,7 +16,12 @@ Bacak tutarlılığı: önce token kısa, sonra aynı nominalde BTC uzun. BTC ba
 BTC'ye eşitlenene kadar geri alınır (riski azaltır; açıkta tek bacak kalmaz).
 
 Takvim alınamazsa gün yalnız kapanışlarla kararlanır (yeni olay yok): belirsizlikte riski azalt (kural 8'in ilkesi).
-Jev bu kolda yok (v1): kural takvimden, yön kararı Jev'e verdirilmez; veto entegrasyonu sonraki iş.
+
+Planlı kapanış (delist) koruması: Binance perp'in kaldırılacağını duyurunca `deliveryDate`'i kapanış anına çeker. Böyle
+bir perp "işlem görmüyor" sayılır: yeni olay açılmaz, açık pozisyon ilk saat başında kapanır (`teslim_planli`; riski
+azaltan, kural 7). Bu bir kural, yargı değil: kodda durur.
+Jev bu kolda yok (2026-10-01 ölçümü): 596 geçmiş olayın giriş penceresinde tokenı anan 23 Binance duyurusunun hiçbiri
+USDT perp tutanı etkilemiyordu (USDT dışı çiftler, marjin). Jev'li ikiz kol Jev'sizin kopyası olurdu, katkı ölçülemezdi.
 """
 from __future__ import annotations
 
@@ -260,7 +265,7 @@ class KilitDugumu:
         _, gecis = izleyici(d.gecmis + [(saat_bas, oz)], self.kol.baslangic_ozkaynak, self.ay.risk)
         neden = "durdur" if d.durdurulmus else ("acil_durdurma" if gecis == Durum.ACIL_DURDURMA else None)
         kapat = [(p, neden) for p in d.acik] if neden else \
-            [(p, "islem_gormuyor") for p in d.acik if perp.get(p.sembol, {}).get("durum") != "TRADING"]
+            [(p, _kapanis_nedeni(perp.get(p.sembol, {}))) for p in d.acik if not _islemde(perp.get(p.sembol, {}))]
         if kapat:
             self._yurut(d, None, saat_bas // GUN_MS * GUN_MS, kapat, [], perp)
             if neden == "acil_durdurma":
@@ -312,11 +317,12 @@ class KilitDugumu:
                 return {"bekliyor": takvim_hatasi}
             _log.error("takvim_yok_yalniz_kapanis", hata=takvim_hatasi)
         iz, _ = izleyici(d.gecmis, self.kol.baslangic_ozkaynak, self.ay.risk)
-        islem = {s for s, v in perp.items() if v.get("durum") == "TRADING"}
+        islem = {s for s, v in perp.items() if _islemde(v)}
         k = ck.gun_karari(gun, olaylar, d.acik, islem, self.ay.kural, yeni_risk=iz.durum == Durum.NORMAL
                           and takvim_hatasi is None, hepsini_kapat=d.durdurulmus)
         ayr = {"tur": KILIT, "takvim_sha": sha, "takvim_hatasi": takvim_hatasi, "gecikmeli": simdi - gun > GECIKMELI_MS,
                "olay_sayisi": len(olaylar), "veto": [],
+               "teslim_planli": sorted(s for s, v in perp.items() if v.get("durum") == "TRADING" and v.get("teslim_ms")),
                "kapat": [_poz(p) | {"neden": n} for p, n in k.kapat], "ac": [_poz(p) for p in k.ac],
                "red": [{"sembol": o.sembol, "olay_ms": o.gun_ms, "oran": o.oran, "neden": n} for o, n in k.red],
                "acik_once": [_poz(p) for p in d.acik]}
@@ -412,6 +418,15 @@ class KilitDugumu:
         pf.pozisyonlar[kim] = pf.pozisyonlar.get(kim, 0.0) + m
         out["dolum"] += 1
         return m, px
+
+
+def _islemde(v: dict) -> bool:
+    """Perp işlemde ve kaldırılması planlanmamış (`teslim_ms` yok)."""
+    return v.get("durum") == "TRADING" and not v.get("teslim_ms")
+
+
+def _kapanis_nedeni(v: dict) -> str:
+    return "teslim_planli" if v.get("durum") == "TRADING" and v.get("teslim_ms") else "islem_gormuyor"
 
 
 def _istemci(gun: int, sembol: str, olay_ms: int, islem: str, bacak: str) -> str:

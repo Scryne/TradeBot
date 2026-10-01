@@ -130,6 +130,23 @@ def test_durdurma_saat_basinda_kapatir_yeni_olay_acmaz(kur):
     assert len(r["kapatilan"]) == 5 and _net(m, d.kol.ad) == {}
 
 
+def test_planli_kapanis_yeni_olay_acmaz_aciki_saat_basinda_kapatir(kur):
+    m, d, saat, borsa = kur
+    borsa.perp["AAA"]["teslim_ms"] = D0 + 10 * G           # Binance AAA perp'in kaldırılacağını duyurdu
+    saat.ms = D0 + 6 * 60_000
+    r = d.tur()["karar"]
+    assert r["ac"] == 5 and "BINANCEF:AAAUSDT" not in _net(m, d.kol.ad)   # AAA reddedildi, yeri FFF'ye kaldı
+    with m.connect() as b:
+        ayr = b.execute(select(paper_karar.c.ayrinti)).scalar()
+    assert ayr["teslim_planli"] == ["AAA"] and {"AAA", "ZZZ"} == {x["sembol"] for x in ayr["red"]
+                                                                   if x["neden"] == "islem_gormuyor"}
+    borsa.perp["BBB"]["teslim_ms"] = D0 + 10 * G           # açık pozisyonun perp'i için duyuru
+    saat.ms = D0 + S + 60_000
+    r = d.tur()["isaret"]
+    assert r["kapatilan"] == [("BBB", "teslim_planli")] and "BINANCEF:BBBUSDT" not in _net(m, d.kol.ad)
+    assert len([k for k in _net(m, d.kol.ad) if "BTC" not in k]) == 4
+
+
 def test_takvim_yoksa_bekler_sonra_yalniz_kapanis(kur):
     m, d, saat, borsa = kur
     borsa.takvim_hata = True

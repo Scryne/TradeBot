@@ -355,7 +355,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     iyi taşıma n=1 Sharpe 0,04, OOS −%0,2/yıl (`docs/turnuva/Dalga-9-Doviz.md`). Ön kayıt gereği taşıma n=1 demo
     hesapta ileriye dönük gözlem kolu: `canli/doviz.py`, compose `doviz`, kol `d9:doviz_tasima@g10_doviz@1d` (B).
     İlk emirler 2026-09-30 17:36 UTC: AUDUSD 0,07 lot alış (AUD uzun), USDCHF 0,05 lot alış (CHF kısa).
-    Açık: bağımsız gözetmen bu düğümün MT5 pozisyonlarını kapatamaz (bekçi kalp atışını izler); Jev vetosu yok.
+    ~~Açık: bağımsız gözetmen bu düğümün MT5 pozisyonlarını kapatamaz~~ → 6b12662'de kapandı: gözetmen donan MT5
+    düğümünün pozisyonlarını sihirli sayıyla köprüden kapatır, kolu durdurur (`cli.MT5_DUGUMLER`). Jev vetosu yok.
   - 2026-09-30 20:57 TR: NCM forex demo 316722'yi kapattı (`Account disabled`; sebep bilinmiyor). Scryne NCM sitesinden
     yeni demo açtı: **316749** (10.000 USD, hedging, 1:10). Döviz kolunun defterdeki açık lotları yeni hesabın orta
     fiyatıyla kapatıldı (`paper doviz --hesap-degisti`, riski azaltan, MT5 emri yok); ertesi karar yeni hesapta açar.
@@ -456,8 +457,17 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     17ef343): A, Sharpe 0,89, DSR 0,96 (7 deneme). Paper'a ayrı düğümle girdi: `canli/kilit.py`, compose `kilit`, kol
     `d6b:kilit_kisa@kilit_perp@1d` (sınıf A, dağıtıcıya girmez). Karar çekirdeği backtest ile ortak (`cekirdek/kilit.py`;
     refaktör ön kayıtlı 6 kolun sonucunu birebir üretti). Gözetmen ve sağlık bekçisi düğüm başına: kilit düğümünün
-    işareti Nautilus düğümünün donmasını gizlemez. Telegram "her şeyi durdur" bu kolu da kapsar. Açık: Jev vetosu (v1'de
-    yok), DefiLlama takviminin günlük anlık görüntüleri biriktikçe backtest takvimiyle karşılaştırma (PIT sapması).
+    işareti Nautilus düğümünün donmasını gizlemez. Telegram "her şeyi durdur" bu kolu da kapsar. Açık: DefiLlama
+    takviminin günlük anlık görüntüleri biriktikçe backtest takvimiyle karşılaştırma (PIT sapması).
+  - 2026-10-01 kilit kolunda Jev vetosu **kurulmadı (ölçümle)**: 596 geçmiş olayın (2021+, perp'li) giriş penceresinde
+    (T−8g…T) tokenı anan 23 Binance duyurusunun hiçbiri USDT perp tutanı etkilemiyor (USDT dışı spot çiftleri, marjin;
+    tek dönüşüm STG→ZRO). Jev'li ikiz kol Jev'sizin kopyası olurdu; katkı ölçülemezdi. Perp kısa için gerçek risk perp'in
+    kaldırılması: bu bir kural, yargı değil (global kural: kural kodun işi). Binance kaldırmayı duyurunca `deliveryDate`'i
+    kapanış anına çeker → düğüm o perp'i "işlem görmüyor" sayar: yeni olay açılmaz, açık pozisyon ilk saat başında kapanır
+    (`teslim_planli`, kural 7). Backtest'te `deliveryDate` geçmişi yok; geçmiş pencerelerde duyuru olmadığı için ölçülen
+    kol değişmez.
+    Yan bulgu: A1'in MAV vetosu (2024, `usdt_pair_removed`, güven 0,54) yanlış: MAVUSDT spot hâlâ işlem görüyor.
+    Kaldırma riski artırır (kural 7): Scryne onayı bekliyor (`tradebot zeka veto-kaldir`).
   - 2026-09-30: forex'e geçiş (Faz 8 notu). Paper'da üç düğüm: `paper` (BTC/ETH trend), `kilit` (gerçek para adayı),
     `doviz` (NCM forex demo, gözlem). Kapı hepsinde aynı: kolun kendi paper haftalarında PSR(0) ≥ 0,95 ve ≥ 26 hafta.
 

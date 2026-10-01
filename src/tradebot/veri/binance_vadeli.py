@@ -11,6 +11,7 @@ import polars as pl
 
 FAPI = "https://fapi.binance.com/fapi/v1"
 GUN_MS = 86_400_000
+TESLIM_YOK_MS = 4_000_000_000_000   # 2096: bunun ötesindeki `deliveryDate` "planlı kapanış yok" demektir
 
 
 def usdt_perpler(http_al, ham=None) -> dict[str, dict]:
@@ -31,8 +32,19 @@ def usdt_perpler(http_al, ham=None) -> dict[str, dict]:
                                    "carpan": x["baseAsset"][: len(x["baseAsset"]) - len(taban)] or "1",
                                    "adim": float((filtre.get("MARKET_LOT_SIZE") or filtre.get("LOT_SIZE") or {})
                                                  .get("stepSize", 0) or 0),
-                                   "asgari_notional": float((filtre.get("MIN_NOTIONAL") or {}).get("notional", 0) or 0)})
+                                   "asgari_notional": float((filtre.get("MIN_NOTIONAL") or {}).get("notional", 0) or 0),
+                                   "teslim_ms": _teslim(x.get("deliveryDate"))})
     return out
+
+
+def _teslim(ms) -> int | None:
+    """Perp'in planlı kapanış (delist) anı. Binance perp'te `deliveryDate` normalde 2100 yılıdır (4133404800000);
+    kaldırma duyurulunca kapanış anına çekilir. Planlı kapanış yoksa None."""
+    try:
+        t = int(ms or 0)
+    except (TypeError, ValueError):
+        return None
+    return t if 0 < t < TESLIM_YOK_MS else None
 
 
 def gunluk(http_al, ham, sembol: str) -> pl.DataFrame:
