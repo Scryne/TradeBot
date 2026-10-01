@@ -271,6 +271,13 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
   - C2 ✅ (`docs/olcum/C2-FOMC-Ton.md`, plan `2026-09-27-c2-fomc-ton`): 173 FOMC kararı, spike 4/4. Jev metni doğru okuyor
     (karar dağılımı gerçeğe yakın) ama Δton ne aynı gün tahvil tepkisini (t = −0,70) ne sonraki 5 günü açıklıyor →
     **özelliğe girmez**. Neden: ton değişimi piyasanın beklediği şey; sürpriz, beklenti verisi (fed funds vadeli) ister.
+  - 2026-10-01 A1 veto denetimi: aktif 180 A1 vetosu Binance'in güncel çift listesiyle ve yeni çelişki kontrolüyle
+    tarandı. **12 yanlış veto** Scryne onayıyla ("ne iyi olacak ise onu yap") geriye dönük kaldırıldı (`kaldir` olayları
+    4652–4663): 11'inde duyuru yalnız X/TUSD, X/BTC, X/ETH ya da X/RUB çiftini kaldırıyordu, Jev `usdt_pair_removed`
+    dedi (MEME ve NFP'de güven 0,97); SUN'da duyuru aynı adlı ABD hissesi içindi. YFII, BOND, TRU, NFP'nin sonraki
+    gerçek delist vetoları yerinde. LUNA, FTT, CVC (o tarihte gerçekten kaldırıldı, sonra yeniden listelendi) ve STG
+    (6 Ekim birleşmesi) doğru. Düzeltme (a1520af): `usdt_pair_removed` seçildi ama metinde varlik/USDT yoksa karar
+    belirsiz sayılır, yükseltme modeline gider; yükseltme yoksa belirsizlik kuralı yine veto verir.
   - Faz 6'da kalan: B1 çapraz kontrolü (KAP geçmişi ~2026-10-07). Bitince Faz 6 kapanır.
   - B1 (tasarım, 2026-09-27): asıl değer düzeltilmemiş bölünmeyi yakalamak. Yahoo bir bedelsizi atlarsa seride kalıcı
     −%50 boşluk kalır; kalite raporunun sıçra-dön kuralı onu görmez (geri dönmüyor). Kural: BIST'te büyük, geri dönmeyen
