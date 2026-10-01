@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-10-01
 type: turnuva-plani
-durum: ön kayıt
+durum: sonuçlandı — 3 kol A (2026-10-01); eşik %0,5 canlıya geçti
 ---
 # Turnuva — Dalga 13: kilit açılımı, daha küçük açılımlar (ön kayıt)
 
@@ -35,6 +35,19 @@ DSR aile `kilit_kisa`: dalga 6'nın 6 + 6b'nin 1 + bu 3 = 10 deneme.
 - Aynı veri, aynı dönem: kör dönem (2025+) 6b'de de görüldü, bu dalgada bağımsız kanıt değildir. Asıl sınama paper.
 - Sonuç ne olursa olsun canlı kola dokunmadan önce paper'da ayrı kol olarak girer.
 
-## Sonuç
+## Sonuç (2026-10-01, ön kayıt 7dd5489): **üç deneme de A**
 
-(koşudan sonra eklenecek)
+| Deneme | Sharpe | Yıllık | En kötü düşüş | DSR (10) | Örneklem içi | Kör (2025+) | Stres 2x | Olay | Olay ort. (t) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| eşik %1, nominal %5 | 0,94 | +%8,0 | −%10 | 0,97 | +%1,5 | +%24,7 | +%6,2 | 442 | +%2,09 (2,5) |
+| **eşik %0,5** | **0,99** | **+%12,2** | **−%17** | **0,98** | **+%5,8** | **+%28,9** | **+%9,0** | **802** | **+%1,77 (3,2)** |
+| eşik %0,25 | 0,93 | +%12,4 | −%17 | 0,97 | +%6,5 | +%27,5 | +%8,6 | 931 | +%1,56 (3,2) |
+
+Yıllar (eşik %0,5): 2021 −%4,7, 2022 +%0,1, 2023 +%6,9, 2024 +%23,5, 2025 +%29,8, 2026 (Eylül'e kadar) +%18,4. En
+kötü hafta −%7,7. 6b ile kıyas (aynı dönem): Sharpe 0,89 → 0,99, düşüş −%20 → −%17, örneklem içi +%2,9 → +%5,8, olay
+382 → 802; kör dönem +%44 → +%29 (daha az yoğunlaşmış).
+
+**Karar (Claude, 2026-10-01):** eşik %0,5, nominal %5 kolu paper ve gerçek (Demo) kilit kollarında 6b'nin yerine
+geçti. İki kolun da henüz pozisyonu yoktu (ilk giriş 2 Ekim 00:05 UTC); geçişin maliyeti yok. Yeni kollar
+`d13:kilit_kisa@kilit_perp@1d` ve `#gercek`; 6b kolları defterde "durdur: yerine_d13". Seçim aynı veride üç varyant
+arasından yapıldı: DSR bunu 10 denemeyle sayıyor; asıl bağımsız sınama paper ve Demo.

@@ -106,5 +106,6 @@ def test_ayri_dugum_kollari_hepsini_durdura_girer():
     from tradebot.telegram_bot import ayri_dugum_kollari
 
     adlar = {k.ad for k in ayri_dugum_kollari()}
-    assert {"d6b:kilit_kisa@kilit_perp@1d", "d9:doviz_tasima@g10_doviz@1d", "am15:kanal_kirilim@xau_m15@15m",
+    assert {"d13:kilit_kisa@kilit_perp@1d", "d13:kilit_kisa@kilit_perp@1d#gercek", "d9:doviz_tasima@g10_doviz@1d",
+            "am15:kanal_kirilim@xau_m15@15m",
             "d10:fomc_dolar@g10_saatlik@1h"} <= adlar

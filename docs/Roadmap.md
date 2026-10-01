@@ -519,6 +519,10 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
        `onay` alanı boşsa düğüm ana ağda çalışmaz.
     - Beklenti (dürüst, Scryne'a söylendi): 1.000 $ ile yılda ~100–150 $, kötü dönemde ~200 $ düşüş. Pilotun asıl
       değeri gerçek parada zincirin çalıştığını ve sapmayı görmek; büyütme ancak ondan sonra.
+  - 2026-10-01 gece: gerçek kol Binance **Demo**'da çalışıyor (`kilit-gercek`, 5.000 sahte USDT, kol sermayesi 1.000).
+    **Dalga 13** (kilit, küçük açılımlar; `docs/turnuva/Dalga-13-Kilit-Genis.md`): üç kol A; eşik %0,5 + nominal %5
+    (Sharpe 0,99, DSR 0,98, 802 olay, 6b'nin iki katı) paper ve gerçek kilit kollarında 6b'nin yerine geçti (ilk giriş
+    öncesi). Scryne "haftada 100–300 $" istedi: kilit oranlarıyla bu ~35–110 bin $ sermaye ister; bir kez söylendi.
 
 ### Faz 13: Sonraki dalgalar (koşullu)
 - **İşler:** Ücretli veriyle ABD tek hisseleri; Databento ile CME vadelileri; VİOP; gerekirse IB bağlantısı;

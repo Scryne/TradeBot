@@ -8,12 +8,21 @@ from sqlalchemy import create_engine, func, insert, select
 from tradebot.canli import kilit as kd
 from tradebot.canli.defter import PaperDefter
 from tradebot.canli.gozetmen import Gozetmen, dugum_kollari, son_isaret_ms
+from tradebot.canli.kollar import oku
 from tradebot.db import metadata, paper_emir, paper_emir_olay, paper_karar, paper_kol, paper_ozkaynak
 
 G = 86_400_000
 S = 3_600_000
 D0 = 1_790_640_000_000 // G * G          # bir UTC günü başı
 TOKENLER = ["AAA", "BBB", "CCC", "DDD", "EEE", "FFF"]   # 6 olay, tavan 5 (BTC ≤ 0,5 / 0,1)
+
+
+def _ayar():
+    """Testler canlı config'ten bağımsız sabit kuralla koşar (6b değerleri: nominal %10, tavanla en çok 5 olay)."""
+    d = oku()
+    d["kilit"] = d["kilit"] | {"kural": {"giris": -7, "cikis": 0, "notional": 0.10},
+                               "olay": {"kategoriler": ["insiders", "privateSale"], "asgari_oran": 0.01}}
+    return kd.ayarlar(d)
 
 
 class Saat:
@@ -70,7 +79,7 @@ def kur(tmp_path):
     metadata.create_all(m)
     saat = Saat(D0 + 60_000)
     borsa = SahteBorsa()
-    d = kd.KilitDugumu(PaperDefter(m, "test"), kd.ayarlar(), borsa, saat=saat)
+    d = kd.KilitDugumu(PaperDefter(m, "test"), _ayar(), borsa, saat=saat)
     d.ac()
     return m, d, saat, borsa
 
@@ -230,7 +239,7 @@ def gercek(tmp_path):
     saat = Saat(D0 + 60_000)
     borsa = SahteBorsa()
     hesap = SahteHesap(borsa)
-    d = kd.KilitDugumu(PaperDefter(m, "test"), kd.ayarlar(), borsa, saat=saat, yurutucu=kd.GercekYurutucu(hesap))
+    d = kd.KilitDugumu(PaperDefter(m, "test"), _ayar(), borsa, saat=saat, yurutucu=kd.GercekYurutucu(hesap))
     d.ac()
     return m, d, saat, borsa, hesap
 

@@ -60,11 +60,13 @@ portfoy:
 # Nautilus dışı, günde bir karar 00:05 UTC, saatte bir işaret. Açılımdan 7 gün önce token perp kısa + aynı nominalde BTC
 # perp uzun, açılım günü kapanır. Risk motoru varsayılan tavanları: kol brütü ≤ 1x, BTC bacağı ≤ özkaynağın %50'si
 # (en çok 5 açık olay). Dağıtıcıya girmez (portföy kolu yalnız BTC/ETH grubunu taşır). Jev vetosuz (v1).
+# 2026-10-01: dalga 13'ün A kolu (eşik %0,5, nominal %5; Sharpe 0,99, DSR 0,98, 6b'nin iki katı olay) 6b'nin yerine
+# geçti (ilk giriş öncesi, pozisyon yokken). 6b kolu defterde "durdur: yerine_d13" ile kapalı. docs/turnuva/Dalga-13-Kilit-Genis.md
 kilit:
-  ad: "d6b:kilit_kisa@kilit_perp@1d"
+  ad: "d13:kilit_kisa@kilit_perp@1d"
   sinif: A
-  kural: {giris: -7, cikis: 0, notional: 0.10}
-  olay: {kategoriler: [insiders, privateSale], asgari_oran: 0.01}
+  kural: {giris: -7, cikis: 0, notional: 0.05}
+  olay: {kategoriler: [insiders, privateSale], asgari_oran: 0.005}
   maliyet: {ucret: 0.0005, kayma_token: 0.001, kayma_btc: 0.0001}
   risk: {kaldirac: 1.0}
 
@@ -73,7 +75,7 @@ kilit:
 # borsanın gelir kaydından. `ortam: demo` Binance Demo Trading (para yok); `ana` gerçek para: `onay` doluysa çalışır
 # (kural 7). Sermaye kodda sabit tavanlı (canli/kilit.GERCEK_SERMAYE_TAVANI, 2.000 USDT). Anahtar yalnız host .env'de.
 kilit_gercek:
-  ad: "d6b:kilit_kisa@kilit_perp@1d#gercek"
+  ad: "d13:kilit_kisa@kilit_perp@1d#gercek"
   sinif: A
   ortam: demo
   sermaye: 1000
