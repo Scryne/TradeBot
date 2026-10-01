@@ -33,7 +33,7 @@ ve 50/50 karışımın Sharpe'ını da raporlar (kapı değil, bilgi).
 | --- | --- | --- | --- | --- |
 | 1 | **VİOP 2 — TL taşıma** | USDTRY vadelisi TL–USD faiz farkı kadar primli; kısa pozisyon bu primi toplar. Çöküşler (2018, 2021) trend ve oynaklık filtresiyle kesilir. Carry + momentum filtresi FX'te kanıtlı bir kalıp. | NCM `TRYUSD_YAKINVADE` (2015-07 → 2026-02) + `F_USDTRY` kontratları; spot Dukascopy USDTRY | ✅ KALDI (2026-09-28, `VIOP-2.md`): en iyi Sharpe 0,13, DSR 0,21 |
 | 2 | **Dalga 3 — çok varlıklı vadeli trend** | Yönetilen vadeli fonların klasik kaynağı: endeks, emtia, metal, döviz vadelilerinde zaman serisi trendi. Kripto trendiyle korelasyonu düşük, kriz dönemlerinde pozitif. Dalga 1'in CFD sürümü finansmanda boğuldu; vadelide finansman yok (faiz farkı serinin içinde). | NCM `ES!`/`NQ!`/`YM!` (geçiş ayarlı) + altın, gümüş, 6 döviz (spot + OECD faiz farkı); tahvil ve enerji yok (ayıklanamaz) | ✅ KALDI (2026-09-28, `Dalga-3.md`): en iyi Sharpe 0,27, DD −%38; döviz negatif |
-| 3 | **Olay tabanlı (Jev)** | C1 ölçümü: A1 vetosu sonrası 7 günde varlık BTC'ye göre −%21. Spot'ta açığa satış yok; kullanım alanı veto (zaten canlı) ve gelecekte vadeli/perp. | Jev olayları + Binance | ⏳ (araç gelince) |
+| 3 | **Olay tabanlı (Jev)** | C1 ölçümü: A1 vetosu sonrası 7 günde varlık BTC'ye göre −%21. Spot'ta açığa satış yok; kullanım alanı veto (zaten canlı) ve gelecekte vadeli/perp. | Jev olayları + Binance | 🔄 Dalga 12 ön kaydı (2026-10-01, `Dalga-12-Delist.md`): delist duyurusu → perp kısa; olayı kod tetikler, Jev yalnız eler |
 
 ### Dalga 3 tasarım notu (veri)
 

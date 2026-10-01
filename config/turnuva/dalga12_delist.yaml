@@ -1,0 +1,26 @@
+# Turnuva dalga 12 — Binance spot delist duyurusu → token perp kısa + BTC perp uzun: ÖN KAYIT (koşudan önce commit edilir).
+# Gerekçe: docs/turnuva/Dalga-12-Delist.md. Veri: `tradebot veri delist`. Motor kilit ile aynı (kural 3).
+# Olayı kod tetikler (başlık kuralı); Jev'li varyantta A1'in dondurulmuş `token_delist` vetosu yalnız olay eler (kural 8).
+
+dalga: 12
+kaynak: delist
+plan:
+  kimlik: 2026-10-01-d12-delist-kisa
+  aile: delist_kisa
+  hipotez: >-
+    Binance bir tokenı spot'tan kaldıracağını duyurduğunda (başlık "Will Delist <liste> on <tarih>") token, duyurudan
+    sonraki günlerde BTC'ye göre düşmeye devam eder (C1: spot'ta 7 gün medyan −%28, 30 gün −%58). Tokenın Binance USDT-M
+    perp'i işlem görüyorsa, duyurudan sonraki ilk 00:00 UTC açılışında token perp kısa + aynı büyüklükte BTC perp uzun,
+    7 ya da 30 gün tutulur; Binance perp'i kaldırmayı duyurursa ilk açılışta kapanır. Ücret, kayma ve gerçek funding
+    sonrası pozitif getiri verir ve kör dönemde (2025+) sürer. Sıfır hipotezi: düşüş duyurunun ilk saatlerinde biter,
+    kalan kısa sıkıştırmaları ve negatif funding (kalabalık kısa) getiriyi siler.
+
+notional: 0.10
+# Delist edilen tokenlarda spread geniş ve derinlik az: token kayması kilit kolunun 3 katı (aleyhte, koşudan önce sabit)
+maliyet: { ucret: 0.0005, kayma_token: 0.003, kayma_btc: 0.0001 }
+tavan: { azami_brut: 1.0, azami_btc: 0.5 }     # paper risk motorunun varsayılanları (dalga 6b, 7 ile aynı)
+donem: { bas: "2022-02-01", is_bitis: "2025-01-01", bit: "2026-09-30" }   # duyuru arşivi 2022-02'de başlıyor
+# 4 deneme: tutma 7 / 30 gün × Jev onayı yok / var
+izgara: { cikis: [7, 30], jev: [false, true] }
+olcut: { dsr_a: 0.95, yil_pozitif: 0.60, stres_maliyet: 2.0, en_kotu_hafta: -0.10, en_kotu_dusus: -0.30,
+         oos_asgari_yillik: 0.0 }

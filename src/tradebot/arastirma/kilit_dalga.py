@@ -1,4 +1,5 @@
-"""Olay tabanlı piyasa nötr perp dalgaları (6: kilit açılımı, 7: yeni listeleme) — veri hazırlığı ve koşucu: olaylar +
+"""Olay tabanlı piyasa nötr perp dalgaları (6: kilit açılımı, 7: yeni listeleme, 12: spot delist) — veri hazırlığı ve
+koşucu: olaylar +
 perp verisi → ön kayıtlı ızgara → defter, sonuç dosyası. Olay kaynağı ön kayıttaki `kaynak` (varsayılan `kilit`)."""
 from __future__ import annotations
 
@@ -12,8 +13,8 @@ import numpy as np
 import polars as pl
 import yaml
 
+from tradebot.arastirma import delist, listeleme
 from tradebot.arastirma import kilit as kl
-from tradebot.arastirma import listeleme
 from tradebot.arastirma.dogrulama import beklenen_max_sr, carpiklik_basiklik, dsr, izgara
 from tradebot.veri import binance_vadeli as bv
 from tradebot.veri import kilit as vk
@@ -78,6 +79,13 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
         tablo = pl.read_parquet(kd / "olaylar.parquet")
         ev_sabit = kl.olaylar(tablo, d["olay"]["kategoriler"], d["olay"]["asgari_oran"])
         vh = hashlib.sha256((kd / "olaylar.parquet").read_bytes()).hexdigest()
+    elif kaynak == "delist":
+        spot = pl.read_parquet(kd / "spot_delist.parquet")
+        kap = pl.read_parquet(kd / "perp_kapanis.parquet")
+        jev = pl.read_parquet(kd / "jev.parquet")
+        barlar = {s: delist.kirp(b, kap.filter(pl.col("sembol") == s)["yayin_ms"].to_list()) for s, b in barlar.items()}
+        vh = hashlib.sha256(b"".join((kd / f).read_bytes() for f in
+                                     ("spot_delist.parquet", "perp_kapanis.parquet", "jev.parquet"))).hexdigest()
     else:   # listeleme: olay günü ızgara noktasına bağlı (çıkış günü = listeleme + bitis_gun)
         perpler = json.loads((kd / "perp_listesi.json").read_text(encoding="utf-8"))
         ilk_mum = {s: int(b["acilis_ms"].min()) for s, b in barlar.items() if b.height}
@@ -97,6 +105,10 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
         if kaynak == "kilit":
             ev, giris, cikis = ev_sabit, p["giris"], p["cikis"]
             ad, dosya_adi = f"kilit(giris={giris},cikis={cikis})", f"kilit_g{giris}_c{cikis}"
+        elif kaynak == "delist":   # olay günü = giriş günü (duyurudan sonraki ilk açılış)
+            ev, giris, cikis = delist.olaylar(spot, jev if p["jev"] else None), 0, p["cikis"]
+            ad = f"delist(cikis={cikis},jev={int(p['jev'])})"
+            dosya_adi = f"delist_c{cikis}_j{int(p['jev'])}"
         else:
             ev = listeleme.olaylar(perpler, ilk_mum, p["giris_gun"], p["bitis_gun"], _ms(d["donem"]["bas"]))
             giris, cikis = -(p["bitis_gun"] - p["giris_gun"]), 0

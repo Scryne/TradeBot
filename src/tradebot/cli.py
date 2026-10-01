@@ -401,6 +401,20 @@ def veri_listeleme(bas: str = typer.Option("2020-12-01", help="Bu tarihten sonra
                     bas_ms, log("veri.listeleme")))
 
 
+@veri_uygulama.command("delist")
+def veri_delist() -> None:
+    """Dalga 12: Binance spot delist ve perp kaldırma duyuruları, A1 onayları, olaylı token'ların perp günlük mumu ve
+    funding'i (kaldırılmış kontratlar dahil) → data/delist/."""
+    from tradebot.arastirma.delist import hazirla
+    from tradebot.veri.depo import HamDepo
+    from tradebot.veri.http import NazikIstemci
+
+    a, m = _veri_baglam()
+    # Hiç perp'i olmamış tokenda API 400 döner (iki aday: XUSDT, 1000XUSDT): kısa geri çekilme
+    http = NazikIstemci("binancef", aralik_sn=0.25, deneme=3, geri_cekilme_sn=1.0, zaman_asimi=120)
+    _yazdir(hazirla(a.veri_dizini, HamDepo(a.veri_dizini, m), http.al, m, log("veri.delist")))
+
+
 @veri_uygulama.command("mt5")
 def veri_mt5(butce_dk: float = typer.Option(60.0, help="Zaman bütçesi (dakika)")) -> None:
     """NCM MT5 (forex CFD + VİOP) barları köprüden kataloğa (1m, 1h, 1d)."""
