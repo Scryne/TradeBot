@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-09-30
 type: turnuva-plani
-durum: ön kayıt (koşudan önce commit edildi)
+durum: sonuçlandı — KALDI (2026-10-01)
 ---
 # Turnuva — Dalga 11: ABD hisse endeksi olay ve takvim primleri (ön kayıt)
 
@@ -60,6 +60,30 @@ rejim + stres; B: DSR şartı yok). DSR aile başına: `endeks_olay` 3 deneme, `
 **Demo hesaba ne girer (sonuçtan önce yazıldı):** A ya da B çıkan her strateji kolunun en iyi varyantı NCM forex demo
 hesabında ES (ve NQ) vadeli CFD'siyle gözlem kolu olarak çalışır; gerçek para kapısı değişmez. Hiçbiri geçmezse sıfır
 hipotezi ayakta kalır, fikirler kapanan fikirlere eklenir.
+
+## Sonuç (2026-10-01, koşu `dalga11`, ön kayıt 0e8e170)
+
+**KALDI: üç kolun hiçbiri geçmedi.** Veri: Dukascopy saatlik endeks verisi 2011-09'dan başlıyor (2010 yok); S&P
+2025-12'ye, Nasdaq 2026-08'e kadar. 5 deneme; DSR `endeks_olay` 3, `takvim` 18 denemeyle (dalga 1 dahil).
+
+| Strateji | En iyi varyant | Yıllık | Sharpe | En kötü düşüş | OOS yıllık | Olay başına | t | Neden kaldı |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| fomc_oncesi | pencere = on | +%0,62 | 0,54 | −%3,4 | +%0,40 | +8,1 bps (111 olay, isabet %53) | 2,06 | yılların yalnız %54'ü pozitif (eşik %60) |
+| ay_donumu_saat | sonra = 1 | +%0,25 | 0,09 | −%8 | −%0,54 | +2,6 bps (168) | 0,37 | walk-forward negatif, DSR 0,16 |
+| gece_kaymasi | — | −%4,4 | −0,68 | −%55 | −%5,4 | −1,7 bps/gece (3.651) | −2,51 | maliyet (her gün gidiş-dönüş + taşıma) |
+
+- **FOMC öncesi kayma bu programın en güçlü olay sinyali:** olay başına t 2,06 (2016–25 t 2,15; 2011–15 zayıf).
+  Tam dönem, walk-forward (OOS Sharpe 0,24), plato, rejim (yukarı/aşağı t 1,16 / 2,35) ve stres kapılarından geçti;
+  yalnız yıl kapısında kaldı: 13 tam yılın 7'si pozitif, kalan yıllar çoğunlukla ~0 (yılda 8 olay, zamanın %3'ü
+  pozisyonda). Ön kayıtlı ölçüt KALDI diyor; sonuca bakıp eşik değiştirilmez (kural 10). Demo hesaba girmez. Yeni,
+  bağımsız veriyle (ör. 2027 ileriye dönük ölçüm) yeniden sınanabilecek tek aday bu.
+- **Ay dönümü** vadeli maliyetiyle de tutmadı (dalga 1'deki CFD sonucuyla aynı yön).
+- **Gece kayması** maliyetten önce de zayıf: Dukascopy CFD gece fiyatı, nakit açılışa kadar olan getiriyi kısmen
+  taşıyor; her gün 4 bps + taşıma onu siliyor.
+- **Al-tut kıyası (aynı boyut):** S&P + Nasdaq sürekli uzun, aynı oynaklık hedefi ve tavanla: yıllık +%6,3, Sharpe 0,63,
+  düşüş −%18,5. Üç takvim kolunun hiçbiri, zamanlamasız uzun durmanın yerini tutmuyor.
+
+Üç fikir kapanan fikirlere eklenir (FOMC öncesi kayma: yeni veriyle ileriye dönük sınama hariç).
 
 ## Raporlanacak (kapı değil, bilgi)
 
