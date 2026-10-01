@@ -376,7 +376,8 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     açık pozisyonda), bir bar gecikme (21:00 UTC devir spread'i). İlk işlem 2026-10-27 22:00 UTC. FOMC takvimi
     `config/fomc_planli.yaml` 2027 sonuna kadar (bitmeye 90 gün kala hata logu). Döviz düğümünde güvenlik düzeltmesi:
     durdurulan kolda USDXXX tam kapanışı reddedilebiliyordu (para uzayında tam adet). **Dalga 11** (ABD endeksi FOMC
-    öncesi, gece kayması, ay dönümü; vadeli maliyeti) ön kayıtlı, saatlik S&P verisi iniyor.
+    öncesi, gece kayması, ay dönümü; vadeli maliyeti) **KALDI** (2026-10-01): FOMC öncesi kayma olay başına +8 bps (t 2,06)
+    ama yalnız yılların %54'ü pozitif (eşik %60); al-tut aynı boyutta Sharpe 0,63. FOMC dolar kör dönemi (2026) −217 bps.
 
 ### Faz 9: Operasyon
 - **İşler:** Bağımsız gözetmen (kalp atışı, özkaynak, pozisyon; motor donarsa kapatma); Telegram bot (3
