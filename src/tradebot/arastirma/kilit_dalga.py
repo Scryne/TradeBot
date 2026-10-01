@@ -105,6 +105,10 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
         if kaynak == "kilit":
             ev, giris, cikis = ev_sabit, p["giris"], p["cikis"]
             ad, dosya_adi = f"kilit(giris={giris},cikis={cikis})", f"kilit_g{giris}_c{cikis}"
+            if "asgari_oran" in p:   # dalga 13: açılım eşiği ızgarada
+                ev = kl.olaylar(tablo, d["olay"]["kategoriler"], float(p["asgari_oran"]))
+                ad = f"kilit(giris={giris},cikis={cikis},oran={p['asgari_oran']})"
+                dosya_adi += f"_o{p['asgari_oran']}"
         elif kaynak == "delist":   # olay günü = giriş günü (duyurudan sonraki ilk açılış)
             ev, giris, cikis = delist.olaylar(spot, jev if p["jev"] else None), 0, p["cikis"]
             ad = f"delist(cikis={cikis},jev={int(p['jev'])})"

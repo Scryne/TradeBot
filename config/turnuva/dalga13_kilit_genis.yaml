@@ -1,0 +1,25 @@
+# Turnuva dalga 13 — kilit açılımı kolunun daha küçük açılımları da kapsayan varyantları: ÖN KAYIT (koşudan önce commit).
+# Neden: kilit kolu (6b, A) ayda birkaç olaya giriyor; tek kanıtlı ailede işlem sayısı ve kapasite artar mı?
+# Gerekçe: docs/turnuva/Dalga-13-Kilit-Genis.md. Motor ve veri dalga 6 ile aynı (kural 3). Aynı aile: DSR dalga 6 ve 6b
+# denemeleriyle birlikte sayılır (kural 10).
+
+dalga: 13
+plan:
+  kimlik: 2026-10-01-d13-kilit-genis
+  aile: kilit_kisa
+  hipotez: >-
+    Ekip ve yatırımcı cliff açılımlarından önceki arz baskısı yalnız büyük açılımlarda (azami arzın ≥ %1'i) değil, daha
+    küçüklerinde de (≥ %0,5, ≥ %0,25) vardır. Olay başına nominal yarıya indirilip (%5) aynı risk tavanlarıyla
+    (BTC ≤ özkaynağın %50'si, brüt ≤ 1x → en çok 10 açık olay) daha çok olaya girilirse kol kapılardan geçer ve dalga 6b'den
+    daha çok işlem yapar. Sıfır hipotezi: etki açılımın büyüklüğüyle orantılıdır; küçük açılımlar maliyeti karşılamaz.
+
+olay: { kategoriler: [insiders, privateSale], asgari_oran: 0.01 }
+notional: 0.05
+maliyet: { ucret: 0.0005, kayma_token: 0.001, kayma_btc: 0.0001 }
+tavan: { azami_brut: 1.0, azami_btc: 0.5 }
+donem: { bas: "2021-01-01", is_bitis: "2025-01-01", bit: "2026-09-20" }
+# 3 deneme: giriş −7 / çıkış 0 sabit (6b'nin seçilen kolu) × açılım eşiği %1 (nominal etkisi için kontrol) / %0,5 / %0,25
+izgara: { giris: [-7], cikis: [0], asgari_oran: [0.01, 0.005, 0.0025] }
+onceki_dalgalar: [dalga6, dalga6b]
+olcut: { dsr_a: 0.95, yil_pozitif: 0.60, stres_maliyet: 2.0, en_kotu_hafta: -0.10, en_kotu_dusus: -0.30,
+         oos_asgari_yillik: 0.0 }
