@@ -379,6 +379,11 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     durdurulan kolda USDXXX tam kapanışı reddedilebiliyordu (para uzayında tam adet). **Dalga 11** (ABD endeksi FOMC
     öncesi, gece kayması, ay dönümü; vadeli maliyeti) **KALDI** (2026-10-01): FOMC öncesi kayma olay başına +8 bps (t 2,06)
     ama yalnız yılların %54'ü pozitif (eşik %60); al-tut aynı boyutta Sharpe 0,63. FOMC dolar kör dönemi (2026) −217 bps.
+  - 2026-10-01 **Dalga 12** (spot delist duyurusu → token perp kısa + BTC uzun; araştırma planının 3. maddesi, C1'den;
+    4 deneme, `docs/turnuva/Dalga-12-Delist.md`) **KALDI**: 65 olay, %77'si kazanıyor (medyan bacak +%11), ama delist
+    pompaları (NFP −%420, ALPACA −%213, BAKE −%202) hepsini siliyor; 7 gün Sharpe −0,05, kör −%19/yıl. Olayı başlık kuralı
+    tetikledi, Jev yalnız eleyebiliyordu: katkısı 0 (perp'li her olayda A1 vetosu vardı). Kilit düğümünün `teslim_planli`
+    korumasını destekliyor: kaldırılacak perp'te kısa tutmak tehlikeli.
 
 ### Faz 9: Operasyon
 - **İşler:** Bağımsız gözetmen (kalp atışı, özkaynak, pozisyon; motor donarsa kapatma); Telegram bot (3

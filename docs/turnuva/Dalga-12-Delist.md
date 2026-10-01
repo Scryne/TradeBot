@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-10-01
 type: turnuva-plani
-durum: ön kayıt
+durum: sonuçlandı — KALDI (2026-10-01)
 ---
 # Turnuva — Dalga 12: spot delist duyurusu → perp kısa (ön kayıt)
 
@@ -72,6 +72,34 @@ maliyette yıllık > 0, kör dönem yıllık > 0 → B; değilse KALDI.
   varsayılır. Jev'li varyant olay eklemediği için bu yanlılık yalnız eleme yönündedir.
 - **Kör dönem ayrı değil:** C1 2022–2026'nın tamamını gördü. Kör dönem sonucu bağımsız kanıt sayılmaz.
 
-## Sonuç
+## Sonuç (2026-10-01, ön kayıt c8f8a49): **dört deneme de KALDI**
 
-(koşudan sonra eklenecek)
+Veri: 161 delist edilen tokenın 73'ünün Binance USDT-M perp'i vardı (kaldırılmış kontratlar dahil); 65 olay kuruldu,
+8'inde duyuru anında perp mumu yoktu (perp daha önce kaldırılmış), 1'i tavana takıldı.
+
+| Deneme | Sharpe | Yıllık | En kötü düşüş | Kör (2025+) yıllık | Stres 2x | DSR | Olay ort. / medyan | İsabet |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `delist(cikis=7,jev=0)` | −0,05 | −%6,2 | −%48 | −%19,0 | −%7,2 | 0,39 | −%0,9 / +%11,4 | %77 |
+| `delist(cikis=30,jev=0)` | −0,19 | −%16,4 | −%67 | −%37,9 | −%17,4 | 0,26 | −%6,5 / +%9,8 | %73 |
+| `delist(cikis=7,jev=1)` | aynı | | | | | | | |
+| `delist(cikis=30,jev=1)` | aynı | | | | | | | |
+
+Yıllar (7 gün): 2023 +%0,6, 2024 +%6,8, 2025 −%7,5, 2026 −%25,2.
+
+**Neden kaldı: delist pompaları.** Olayların dörtte üçünde kısa kazanıyor (medyan bacak getirisi +%11), ama birkaç olay
+hepsini siliyor. 7 günlük kolda bacak zararları: NFP −%420 (token 7 günde ~5 kat), ALPACA −%213, BAKE −%202, HFT
+−%145. Bu beş olay hariç ortalama +%16. Delist edilen tokenın dolaşımdaki arzı az, spot satıcıları çıkıyor ve perp'te
+kalabalık kısa sıkıştırılıyor. Etki 2025–2026'da büyüdü (kör dönem en kötü). Maliyet ve funding sonucu değiştirmiyor:
+maliyetsiz ve fundingsiz olay ortalaması da ~0 (7 gün +%0,4, 30 gün −%5,5).
+
+**Jev'in katkısı sıfır:** perp'i olan her olayda A1'in `token_delist` vetosu da vardı. Jev'li varyant yalnız perp'i
+olmayan olayları eledi. Jev'li ve Jev'siz kol birebir aynı.
+
+**Zarar-kes varyantı denenmedi.** Sonuca bakıp eklenecek bir kural yeni deneme olurdu (kural 10). Aynı yapıda dalga 7b
+(listeleme kısası + zarar-kes) de kalmıştı. Pompalar günlük barda boşlukla geliyor: ertesi açılışta kesmek kuyruğun
+çoğunu kaçırır.
+
+**Kilit koluna ders:** perp'i kaldırılacak tokenda kısa tutmak tehlikeli. Bu, aynı gün kilit düğümüne eklenen
+`teslim_planli` korumasını (kaldırma duyurulunca kısa ilk saat başında kapanır) destekliyor.
+
+Kapanan fikir: delist duyurusu perp kısası (spot delist pompası). Yeni gerekçe olmadan tekrar denenmez.
