@@ -83,8 +83,11 @@ class Zeka:
             hedef = f"metin:{m.id}|{kimlik}"
             y = self.jev.sor(rol.ROL, hedef, st, rol.SORULAR)
             secim, guven, p = y.secim("etki")
+            # Kodla denetlenebilen çelişki (rolün `celiski` kancası): karar belirsiz sayılır, yükseltmeye gider
+            cel = None if y.hata else getattr(rol, "celiski", lambda *_: None)(secim, m, kimlik)
+            guven_k = 0.0 if cel else guven
             yuk, yuk_model = (None, None)
-            if y.hata or guven < esik:
+            if y.hata or guven_k < esik:
                 yuk, yuk_model = self.yuk.sec(rol.ROL, hedef, rol.ETKI.model_dump(mode="json"), st, "etki")
             if y.hata and yuk is None:   # model yok: önlem vetosu (canlı) + alarm; metin sonraki turda yeniden sorulur
                 if canli and (m.id, kimlik) not in self._onlem:
@@ -97,11 +100,13 @@ class Zeka:
                 elif not canli:
                     _log.warning("model_yok_gecmis", rol=rol.ROL, enstruman=kimlik, metin_id=m.id)
                 continue
-            veto, neden = karar(None if y.hata else secim, guven, p, yuk, self.yuk.hazir, rol.VETO, esik)
+            veto, neden = karar(None if y.hata else secim, guven_k, p, yuk, self.yuk.hazir, rol.VETO, esik)
             belirsiz = neden.startswith("belirsiz")
             son_secim = yuk if yuk is not None else secim
             ayrinti = {"jev": secim, "guven": guven, "yukseltme": yuk, "yukseltme_model": yuk_model, "canli": canli,
                        "aciliyet": (y.cevap.get("aciliyet") or {}).get("score"), "baslik": m.baslik[:200]}
+            if cel:
+                ayrinti["celiski"] = cel
             if veto:
                 olaylar.append(self._veto_yaz(rol, kimlik, gecerli, son_secim, neden, m, y.id, ayrinti))
                 _log.info("veto", rol=rol.ROL, enstruman=kimlik, neden=neden, canli=canli)

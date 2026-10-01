@@ -414,3 +414,49 @@ def test_model_yok_onlem_vetosu_ve_alarm(m, ayar):
     assert jev.cagri > once                                                      # yeniden sorulur
     with m.connect() as b:
         assert b.execute(select(olay.c.id)).all().__len__() == 1                 # önlem vetosu tekrar yazılmaz
+
+
+def test_a1_celiski_tusd_usdt_sanilirsa_yukseltmeye_gider(m, ayar):
+    """2026-10-01: Jev "X/TUSD kaldırıldı"yı `usdt_pair_removed` okudu (MEME'de güven 0,97). Metinde X/USDT yoksa karar
+    belirsiz sayılır: yükseltme "veto gerekmez" derse veto yok; yükseltme yoksa belirsizlik kuralı yine veto verir."""
+    with m.begin() as b:
+        for s in ("MAV", "ICP"):
+            b.execute(insert(enstruman).values(kimlik=f"BINANCE:{s}USDT", piyasa="BINANCE", sembol=f"{s}USDT", sinif="kripto",
+                                               takvim="kripto_7x24", para_birimi="USDT", kaynak="binance", durum="aktif",
+                                               meta={}, guncellendi=__import__("datetime").datetime.now()))
+    yayin = 1_700_000_000_000
+    http = SahteHttp([{"katalog": 161, "code": "d1", "baslik": "Notice of Removal of Spot Trading Pairs",
+                       "govde": "At 03:00 (UTC): MAV/TUSD, ICP/USDT", "zaman": yayin}])
+    jev = SahteJev({"MAV": ("usdt_pair_removed", 0.97, {"usdt_pair_removed": 0.97, "other_pairs_or_products_removed": 0.03}),
+                    "ICP": ("usdt_pair_removed", 0.95, {"usdt_pair_removed": 0.95})})
+    gecerli = yayin + ol.GERIYE_DONUK_GECIKME_MS
+    m2 = SimpleNamespace(baslik="x", govde="MAV/TUSD, ICP/USDT and FOOUSDT")
+    assert a1.celiski("usdt_pair_removed", m2, "BINANCE:MAVUSDT") and not a1.celiski("usdt_pair_removed", m2, "BINANCE:ICPUSDT")
+    assert not a1.celiski("usdt_pair_removed", m2, "BINANCE:FOOUSDT") and not a1.celiski("token_delist", m2, "BINANCE:MAVUSDT")
+
+    def isle(req: httpx.Request):
+        return httpx.Response(200, json={"choices": [{"message": {"content": json.dumps(
+            {"etki": "other_pairs_or_products_removed"})}}]})
+
+    top = BinanceDuyuru(HamDepo(ayar.veri_dizini, m), m, http)
+    ayar_z = {"jev": {"esik": 0.5}, "binance": {"kataloglar": [161]}}
+    y = Yukseltme(m, "https://x/v1", ["c"], "k", http=httpx.Client(transport=httpx.MockTransport(isle)))
+    Zeka(m, JevIstemci(m, "jev-1.13.0", istemci=jev), y, [top], ayar_z).tur()
+    assert ol.aktif_vetolar(m, gecerli) == {"BINANCE:ICPUSDT"}            # MAV yükseltmeyle düştü, ICP doğrudan
+
+
+def test_a1_celiski_yukseltme_yoksa_veto_kalir(m, ayar):
+    with m.begin() as b:
+        b.execute(insert(enstruman).values(kimlik="BINANCE:MAVUSDT", piyasa="BINANCE", sembol="MAVUSDT", sinif="kripto",
+                                           takvim="kripto_7x24", para_birimi="USDT", kaynak="binance", durum="aktif",
+                                           meta={}, guncellendi=__import__("datetime").datetime.now()))
+    yayin = 1_700_000_000_000
+    http = SahteHttp([{"katalog": 161, "code": "d1", "baslik": "Notice", "govde": "MAV/TUSD", "zaman": yayin}])
+    jev = SahteJev({"MAV": ("usdt_pair_removed", 0.97, {"usdt_pair_removed": 0.97})})
+    z = Zeka(m, JevIstemci(m, "jev-1.13.0", istemci=jev), Yukseltme(m, "u", [], None),
+             [BinanceDuyuru(HamDepo(ayar.veri_dizini, m), m, http)], {"jev": {"esik": 0.5}, "binance": {"kataloglar": [161]}})
+    z.tur()
+    assert ol.aktif_vetolar(m, yayin + ol.GERIYE_DONUK_GECIKME_MS) == {"BINANCE:MAVUSDT"}   # belirsizlikte riski azalt
+    with m.connect() as b:
+        u = b.execute(select(olay.c.ayrinti).where(olay.c.tur == "uyari")).scalar()
+    assert u["celiski"] == "metinde varlik/USDT yok"

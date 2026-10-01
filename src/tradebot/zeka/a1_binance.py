@@ -101,6 +101,19 @@ def hedef_state(m, kimlik: str) -> dict:
     return state(m.baslik, m.govde, kimlik.removeprefix("BINANCE:").removesuffix("USDT"))
 
 
+def celiski(secim: str | None, m, kimlik: str) -> str | None:
+    """Kodla denetlenebilen çelişki: `usdt_pair_removed` seçildi ama metinde `varlik/USDT` (ya da `varlikUSDT`) hiç
+    geçmiyor. 2026-10-01: 15 yanlış vetonun 13'ü bu kalıptı (yalnız X/TUSD kaldırılmıştı; MEME'de güven 0,97). Çelişkili
+    karar belirsiz sayılır → yükseltme modeline gider; yükseltme yoksa belirsizlik kuralı yine veto verir (riski azalt)."""
+    if secim != "usdt_pair_removed":
+        return None
+    v = re.escape(kimlik.removeprefix("BINANCE:").removesuffix("USDT"))
+    if re.search(rf"(?<![A-Za-z0-9]){v}\s*/\s*USDT(?![A-Za-z])|(?<![A-Za-z0-9]){v}USDT(?![A-Za-z])",
+                 f"{m.baslik}\n{m.govde}"):
+        return None
+    return "metinde varlik/USDT yok"
+
+
 def veto_suresi_ms(secim: str | None, ayar: dict) -> int | None:
     return None  # delist, USDT çifti kaldırma, dönüşüm: kalıcı
 
