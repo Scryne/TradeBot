@@ -505,6 +505,20 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
       emir, açılışta borsa ↔ defter mutabakatı (fark → kol durur + KRİTİK), anahtarda çekim izni açık ya da IP kısıtı
       yoksa düğüm çalışmaz (`/sapi/v1/account/apiRestrictions`), kodda sabit sermaye tavanı, funding
       `/fapi/v1/income`'dan, önce Binance vadeli testnet'i.
+  - **2026-10-01 karar (Claude; Scryne: "artık para kazanmak istiyorum", "projeyi tamamen sana bırakıyorum"):** kapının
+    DSR yolu kullanılır. Kilit kolu 6b DSR 0,96 (7 deneme) ile Faz 12 tablosundaki "DSR ≥ 0,95" koşulunu geçiyor; 26
+    haftalık paper PSR şartı Scryne'ın 09-29'daki "emin olmak" isteğiydi, bugün yerini "para kazanmak" aldı. Plan:
+    1. Paper kilit kolu **mekanik kontrol** için ~4 hafta sürer (2026-10-29'a kadar; 2/3/5/6 Ekim girişleri ve
+       çıkışları): dolumlar, funding, kapanışlar, takvim anlık görüntüleri backtest'teki gibi mi. Kâr ölçütü değil.
+    2. Bu sürede gerçek yürütme katmanı yazılır ve **Binance vadeli testnet'inde** uçtan uca sınanır.
+    3. Mikro pilot: ayrı kol (`#gercek`), kodda sabit sermaye tavanı (2.000 USDT), çekim kapalı ve IP kısıtlı anahtar.
+       Küçük sermayede BTC bacağı olay başına yuvarlanamaz (0,001 BTC ≈ 85 $) → gerçek kolda **net BTC koruması**
+       (token kısalarının toplamı kadar BTC, adıma yuvarlanmış); paper kolu olay başına bacakla sürer, fark paper ↔
+       gerçek sapması olarak ölçülür.
+    4. Gerçek paraya geçiş anı kural 7 gereği Scryne'ın tek açık onayını ister (parayı hesaba o yatırır): config'te
+       `onay` alanı boşsa düğüm ana ağda çalışmaz.
+    - Beklenti (dürüst, Scryne'a söylendi): 1.000 $ ile yılda ~100–150 $, kötü dönemde ~200 $ düşüş. Pilotun asıl
+      değeri gerçek parada zincirin çalıştığını ve sapmayı görmek; büyütme ancak ondan sonra.
 
 ### Faz 13: Sonraki dalgalar (koşullu)
 - **İşler:** Ücretli veriyle ABD tek hisseleri; Databento ile CME vadelileri; VİOP; gerekirse IB bağlantısı;

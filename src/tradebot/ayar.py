@@ -12,7 +12,8 @@ from typing import Literal
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-SIR_ALANLARI = ("veritabani_url", "typesafe_api_key", "nvidia_api_key", "telegram_token")
+SIR_ALANLARI = ("veritabani_url", "typesafe_api_key", "nvidia_api_key", "telegram_token", "binance_anahtar",
+                "binance_gizli")
 
 
 class Ayarlar(BaseSettings):
@@ -31,6 +32,9 @@ class Ayarlar(BaseSettings):
     typesafe_api_key: SecretStr | None = Field(default=None, validation_alias="TYPESAFE_API_KEY")
     nvidia_api_key: SecretStr | None = Field(default=None, validation_alias="NVIDIA_API_KEY")
     telegram_token: SecretStr | None = Field(default=None, validation_alias="TRADEBOT_TELEGRAM_TOKEN")
+    # Binance USDⓈ-M (Faz 12 gerçek kol): çekim izni kapalı, IP kısıtlı anahtar; yalnız host .env (kural 12)
+    binance_anahtar: SecretStr | None = None
+    binance_gizli: SecretStr | None = None
     telegram_sohbet: str | None = None    # Scryne'ın sohbet kimliği (sır değil; bot yalnız buraya yazar)
     yedek_dizini: Path | None = None      # compose `yedek`in hedefi; tanımlıysa sağlık yedek yaşını denetler
     olu_adam_url: str | None = None       # healthchecks.io ping adresi (yalnız .env'de): host kapanırsa dışarıdan alarm

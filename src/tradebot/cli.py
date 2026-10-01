@@ -115,7 +115,7 @@ def saglik_komutu(
         time.sleep(dongu)
 
 
-DUGUMLER = ("paper", "kilit", "doviz", "altin", "akis")   # her süreç ayrı gözetmen (kalp atışı ayrı)
+DUGUMLER = ("paper", "kilit", "kilit_gercek", "doviz", "altin", "akis")   # her süreç ayrı gözetmen (kalp atışı ayrı)
 MT5_DUGUMLER = ("doviz", "altin", "akis")                  # gözetmen bunlarda köprüden gerçek kapatma emri verir
 
 
@@ -125,6 +125,13 @@ def _gozetmen_kur(a, **ayar):
     from tradebot.db import motor as db_motor
     from tradebot.veri.http import NazikIstemci
 
+    if ayar.get("dugum") == "kilit_gercek":   # gerçek kol: gözetmen Binance'te reduceOnly ile kapatır
+        from tradebot.canli import kilit
+
+        ay = kilit.ayarlar(blok=kilit.GERCEK_BLOK)
+        ist = kilit.gercek_istemci(ay, a) if ay is not None else None
+        if ist is not None:
+            ayar |= {"binance": ist}
     if ayar.get("dugum") in MT5_DUGUMLER:
         from tradebot.canli import akis, altin, doviz
         from tradebot.mt5.istemci import Mt5Istemci
@@ -895,10 +902,15 @@ def paper_calis(
 def paper_kilit(
     sure_sn: float = typer.Option(0, help="Saniye; 0 = süresiz (servis)"),
     tek: bool = typer.Option(False, help="Tek tur çalıştır ve sonucu yazdır"),
+    blok: str = typer.Option("kilit", help="kilit (paper) | kilit_gercek (Binance demo/ana; Faz 12)"),
 ) -> None:
-    """Kilit açılımı kolu düğümü (Dalga 6b): günde bir karar 00:05 UTC, saatte bir işaret (compose `kilit`)."""
+    """Kilit açılımı kolu düğümü (Dalga 6b): günde bir karar 00:05 UTC, saatte bir işaret (compose `kilit`,
+    gerçek kol `kilit-gercek`)."""
     from tradebot.canli import kilit
 
+    if blok != "kilit":
+        kilit.calistir(sure_sn or None, blok=blok)
+        return
     if tek:
         import os
 
@@ -913,6 +925,22 @@ def paper_kilit(
         _yazdir(d.tur())
         return
     kilit.calistir(sure_sn or None)
+
+
+@paper_uygulama.command("binance-kontrol")
+def paper_binance_kontrol() -> None:
+    """Gerçek kolun Binance hesabını salt okuyarak doğrular: tek yön modu, (ana ağda) çekim kapalı + IP kısıtı,
+    marjin bakiyesi, açık pozisyonlar. Emir göndermez."""
+    from tradebot.canli import kilit
+
+    ay = kilit.ayarlar(blok=kilit.GERCEK_BLOK)
+    if ay is None:
+        raise SystemExit("config/paper.yaml içinde `kilit_gercek` bloğu yok")
+    ist = kilit.gercek_istemci(ay)
+    if ist is None:
+        raise SystemExit("TRADEBOT_BINANCE_ANAHTAR / TRADEBOT_BINANCE_GIZLI tanımlı değil (yalnız host .env)")
+    _yazdir(ist.dogrula() | {"pozisyonlar": ist.pozisyonlar(), "sermaye_tavani": kilit.GERCEK_SERMAYE_TAVANI,
+                             "kol_sermayesi": ay.gercek["sermaye"]})
 
 
 @paper_uygulama.command("doviz")

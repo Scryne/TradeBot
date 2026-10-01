@@ -68,6 +68,17 @@ kilit:
   maliyet: {ucret: 0.0005, kayma_token: 0.001, kayma_btc: 0.0001}
   risk: {kaldirac: 1.0}
 
+# Kilit kolunun GERÇEK yürütmesi (Faz 12; Roadmap 2026-10-01 kararı). Kural `kilit` ile aynı; ayrı kol ve düğüm
+# (compose `kilit-gercek`, profil `gercek`), Binance USDⓈ-M'ye gerçek emir, net BTC koruması, funding ve komisyon
+# borsanın gelir kaydından. `ortam: demo` Binance Demo Trading (para yok); `ana` gerçek para: `onay` doluysa çalışır
+# (kural 7). Sermaye kodda sabit tavanlı (canli/kilit.GERCEK_SERMAYE_TAVANI, 2.000 USDT). Anahtar yalnız host .env'de.
+kilit_gercek:
+  ad: "d6b:kilit_kisa@kilit_perp@1d#gercek"
+  sinif: A
+  ortam: demo
+  sermaye: 1000
+  onay: ""
+
 
 # Döviz taşıma kolu (Dalga 9 KALDI; ön kayıt gereği ileriye dönük GÖZLEM kolu, docs/turnuva/Dalga-9-Doviz.md). Ayrı
 # düğüm (canli/doviz.py, compose `doviz`): NCM forex DEMO hesabında gerçek MT5 emri. İş günü 07:00 UTC'de günde bir karar

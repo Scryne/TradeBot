@@ -273,7 +273,8 @@ def ayri_dugum_kollari() -> list[PaperKol]:
     azaltan her şey otomatik); 2026-09-30'a kadar yalnız kilit vardı, MT5 kolları dışarıda kalıyordu."""
     from tradebot.canli import akis, altin, doviz, kilit
 
-    return [ay.kol for ay in (kilit.ayarlar(), doviz.ayarlar(), altin.ayarlar(), akis.ayarlar()) if ay is not None]
+    return [ay.kol for ay in (kilit.ayarlar(), kilit.ayarlar(blok=kilit.GERCEK_BLOK), doviz.ayarlar(), altin.ayarlar(),
+                              akis.ayarlar()) if ay is not None]
 
 
 def calistir() -> None:

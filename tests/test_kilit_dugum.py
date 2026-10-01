@@ -197,3 +197,85 @@ def test_gozetmen_dugum_basina_kalp_atisi(kur):
     gp = Gozetmen(m, lambda k: {}, dugum="paper", saat=saat, onay_tur=1, isinma_sn=0)
     gk = Gozetmen(m, lambda k: {}, dugum="kilit", saat=saat, onay_tur=1, isinma_sn=0)
     assert gp.kontrol()["durum"] == "donma" and gk.kontrol()["durum"] == "canli"
+
+
+# --- gerçek yürütücü (Faz 12): sahte Binance hesabıyla --------------------------------------------------------------
+class SahteHesap:
+    """`binance_emir.VadeliIstemci` arayüzü: emir orta fiyattan dolar, pozisyonlar ve gelir kaydı tutulur."""
+
+    def __init__(self, borsa):
+        self.borsa, self.poz, self.gelirler, self.emirler, self.dolmayan = borsa, {}, [], [], set()
+
+    def emir(self, sembol, miktar, istemci_id, azaltan):
+        self.emirler.append((sembol, miktar, istemci_id, azaltan))
+        if sembol in self.dolmayan:
+            return {"adet": 0.0, "fiyat": 0.0, "durum": "EXPIRED"}
+        self.poz[sembol] = self.poz.get(sembol, 0.0) + miktar
+        return {"adet": miktar, "fiyat": self.borsa.fiyat[sembol], "durum": "FILLED", "emir_id": len(self.emirler)}
+
+    def pozisyonlar(self):
+        return {s: q for s, q in self.poz.items() if abs(q) > 1e-12}
+
+    def gelir(self, bas_ms):
+        return [g for g in self.gelirler if g["zaman_ms"] >= bas_ms]
+
+    def ozkaynak(self):
+        return 1e9
+
+
+@pytest.fixture()
+def gercek(tmp_path):
+    m = create_engine(f"sqlite:///{tmp_path / 'g.db'}")
+    metadata.create_all(m)
+    saat = Saat(D0 + 60_000)
+    borsa = SahteBorsa()
+    hesap = SahteHesap(borsa)
+    d = kd.KilitDugumu(PaperDefter(m, "test"), kd.ayarlar(), borsa, saat=saat, yurutucu=kd.GercekYurutucu(hesap))
+    d.ac()
+    return m, d, saat, borsa, hesap
+
+
+def test_gercek_net_btc_korumasi_ve_ucret_borsadan(gercek):
+    m, d, saat, borsa, hesap = gercek
+    saat.ms = D0 + 6 * 60_000
+    r = d.tur()["karar"]
+    assert r["ac"] == 5 and r["dolum"] == 6                      # 5 token + tek net BTC emri
+    net = _net(m, d.kol.ad)
+    kisa = -sum(q * 10.0 for k, q in net.items() if "BTC" not in k)
+    # BTC = token kısalarının nominali, adıma en yakın; risk motoru enstrüman tavanına (0,5) kırparsa bir adım eksik
+    assert abs(net["BINANCEF:BTCUSDT"] - kisa / 80_000) <= 0.0015 and net["BINANCEF:BTCUSDT"] * 80_000 <= 50_000
+    assert hesap.pozisyonlar() == {k[len("BINANCEF:"):]: q for k, q in net.items()}   # borsa = defter
+    assert all(len(i) <= 36 for _, _, i, _ in hesap.emirler)
+    with m.connect() as b:
+        assert b.execute(select(func.sum(paper_emir_olay.c.ucret)).where(paper_emir_olay.c.tur == "dolum")).scalar() == 0
+    hesap.gelirler = [{"tur": "COMMISSION", "sembol": "AAAUSDT", "gelir": -2.5, "zaman_ms": D0 + 7 * 60_000, "tranId": 1},
+                      {"tur": "FUNDING_FEE", "sembol": "AAAUSDT", "gelir": 1.0, "zaman_ms": D0 + 8 * S, "tranId": 2},
+                      {"tur": "REALIZED_PNL", "sembol": "AAAUSDT", "gelir": 9.0, "zaman_ms": D0 + 8 * S, "tranId": 3}]
+    saat.ms = D0 + 9 * S + 30_000
+    assert d.tur()["isaret"]["fonlama"] == 2 and "mutabakat" not in d.tur()
+    saat.ms = D0 + 10 * S + 30_000
+    assert d.tur()["isaret"]["fonlama"] == 0                     # aynı tranId ikinci kez yazılmaz
+    with m.connect() as b:
+        assert sorted(b.execute(select(paper_emir_olay.c.ucret).where(paper_emir_olay.c.tur == "fonlama")).scalars()) \
+            == [-1.0, 2.5]
+
+
+def test_gercek_mutabakat_farki_kolu_durdurur_ve_kapatir(gercek):
+    m, d, saat, borsa, hesap = gercek
+    saat.ms = D0 + 6 * 60_000
+    d.tur()
+    hesap.poz["CCCUSDT"] += 1.0                                  # borsada defterin bilmediği fark
+    saat.ms = D0 + S + 60_000
+    r = d.tur()["isaret"]
+    assert "BINANCEF:CCCUSDT" in r["mutabakat"] and len(r["kapatilan"]) == 5
+    assert _net(m, d.kol.ad) == {}                               # defterdekiler ve net BTC kapandı
+    assert hesap.pozisyonlar() == {"CCCUSDT": pytest.approx(1.0)}   # bilinmeyen fark yerinde (alarm)
+    assert d.defter.kol_olaylari(d.kol.ad, "durdur")[-1].ayrinti["neden"] == "mutabakat_gercek"
+
+
+def test_gercek_btc_dolmazsa_tokenlar_geri_kapanir(gercek):
+    m, d, saat, borsa, hesap = gercek
+    hesap.dolmayan.add("BTCUSDT")
+    saat.ms = D0 + 6 * 60_000
+    d.tur()
+    assert _net(m, d.kol.ad) == {} and hesap.pozisyonlar() == {}  # açıkta kısa kalmaz

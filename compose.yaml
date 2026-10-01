@@ -161,6 +161,16 @@ services:
     depends_on:
       goc: { condition: service_completed_successfully }
 
+  kilit-gercek:
+    <<: *ortak
+    # Kilit kolunun gerçek yürütmesi (Faz 12): Binance USDⓈ-M (config `kilit_gercek.ortam`: demo | ana). Yalnız profil
+    # açıkça verilince kalkar (`docker compose --profile gercek up -d kilit-gercek`): anahtar yokken çökme döngüsü olmaz.
+    # Açılışta hesap doğrulanır (tek yön modu; ana ağda çekim kapalı + IP kısıtı), değilse çalışmaz.
+    profiles: ["gercek"]
+    command: ["tradebot", "paper", "kilit", "--blok", "kilit_gercek"]
+    depends_on:
+      goc: { condition: service_completed_successfully }
+
   doviz:
     <<: *ortak
     # Dalga 9 döviz taşıma gözlem kolu (canli/doviz.py): NCM forex DEMO hesabına MT5 köprüsünden gerçek emir (köprü

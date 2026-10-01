@@ -31,7 +31,7 @@ from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from sqlalchemy import insert, select
+from sqlalchemy import func, insert, select
 from sqlalchemy.engine import Engine
 
 from tradebot import denetim
@@ -57,6 +57,7 @@ SAAT_MS = 3_600_000
 KARAR_GECIKME_MS = 5 * 60_000          # 00:05 UTC: günlük mum kesinleşmiş, takvim güncel
 TAKVIM_SABIR_MS = 30 * 60_000          # takvim bu süre içinde alınamazsa gün yalnız kapanışlarla kararlanır
 GECIKMELI_MS = 30 * 60_000             # 00:30'dan sonra verilen karar "gecikmeli" (maliyet ölçümünde ayrılır)
+NAKIT_GELIRI = {"FUNDING_FEE", "SPECIAL_FUNDING_FEE", "COMMISSION", "COMMISSION_REBATE", "INSURANCE_CLEAR"}   # gerçek kol nakdi
 FAPI = bv.FAPI
 _log = log("kilit")
 
@@ -76,26 +77,44 @@ class KilitAyarlari:
     kategoriler: tuple[str, ...]
     asgari_oran: float
     risk: RiskAyar
+    gercek: dict | None = None     # gerçek kol: {"ortam": demo|ana, "sermaye": USDT, "onay": "..."}
 
 
-def ayarlar(d: dict | None = None) -> KilitAyarlari | None:
-    """`config/paper.yaml` `kilit` bloğu → kol + kural. Blok yoksa None (düğüm çalışmaz)."""
+GERCEK_SERMAYE_TAVANI = 2_000.0    # USDT; kodda sabit. Yükseltmek riski artırır: Scryne'ın açık onayı (kural 7)
+GERCEK_BLOK = "kilit_gercek"
+
+
+def ayarlar(d: dict | None = None, blok: str = "kilit") -> KilitAyarlari | None:
+    """`config/paper.yaml` `kilit` bloğu → kol + kural. Blok yoksa None (düğüm çalışmaz).
+    `blok="kilit_gercek"`: aynı kural, ayrı kol ve düğüm; gerçek emir. Ana ağ `onay` ister, sermaye tavanı kodda."""
     d = d or oku()
     b = d.get("kilit")
-    if not b:
+    if not b or (blok != "kilit" and not d.get(blok)):
         return None
+    gercek = None
+    if blok != "kilit":
+        g = d[blok]
+        b = b | {k: v for k, v in g.items() if k in ("ad", "sinif")}
+        gercek = {"ortam": str(g["ortam"]), "sermaye": float(g["sermaye"]), "onay": str(g.get("onay") or "").strip()}
+        if gercek["ortam"] not in ("demo", "ana"):
+            raise ValueError(f"{blok}.ortam demo|ana olmalı")
+        if not 0 < gercek["sermaye"] <= GERCEK_SERMAYE_TAVANI:
+            raise ValueError(f"{blok}.sermaye (0, {GERCEK_SERMAYE_TAVANI}] USDT olmalı (kodda sabit tavan, kural 7)")
+        if gercek["ortam"] == "ana" and not gercek["onay"]:
+            raise ValueError(f"{blok}: gerçek paraya geçiş Scryne'ın açık onayını ister (`onay` boş; kural 7)")
     risk = RiskAyar(kaldirac=float(b["risk"]["kaldirac"]))
     kr = b["kural"]
     kural = ck.KilitKural(int(kr["giris"]), int(kr["cikis"]), float(kr["notional"]),
                           azami_brut=risk.kaldirac, azami_btc=risk.enstruman_tavani)
     ayar = Ayar(hedef_vol=0.0, kaldirac=risk.kaldirac, vol_pencere_gun=0, frenler=bool(d.get("frenler", True)), bant=0.0)
-    kol = PaperKol(b["ad"], KILIT, "kilit_perp", {"dugum": DUGUM, "yon": "kisa_notr", "kimlikler": [f"{ONEK}*USDT"],
-                                                 "olay": b["olay"], "maliyet": b["maliyet"]},
+    grup = {"dugum": DUGUM if gercek is None else blok, "yon": "kisa_notr", "kimlikler": [f"{ONEK}*USDT"],
+            "olay": b["olay"], "maliyet": b["maliyet"]} | ({"ortam": gercek["ortam"]} if gercek else {})
+    kol = PaperKol(b["ad"], KILIT, "kilit_perp", grup,
                    "1d", ayar, {"giris": kural.giris, "cikis": kural.cikis, "notional": kural.notional,
                                 "azami_brut": kural.azami_brut, "azami_btc": kural.azami_btc},
-                   b.get("sinif", "A"), float(d.get("baslangic_ozkaynak", 100_000)))
+                   b.get("sinif", "A"), gercek["sermaye"] if gercek else float(d.get("baslangic_ozkaynak", 100_000)))
     return KilitAyarlari(kol, kural, Maliyet(**b["maliyet"]), tuple(b["olay"]["kategoriler"]),
-                         float(b["olay"]["asgari_oran"]), risk)
+                         float(b["olay"]["asgari_oran"]), risk, gercek)
 
 
 # ---------------------------------------------------------------------------------------------------- borsa (okuma)
@@ -201,13 +220,58 @@ def izleyici(gecmis: list[tuple[int, float]], baslangic: float, risk: RiskAyar) 
     return iz, son
 
 
+# ---------------------------------------------------------------------------------------------------- yürütücüler
+@dataclass(frozen=True)
+class Dolum:
+    adet: float          # işaretli gerçekleşen adet
+    fiyat: float
+    ucret: float         # paper: modelden; gerçek: 0 (komisyon borsanın gelir kaydından ayrıca yazılır)
+    ek: dict
+
+
+class PaperYurutucu:
+    """Paper dolum (aleyhte): alış ask'tan, satış bid'den, üstüne kayma ve taker ücreti. Olay başına BTC bacağı."""
+    gercek = False
+    net_btc = False
+    onek = "KL"          # istemci emir kimliği öneki (kimlik tablo genelinde tekil: kollar çakışmasın)
+
+    def __init__(self, maliyet: Maliyet) -> None:
+        self.maliyet = maliyet
+
+    def doldur(self, sembol: str, m: float, bid: float, ask: float, bacak: str, istemci_id: str,
+               azaltan: bool) -> Dolum | str:
+        kayma = self.maliyet.kayma_btc if bacak.startswith("btc") else self.maliyet.kayma_token
+        px = ask * (1 + kayma) if m > 0 else bid * (1 - kayma)
+        return Dolum(m, px, abs(m) * px * self.maliyet.ucret, {})
+
+
+class GercekYurutucu:
+    """Binance USDT-M piyasa emri (`canli/binance_emir.VadeliIstemci`). Küçük sermayede BTC bacağı olay başına
+    yuvarlanamadığı için BTC korumasını netler (`net_btc`). Funding ve komisyon borsanın gelir kaydından okunur."""
+    gercek = True
+    net_btc = True
+    onek = "KG"
+
+    def __init__(self, istemci) -> None:
+        self.ist = istemci
+
+    def doldur(self, sembol: str, m: float, bid: float, ask: float, bacak: str, istemci_id: str,
+               azaltan: bool) -> Dolum | str:
+        r = self.ist.emir(sembol, m, istemci_id, azaltan)
+        if abs(r["adet"]) < 1e-12:
+            return f"borsa: {r.get('durum', 'dolmadı')}"
+        return Dolum(r["adet"], r["fiyat"], 0.0, {"borsa_emir": r.get("emir_id"), "durum": r.get("durum")})
+
+
 # ---------------------------------------------------------------------------------------------------- düğüm
 class KilitDugumu:
-    def __init__(self, defter: PaperDefter, ay: KilitAyarlari, borsa: Borsa, saat: Callable[[], float] = time.time):
+    def __init__(self, defter: PaperDefter, ay: KilitAyarlari, borsa: Borsa, saat: Callable[[], float] = time.time,
+                 yurutucu: PaperYurutucu | GercekYurutucu | None = None):
         self.defter, self.ay, self.borsa, self.saat = defter, ay, borsa, saat
         self.m: Engine = defter.motor
         self.kol = ay.kol
         self.risk = RiskMotoru(ay.risk)
+        self.yurutucu = yurutucu or PaperYurutucu(ay.maliyet)
         self._takvim_hatasi: dict[int, int] = {}
 
     def ac(self) -> None:
@@ -247,7 +311,8 @@ class KilitDugumu:
         kapat = [(acik[(x["sembol"], int(x["olay_ms"]))], x.get("neden", "cikis")) for x in ayr.get("kapat", [])
                  if (x["sembol"], int(x["olay_ms"])) in acik]
         ac = [ck.Pozisyon(x["sembol"], int(x["olay_ms"]), int(x["giris_ms"]), int(x["cikis_ms"]), float(x["notional"]))
-              for x in ayr.get("ac", []) if _istemci(gun, x["sembol"], int(x["olay_ms"]), "ac", "token") not in ids]
+              for x in ayr.get("ac", [])
+              if _istemci(gun, x["sembol"], int(x["olay_ms"]), "ac", "token", self.yurutucu.onek) not in ids]
         if not kapat and not ac:
             return None
         _log.warning("kilit_karar_devam", gun=gun, kapat=len(kapat), ac=len(ac))
@@ -257,8 +322,9 @@ class KilitDugumu:
     def _saatlik(self, d: Durum_, saat_bas: int) -> dict:
         perp = self.borsa.perpler()
         isaret = self.borsa.isaret()
-        fon = self._fonlama(d, perp)
-        d = durum_kur(self.defter, self.kol.ad, self.kol.baslangic_ozkaynak) if fon else d
+        fon = self._gelir() if self.yurutucu.gercek else self._fonlama(d, perp)
+        mutabakat = self._mutabakat(d) if self.yurutucu.gercek else None
+        d = durum_kur(self.defter, self.kol.ad, self.kol.baslangic_ozkaynak) if fon or mutabakat else d
         fiyat = {k: isaret.get(k[len(ONEK):], d.son_fiyat.get(k, 0.0)) for k in d.adet}
         oz = d.ozkaynak(fiyat)
         self.defter.ozkaynak_yaz(self.kol.ad, saat_bas, KolDurum(oz, d.nakit, dict(d.adet)), fiyat)
@@ -270,7 +336,44 @@ class KilitDugumu:
             self._yurut(d, None, saat_bas // GUN_MS * GUN_MS, kapat, [], perp)
             if neden == "acil_durdurma":
                 denetim.kaydet(self.m, "kilit", "acil_durdurma_kapatma", {"kol": self.kol.ad, "ozkaynak": oz})
-        return {"ozkaynak": round(oz, 2), "fonlama": fon, "kapatilan": [(p.sembol, n) for p, n in kapat]}
+        out = {"ozkaynak": round(oz, 2), "fonlama": fon, "kapatilan": [(p.sembol, n) for p, n in kapat]}
+        return out | ({"mutabakat": mutabakat} if mutabakat else {})
+
+    def _gelir(self) -> int:
+        """Gerçek kol: borsanın gelir kaydındaki funding ve komisyon satırları (`tranId` tekil) → `fonlama` olayı.
+        `ucret` = −gelir (maliyet pozitif). Komisyon dolumda 0 yazıldığı için tek kaynak burasıdır."""
+        with self.m.connect() as b:
+            rows = list(b.execute(select(paper_emir_olay.c.zaman_ms, paper_emir_olay.c.ayrinti).where(
+                paper_emir_olay.c.kol == self.kol.ad, paper_emir_olay.c.tur == "fonlama")))
+        gorulen = {str((a or {}).get("tranId")) for _, a in rows}
+        bas = max([int(t) for t, _ in rows] + [self.defter.kol_baslangic(self.kol.ad) or 0])
+        n = 0
+        for g in self.yurutucu.ist.gelir(bas - 3_600_000):     # bir saat geriden: geç yazılan satırlar kaçmasın
+            if g["tur"] not in NAKIT_GELIRI or str(g["tranId"]) in gorulen:
+                if g["tur"] not in NAKIT_GELIRI and g["tur"] not in ("REALIZED_PNL", "TRANSFER"):
+                    _log.warning("tanimsiz_gelir_turu", tur=g["tur"], gelir=g["gelir"])
+                continue
+            kim = f"{ONEK}{g['sembol']}"
+            self.defter.olay_yaz(0, self.kol.ad, "fonlama", kim, 0.0, None, -float(g["gelir"]), int(g["zaman_ms"]),
+                                 {"gelir": g["tur"], "tranId": str(g["tranId"]), "funding_ms": int(g["zaman_ms"])})
+            gorulen.add(str(g["tranId"]))
+            n += 1
+        return n
+
+    def _mutabakat(self, d: Durum_) -> dict | None:
+        """Gerçek kol: borsadaki pozisyonlar ↔ defter. Fark varsa kol durdurulur (yeni risk yok, defterdekiler ilk
+        saat başında kapanır; kural 7) ve KRİTİK hata loglanır. Defterin bilmediği borsa pozisyonuna dokunulmaz."""
+        borsa = {f"{ONEK}{s}": q for s, q in self.yurutucu.ist.pozisyonlar().items() if abs(q) > 1e-12}
+        fark = {k: {"borsa": borsa.get(k, 0.0), "defter": d.adet.get(k, 0.0)} for k in set(borsa) | set(d.adet)
+                if abs(borsa.get(k, 0.0) - d.adet.get(k, 0.0)) > 1e-9 * max(1.0, abs(borsa.get(k, 0.0)))}
+        if not fark:
+            return None
+        if not d.durdurulmus:
+            self.defter.kol_olay_yaz(self.kol.ad, "durdur", {"neden": "mutabakat_gercek", "fark": fark},
+                                     int(self.saat() * 1000))
+            denetim.kaydet(self.m, "kilit", "gercek_mutabakat_farki", {"kol": self.kol.ad, "fark": fark})
+        _log.error("gercek_mutabakat_farki", kol=self.kol.ad, fark=fark)
+        return fark
 
     def _fonlama(self, d: Durum_, perp: dict[str, dict]) -> int:
         """Tutulan her enstrümanın gerçekleşen funding'i (8 saatte bir). Nakit etkisi = −adet × işaret × oran
@@ -343,7 +446,10 @@ class KilitDugumu:
         fiyat = {f"{ONEK}{v['sembol']}": isaret[v["sembol"]] for v in perp.values() if v["sembol"] in isaret}
         fiyat |= {k: d.son_fiyat.get(k, 0.0) for k in adet if k not in fiyat}
         iz, _ = izleyici(d.gecmis, self.kol.baslangic_ozkaynak, self.ay.risk)
-        pf = Portfoy(d.ozkaynak(fiyat), adet, fiyat, {k: SINIF for k in fiyat}, iz.durum,
+        oz = d.ozkaynak(fiyat)
+        if self.yurutucu.gercek:   # boyut hiçbir zaman borsadaki gerçek marjin bakiyesini aşmaz
+            oz = min(oz, self.yurutucu.ist.ozkaynak())
+        pf = Portfoy(oz, adet, fiyat, {k: SINIF for k in fiyat}, iz.durum,
                      {self.kol.ad} if d.durdurulmus else set())
         btc = f"{ONEK}{perp[BTC]['sembol']}"
         acilis: dict[str, float | None] = {}
@@ -357,12 +463,28 @@ class KilitDugumu:
             return acilis[kim] or sum(kot[kim[len(ONEK):]]) / 2
 
         out = {"dolum": 0, "ret": []}
+        net = self.yurutucu.net_btc
         for p, neden in kapat:
             b_ = d.bacak.get(p.anahtar, {})
-            for bacak, kim in (("token", b_.get("perp")), ("btc", btc)):
+            for bacak, kim in (("token", b_.get("perp")),) + ((("btc", btc),) if not net else ()):
                 q = -b_.get(bacak, 0.0)
                 if kim and abs(q) > 1e-12:
                     self._emir(karar_id, pf, kim, q, p, bacak, "kapat", gun, kot, ref(kim), perp, out, neden)
+        if net:
+            acilan = []
+            for p in ac:
+                v = perp[p.sembol]
+                kim = f"{ONEK}{v['sembol']}"
+                bid = kot[v["sembol"]][0]
+                q_t = -_yuvarla(p.notional * pf.ozkaynak / bid, v.get("adim", 0.0))
+                if q_t == 0 or abs(q_t) * bid < v.get("asgari_notional", 0.0):
+                    out["ret"].append({"sembol": p.sembol, "neden": "lot/asgari notional"})
+                    continue
+                t = self._emir(karar_id, pf, kim, q_t, p, "token", "ac", gun, kot, ref(kim), perp, out)
+                if t:
+                    acilan.append((p, kim, t))
+            self._btc_dengele(karar_id, pf, btc, gun, kot, perp, out, acilan, ref)
+            return out
         for p in ac:
             v = perp[p.sembol]
             kim = f"{ONEK}{v['sembol']}"
@@ -387,12 +509,37 @@ class KilitDugumu:
                                out)
         return out
 
-    def _emir(self, karar_id, pf: Portfoy, kim: str, q: float, p: ck.Pozisyon, bacak: str, islem: str, gun: int,
-              kot, karar_fiyati: float, perp, out: dict, neden: str | None = None) -> tuple[float, float] | None:
+    def _btc_dengele(self, karar_id, pf: Portfoy, btc: str, gun: int, kot, perp, out: dict,
+                     acilan: list, ref) -> None:
+        """Net BTC koruması (gerçek kol): BTC uzun = token kısalarının toplam nominali, BTC adımına en yakın.
+        Artış dolmazsa bu turda açılan tokenlar geri kapatılır (açıkta kısa kalmaz; riski azaltır)."""
+        s = btc[len(ONEK):]
+        ask = kot[s][1]
+        adim = float(perp[BTC].get("adim", 0.0) or 0.0)
+        kisa = sum(-q * pf.fiyatlar.get(k, 0.0) for k, q in pf.pozisyonlar.items() if k != btc and q < 0)
+        hedef = round(round(kisa / ask / adim) * adim, 12) if adim > 0 else kisa / ask
+        fark = round(hedef - pf.pozisyonlar.get(btc, 0.0), 12)
+        if abs(fark) < max(adim / 2, 1e-12):
+            return
+        on = f"{self.yurutucu.onek}H{gun // GUN_MS}-"
+        with self.m.connect() as b:   # gün içindeki sıra: yeniden başlatmada da tekil ve belirlenimci
+            n = b.execute(select(func.count()).select_from(paper_emir).where(
+                paper_emir.c.istemci_emir_id.like(f"{on}%"))).scalar()
+        eid = f"{on}{n}"
+        b = self._emir(karar_id, pf, btc, fark, None, "btc_net", "denge", gun, kot, ref(btc), perp, out, istemci=eid)
+        if fark > 0 and (b is None or b[0] < fark - adim - 1e-12) and acilan:   # risk motoru tavana kırparsa bir adım tolerans
+            _log.error("btc_korumasi_eksik_tokenlar_geri", hedef=hedef, fark=fark)
+            for p, kim, t in acilan:
+                self._emir(karar_id, pf, kim, -t[0], p, "token", "geri", gun, kot, ref(kim), perp, out)
+            self._btc_dengele(karar_id, pf, btc, gun, kot, perp, out, [], ref)
+
+    def _emir(self, karar_id, pf: Portfoy, kim: str, q: float, p: ck.Pozisyon | None, bacak: str, islem: str, gun: int,
+              kot, karar_fiyati: float, perp, out: dict, neden: str | None = None,
+              istemci: str | None = None) -> tuple[float, float] | None:
         s = kim[len(ONEK):]
         bid, ask = kot[s]
         on = ask if q > 0 else bid
-        eid_ist = _istemci(gun, p.sembol, p.olay_ms, islem, bacak)
+        eid_ist = istemci or _istemci(gun, p.sembol, p.olay_ms, islem, bacak, self.yurutucu.onek)
         ist = EmirIstegi(kim, SINIF, q, on, self.kol.ad, int(self.saat() * 1000), eid_ist)
         taban = next((t for t, v in perp.items() if v["sembol"] == s), None)
         piy = Piyasa(pf.fiyatlar.get(kim, (bid + ask) / 2), int(self.saat() * 1000), 60_000, True,
@@ -404,18 +551,26 @@ class KilitDugumu:
         if not r.onay or abs(r.miktar) < 1e-12:
             self.defter.olay_yaz(eid, self.kol.ad, "ret", kim, q, None, 0.0, int(self.saat() * 1000),
                                  {"gerekceler": list(r.gerekceler)})
-            out["ret"].append({"sembol": p.sembol, "bacak": bacak, "gerekce": list(r.gerekceler)})
+            out["ret"].append({"sembol": p.sembol if p else s, "bacak": bacak, "gerekce": list(r.gerekceler)})
             return None
-        m = r.miktar
-        kayma = self.ay.maliyet.kayma_btc if bacak == "btc" else self.ay.maliyet.kayma_token
-        px = ask * (1 + kayma) if m > 0 else bid * (1 - kayma)
-        ucret = abs(m) * px * self.ay.maliyet.ucret
-        self.defter.olay_yaz(eid, self.kol.ad, "dolum", kim, m, px, ucret, int(self.saat() * 1000),
-                             {"sembol": p.sembol, "olay_ms": p.olay_ms, "gun_ms": gun, "cikis_ms": p.cikis_ms,
-                              "notional": p.notional, "bacak": bacak, "islem": islem, "perp": f"{ONEK}{s}"
-                              if bacak == "token" else None, "neden": neden, "bid": bid, "ask": ask,
-                              "gecikmeli": False})
-        pf.pozisyonlar[kim] = pf.pozisyonlar.get(kim, 0.0) + m
+        onceki = pf.pozisyonlar.get(kim, 0.0)
+        azaltan = abs(onceki + r.miktar) < abs(onceki) and onceki * r.miktar < 0
+        try:
+            dol = self.yurutucu.doldur(s, r.miktar, bid, ask, bacak, eid_ist, azaltan)
+        except Exception as e:  # noqa: BLE001 — emir gitti mi bilinmiyor: mutabakat yakalar
+            dol = f"hata: {type(e).__name__}: {e}"[:200]
+            _log.error("emir_hatasi", kol=self.kol.ad, enstruman=kim, hata=dol)
+        if isinstance(dol, str):
+            self.defter.olay_yaz(eid, self.kol.ad, "ret", kim, q, None, 0.0, int(self.saat() * 1000), {"gerekceler": [dol]})
+            out["ret"].append({"sembol": p.sembol if p else s, "bacak": bacak, "gerekce": [dol]})
+            return None
+        m, px = dol.adet, dol.fiyat
+        ayr = {"bacak": bacak, "islem": islem, "neden": neden, "bid": bid, "ask": ask, "gecikmeli": False} | dol.ek
+        if p is not None:
+            ayr |= {"sembol": p.sembol, "olay_ms": p.olay_ms, "gun_ms": gun, "cikis_ms": p.cikis_ms,
+                    "notional": p.notional, "perp": f"{ONEK}{s}" if bacak == "token" else None}
+        self.defter.olay_yaz(eid, self.kol.ad, "dolum", kim, m, px, dol.ucret, int(self.saat() * 1000), ayr)
+        pf.pozisyonlar[kim] = onceki + m
         out["dolum"] += 1
         return m, px
 
@@ -429,9 +584,9 @@ def _kapanis_nedeni(v: dict) -> str:
     return "teslim_planli" if v.get("durum") == "TRADING" and v.get("teslim_ms") else "islem_gormuyor"
 
 
-def _istemci(gun: int, sembol: str, olay_ms: int, islem: str, bacak: str) -> str:
-    """Tekil emir kimliği: gün + olay + işlem (Aç/Kapat/Geri) + bacak (Token/Btc)."""
-    return f"KL{gun // GUN_MS}-{sembol}-{olay_ms // GUN_MS}-{islem[0].upper()}{bacak[0].upper()}"[:64]
+def _istemci(gun: int, sembol: str, olay_ms: int, islem: str, bacak: str, onek: str = "KL") -> str:
+    """Tekil emir kimliği: önek + gün + olay + işlem (Aç/Kapat/Geri) + bacak (Token/Btc)."""
+    return f"{onek}{gun // GUN_MS}-{sembol}-{olay_ms // GUN_MS}-{islem[0].upper()}{bacak[0].upper()}"[:36]   # Binance ≤ 36
 
 
 def _poz(p: ck.Pozisyon) -> dict:
@@ -446,8 +601,20 @@ def _yuvarla(x: float, adim: float) -> float:
     return round(math.floor(x / adim + 1e-9) * adim, 12)
 
 
-def calistir(sure_sn: float | None = None, dongu_sn: float = 60.0) -> None:
-    """compose `kilit` servisi: her `dongu_sn`'de bir tur. Hata turu atlar (log), bir sonraki tur yeniden dener."""
+def gercek_istemci(ay: KilitAyarlari, a=None):
+    """Gerçek kolun Binance istemcisi (sırlar yalnız host `.env`'inde; kural 12). Anahtar yoksa None."""
+    from tradebot.ayar import ayarlar as sistem
+    from tradebot.canli.binance_emir import VadeliIstemci
+
+    a = a or sistem()
+    if ay.gercek is None or a.binance_anahtar is None or a.binance_gizli is None:
+        return None
+    return VadeliIstemci(ay.gercek["ortam"], a.binance_anahtar.get_secret_value(), a.binance_gizli.get_secret_value())
+
+
+def calistir(sure_sn: float | None = None, dongu_sn: float = 60.0, blok: str = "kilit") -> None:
+    """compose `kilit` (paper) ya da `kilit-gercek` servisi: her `dongu_sn`'de bir tur. Hata turu atlar (log), bir
+    sonraki tur yeniden dener. Gerçek kol açılışta hesabı doğrular (tek yön modu; ana ağda çekim kapalı + IP kısıtı)."""
     import os
 
     from tradebot.ayar import ayarlar as sistem
@@ -455,13 +622,21 @@ def calistir(sure_sn: float | None = None, dongu_sn: float = 60.0) -> None:
     from tradebot.veri.depo import HamDepo
     from tradebot.veri.http import NazikIstemci
 
-    ay = ayarlar()
+    ay = ayarlar(blok=blok)
     if ay is None:
-        raise SystemExit("config/paper.yaml içinde `kilit` bloğu yok")
+        raise SystemExit(f"config/paper.yaml içinde `{blok}` bloğu yok")
     a = sistem()
     m = db_motor(a)
     defter = PaperDefter(m, os.environ.get("TRADEBOT_KOD_SURUMU", "yerel"))
-    dugum = KilitDugumu(defter, ay, Borsa(NazikIstemci("kilit", deneme=3, zaman_asimi=60).al, HamDepo(a.veri_dizini, m)))
+    yurutucu = None
+    if ay.gercek is not None:
+        ist = gercek_istemci(ay, a)
+        if ist is None:
+            raise SystemExit("TRADEBOT_BINANCE_ANAHTAR / TRADEBOT_BINANCE_GIZLI tanımlı değil (yalnız host .env)")
+        _log.info("gercek_hesap", **ist.dogrula())
+        yurutucu = GercekYurutucu(ist)
+    dugum = KilitDugumu(defter, ay, Borsa(NazikIstemci("kilit", deneme=3, zaman_asimi=60).al, HamDepo(a.veri_dizini, m)),
+                        yurutucu=yurutucu)
     dugum.ac()
     bas = time.monotonic()
     while sure_sn is None or time.monotonic() - bas < sure_sn:

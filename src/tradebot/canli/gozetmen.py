@@ -38,6 +38,7 @@ from tradebot.db import paper_emir, paper_emir_olay, paper_kol, paper_kol_olay, 
 from tradebot.kayit import log
 
 NEDEN = "gozetmen_donma"
+GERCEK_DUGUM = "kilit_gercek"
 DONMA_MS = 125 * 60_000
 ONAY_TUR = 3
 ISINMA_SN = 15 * 60
@@ -112,6 +113,7 @@ class Gozetmen:
     kuru: bool = False                      # tatbikat: tespit eder, raporlar, yazmaz
     dugum: str = "paper"                    # izlenen süreç (dugum_kollari); her düğüme ayrı gözetmen
     mt5: object | None = None               # MT5 düğümü: köprü istemcisi (Mt5Istemci); kapatma köprüden
+    binance: object | None = None           # gerçek kilit kolu: VadeliIstemci; kapatma Binance'te reduceOnly
     magic: int | None = None                # MT5 düğümünün sihirli sayısı
     donma_ms: int = DONMA_MS
     onay_tur: int = ONAY_TUR
@@ -141,6 +143,10 @@ class Gozetmen:
             durmus = {r[0] for r in b.execute(select(paper_kol_olay.c.kol).where(
                 paper_kol_olay.c.tur == "durdur", paper_kol_olay.c.zaman_ms > int(son)))}
         durdurulacak = [k for k in kollar if k not in durmus]
+        if self.dugum == GERCEK_DUGUM:
+            if self.binance is None:   # deftere sahte kapanış yazılmaz: gerçek pozisyon borsada kalırdı
+                raise RuntimeError("gerçek kol dondu ama gözetmenin Binance istemcisi yok: elle kapatılmalı")
+            return self._binance_donma(simdi_ms, int(son), yas_dk, durdurulacak, kollar)
         if self.mt5 is not None:
             return self._mt5_donma(simdi_ms, int(son), yas_dk, durdurulacak)
         acik = {k: v for k, v in net_pozisyonlar(self.motor).items() if k in kollar}
@@ -183,6 +189,39 @@ class Gozetmen:
         eksik = [s for s, v in kapatilan.items() if not v["tamam"]]
         if eksik:
             raise RuntimeError(f"MT5 kapatma tamamlanamadı: {eksik}")
+        return {"durum": "donma", "yas_dk": yas_dk, "kapatilan": {kol: kapatilan} if kapatilan else {},
+                "durdurulan": durdurulacak}
+
+    def _binance_donma(self, simdi_ms: int, son: int, yas_dk: float, durdurulacak: list[str],
+                       kollar: list[str]) -> dict:
+        """Gerçek kilit kolu dondu: Binance'teki bütün pozisyonlar reduceOnly piyasa emriyle kapatılır, gerçek dolumlar
+        kolun defterine yazılır (defter borsayla eşit kalır), kol durdurulur."""
+        if self.kuru:
+            return {"durum": "donma", "yas_dk": yas_dk, "kuru": True, "kapatilacak": self.binance.pozisyonlar(),
+                    "durdurulacak": durdurulacak}
+        sonuc = self.binance.hepsini_kapat()             # hata yükselir: kapatılamadı, bir sonraki tur dener
+        kol = kollar[0]
+        kapatilan: dict[str, dict] = {}
+        with self.motor.begin() as b:
+            for sembol, r in sonuc.items():
+                if abs(r["adet"]) < 1e-12:
+                    continue
+                kim = f"BINANCEF:{sembol}"
+                eid = b.execute(insert(paper_emir).values(
+                    kol=kol, karar_id=None, istemci_emir_id=f"G-{uuid.uuid4().hex[:20]}", enstruman=kim,
+                    istenen=r["adet"], onaylanan=r["adet"], karar_fiyati=r["fiyat"], gonderim_fiyati=r["fiyat"],
+                    zaman_ms=simdi_ms, tur="gozetmen",
+                    risk={"onay": True, "gerekceler": [NEDEN], "risk_azaltan": True})).inserted_primary_key[0]
+                b.execute(insert(paper_emir_olay).values(
+                    emir_id=eid, kol=kol, tur="dolum", enstruman=kim, miktar=r["adet"], fiyat=r["fiyat"], ucret=0.0,
+                    zaman_ms=simdi_ms, ayrinti={"gozetmen": True, "borsa_emir": r.get("emir_id"), "son_isaret_ms": son}))
+                kapatilan[kim] = {"adet": r["adet"], "fiyat": r["fiyat"]}
+        for k in durdurulacak:
+            self._olay(k, simdi_ms, {"neden": NEDEN, "son_isaret_ms": son, "kapatilan_binance": kapatilan})
+        denetim.kaydet(self.motor, "gozetmen", "donma_kapatma_binance",
+                       {"dugum": self.dugum, "son_isaret_ms": son, "yas_dk": yas_dk, "kapatilan": kapatilan,
+                        "durdurulan": durdurulacak})
+        _log.error("binance_dugum_donmasi_kapatildi", yas_dk=yas_dk, kapatilan=kapatilan)
         return {"durum": "donma", "yas_dk": yas_dk, "kapatilan": {kol: kapatilan} if kapatilan else {},
                 "durdurulan": durdurulacak}
 
