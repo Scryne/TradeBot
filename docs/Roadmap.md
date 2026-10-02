@@ -523,6 +523,12 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     **Dalga 13** (kilit, küçük açılımlar; `docs/turnuva/Dalga-13-Kilit-Genis.md`): üç kol A; eşik %0,5 + nominal %5
     (Sharpe 0,99, DSR 0,98, 802 olay, 6b'nin iki katı) paper ve gerçek kilit kollarında 6b'nin yerine geçti (ilk giriş
     öncesi). Scryne "haftada 100–300 $" istedi: kilit oranlarıyla bu ~35–110 bin $ sermaye ister; bir kez söylendi.
+  - 2026-10-02 ilk kararlar (00:05 UTC): paper ve Demo kolları MOVE olayına girdi (paper 4.995 $ kısa + 0,058 BTC; Demo
+    4.944 MOVE ≈ 49,8 $ kısa + 0,001 BTC net koruma). Borsa ↔ defter eşit. **Hata ve düzeltme:** Demo'nun RESULT yanıtı
+    dolu emirde `avgPrice` 0 döndü, deftere 0 fiyat yazıldı; istemci artık emri sorguluyor (e1b320f). Defter yalnız
+    eklenir: iki satır ters çevrilip borsadan sorgulanan fiyatla yeniden yazıldı (denetim `dolum_fiyati_duzeltme`).
+    Küçük sermaye etkisi: tek olayda net BTC koruması 0,001 BTC (~85 $) 50 $'lık kısayı aşıyor (~35 $ net BTC uzun);
+    açık olay sayısı arttıkça yuvarlama payı küçülür.
 
 ### Faz 13: Sonraki dalgalar (koşullu)
 - **İşler:** Ücretli veriyle ABD tek hisseleri; Databento ile CME vadelileri; VİOP; gerekirse IB bağlantısı;
