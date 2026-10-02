@@ -40,6 +40,15 @@ def miktar_metni(x: float) -> str:
     return f"{abs(x):.8f}".rstrip("0").rstrip(".")
 
 
+def _ortalama(r: dict) -> float:
+    """Ortalama dolum fiyatı: `avgPrice`, yoksa `cumQuote / executedQty`."""
+    p = float(r.get("avgPrice") or 0)
+    if p > 0:
+        return p
+    q = float(r.get("executedQty") or 0)
+    return float(r.get("cumQuote") or 0) / q if q > 0 else 0.0
+
+
 class VadeliIstemci:
     def __init__(self, ortam: str, anahtar: str, gizli: str, http: httpx.Client | None = None,
                  saat: Callable[[], float] = time.time, recv_window: int = 5000) -> None:
@@ -121,8 +130,13 @@ class VadeliIstemci:
             _log.warning("emir_tekrar_sorgulandi", sembol=sembol, istemci=istemci_id)
             r = self.emir_sorgu(sembol, istemci_id)
         adet = float(r.get("executedQty") or 0) * (1 if miktar > 0 else -1)
-        return {"adet": adet, "fiyat": float(r.get("avgPrice") or 0), "durum": r.get("status"),
-                "emir_id": r.get("orderId")}
+        fiyat = _ortalama(r)
+        if abs(adet) > 0 and fiyat <= 0:   # Demo'da RESULT yanıtı dolu emirde avgPrice "0" döndü (2026-10-02): sorgula
+            r = self.emir_sorgu(sembol, istemci_id)
+            fiyat = _ortalama(r)
+        if abs(adet) > 0 and fiyat <= 0:
+            raise BorsaHatasi(-1, f"dolum fiyatı alınamadı: {sembol} {istemci_id}")
+        return {"adet": adet, "fiyat": fiyat, "durum": r.get("status"), "emir_id": r.get("orderId")}
 
     # ------------------------------------------------------------------ güvenlik
     def dogrula(self) -> dict:

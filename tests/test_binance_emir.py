@@ -19,6 +19,7 @@ class SahteBinance:
         self.gizli, self.istekler, self.emirler = gizli, [], {}
         self.poz = {"MOVEUSDT": -100.0}
         self.dual = False
+        self.sifir_fiyat = False   # Demo davranışı: RESULT yanıtında avgPrice "0"
         self.kisit = {"enableWithdrawals": False, "ipRestrict": True}
         self.gelir = [{"incomeType": "FUNDING_FEE", "income": "0.5", "symbol": "MOVEUSDT", "time": 1000 + i,
                        "tranId": i, "asset": "USDT"} for i in range(1500)]
@@ -38,7 +39,8 @@ class SahteBinance:
             self.emirler[q["newClientOrderId"]] = {"orderId": len(self.emirler) + 1, "status": "FILLED",
                                                    "executedQty": q["quantity"], "avgPrice": "1.25"}
             self.poz[q["symbol"]] = self.poz.get(q["symbol"], 0.0) + qty
-            return httpx.Response(200, json=self.emirler[q["newClientOrderId"]])
+            yanit = self.emirler[q["newClientOrderId"]]
+            return httpx.Response(200, json=yanit | ({"avgPrice": "0", "cumQuote": "0"} if self.sifir_fiyat else {}))
         if yol == "/fapi/v1/order":
             return httpx.Response(200, json=self.emirler[q["origClientOrderId"]])
         if yol == "/fapi/v3/positionRisk":
@@ -157,3 +159,11 @@ def test_gozetmen_gercek_kolu_binance_te_kapatir_ve_deftere_yazar(tmp_path):
         b.execute(paper_kol_olay.delete())
     with pytest.raises(RuntimeError, match="Binance istemcisi yok"):
         g2.kontrol()
+
+
+def test_yanitta_fiyat_sifirsa_emir_sorgulanir():
+    s = SahteBinance()
+    s.sifir_fiyat = True
+    r = _ist(s).emir("MOVEUSDT", -10.0, "KG9-MOVE-9-AT", False)
+    assert r["fiyat"] == 1.25 and r["adet"] == -10.0
+    assert any(m == "GET" and y == "/fapi/v1/order" for m, _, y, _ in s.istekler)
