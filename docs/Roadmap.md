@@ -38,6 +38,8 @@ durdurulan kolu düzleştirir (önceden yalnız yeni riski kesiyordu). Sık işl
 daha gösterildi; Scryne "ikisi birlikte"yi seçti: sürekli işlem botu demoda (Altın M15 `kanal_kirilim`, ölçülmüş en az
 kötü aile) + haber botu önce ölçülür (dalga 14, `docs/turnuva/Dalga-14-Altin-Haber.md`). ScryneQuant artık okunabilir
 (kural 1 değişti). Gerçek para ve kaldıraç tavanı (kural 6–7) yine Scryne'ın açık onayıyla.
+Aynı gece: dalga 14 KALDI; Scryne'ın gerçek para bütçesi en çok 5–10 $ (kilit en az ~500 $ ister) ve karar Claude'a
+bırakıldı → kilit d13 paper + Binance Demo yeniden açıldı (ölçülmüş tek kazanan), altın M15 demo sürüyor, gerçek para yok.
 
 ## Faz Detayları
 
