@@ -59,7 +59,7 @@ def ayarlar(d: dict | None = None) -> tuple[AltinAyarlari, SkalpParam] | None:
     if ay is None:
         return None
     p = d[BLOK]["parametre"]
-    bitis = p.get("bitis_utc")
+    bitis = d[BLOK].get("bitis_utc")
     bitis_ms = int(datetime.fromisoformat(str(bitis).replace("Z", "+00:00")).timestamp() * 1000) if bitis else None
     return ay, SkalpParam(int(float(p["bekleme_sn"]) * 1000), float(p["tp_usd"]), float(p["sl_oran"]),
                           int(float(p["azami_sn"]) * 1000), bitis_ms)
