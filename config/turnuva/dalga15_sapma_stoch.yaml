@@ -1,0 +1,35 @@
+# Turnuva dalga 15 — YouTube "sapma + stokastik RSI + EMA" sistemi: ÖN KAYIT (koşudan önce commit edilir, koşu
+# sırasında değişmez). Gerekçe: docs/turnuva/Dalga-15-Sapma-Stoch.md. Kaynak: Scryne'ın gönderdiği video (2026-10-05),
+# BIST hisseleri, 4 saatlik ve günlük; kâr al %5–7, stop %2, yalnız alış. Kurallar dalga 1 ile aynı.
+
+dalga: 15
+veri_bitis: "2026-09-25"
+frenler: true
+boyut:
+  hedef_vol: 0.20
+  kaldirac: 3.0
+  vol_pencere_gun: 30
+  bant: 0.25
+walk_forward: { is_yil: 3, oos_yil: 1 }
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0 }
+
+planlar:
+  sapma_stoch:
+    kimlik: 2026-10-05-d15-sapma-stoch
+    hipotez: >-
+      Fiyat 21 barlık ortalamanın belirgin altına sapınca (z ≤ eşik) takibe alıp stokastik RSI(14) al kesişiminde
+      (güvenli varyantta ayrıca EMA(21) üstü kapanışta) alış, %5–7 kâr al ve %2 stopla, maliyet sonrası pozitif ve
+      walk-forward'da kalıcı getiri verir; videonun piyasasında (BIST hisseleri) ve altın/kriptoda. Sıfır hipotezi: vermez.
+
+gruplar:
+  xau_4h: { kimlikler: [DUKASCOPY:XAUUSD], asgari_gecmis_gun: 60, yon: long, zd: [4h] }
+  kripto_btc_eth: { kimlikler: [BINANCE:BTCUSDT, BINANCE:ETHUSDT], asgari_gecmis_gun: 30, yon: long, zd: [4h] }
+  bist_endeks: { kimlikler: [BIST:XU100], asgari_gecmis_gun: 60, kur: DUKASCOPY:USDTRY, yon: long, zd: [1d] }
+  bist_hisse:  { dinamik: bist, ilk_n: 30, likidite_gun: 30, asgari_gecmis_gun: 120, kur: DUKASCOPY:USDTRY, yon: long, zd: [1d], en_fazla: B }
+
+# 8 deneme / grup (32 toplam): sapma eşiği × güvenli (EMA onayı) × kâr al; stop %2 sabit (video).
+kollar:
+  - strateji: sapma_stoch
+    gruplar: [xau_4h, kripto_btc_eth, bist_endeks, bist_hisse]
+    zd: [4h, 1d]
+    izgara: { z_esik: [-1.5, -2.0], guvenli: [0, 1], tp: [0.05, 0.07], sl: [0.02] }

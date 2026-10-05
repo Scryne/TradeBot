@@ -44,6 +44,7 @@ from tradebot.cekirdek import aileler as al
 from tradebot.cekirdek import doviz_akis as da
 from tradebot.cekirdek import endeks_takvim as et
 from tradebot.cekirdek import haber as hb
+from tradebot.cekirdek import sapma_stoch as ss
 from tradebot.cekirdek.boyut import kaldirac_dogrula, panel_oynaklik_hedefi, yarim_kelly_tavani
 from tradebot.risk.motor import PortfoyIzleyici, RiskAyar
 from tradebot.veri.depo import BarDepo
@@ -93,6 +94,8 @@ STRATEJILER = {
     "ters_ea_birlesik": ("altin_m15", altin.ters_ea_birlesik, "tek"),
     # Dalga 14: altın haber ivmesi / dönüşü, 1 dk (docs/turnuva/Dalga-14-Altin-Haber.md); yeni aile
     "haber_ivme": ("altin_haber", hb.haber_ivme, "tek"),
+    # Dalga 15: YouTube "sapma + stokastik RSI + EMA" sistemi (docs/turnuva/Dalga-15-Sapma-Stoch.md); yeni aile
+    "sapma_stoch": ("sapma_stoch", ss.sapma_stoch, "tek"),
 }
 
 
