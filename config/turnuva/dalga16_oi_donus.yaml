@@ -1,0 +1,26 @@
+# Turnuva dalga 16 — OI temizlenmesi (zorunlu kapanış) sonrası dönüş: ÖN KAYIT (koşudan önce commit).
+# Gerekçe: docs/turnuva/Dalga-16-OI-Donus.md. Motor: arastirma/um_dalga.py (dalga16), çekirdek cekirdek/oi_donus.py.
+# Veri: data/um/ (Binance USDT-M arşivi, kaldırılan perp'ler dahil; OI 2021-12'den).
+
+dalga: 16
+motor: oi_donus
+plan:
+  kimlik: 2026-10-06-d16-oi-donus
+  aile: oi_donus
+  hipotez: >-
+    Bir perp saatlik barda sert düşerken (z ≤ −4, önceki 30 günün saatlik oynaklığıyla) açık pozisyon da bir saatte
+    belirgin azalırsa düşüş zorunlu kapanıştır (likidasyon, marj çağrısı): satış bilgiden değil kaldıraçtan gelir ve
+    likidite sağlayan tarafa prim kalır. Sonraki 4–24 saatte perp uzun pozisyon, maliyet ve funding sonrası pozitif
+    getiri verir. OI koşulu olmayan kontrol kolu, aynı fiyat düşüşünde OI bilgisinin katkısını ayırır. Sıfır hipotezi:
+    düşüş sonrası getiri sıfır ya da devam yönünde (momentum); OI koşulu fark yaratmaz.
+
+kural: { k: 4.0, asgari_hacim: 2.0e7 }      # günlük ortalama quote hacmi ≥ 20 M USDT (önceki 30 gün)
+notional: 0.05                               # olay başına bacak nominali / özkaynak
+azami_brut: 1.0                              # açık olayların brüt toplamı (hedge'li olay 2 bacak sayılır)
+maliyet: { ucret: 0.0005, kayma_token: 0.001, kayma_btc: 0.0001 }
+donem: { bas: "2022-01-01", is_bitis: "2025-01-01", bit: "2026-10-01" }
+# 12 deneme: OI eşiği (yok = kontrol, −%5, −%10) × tutma (4 s, 24 s) × BTC hedge (yok, var)
+izgara: { oi_esik: ["yok", -0.05, -0.10], tut: [4, 24], hedge: [false, true] }
+onceki_dalgalar: []
+olcut: { dsr_a: 0.95, yil_pozitif: 0.60, stres_maliyet: 2.0, en_kotu_hafta: -0.10, en_kotu_dusus: -0.30,
+         oos_asgari_yillik: 0.0 }

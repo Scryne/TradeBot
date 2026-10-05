@@ -91,13 +91,7 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
         ilk_mum = {s: int(b["acilis_ms"].min()) for s, b in barlar.items() if b.height}
         vh = hashlib.sha256((kd / "perp_listesi.json").read_bytes()).hexdigest()
     bas, is_bit, bit = _ms(d["donem"]["bas"]), _ms(d["donem"]["is_bitis"]), _ms(d["donem"]["bit"])
-    plan = d["plan"]
-    if defter is not None:
-        try:
-            defter.plan_ac(plan["kimlik"], plan["aile"], " ".join(plan["hipotez"].split()), d["izgara"],
-                           ["BINANCEF:perp"], f"{dosya} → olcut {o}")
-        except ValueError:
-            pass
+    plan_ac(d, dosya, defter, ["BINANCEF:perp"])
     kollar = []
     tavan = d.get("tavan") or {}
     for p in izgara(d["izgara"]):
@@ -144,6 +138,24 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
                                 "birim_t": float(kurulan["getiri"].mean() / (kurulan["getiri"].std() / np.sqrt(kurulan.height)))
                                 if kurulan.height > 2 else None},
                        "sure": time.perf_counter() - t0, "ad": ad, "dosya": dosya_adi})
+    return degerlendir(kollar, d, veri_dizini, defter, f"BINANCEF:{kaynak}", "1d", vh)
+
+
+def plan_ac(d: dict, dosya: Path, defter, piyasalar: list[str]) -> None:
+    """Ön kayıttaki planı deftere açar (zaten açıksa sürer: kesilen koşu yeniden başlatılabilir)."""
+    if defter is not None:
+        try:
+            defter.plan_ac(d["plan"]["kimlik"], d["plan"]["aile"], " ".join(d["plan"]["hipotez"].split()), d["izgara"],
+                           piyasalar, f"{dosya} → olcut {d['olcut']}")
+        except ValueError:
+            pass
+
+
+def degerlendir(kollar: list[dict], d: dict, veri_dizini: Path, defter, piyasa: str, zd: str, vh: str) -> list[dict]:
+    """Ön kayıtlı ölçütle karar (A/B/KALDI), DSR (önceki dalgalar dahil), defter ve `data/turnuva/dalga<N>/` yazımı.
+
+    `kollar` öğeleri: p, h (haftalık getiri), tam, is, kor, stres, yillik, olay, sure, ad, dosya."""
+    o, plan, bas = d["olcut"], d["plan"], _ms(d["donem"]["bas"])
     sr = [k["tam"].get("sr_haftalik", 0.0) for k in kollar]
     # Aynı ailenin önceki dalgaları (ör. 6b → 6): DSR bütün denemelerle sayılır (kural 10)
     for onceki in d.get("onceki_dalgalar") or []:
@@ -162,14 +174,14 @@ def kos(dosya: Path, veri_dizini: Path, defter=None) -> list[dict]:
                  and k["kor"].get("en_kotu_dusus", -1) >= o["en_kotu_dusus"])
         kr = "KALDI" if not temel else ("A" if dd >= o["dsr_a"] else "B")
         ad = k["ad"]
-        sonuc = {"plan": plan["kimlik"], "kol": f"{ad}@BINANCEF:{kaynak}@1d", "karar": kr,
+        sonuc = {"plan": plan["kimlik"], "kol": f"{ad}@{piyasa}@{zd}", "karar": kr,
                  "en_iyi": {"varyant": ad, "sharpe": k["tam"].get("sharpe"), "yillik_bilesik": k["tam"].get("yillik_bilesik")},
                  "dsr": {"dsr": dd, "deneme": deneme_sayisi, "sr_esik": beklenen_max_sr(deneme_sayisi, v)},
                  "tam": k["tam"], "orneklem_ici": k["is"], "kor": k["kor"], "stres_2x": k["stres"], "yillik": k["yillik"],
                  "yil_pozitif_orani": yp, "olay": k["olay"], "veri_hash": vh,
                  "haftalik": {"bas_ms": bas, "getiri": [float(x) for x in k["h"]]}}
         if defter is not None:
-            defter.kaydet(plan["kimlik"], "tarama", plan["aile"], plan["aile"], k["p"], f"BINANCEF:{kaynak}", "1d", vh,
+            defter.kaydet(plan["kimlik"], "tarama", plan["aile"], plan["aile"], k["p"], piyasa, zd, vh,
                           {x: sonuc[x] for x in ("karar", "dsr", "tam", "kor", "olay")}, k["sure"])
         dz = Path(veri_dizini) / "turnuva" / f"dalga{d['dalga']}"
         dz.mkdir(parents=True, exist_ok=True)

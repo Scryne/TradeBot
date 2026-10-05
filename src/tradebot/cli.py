@@ -580,6 +580,22 @@ def arastirma_opsiyon(
                    f"trend kor {r['trend_korelasyonu'] if r['trend_korelasyonu'] is None else round(r['trend_korelasyonu'], 2)}")
 
 
+@arastirma_uygulama.command("um")
+def arastirma_um(dosya: str = typer.Option(..., help="config/turnuva/dalga16_oi_donus.yaml vb.")) -> None:
+    """Binance USDT-M arşivi dalgaları (16: OI temizlenmesi sonrası dönüş, 17: kesitsel funding) → defter, data/turnuva/."""
+    from tradebot.arastirma import um_dalga
+    from tradebot.arastirma.defter import Defter
+
+    a, m = _veri_baglam()
+    for r in um_dalga.kos(Path(dosya), a.veri_dizini, Defter(m)):
+        k, o, e = r["tam"], r["kor"], r["olay"]
+        typer.echo(f"{r['karar']:<5} {r['kol']:<58} Sharpe {k.get('sharpe', float('nan')):.2f}  "
+                   f"yıllık {k.get('yillik_bilesik', float('nan')):+.1%}  DD {k.get('en_kotu_dusus', float('nan')):.0%}  "
+                   f"DSR {r['dsr']['dsr']:.2f}  kör {o.get('yillik_bilesik', float('nan')):+.1%}  "
+                   f"stres {r['stres_2x'].get('yillik_bilesik', float('nan')):+.1%}  olay {e.get('kurulan')}  "
+                   f"birim {e.get('birim_ort')}")
+
+
 @arastirma_uygulama.command("kilit")
 def arastirma_kilit(dosya: str = typer.Option("config/turnuva/dalga6_kilit.yaml")) -> None:
     """Olay tabanlı perp kısa (BTC ile nötr; dalga 6 kilit, dalga 7 listeleme): ön kayıtlı ızgara → defter, data/turnuva/."""

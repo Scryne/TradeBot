@@ -1,0 +1,25 @@
+# Turnuva dalga 17 — kesitsel funding (kalabalık uzunlara karşı): ÖN KAYIT (koşudan önce commit).
+# Gerekçe: docs/turnuva/Dalga-17-Funding-Kesit.md. Motor: arastirma/um_dalga.py (dalga17), çekirdek
+# cekirdek/funding_kesit.py. Veri: data/um/ (Binance USDT-M arşivi, kaldırılan perp'ler dahil).
+
+dalga: 17
+motor: funding_kesit
+plan:
+  kimlik: 2026-10-06-d17-funding-kesit
+  aile: funding_kesit
+  hipotez: >-
+    Funding'i kesitte en yüksek perp'ler kaldıraçlı uzunların kalabalıklaştığı isimlerdir: hem funding öderler hem de
+    sonraki haftalarda kesitin gerisinde kalırlar (kalabalık çözülür). Hacme göre ilk 50 perp içinde, son 3 ya da 14
+    günün ortalama funding'ine göre en yüksek n perp kısa, en düşük n uzun, dolar nötr, haftalık dengeleme; funding ve
+    maliyet sonrası pozitif getiri. Sıfır hipotezi: funding farkı fiyat farkıyla geri ödenir (yüksek funding'li isimler
+    momentumla yükselmeye devam eder) ve maliyet kalanı yer.
+
+evren: 50
+brut: 1.0
+maliyet: { ucret: 0.0005, kayma_token: 0.001 }
+donem: { bas: "2021-01-04", is_bitis: "2025-01-06", bit: "2026-09-28" }
+# 4 deneme: funding penceresi (3, 14 gün) × bacak başına perp (5, 10)
+izgara: { pencere: [3, 14], n: [5, 10] }
+onceki_dalgalar: []
+olcut: { dsr_a: 0.95, yil_pozitif: 0.60, stres_maliyet: 2.0, en_kotu_hafta: -0.10, en_kotu_dusus: -0.30,
+         oos_asgari_yillik: 0.0 }
