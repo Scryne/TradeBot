@@ -1,1266 +1,4429 @@
 aciklama: 'Yüksek etkili ABD verileri (haber filtresi). Üreten: tradebot veri haber-takvimi'
 kaynak_sha:
-  fomc: 78de8ae34bf5f05ce703140c35a4bc0643ed6aa65e685387d9a674c9eded5f63
-  empsit: 5a2630d7c59ff8153254741c0a8b234bb842484f01ee7e1a1e50d8e95234b2e7
+  fomc: 0344a73d669d30a9e41e4f8e31ada009110741b4cfbaff159dca3b2c5820e451
+  empsit: faabff400e4e64d8e354a5e6a6d5f6aebb59a006b951ae5f5259b47b7245adf3
   cpi: e522ffbbd037e18febae96b978ac1873617661e9e75a8f5f6ac6b4271ffd6c43
+  ppi: d5a2dfd4ad2165a5cd69887be7642e923dcf475e498ae0782d190eaf92ad4cd5
 olaylar:
+- olay: ISSIZLIK
+  tarih: '20080103'
+  utc_ms: 1199367000000
+- olay: ISSIZLIK
+  tarih: '20080110'
+  utc_ms: 1199971800000
+- olay: ISSIZLIK
+  tarih: '20080117'
+  utc_ms: 1200576600000
+- olay: ISSIZLIK
+  tarih: '20080124'
+  utc_ms: 1201181400000
+- olay: ISSIZLIK
+  tarih: '20080131'
+  utc_ms: 1201786200000
 - olay: NFP
   tarih: '20080201'
   utc_ms: 1201872600000
+- olay: ISSIZLIK
+  tarih: '20080207'
+  utc_ms: 1202391000000
+- olay: ISSIZLIK
+  tarih: '20080214'
+  utc_ms: 1202995800000
 - olay: CPI
   tarih: '20080220'
   utc_ms: 1203514200000
+- olay: ISSIZLIK
+  tarih: '20080221'
+  utc_ms: 1203600600000
+- olay: PPI
+  tarih: '20080226'
+  utc_ms: 1204032600000
+- olay: ISSIZLIK
+  tarih: '20080228'
+  utc_ms: 1204205400000
+- olay: ISSIZLIK
+  tarih: '20080306'
+  utc_ms: 1204810200000
 - olay: NFP
   tarih: '20080307'
   utc_ms: 1204896600000
+- olay: ISSIZLIK
+  tarih: '20080313'
+  utc_ms: 1205411400000
 - olay: CPI
   tarih: '20080314'
   utc_ms: 1205497800000
+- olay: PPI
+  tarih: '20080318'
+  utc_ms: 1205843400000
+- olay: ISSIZLIK
+  tarih: '20080320'
+  utc_ms: 1206016200000
+- olay: ISSIZLIK
+  tarih: '20080327'
+  utc_ms: 1206621000000
+- olay: ISSIZLIK
+  tarih: '20080403'
+  utc_ms: 1207225800000
 - olay: NFP
   tarih: '20080404'
   utc_ms: 1207312200000
+- olay: ISSIZLIK
+  tarih: '20080410'
+  utc_ms: 1207830600000
+- olay: PPI
+  tarih: '20080415'
+  utc_ms: 1208262600000
 - olay: CPI
   tarih: '20080416'
   utc_ms: 1208349000000
+- olay: ISSIZLIK
+  tarih: '20080417'
+  utc_ms: 1208435400000
+- olay: ISSIZLIK
+  tarih: '20080424'
+  utc_ms: 1209040200000
+- olay: ISSIZLIK
+  tarih: '20080501'
+  utc_ms: 1209645000000
 - olay: NFP
   tarih: '20080502'
   utc_ms: 1209731400000
+- olay: ISSIZLIK
+  tarih: '20080508'
+  utc_ms: 1210249800000
 - olay: CPI
   tarih: '20080514'
   utc_ms: 1210768200000
+- olay: ISSIZLIK
+  tarih: '20080515'
+  utc_ms: 1210854600000
+- olay: PPI
+  tarih: '20080520'
+  utc_ms: 1211286600000
+- olay: ISSIZLIK
+  tarih: '20080522'
+  utc_ms: 1211459400000
+- olay: ISSIZLIK
+  tarih: '20080529'
+  utc_ms: 1212064200000
+- olay: ISSIZLIK
+  tarih: '20080605'
+  utc_ms: 1212669000000
 - olay: NFP
   tarih: '20080606'
   utc_ms: 1212755400000
+- olay: ISSIZLIK
+  tarih: '20080612'
+  utc_ms: 1213273800000
 - olay: CPI
   tarih: '20080613'
   utc_ms: 1213360200000
+- olay: PPI
+  tarih: '20080617'
+  utc_ms: 1213705800000
+- olay: ISSIZLIK
+  tarih: '20080619'
+  utc_ms: 1213878600000
+- olay: ISSIZLIK
+  tarih: '20080626'
+  utc_ms: 1214483400000
+- olay: ISSIZLIK
+  tarih: '20080703'
+  utc_ms: 1215088200000
 - olay: NFP
   tarih: '20080703'
   utc_ms: 1215088200000
+- olay: ISSIZLIK
+  tarih: '20080710'
+  utc_ms: 1215693000000
+- olay: PPI
+  tarih: '20080715'
+  utc_ms: 1216125000000
 - olay: CPI
   tarih: '20080716'
   utc_ms: 1216211400000
+- olay: ISSIZLIK
+  tarih: '20080717'
+  utc_ms: 1216297800000
+- olay: ISSIZLIK
+  tarih: '20080724'
+  utc_ms: 1216902600000
+- olay: ISSIZLIK
+  tarih: '20080731'
+  utc_ms: 1217507400000
 - olay: NFP
   tarih: '20080801'
   utc_ms: 1217593800000
+- olay: ISSIZLIK
+  tarih: '20080807'
+  utc_ms: 1218112200000
 - olay: CPI
   tarih: '20080814'
   utc_ms: 1218717000000
+- olay: ISSIZLIK
+  tarih: '20080814'
+  utc_ms: 1218717000000
+- olay: PPI
+  tarih: '20080819'
+  utc_ms: 1219149000000
+- olay: ISSIZLIK
+  tarih: '20080821'
+  utc_ms: 1219321800000
+- olay: ISSIZLIK
+  tarih: '20080828'
+  utc_ms: 1219926600000
+- olay: ISSIZLIK
+  tarih: '20080904'
+  utc_ms: 1220531400000
 - olay: NFP
   tarih: '20080905'
   utc_ms: 1220617800000
+- olay: ISSIZLIK
+  tarih: '20080911'
+  utc_ms: 1221136200000
+- olay: PPI
+  tarih: '20080912'
+  utc_ms: 1221222600000
 - olay: CPI
   tarih: '20080916'
   utc_ms: 1221568200000
+- olay: ISSIZLIK
+  tarih: '20080918'
+  utc_ms: 1221741000000
+- olay: ISSIZLIK
+  tarih: '20080925'
+  utc_ms: 1222345800000
+- olay: ISSIZLIK
+  tarih: '20081002'
+  utc_ms: 1222950600000
 - olay: NFP
   tarih: '20081003'
   utc_ms: 1223037000000
+- olay: ISSIZLIK
+  tarih: '20081009'
+  utc_ms: 1223555400000
+- olay: PPI
+  tarih: '20081015'
+  utc_ms: 1224073800000
 - olay: CPI
   tarih: '20081016'
   utc_ms: 1224160200000
+- olay: ISSIZLIK
+  tarih: '20081016'
+  utc_ms: 1224160200000
+- olay: ISSIZLIK
+  tarih: '20081023'
+  utc_ms: 1224765000000
+- olay: ISSIZLIK
+  tarih: '20081030'
+  utc_ms: 1225369800000
+- olay: ISSIZLIK
+  tarih: '20081106'
+  utc_ms: 1225978200000
 - olay: NFP
   tarih: '20081107'
   utc_ms: 1226064600000
+- olay: ISSIZLIK
+  tarih: '20081113'
+  utc_ms: 1226583000000
+- olay: PPI
+  tarih: '20081118'
+  utc_ms: 1227015000000
 - olay: CPI
   tarih: '20081119'
   utc_ms: 1227101400000
+- olay: ISSIZLIK
+  tarih: '20081120'
+  utc_ms: 1227187800000
+- olay: ISSIZLIK
+  tarih: '20081126'
+  utc_ms: 1227706200000
+- olay: ISSIZLIK
+  tarih: '20081204'
+  utc_ms: 1228397400000
 - olay: NFP
   tarih: '20081205'
   utc_ms: 1228483800000
+- olay: ISSIZLIK
+  tarih: '20081211'
+  utc_ms: 1229002200000
+- olay: PPI
+  tarih: '20081212'
+  utc_ms: 1229088600000
 - olay: CPI
   tarih: '20081216'
   utc_ms: 1229434200000
+- olay: ISSIZLIK
+  tarih: '20081218'
+  utc_ms: 1229607000000
+- olay: ISSIZLIK
+  tarih: '20081224'
+  utc_ms: 1230125400000
+- olay: ISSIZLIK
+  tarih: '20081231'
+  utc_ms: 1230730200000
+- olay: ISSIZLIK
+  tarih: '20090108'
+  utc_ms: 1231421400000
 - olay: NFP
   tarih: '20090109'
   utc_ms: 1231507800000
+- olay: ISSIZLIK
+  tarih: '20090115'
+  utc_ms: 1232026200000
+- olay: PPI
+  tarih: '20090115'
+  utc_ms: 1232026200000
 - olay: CPI
   tarih: '20090116'
   utc_ms: 1232112600000
+- olay: ISSIZLIK
+  tarih: '20090122'
+  utc_ms: 1232631000000
+- olay: ISSIZLIK
+  tarih: '20090129'
+  utc_ms: 1233235800000
+- olay: ISSIZLIK
+  tarih: '20090205'
+  utc_ms: 1233840600000
 - olay: NFP
   tarih: '20090206'
   utc_ms: 1233927000000
+- olay: ISSIZLIK
+  tarih: '20090212'
+  utc_ms: 1234445400000
+- olay: ISSIZLIK
+  tarih: '20090219'
+  utc_ms: 1235050200000
+- olay: PPI
+  tarih: '20090219'
+  utc_ms: 1235050200000
 - olay: CPI
   tarih: '20090220'
   utc_ms: 1235136600000
+- olay: ISSIZLIK
+  tarih: '20090226'
+  utc_ms: 1235655000000
+- olay: ISSIZLIK
+  tarih: '20090305'
+  utc_ms: 1236259800000
 - olay: NFP
   tarih: '20090306'
   utc_ms: 1236346200000
+- olay: ISSIZLIK
+  tarih: '20090312'
+  utc_ms: 1236861000000
+- olay: PPI
+  tarih: '20090317'
+  utc_ms: 1237293000000
 - olay: CPI
   tarih: '20090318'
   utc_ms: 1237379400000
+- olay: ISSIZLIK
+  tarih: '20090319'
+  utc_ms: 1237465800000
+- olay: ISSIZLIK
+  tarih: '20090326'
+  utc_ms: 1238070600000
+- olay: ISSIZLIK
+  tarih: '20090402'
+  utc_ms: 1238675400000
 - olay: NFP
   tarih: '20090403'
   utc_ms: 1238761800000
+- olay: ISSIZLIK
+  tarih: '20090409'
+  utc_ms: 1239280200000
+- olay: PPI
+  tarih: '20090414'
+  utc_ms: 1239712200000
 - olay: CPI
   tarih: '20090415'
   utc_ms: 1239798600000
+- olay: ISSIZLIK
+  tarih: '20090416'
+  utc_ms: 1239885000000
+- olay: ISSIZLIK
+  tarih: '20090423'
+  utc_ms: 1240489800000
+- olay: ISSIZLIK
+  tarih: '20090430'
+  utc_ms: 1241094600000
+- olay: ISSIZLIK
+  tarih: '20090507'
+  utc_ms: 1241699400000
 - olay: NFP
   tarih: '20090508'
   utc_ms: 1241785800000
+- olay: ISSIZLIK
+  tarih: '20090514'
+  utc_ms: 1242304200000
+- olay: PPI
+  tarih: '20090514'
+  utc_ms: 1242304200000
 - olay: CPI
   tarih: '20090515'
   utc_ms: 1242390600000
+- olay: ISSIZLIK
+  tarih: '20090521'
+  utc_ms: 1242909000000
+- olay: ISSIZLIK
+  tarih: '20090528'
+  utc_ms: 1243513800000
+- olay: ISSIZLIK
+  tarih: '20090604'
+  utc_ms: 1244118600000
 - olay: NFP
   tarih: '20090605'
   utc_ms: 1244205000000
+- olay: ISSIZLIK
+  tarih: '20090611'
+  utc_ms: 1244723400000
+- olay: PPI
+  tarih: '20090616'
+  utc_ms: 1245155400000
 - olay: CPI
   tarih: '20090617'
   utc_ms: 1245241800000
+- olay: ISSIZLIK
+  tarih: '20090618'
+  utc_ms: 1245328200000
+- olay: ISSIZLIK
+  tarih: '20090625'
+  utc_ms: 1245933000000
+- olay: ISSIZLIK
+  tarih: '20090702'
+  utc_ms: 1246537800000
 - olay: NFP
   tarih: '20090702'
   utc_ms: 1246537800000
+- olay: ISSIZLIK
+  tarih: '20090709'
+  utc_ms: 1247142600000
+- olay: PPI
+  tarih: '20090714'
+  utc_ms: 1247574600000
 - olay: CPI
   tarih: '20090715'
   utc_ms: 1247661000000
+- olay: ISSIZLIK
+  tarih: '20090716'
+  utc_ms: 1247747400000
+- olay: ISSIZLIK
+  tarih: '20090723'
+  utc_ms: 1248352200000
+- olay: ISSIZLIK
+  tarih: '20090730'
+  utc_ms: 1248957000000
+- olay: ISSIZLIK
+  tarih: '20090806'
+  utc_ms: 1249561800000
 - olay: NFP
   tarih: '20090807'
   utc_ms: 1249648200000
+- olay: ISSIZLIK
+  tarih: '20090813'
+  utc_ms: 1250166600000
 - olay: CPI
   tarih: '20090814'
   utc_ms: 1250253000000
+- olay: PPI
+  tarih: '20090818'
+  utc_ms: 1250598600000
+- olay: ISSIZLIK
+  tarih: '20090820'
+  utc_ms: 1250771400000
+- olay: ISSIZLIK
+  tarih: '20090827'
+  utc_ms: 1251376200000
+- olay: ISSIZLIK
+  tarih: '20090903'
+  utc_ms: 1251981000000
 - olay: NFP
   tarih: '20090904'
   utc_ms: 1252067400000
+- olay: ISSIZLIK
+  tarih: '20090910'
+  utc_ms: 1252585800000
+- olay: PPI
+  tarih: '20090915'
+  utc_ms: 1253017800000
 - olay: CPI
   tarih: '20090916'
   utc_ms: 1253104200000
+- olay: ISSIZLIK
+  tarih: '20090917'
+  utc_ms: 1253190600000
+- olay: ISSIZLIK
+  tarih: '20090924'
+  utc_ms: 1253795400000
+- olay: ISSIZLIK
+  tarih: '20091001'
+  utc_ms: 1254400200000
 - olay: NFP
   tarih: '20091002'
   utc_ms: 1254486600000
+- olay: ISSIZLIK
+  tarih: '20091008'
+  utc_ms: 1255005000000
 - olay: CPI
   tarih: '20091015'
   utc_ms: 1255609800000
+- olay: ISSIZLIK
+  tarih: '20091015'
+  utc_ms: 1255609800000
+- olay: PPI
+  tarih: '20091020'
+  utc_ms: 1256041800000
+- olay: ISSIZLIK
+  tarih: '20091022'
+  utc_ms: 1256214600000
+- olay: ISSIZLIK
+  tarih: '20091029'
+  utc_ms: 1256819400000
+- olay: ISSIZLIK
+  tarih: '20091105'
+  utc_ms: 1257427800000
 - olay: NFP
   tarih: '20091106'
   utc_ms: 1257514200000
+- olay: ISSIZLIK
+  tarih: '20091112'
+  utc_ms: 1258032600000
+- olay: PPI
+  tarih: '20091117'
+  utc_ms: 1258464600000
 - olay: CPI
   tarih: '20091118'
   utc_ms: 1258551000000
+- olay: ISSIZLIK
+  tarih: '20091119'
+  utc_ms: 1258637400000
+- olay: ISSIZLIK
+  tarih: '20091125'
+  utc_ms: 1259155800000
+- olay: ISSIZLIK
+  tarih: '20091203'
+  utc_ms: 1259847000000
 - olay: NFP
   tarih: '20091204'
   utc_ms: 1259933400000
+- olay: ISSIZLIK
+  tarih: '20091210'
+  utc_ms: 1260451800000
+- olay: PPI
+  tarih: '20091215'
+  utc_ms: 1260883800000
 - olay: CPI
   tarih: '20091216'
   utc_ms: 1260970200000
+- olay: ISSIZLIK
+  tarih: '20091217'
+  utc_ms: 1261056600000
+- olay: ISSIZLIK
+  tarih: '20091224'
+  utc_ms: 1261661400000
+- olay: ISSIZLIK
+  tarih: '20091231'
+  utc_ms: 1262266200000
+- olay: ISSIZLIK
+  tarih: '20100107'
+  utc_ms: 1262871000000
 - olay: NFP
   tarih: '20100108'
   utc_ms: 1262957400000
+- olay: ISSIZLIK
+  tarih: '20100114'
+  utc_ms: 1263475800000
 - olay: CPI
   tarih: '20100115'
   utc_ms: 1263562200000
+- olay: PPI
+  tarih: '20100120'
+  utc_ms: 1263994200000
+- olay: ISSIZLIK
+  tarih: '20100121'
+  utc_ms: 1264080600000
+- olay: ISSIZLIK
+  tarih: '20100128'
+  utc_ms: 1264685400000
+- olay: ISSIZLIK
+  tarih: '20100204'
+  utc_ms: 1265290200000
 - olay: NFP
   tarih: '20100205'
   utc_ms: 1265376600000
+- olay: ISSIZLIK
+  tarih: '20100211'
+  utc_ms: 1265895000000
+- olay: ISSIZLIK
+  tarih: '20100218'
+  utc_ms: 1266499800000
+- olay: PPI
+  tarih: '20100218'
+  utc_ms: 1266499800000
 - olay: CPI
   tarih: '20100219'
   utc_ms: 1266586200000
+- olay: ISSIZLIK
+  tarih: '20100225'
+  utc_ms: 1267104600000
+- olay: ISSIZLIK
+  tarih: '20100304'
+  utc_ms: 1267709400000
 - olay: NFP
   tarih: '20100305'
   utc_ms: 1267795800000
+- olay: ISSIZLIK
+  tarih: '20100311'
+  utc_ms: 1268314200000
+- olay: PPI
+  tarih: '20100317'
+  utc_ms: 1268829000000
 - olay: CPI
   tarih: '20100318'
   utc_ms: 1268915400000
+- olay: ISSIZLIK
+  tarih: '20100318'
+  utc_ms: 1268915400000
+- olay: ISSIZLIK
+  tarih: '20100325'
+  utc_ms: 1269520200000
+- olay: ISSIZLIK
+  tarih: '20100401'
+  utc_ms: 1270125000000
 - olay: NFP
   tarih: '20100402'
   utc_ms: 1270211400000
+- olay: ISSIZLIK
+  tarih: '20100408'
+  utc_ms: 1270729800000
 - olay: CPI
   tarih: '20100414'
   utc_ms: 1271248200000
+- olay: ISSIZLIK
+  tarih: '20100415'
+  utc_ms: 1271334600000
+- olay: ISSIZLIK
+  tarih: '20100422'
+  utc_ms: 1271939400000
+- olay: PPI
+  tarih: '20100422'
+  utc_ms: 1271939400000
+- olay: ISSIZLIK
+  tarih: '20100429'
+  utc_ms: 1272544200000
+- olay: ISSIZLIK
+  tarih: '20100506'
+  utc_ms: 1273149000000
 - olay: NFP
   tarih: '20100507'
   utc_ms: 1273235400000
+- olay: ISSIZLIK
+  tarih: '20100513'
+  utc_ms: 1273753800000
+- olay: PPI
+  tarih: '20100518'
+  utc_ms: 1274185800000
 - olay: CPI
   tarih: '20100519'
   utc_ms: 1274272200000
+- olay: ISSIZLIK
+  tarih: '20100520'
+  utc_ms: 1274358600000
+- olay: ISSIZLIK
+  tarih: '20100527'
+  utc_ms: 1274963400000
+- olay: ISSIZLIK
+  tarih: '20100603'
+  utc_ms: 1275568200000
 - olay: NFP
   tarih: '20100604'
   utc_ms: 1275654600000
+- olay: ISSIZLIK
+  tarih: '20100610'
+  utc_ms: 1276173000000
+- olay: PPI
+  tarih: '20100616'
+  utc_ms: 1276691400000
 - olay: CPI
   tarih: '20100617'
   utc_ms: 1276777800000
+- olay: ISSIZLIK
+  tarih: '20100617'
+  utc_ms: 1276777800000
+- olay: ISSIZLIK
+  tarih: '20100624'
+  utc_ms: 1277382600000
+- olay: ISSIZLIK
+  tarih: '20100701'
+  utc_ms: 1277987400000
 - olay: NFP
   tarih: '20100702'
   utc_ms: 1278073800000
+- olay: ISSIZLIK
+  tarih: '20100708'
+  utc_ms: 1278592200000
+- olay: ISSIZLIK
+  tarih: '20100715'
+  utc_ms: 1279197000000
+- olay: PPI
+  tarih: '20100715'
+  utc_ms: 1279197000000
 - olay: CPI
   tarih: '20100716'
   utc_ms: 1279283400000
+- olay: ISSIZLIK
+  tarih: '20100722'
+  utc_ms: 1279801800000
+- olay: ISSIZLIK
+  tarih: '20100729'
+  utc_ms: 1280406600000
+- olay: ISSIZLIK
+  tarih: '20100805'
+  utc_ms: 1281011400000
 - olay: NFP
   tarih: '20100806'
   utc_ms: 1281097800000
+- olay: ISSIZLIK
+  tarih: '20100812'
+  utc_ms: 1281616200000
 - olay: CPI
   tarih: '20100813'
   utc_ms: 1281702600000
+- olay: PPI
+  tarih: '20100817'
+  utc_ms: 1282048200000
+- olay: ISSIZLIK
+  tarih: '20100819'
+  utc_ms: 1282221000000
+- olay: ISSIZLIK
+  tarih: '20100826'
+  utc_ms: 1282825800000
+- olay: ISSIZLIK
+  tarih: '20100902'
+  utc_ms: 1283430600000
 - olay: NFP
   tarih: '20100903'
   utc_ms: 1283517000000
+- olay: ISSIZLIK
+  tarih: '20100909'
+  utc_ms: 1284035400000
+- olay: ISSIZLIK
+  tarih: '20100916'
+  utc_ms: 1284640200000
+- olay: PPI
+  tarih: '20100916'
+  utc_ms: 1284640200000
 - olay: CPI
   tarih: '20100917'
   utc_ms: 1284726600000
+- olay: ISSIZLIK
+  tarih: '20100923'
+  utc_ms: 1285245000000
+- olay: ISSIZLIK
+  tarih: '20100930'
+  utc_ms: 1285849800000
+- olay: ISSIZLIK
+  tarih: '20101007'
+  utc_ms: 1286454600000
 - olay: NFP
   tarih: '20101008'
   utc_ms: 1286541000000
+- olay: ISSIZLIK
+  tarih: '20101014'
+  utc_ms: 1287059400000
+- olay: PPI
+  tarih: '20101014'
+  utc_ms: 1287059400000
 - olay: CPI
   tarih: '20101015'
   utc_ms: 1287145800000
+- olay: ISSIZLIK
+  tarih: '20101021'
+  utc_ms: 1287664200000
+- olay: ISSIZLIK
+  tarih: '20101028'
+  utc_ms: 1288269000000
+- olay: ISSIZLIK
+  tarih: '20101104'
+  utc_ms: 1288873800000
 - olay: NFP
   tarih: '20101105'
   utc_ms: 1288960200000
+- olay: ISSIZLIK
+  tarih: '20101110'
+  utc_ms: 1289395800000
+- olay: PPI
+  tarih: '20101116'
+  utc_ms: 1289914200000
 - olay: CPI
   tarih: '20101117'
   utc_ms: 1290000600000
+- olay: ISSIZLIK
+  tarih: '20101118'
+  utc_ms: 1290087000000
+- olay: ISSIZLIK
+  tarih: '20101124'
+  utc_ms: 1290605400000
+- olay: ISSIZLIK
+  tarih: '20101202'
+  utc_ms: 1291296600000
 - olay: NFP
   tarih: '20101203'
   utc_ms: 1291383000000
+- olay: ISSIZLIK
+  tarih: '20101209'
+  utc_ms: 1291901400000
+- olay: PPI
+  tarih: '20101214'
+  utc_ms: 1292333400000
 - olay: CPI
   tarih: '20101215'
   utc_ms: 1292419800000
+- olay: ISSIZLIK
+  tarih: '20101216'
+  utc_ms: 1292506200000
+- olay: ISSIZLIK
+  tarih: '20101223'
+  utc_ms: 1293111000000
+- olay: ISSIZLIK
+  tarih: '20101230'
+  utc_ms: 1293715800000
+- olay: ISSIZLIK
+  tarih: '20110106'
+  utc_ms: 1294320600000
 - olay: NFP
   tarih: '20110107'
   utc_ms: 1294407000000
+- olay: ISSIZLIK
+  tarih: '20110113'
+  utc_ms: 1294925400000
+- olay: PPI
+  tarih: '20110113'
+  utc_ms: 1294925400000
 - olay: CPI
   tarih: '20110114'
   utc_ms: 1295011800000
+- olay: ISSIZLIK
+  tarih: '20110120'
+  utc_ms: 1295530200000
+- olay: ISSIZLIK
+  tarih: '20110127'
+  utc_ms: 1296135000000
+- olay: ISSIZLIK
+  tarih: '20110203'
+  utc_ms: 1296739800000
 - olay: NFP
   tarih: '20110204'
   utc_ms: 1296826200000
+- olay: ISSIZLIK
+  tarih: '20110210'
+  utc_ms: 1297344600000
+- olay: PPI
+  tarih: '20110216'
+  utc_ms: 1297863000000
 - olay: CPI
   tarih: '20110217'
   utc_ms: 1297949400000
+- olay: ISSIZLIK
+  tarih: '20110217'
+  utc_ms: 1297949400000
+- olay: ISSIZLIK
+  tarih: '20110224'
+  utc_ms: 1298554200000
+- olay: ISSIZLIK
+  tarih: '20110303'
+  utc_ms: 1299159000000
 - olay: NFP
   tarih: '20110304'
   utc_ms: 1299245400000
+- olay: ISSIZLIK
+  tarih: '20110310'
+  utc_ms: 1299763800000
+- olay: PPI
+  tarih: '20110316'
+  utc_ms: 1300278600000
 - olay: CPI
   tarih: '20110317'
   utc_ms: 1300365000000
+- olay: ISSIZLIK
+  tarih: '20110317'
+  utc_ms: 1300365000000
+- olay: ISSIZLIK
+  tarih: '20110324'
+  utc_ms: 1300969800000
+- olay: ISSIZLIK
+  tarih: '20110331'
+  utc_ms: 1301574600000
 - olay: NFP
   tarih: '20110401'
   utc_ms: 1301661000000
+- olay: ISSIZLIK
+  tarih: '20110407'
+  utc_ms: 1302179400000
+- olay: ISSIZLIK
+  tarih: '20110414'
+  utc_ms: 1302784200000
+- olay: PPI
+  tarih: '20110414'
+  utc_ms: 1302784200000
 - olay: CPI
   tarih: '20110415'
   utc_ms: 1302870600000
+- olay: ISSIZLIK
+  tarih: '20110421'
+  utc_ms: 1303389000000
+- olay: ISSIZLIK
+  tarih: '20110428'
+  utc_ms: 1303993800000
+- olay: ISSIZLIK
+  tarih: '20110505'
+  utc_ms: 1304598600000
 - olay: NFP
   tarih: '20110506'
   utc_ms: 1304685000000
+- olay: ISSIZLIK
+  tarih: '20110512'
+  utc_ms: 1305203400000
+- olay: PPI
+  tarih: '20110512'
+  utc_ms: 1305203400000
 - olay: CPI
   tarih: '20110513'
   utc_ms: 1305289800000
+- olay: ISSIZLIK
+  tarih: '20110519'
+  utc_ms: 1305808200000
+- olay: ISSIZLIK
+  tarih: '20110526'
+  utc_ms: 1306413000000
+- olay: ISSIZLIK
+  tarih: '20110602'
+  utc_ms: 1307017800000
 - olay: NFP
   tarih: '20110603'
   utc_ms: 1307104200000
+- olay: ISSIZLIK
+  tarih: '20110609'
+  utc_ms: 1307622600000
+- olay: PPI
+  tarih: '20110614'
+  utc_ms: 1308054600000
 - olay: CPI
   tarih: '20110615'
   utc_ms: 1308141000000
+- olay: ISSIZLIK
+  tarih: '20110616'
+  utc_ms: 1308227400000
+- olay: ISSIZLIK
+  tarih: '20110623'
+  utc_ms: 1308832200000
+- olay: ISSIZLIK
+  tarih: '20110630'
+  utc_ms: 1309437000000
+- olay: ISSIZLIK
+  tarih: '20110707'
+  utc_ms: 1310041800000
 - olay: NFP
   tarih: '20110708'
   utc_ms: 1310128200000
+- olay: ISSIZLIK
+  tarih: '20110714'
+  utc_ms: 1310646600000
+- olay: PPI
+  tarih: '20110714'
+  utc_ms: 1310646600000
 - olay: CPI
   tarih: '20110715'
   utc_ms: 1310733000000
+- olay: ISSIZLIK
+  tarih: '20110721'
+  utc_ms: 1311251400000
+- olay: ISSIZLIK
+  tarih: '20110728'
+  utc_ms: 1311856200000
+- olay: ISSIZLIK
+  tarih: '20110804'
+  utc_ms: 1312461000000
 - olay: NFP
   tarih: '20110805'
   utc_ms: 1312547400000
+- olay: ISSIZLIK
+  tarih: '20110811'
+  utc_ms: 1313065800000
+- olay: PPI
+  tarih: '20110817'
+  utc_ms: 1313584200000
 - olay: CPI
   tarih: '20110818'
   utc_ms: 1313670600000
+- olay: ISSIZLIK
+  tarih: '20110818'
+  utc_ms: 1313670600000
+- olay: ISSIZLIK
+  tarih: '20110825'
+  utc_ms: 1314275400000
+- olay: ISSIZLIK
+  tarih: '20110901'
+  utc_ms: 1314880200000
 - olay: NFP
   tarih: '20110902'
   utc_ms: 1314966600000
+- olay: ISSIZLIK
+  tarih: '20110908'
+  utc_ms: 1315485000000
+- olay: PPI
+  tarih: '20110914'
+  utc_ms: 1316003400000
 - olay: CPI
   tarih: '20110915'
   utc_ms: 1316089800000
+- olay: ISSIZLIK
+  tarih: '20110915'
+  utc_ms: 1316089800000
+- olay: ISSIZLIK
+  tarih: '20110922'
+  utc_ms: 1316694600000
+- olay: ISSIZLIK
+  tarih: '20110929'
+  utc_ms: 1317299400000
+- olay: ISSIZLIK
+  tarih: '20111006'
+  utc_ms: 1317904200000
 - olay: NFP
   tarih: '20111007'
   utc_ms: 1317990600000
+- olay: ISSIZLIK
+  tarih: '20111013'
+  utc_ms: 1318509000000
+- olay: PPI
+  tarih: '20111018'
+  utc_ms: 1318941000000
 - olay: CPI
   tarih: '20111019'
   utc_ms: 1319027400000
+- olay: ISSIZLIK
+  tarih: '20111020'
+  utc_ms: 1319113800000
+- olay: ISSIZLIK
+  tarih: '20111027'
+  utc_ms: 1319718600000
+- olay: ISSIZLIK
+  tarih: '20111103'
+  utc_ms: 1320323400000
 - olay: NFP
   tarih: '20111104'
   utc_ms: 1320409800000
+- olay: ISSIZLIK
+  tarih: '20111110'
+  utc_ms: 1320931800000
+- olay: PPI
+  tarih: '20111115'
+  utc_ms: 1321363800000
 - olay: CPI
   tarih: '20111116'
   utc_ms: 1321450200000
+- olay: ISSIZLIK
+  tarih: '20111117'
+  utc_ms: 1321536600000
+- olay: ISSIZLIK
+  tarih: '20111123'
+  utc_ms: 1322055000000
+- olay: ISSIZLIK
+  tarih: '20111201'
+  utc_ms: 1322746200000
 - olay: NFP
   tarih: '20111202'
   utc_ms: 1322832600000
+- olay: ISSIZLIK
+  tarih: '20111208'
+  utc_ms: 1323351000000
+- olay: ISSIZLIK
+  tarih: '20111215'
+  utc_ms: 1323955800000
+- olay: PPI
+  tarih: '20111215'
+  utc_ms: 1323955800000
 - olay: CPI
   tarih: '20111216'
   utc_ms: 1324042200000
+- olay: ISSIZLIK
+  tarih: '20111222'
+  utc_ms: 1324560600000
+- olay: ISSIZLIK
+  tarih: '20111229'
+  utc_ms: 1325165400000
+- olay: ISSIZLIK
+  tarih: '20120105'
+  utc_ms: 1325770200000
 - olay: NFP
   tarih: '20120106'
   utc_ms: 1325856600000
+- olay: ISSIZLIK
+  tarih: '20120112'
+  utc_ms: 1326375000000
+- olay: PPI
+  tarih: '20120118'
+  utc_ms: 1326893400000
 - olay: CPI
   tarih: '20120119'
   utc_ms: 1326979800000
+- olay: ISSIZLIK
+  tarih: '20120119'
+  utc_ms: 1326979800000
+- olay: ISSIZLIK
+  tarih: '20120126'
+  utc_ms: 1327584600000
+- olay: ISSIZLIK
+  tarih: '20120202'
+  utc_ms: 1328189400000
 - olay: NFP
   tarih: '20120203'
   utc_ms: 1328275800000
+- olay: ISSIZLIK
+  tarih: '20120209'
+  utc_ms: 1328794200000
+- olay: ISSIZLIK
+  tarih: '20120216'
+  utc_ms: 1329399000000
+- olay: PPI
+  tarih: '20120216'
+  utc_ms: 1329399000000
 - olay: CPI
   tarih: '20120217'
   utc_ms: 1329485400000
+- olay: ISSIZLIK
+  tarih: '20120223'
+  utc_ms: 1330003800000
+- olay: ISSIZLIK
+  tarih: '20120301'
+  utc_ms: 1330608600000
+- olay: ISSIZLIK
+  tarih: '20120308'
+  utc_ms: 1331213400000
 - olay: NFP
   tarih: '20120309'
   utc_ms: 1331299800000
+- olay: ISSIZLIK
+  tarih: '20120315'
+  utc_ms: 1331814600000
+- olay: PPI
+  tarih: '20120315'
+  utc_ms: 1331814600000
 - olay: CPI
   tarih: '20120316'
   utc_ms: 1331901000000
+- olay: ISSIZLIK
+  tarih: '20120322'
+  utc_ms: 1332419400000
+- olay: ISSIZLIK
+  tarih: '20120329'
+  utc_ms: 1333024200000
+- olay: ISSIZLIK
+  tarih: '20120405'
+  utc_ms: 1333629000000
 - olay: NFP
   tarih: '20120406'
   utc_ms: 1333715400000
+- olay: ISSIZLIK
+  tarih: '20120412'
+  utc_ms: 1334233800000
+- olay: PPI
+  tarih: '20120412'
+  utc_ms: 1334233800000
 - olay: CPI
   tarih: '20120413'
   utc_ms: 1334320200000
+- olay: ISSIZLIK
+  tarih: '20120419'
+  utc_ms: 1334838600000
+- olay: ISSIZLIK
+  tarih: '20120426'
+  utc_ms: 1335443400000
+- olay: ISSIZLIK
+  tarih: '20120503'
+  utc_ms: 1336048200000
 - olay: NFP
   tarih: '20120504'
   utc_ms: 1336134600000
+- olay: ISSIZLIK
+  tarih: '20120510'
+  utc_ms: 1336653000000
+- olay: PPI
+  tarih: '20120511'
+  utc_ms: 1336739400000
 - olay: CPI
   tarih: '20120515'
   utc_ms: 1337085000000
+- olay: ISSIZLIK
+  tarih: '20120517'
+  utc_ms: 1337257800000
+- olay: ISSIZLIK
+  tarih: '20120524'
+  utc_ms: 1337862600000
+- olay: ISSIZLIK
+  tarih: '20120531'
+  utc_ms: 1338467400000
 - olay: NFP
   tarih: '20120601'
   utc_ms: 1338553800000
+- olay: ISSIZLIK
+  tarih: '20120607'
+  utc_ms: 1339072200000
+- olay: PPI
+  tarih: '20120613'
+  utc_ms: 1339590600000
 - olay: CPI
   tarih: '20120614'
   utc_ms: 1339677000000
+- olay: ISSIZLIK
+  tarih: '20120614'
+  utc_ms: 1339677000000
+- olay: ISSIZLIK
+  tarih: '20120621'
+  utc_ms: 1340281800000
+- olay: ISSIZLIK
+  tarih: '20120628'
+  utc_ms: 1340886600000
+- olay: ISSIZLIK
+  tarih: '20120705'
+  utc_ms: 1341491400000
 - olay: NFP
   tarih: '20120706'
   utc_ms: 1341577800000
+- olay: ISSIZLIK
+  tarih: '20120712'
+  utc_ms: 1342096200000
+- olay: PPI
+  tarih: '20120713'
+  utc_ms: 1342182600000
 - olay: CPI
   tarih: '20120717'
   utc_ms: 1342528200000
+- olay: ISSIZLIK
+  tarih: '20120719'
+  utc_ms: 1342701000000
+- olay: ISSIZLIK
+  tarih: '20120726'
+  utc_ms: 1343305800000
+- olay: ISSIZLIK
+  tarih: '20120802'
+  utc_ms: 1343910600000
 - olay: NFP
   tarih: '20120803'
   utc_ms: 1343997000000
+- olay: ISSIZLIK
+  tarih: '20120809'
+  utc_ms: 1344515400000
+- olay: PPI
+  tarih: '20120814'
+  utc_ms: 1344947400000
 - olay: CPI
   tarih: '20120815'
   utc_ms: 1345033800000
+- olay: ISSIZLIK
+  tarih: '20120816'
+  utc_ms: 1345120200000
+- olay: ISSIZLIK
+  tarih: '20120823'
+  utc_ms: 1345725000000
+- olay: ISSIZLIK
+  tarih: '20120830'
+  utc_ms: 1346329800000
+- olay: ISSIZLIK
+  tarih: '20120906'
+  utc_ms: 1346934600000
 - olay: NFP
   tarih: '20120907'
   utc_ms: 1347021000000
+- olay: ISSIZLIK
+  tarih: '20120913'
+  utc_ms: 1347539400000
+- olay: PPI
+  tarih: '20120913'
+  utc_ms: 1347539400000
 - olay: CPI
   tarih: '20120914'
   utc_ms: 1347625800000
+- olay: ISSIZLIK
+  tarih: '20120920'
+  utc_ms: 1348144200000
+- olay: ISSIZLIK
+  tarih: '20120927'
+  utc_ms: 1348749000000
+- olay: ISSIZLIK
+  tarih: '20121004'
+  utc_ms: 1349353800000
 - olay: NFP
   tarih: '20121005'
   utc_ms: 1349440200000
+- olay: ISSIZLIK
+  tarih: '20121011'
+  utc_ms: 1349958600000
+- olay: PPI
+  tarih: '20121012'
+  utc_ms: 1350045000000
 - olay: CPI
   tarih: '20121016'
   utc_ms: 1350390600000
+- olay: ISSIZLIK
+  tarih: '20121018'
+  utc_ms: 1350563400000
+- olay: ISSIZLIK
+  tarih: '20121025'
+  utc_ms: 1351168200000
+- olay: ISSIZLIK
+  tarih: '20121101'
+  utc_ms: 1351773000000
 - olay: NFP
   tarih: '20121102'
   utc_ms: 1351859400000
+- olay: ISSIZLIK
+  tarih: '20121108'
+  utc_ms: 1352381400000
+- olay: PPI
+  tarih: '20121114'
+  utc_ms: 1352899800000
 - olay: CPI
   tarih: '20121115'
   utc_ms: 1352986200000
+- olay: ISSIZLIK
+  tarih: '20121115'
+  utc_ms: 1352986200000
+- olay: ISSIZLIK
+  tarih: '20121121'
+  utc_ms: 1353504600000
+- olay: ISSIZLIK
+  tarih: '20121129'
+  utc_ms: 1354195800000
+- olay: ISSIZLIK
+  tarih: '20121206'
+  utc_ms: 1354800600000
 - olay: NFP
   tarih: '20121207'
   utc_ms: 1354887000000
+- olay: ISSIZLIK
+  tarih: '20121213'
+  utc_ms: 1355405400000
+- olay: PPI
+  tarih: '20121213'
+  utc_ms: 1355405400000
 - olay: CPI
   tarih: '20121214'
   utc_ms: 1355491800000
+- olay: ISSIZLIK
+  tarih: '20121220'
+  utc_ms: 1356010200000
+- olay: ISSIZLIK
+  tarih: '20121227'
+  utc_ms: 1356615000000
+- olay: ISSIZLIK
+  tarih: '20130103'
+  utc_ms: 1357219800000
 - olay: NFP
   tarih: '20130104'
   utc_ms: 1357306200000
+- olay: ISSIZLIK
+  tarih: '20130110'
+  utc_ms: 1357824600000
+- olay: PPI
+  tarih: '20130115'
+  utc_ms: 1358256600000
 - olay: CPI
   tarih: '20130116'
   utc_ms: 1358343000000
+- olay: ISSIZLIK
+  tarih: '20130117'
+  utc_ms: 1358429400000
+- olay: ISSIZLIK
+  tarih: '20130124'
+  utc_ms: 1359034200000
+- olay: ISSIZLIK
+  tarih: '20130131'
+  utc_ms: 1359639000000
 - olay: NFP
   tarih: '20130201'
   utc_ms: 1359725400000
+- olay: ISSIZLIK
+  tarih: '20130207'
+  utc_ms: 1360243800000
+- olay: ISSIZLIK
+  tarih: '20130214'
+  utc_ms: 1360848600000
+- olay: PPI
+  tarih: '20130220'
+  utc_ms: 1361367000000
 - olay: CPI
   tarih: '20130221'
   utc_ms: 1361453400000
+- olay: ISSIZLIK
+  tarih: '20130221'
+  utc_ms: 1361453400000
+- olay: ISSIZLIK
+  tarih: '20130228'
+  utc_ms: 1362058200000
+- olay: ISSIZLIK
+  tarih: '20130307'
+  utc_ms: 1362663000000
 - olay: NFP
   tarih: '20130308'
   utc_ms: 1362749400000
+- olay: ISSIZLIK
+  tarih: '20130314'
+  utc_ms: 1363264200000
+- olay: PPI
+  tarih: '20130314'
+  utc_ms: 1363264200000
 - olay: CPI
   tarih: '20130315'
   utc_ms: 1363350600000
+- olay: ISSIZLIK
+  tarih: '20130321'
+  utc_ms: 1363869000000
+- olay: ISSIZLIK
+  tarih: '20130328'
+  utc_ms: 1364473800000
+- olay: ISSIZLIK
+  tarih: '20130404'
+  utc_ms: 1365078600000
 - olay: NFP
   tarih: '20130405'
   utc_ms: 1365165000000
+- olay: ISSIZLIK
+  tarih: '20130411'
+  utc_ms: 1365683400000
+- olay: PPI
+  tarih: '20130412'
+  utc_ms: 1365769800000
 - olay: CPI
   tarih: '20130416'
   utc_ms: 1366115400000
+- olay: ISSIZLIK
+  tarih: '20130418'
+  utc_ms: 1366288200000
+- olay: ISSIZLIK
+  tarih: '20130425'
+  utc_ms: 1366893000000
+- olay: ISSIZLIK
+  tarih: '20130502'
+  utc_ms: 1367497800000
 - olay: NFP
   tarih: '20130503'
   utc_ms: 1367584200000
+- olay: ISSIZLIK
+  tarih: '20130509'
+  utc_ms: 1368102600000
+- olay: PPI
+  tarih: '20130515'
+  utc_ms: 1368621000000
 - olay: CPI
   tarih: '20130516'
   utc_ms: 1368707400000
+- olay: ISSIZLIK
+  tarih: '20130516'
+  utc_ms: 1368707400000
+- olay: ISSIZLIK
+  tarih: '20130523'
+  utc_ms: 1369312200000
+- olay: ISSIZLIK
+  tarih: '20130530'
+  utc_ms: 1369917000000
+- olay: ISSIZLIK
+  tarih: '20130606'
+  utc_ms: 1370521800000
 - olay: NFP
   tarih: '20130607'
   utc_ms: 1370608200000
+- olay: ISSIZLIK
+  tarih: '20130613'
+  utc_ms: 1371126600000
+- olay: PPI
+  tarih: '20130614'
+  utc_ms: 1371213000000
 - olay: CPI
   tarih: '20130618'
   utc_ms: 1371558600000
+- olay: ISSIZLIK
+  tarih: '20130620'
+  utc_ms: 1371731400000
+- olay: ISSIZLIK
+  tarih: '20130627'
+  utc_ms: 1372336200000
+- olay: ISSIZLIK
+  tarih: '20130703'
+  utc_ms: 1372854600000
 - olay: NFP
   tarih: '20130705'
   utc_ms: 1373027400000
+- olay: ISSIZLIK
+  tarih: '20130711'
+  utc_ms: 1373545800000
+- olay: PPI
+  tarih: '20130712'
+  utc_ms: 1373632200000
 - olay: CPI
   tarih: '20130716'
   utc_ms: 1373977800000
+- olay: ISSIZLIK
+  tarih: '20130718'
+  utc_ms: 1374150600000
+- olay: ISSIZLIK
+  tarih: '20130725'
+  utc_ms: 1374755400000
+- olay: ISSIZLIK
+  tarih: '20130801'
+  utc_ms: 1375360200000
 - olay: NFP
   tarih: '20130802'
   utc_ms: 1375446600000
+- olay: ISSIZLIK
+  tarih: '20130808'
+  utc_ms: 1375965000000
+- olay: PPI
+  tarih: '20130814'
+  utc_ms: 1376483400000
 - olay: CPI
   tarih: '20130815'
   utc_ms: 1376569800000
+- olay: ISSIZLIK
+  tarih: '20130815'
+  utc_ms: 1376569800000
+- olay: ISSIZLIK
+  tarih: '20130822'
+  utc_ms: 1377174600000
+- olay: ISSIZLIK
+  tarih: '20130829'
+  utc_ms: 1377779400000
+- olay: ISSIZLIK
+  tarih: '20130905'
+  utc_ms: 1378384200000
 - olay: NFP
   tarih: '20130906'
   utc_ms: 1378470600000
+- olay: ISSIZLIK
+  tarih: '20130912'
+  utc_ms: 1378989000000
+- olay: PPI
+  tarih: '20130913'
+  utc_ms: 1379075400000
 - olay: CPI
   tarih: '20130917'
   utc_ms: 1379421000000
+- olay: ISSIZLIK
+  tarih: '20130919'
+  utc_ms: 1379593800000
+- olay: ISSIZLIK
+  tarih: '20130926'
+  utc_ms: 1380198600000
+- olay: ISSIZLIK
+  tarih: '20131003'
+  utc_ms: 1380803400000
+- olay: ISSIZLIK
+  tarih: '20131010'
+  utc_ms: 1381408200000
+- olay: ISSIZLIK
+  tarih: '20131017'
+  utc_ms: 1382013000000
 - olay: NFP
   tarih: '20131022'
   utc_ms: 1382445000000
+- olay: ISSIZLIK
+  tarih: '20131024'
+  utc_ms: 1382617800000
+- olay: PPI
+  tarih: '20131029'
+  utc_ms: 1383049800000
 - olay: CPI
   tarih: '20131030'
   utc_ms: 1383136200000
+- olay: ISSIZLIK
+  tarih: '20131031'
+  utc_ms: 1383222600000
+- olay: ISSIZLIK
+  tarih: '20131107'
+  utc_ms: 1383831000000
 - olay: NFP
   tarih: '20131108'
   utc_ms: 1383917400000
+- olay: ISSIZLIK
+  tarih: '20131114'
+  utc_ms: 1384435800000
 - olay: CPI
   tarih: '20131120'
   utc_ms: 1384954200000
+- olay: ISSIZLIK
+  tarih: '20131121'
+  utc_ms: 1385040600000
+- olay: PPI
+  tarih: '20131121'
+  utc_ms: 1385040600000
+- olay: ISSIZLIK
+  tarih: '20131127'
+  utc_ms: 1385559000000
+- olay: ISSIZLIK
+  tarih: '20131205'
+  utc_ms: 1386250200000
 - olay: NFP
   tarih: '20131206'
   utc_ms: 1386336600000
+- olay: ISSIZLIK
+  tarih: '20131212'
+  utc_ms: 1386855000000
+- olay: PPI
+  tarih: '20131213'
+  utc_ms: 1386941400000
 - olay: CPI
   tarih: '20131217'
   utc_ms: 1387287000000
+- olay: ISSIZLIK
+  tarih: '20131219'
+  utc_ms: 1387459800000
+- olay: ISSIZLIK
+  tarih: '20131226'
+  utc_ms: 1388064600000
+- olay: ISSIZLIK
+  tarih: '20140102'
+  utc_ms: 1388669400000
+- olay: ISSIZLIK
+  tarih: '20140109'
+  utc_ms: 1389274200000
 - olay: NFP
   tarih: '20140110'
   utc_ms: 1389360600000
+- olay: PPI
+  tarih: '20140115'
+  utc_ms: 1389792600000
 - olay: CPI
   tarih: '20140116'
   utc_ms: 1389879000000
+- olay: ISSIZLIK
+  tarih: '20140116'
+  utc_ms: 1389879000000
+- olay: ISSIZLIK
+  tarih: '20140123'
+  utc_ms: 1390483800000
+- olay: ISSIZLIK
+  tarih: '20140130'
+  utc_ms: 1391088600000
+- olay: ISSIZLIK
+  tarih: '20140206'
+  utc_ms: 1391693400000
 - olay: NFP
   tarih: '20140207'
   utc_ms: 1391779800000
+- olay: ISSIZLIK
+  tarih: '20140213'
+  utc_ms: 1392298200000
+- olay: PPI
+  tarih: '20140219'
+  utc_ms: 1392816600000
 - olay: CPI
   tarih: '20140220'
   utc_ms: 1392903000000
+- olay: ISSIZLIK
+  tarih: '20140220'
+  utc_ms: 1392903000000
+- olay: ISSIZLIK
+  tarih: '20140227'
+  utc_ms: 1393507800000
+- olay: ISSIZLIK
+  tarih: '20140306'
+  utc_ms: 1394112600000
 - olay: NFP
   tarih: '20140307'
   utc_ms: 1394199000000
+- olay: ISSIZLIK
+  tarih: '20140313'
+  utc_ms: 1394713800000
+- olay: PPI
+  tarih: '20140314'
+  utc_ms: 1394800200000
 - olay: CPI
   tarih: '20140318'
   utc_ms: 1395145800000
+- olay: ISSIZLIK
+  tarih: '20140320'
+  utc_ms: 1395318600000
+- olay: ISSIZLIK
+  tarih: '20140327'
+  utc_ms: 1395923400000
+- olay: ISSIZLIK
+  tarih: '20140403'
+  utc_ms: 1396528200000
 - olay: NFP
   tarih: '20140404'
   utc_ms: 1396614600000
+- olay: ISSIZLIK
+  tarih: '20140410'
+  utc_ms: 1397133000000
+- olay: PPI
+  tarih: '20140411'
+  utc_ms: 1397219400000
 - olay: CPI
   tarih: '20140415'
   utc_ms: 1397565000000
+- olay: ISSIZLIK
+  tarih: '20140417'
+  utc_ms: 1397737800000
+- olay: ISSIZLIK
+  tarih: '20140424'
+  utc_ms: 1398342600000
+- olay: ISSIZLIK
+  tarih: '20140501'
+  utc_ms: 1398947400000
 - olay: NFP
   tarih: '20140502'
   utc_ms: 1399033800000
+- olay: ISSIZLIK
+  tarih: '20140508'
+  utc_ms: 1399552200000
+- olay: PPI
+  tarih: '20140514'
+  utc_ms: 1400070600000
 - olay: CPI
   tarih: '20140515'
   utc_ms: 1400157000000
+- olay: ISSIZLIK
+  tarih: '20140515'
+  utc_ms: 1400157000000
+- olay: ISSIZLIK
+  tarih: '20140522'
+  utc_ms: 1400761800000
+- olay: ISSIZLIK
+  tarih: '20140529'
+  utc_ms: 1401366600000
+- olay: ISSIZLIK
+  tarih: '20140605'
+  utc_ms: 1401971400000
 - olay: NFP
   tarih: '20140606'
   utc_ms: 1402057800000
+- olay: ISSIZLIK
+  tarih: '20140612'
+  utc_ms: 1402576200000
+- olay: PPI
+  tarih: '20140613'
+  utc_ms: 1402662600000
 - olay: CPI
   tarih: '20140617'
   utc_ms: 1403008200000
+- olay: ISSIZLIK
+  tarih: '20140619'
+  utc_ms: 1403181000000
+- olay: ISSIZLIK
+  tarih: '20140626'
+  utc_ms: 1403785800000
+- olay: ISSIZLIK
+  tarih: '20140703'
+  utc_ms: 1404390600000
 - olay: NFP
   tarih: '20140703'
   utc_ms: 1404390600000
+- olay: ISSIZLIK
+  tarih: '20140710'
+  utc_ms: 1404995400000
+- olay: PPI
+  tarih: '20140716'
+  utc_ms: 1405513800000
+- olay: ISSIZLIK
+  tarih: '20140717'
+  utc_ms: 1405600200000
 - olay: CPI
   tarih: '20140722'
   utc_ms: 1406032200000
+- olay: ISSIZLIK
+  tarih: '20140724'
+  utc_ms: 1406205000000
+- olay: ISSIZLIK
+  tarih: '20140731'
+  utc_ms: 1406809800000
 - olay: NFP
   tarih: '20140801'
   utc_ms: 1406896200000
+- olay: ISSIZLIK
+  tarih: '20140807'
+  utc_ms: 1407414600000
+- olay: ISSIZLIK
+  tarih: '20140814'
+  utc_ms: 1408019400000
+- olay: PPI
+  tarih: '20140815'
+  utc_ms: 1408105800000
 - olay: CPI
   tarih: '20140819'
   utc_ms: 1408451400000
+- olay: ISSIZLIK
+  tarih: '20140821'
+  utc_ms: 1408624200000
+- olay: ISSIZLIK
+  tarih: '20140828'
+  utc_ms: 1409229000000
+- olay: ISSIZLIK
+  tarih: '20140904'
+  utc_ms: 1409833800000
 - olay: NFP
   tarih: '20140905'
   utc_ms: 1409920200000
+- olay: ISSIZLIK
+  tarih: '20140911'
+  utc_ms: 1410438600000
+- olay: PPI
+  tarih: '20140916'
+  utc_ms: 1410870600000
 - olay: CPI
   tarih: '20140917'
   utc_ms: 1410957000000
+- olay: ISSIZLIK
+  tarih: '20140918'
+  utc_ms: 1411043400000
+- olay: ISSIZLIK
+  tarih: '20140925'
+  utc_ms: 1411648200000
+- olay: ISSIZLIK
+  tarih: '20141002'
+  utc_ms: 1412253000000
 - olay: NFP
   tarih: '20141003'
   utc_ms: 1412339400000
+- olay: ISSIZLIK
+  tarih: '20141009'
+  utc_ms: 1412857800000
+- olay: PPI
+  tarih: '20141015'
+  utc_ms: 1413376200000
+- olay: ISSIZLIK
+  tarih: '20141016'
+  utc_ms: 1413462600000
 - olay: CPI
   tarih: '20141022'
   utc_ms: 1413981000000
+- olay: ISSIZLIK
+  tarih: '20141023'
+  utc_ms: 1414067400000
+- olay: ISSIZLIK
+  tarih: '20141030'
+  utc_ms: 1414672200000
+- olay: ISSIZLIK
+  tarih: '20141106'
+  utc_ms: 1415280600000
 - olay: NFP
   tarih: '20141107'
   utc_ms: 1415367000000
+- olay: ISSIZLIK
+  tarih: '20141113'
+  utc_ms: 1415885400000
+- olay: PPI
+  tarih: '20141118'
+  utc_ms: 1416317400000
 - olay: CPI
   tarih: '20141120'
   utc_ms: 1416490200000
+- olay: ISSIZLIK
+  tarih: '20141120'
+  utc_ms: 1416490200000
+- olay: ISSIZLIK
+  tarih: '20141126'
+  utc_ms: 1417008600000
+- olay: ISSIZLIK
+  tarih: '20141204'
+  utc_ms: 1417699800000
 - olay: NFP
   tarih: '20141205'
   utc_ms: 1417786200000
+- olay: ISSIZLIK
+  tarih: '20141211'
+  utc_ms: 1418304600000
+- olay: PPI
+  tarih: '20141212'
+  utc_ms: 1418391000000
 - olay: CPI
   tarih: '20141217'
   utc_ms: 1418823000000
+- olay: ISSIZLIK
+  tarih: '20141218'
+  utc_ms: 1418909400000
+- olay: ISSIZLIK
+  tarih: '20141224'
+  utc_ms: 1419427800000
+- olay: ISSIZLIK
+  tarih: '20141231'
+  utc_ms: 1420032600000
+- olay: ISSIZLIK
+  tarih: '20150108'
+  utc_ms: 1420723800000
 - olay: NFP
   tarih: '20150109'
   utc_ms: 1420810200000
+- olay: ISSIZLIK
+  tarih: '20150115'
+  utc_ms: 1421328600000
+- olay: PPI
+  tarih: '20150115'
+  utc_ms: 1421328600000
 - olay: CPI
   tarih: '20150116'
   utc_ms: 1421415000000
+- olay: ISSIZLIK
+  tarih: '20150122'
+  utc_ms: 1421933400000
+- olay: ISSIZLIK
+  tarih: '20150129'
+  utc_ms: 1422538200000
+- olay: ISSIZLIK
+  tarih: '20150205'
+  utc_ms: 1423143000000
 - olay: NFP
   tarih: '20150206'
   utc_ms: 1423229400000
+- olay: ISSIZLIK
+  tarih: '20150212'
+  utc_ms: 1423747800000
+- olay: PPI
+  tarih: '20150218'
+  utc_ms: 1424266200000
+- olay: ISSIZLIK
+  tarih: '20150219'
+  utc_ms: 1424352600000
 - olay: CPI
   tarih: '20150226'
   utc_ms: 1424957400000
+- olay: ISSIZLIK
+  tarih: '20150226'
+  utc_ms: 1424957400000
+- olay: ISSIZLIK
+  tarih: '20150305'
+  utc_ms: 1425562200000
 - olay: NFP
   tarih: '20150306'
   utc_ms: 1425648600000
+- olay: ISSIZLIK
+  tarih: '20150312'
+  utc_ms: 1426163400000
+- olay: PPI
+  tarih: '20150313'
+  utc_ms: 1426249800000
+- olay: ISSIZLIK
+  tarih: '20150319'
+  utc_ms: 1426768200000
 - olay: CPI
   tarih: '20150324'
   utc_ms: 1427200200000
+- olay: ISSIZLIK
+  tarih: '20150326'
+  utc_ms: 1427373000000
+- olay: ISSIZLIK
+  tarih: '20150402'
+  utc_ms: 1427977800000
 - olay: NFP
   tarih: '20150403'
   utc_ms: 1428064200000
+- olay: ISSIZLIK
+  tarih: '20150409'
+  utc_ms: 1428582600000
+- olay: PPI
+  tarih: '20150414'
+  utc_ms: 1429014600000
+- olay: ISSIZLIK
+  tarih: '20150416'
+  utc_ms: 1429187400000
 - olay: CPI
   tarih: '20150417'
   utc_ms: 1429273800000
+- olay: ISSIZLIK
+  tarih: '20150423'
+  utc_ms: 1429792200000
+- olay: ISSIZLIK
+  tarih: '20150430'
+  utc_ms: 1430397000000
+- olay: ISSIZLIK
+  tarih: '20150507'
+  utc_ms: 1431001800000
 - olay: NFP
   tarih: '20150508'
   utc_ms: 1431088200000
+- olay: ISSIZLIK
+  tarih: '20150514'
+  utc_ms: 1431606600000
+- olay: PPI
+  tarih: '20150514'
+  utc_ms: 1431606600000
+- olay: ISSIZLIK
+  tarih: '20150521'
+  utc_ms: 1432211400000
 - olay: CPI
   tarih: '20150522'
   utc_ms: 1432297800000
+- olay: ISSIZLIK
+  tarih: '20150528'
+  utc_ms: 1432816200000
+- olay: ISSIZLIK
+  tarih: '20150604'
+  utc_ms: 1433421000000
 - olay: NFP
   tarih: '20150605'
   utc_ms: 1433507400000
+- olay: ISSIZLIK
+  tarih: '20150611'
+  utc_ms: 1434025800000
+- olay: PPI
+  tarih: '20150612'
+  utc_ms: 1434112200000
 - olay: CPI
   tarih: '20150618'
   utc_ms: 1434630600000
+- olay: ISSIZLIK
+  tarih: '20150618'
+  utc_ms: 1434630600000
+- olay: ISSIZLIK
+  tarih: '20150625'
+  utc_ms: 1435235400000
+- olay: ISSIZLIK
+  tarih: '20150702'
+  utc_ms: 1435840200000
 - olay: NFP
   tarih: '20150702'
   utc_ms: 1435840200000
+- olay: ISSIZLIK
+  tarih: '20150709'
+  utc_ms: 1436445000000
+- olay: PPI
+  tarih: '20150715'
+  utc_ms: 1436963400000
+- olay: ISSIZLIK
+  tarih: '20150716'
+  utc_ms: 1437049800000
 - olay: CPI
   tarih: '20150717'
   utc_ms: 1437136200000
+- olay: ISSIZLIK
+  tarih: '20150723'
+  utc_ms: 1437654600000
+- olay: ISSIZLIK
+  tarih: '20150730'
+  utc_ms: 1438259400000
+- olay: ISSIZLIK
+  tarih: '20150806'
+  utc_ms: 1438864200000
 - olay: NFP
   tarih: '20150807'
   utc_ms: 1438950600000
+- olay: ISSIZLIK
+  tarih: '20150813'
+  utc_ms: 1439469000000
+- olay: PPI
+  tarih: '20150814'
+  utc_ms: 1439555400000
 - olay: CPI
   tarih: '20150819'
   utc_ms: 1439987400000
+- olay: ISSIZLIK
+  tarih: '20150820'
+  utc_ms: 1440073800000
+- olay: ISSIZLIK
+  tarih: '20150827'
+  utc_ms: 1440678600000
+- olay: ISSIZLIK
+  tarih: '20150903'
+  utc_ms: 1441283400000
 - olay: NFP
   tarih: '20150904'
   utc_ms: 1441369800000
+- olay: ISSIZLIK
+  tarih: '20150910'
+  utc_ms: 1441888200000
+- olay: PPI
+  tarih: '20150911'
+  utc_ms: 1441974600000
 - olay: CPI
   tarih: '20150916'
   utc_ms: 1442406600000
+- olay: ISSIZLIK
+  tarih: '20150917'
+  utc_ms: 1442493000000
+- olay: ISSIZLIK
+  tarih: '20150924'
+  utc_ms: 1443097800000
+- olay: ISSIZLIK
+  tarih: '20151001'
+  utc_ms: 1443702600000
 - olay: NFP
   tarih: '20151002'
   utc_ms: 1443789000000
+- olay: ISSIZLIK
+  tarih: '20151008'
+  utc_ms: 1444307400000
+- olay: PPI
+  tarih: '20151014'
+  utc_ms: 1444825800000
 - olay: CPI
   tarih: '20151015'
   utc_ms: 1444912200000
+- olay: ISSIZLIK
+  tarih: '20151015'
+  utc_ms: 1444912200000
+- olay: ISSIZLIK
+  tarih: '20151022'
+  utc_ms: 1445517000000
+- olay: ISSIZLIK
+  tarih: '20151029'
+  utc_ms: 1446121800000
+- olay: ISSIZLIK
+  tarih: '20151105'
+  utc_ms: 1446730200000
 - olay: NFP
   tarih: '20151106'
   utc_ms: 1446816600000
+- olay: ISSIZLIK
+  tarih: '20151112'
+  utc_ms: 1447335000000
+- olay: PPI
+  tarih: '20151113'
+  utc_ms: 1447421400000
 - olay: CPI
   tarih: '20151117'
   utc_ms: 1447767000000
+- olay: ISSIZLIK
+  tarih: '20151119'
+  utc_ms: 1447939800000
+- olay: ISSIZLIK
+  tarih: '20151125'
+  utc_ms: 1448458200000
+- olay: ISSIZLIK
+  tarih: '20151203'
+  utc_ms: 1449149400000
 - olay: NFP
   tarih: '20151204'
   utc_ms: 1449235800000
+- olay: ISSIZLIK
+  tarih: '20151210'
+  utc_ms: 1449754200000
+- olay: PPI
+  tarih: '20151211'
+  utc_ms: 1449840600000
 - olay: CPI
   tarih: '20151215'
   utc_ms: 1450186200000
+- olay: ISSIZLIK
+  tarih: '20151217'
+  utc_ms: 1450359000000
+- olay: ISSIZLIK
+  tarih: '20151224'
+  utc_ms: 1450963800000
+- olay: ISSIZLIK
+  tarih: '20151231'
+  utc_ms: 1451568600000
+- olay: ISSIZLIK
+  tarih: '20160107'
+  utc_ms: 1452173400000
 - olay: NFP
   tarih: '20160108'
   utc_ms: 1452259800000
+- olay: ISSIZLIK
+  tarih: '20160114'
+  utc_ms: 1452778200000
+- olay: PPI
+  tarih: '20160115'
+  utc_ms: 1452864600000
 - olay: CPI
   tarih: '20160120'
   utc_ms: 1453296600000
+- olay: ISSIZLIK
+  tarih: '20160121'
+  utc_ms: 1453383000000
+- olay: ISSIZLIK
+  tarih: '20160128'
+  utc_ms: 1453987800000
+- olay: ISSIZLIK
+  tarih: '20160204'
+  utc_ms: 1454592600000
 - olay: NFP
   tarih: '20160205'
   utc_ms: 1454679000000
+- olay: ISSIZLIK
+  tarih: '20160211'
+  utc_ms: 1455197400000
+- olay: PPI
+  tarih: '20160217'
+  utc_ms: 1455715800000
+- olay: ISSIZLIK
+  tarih: '20160218'
+  utc_ms: 1455802200000
 - olay: CPI
   tarih: '20160219'
   utc_ms: 1455888600000
+- olay: ISSIZLIK
+  tarih: '20160225'
+  utc_ms: 1456407000000
+- olay: ISSIZLIK
+  tarih: '20160303'
+  utc_ms: 1457011800000
 - olay: NFP
   tarih: '20160304'
   utc_ms: 1457098200000
+- olay: ISSIZLIK
+  tarih: '20160310'
+  utc_ms: 1457616600000
+- olay: PPI
+  tarih: '20160315'
+  utc_ms: 1458045000000
 - olay: CPI
   tarih: '20160316'
   utc_ms: 1458131400000
+- olay: ISSIZLIK
+  tarih: '20160317'
+  utc_ms: 1458217800000
+- olay: ISSIZLIK
+  tarih: '20160324'
+  utc_ms: 1458822600000
+- olay: ISSIZLIK
+  tarih: '20160331'
+  utc_ms: 1459427400000
 - olay: NFP
   tarih: '20160401'
   utc_ms: 1459513800000
+- olay: ISSIZLIK
+  tarih: '20160407'
+  utc_ms: 1460032200000
+- olay: PPI
+  tarih: '20160413'
+  utc_ms: 1460550600000
 - olay: CPI
   tarih: '20160414'
   utc_ms: 1460637000000
+- olay: ISSIZLIK
+  tarih: '20160414'
+  utc_ms: 1460637000000
+- olay: ISSIZLIK
+  tarih: '20160421'
+  utc_ms: 1461241800000
+- olay: ISSIZLIK
+  tarih: '20160428'
+  utc_ms: 1461846600000
+- olay: ISSIZLIK
+  tarih: '20160505'
+  utc_ms: 1462451400000
 - olay: NFP
   tarih: '20160506'
   utc_ms: 1462537800000
+- olay: ISSIZLIK
+  tarih: '20160512'
+  utc_ms: 1463056200000
+- olay: PPI
+  tarih: '20160513'
+  utc_ms: 1463142600000
 - olay: CPI
   tarih: '20160517'
   utc_ms: 1463488200000
+- olay: ISSIZLIK
+  tarih: '20160519'
+  utc_ms: 1463661000000
+- olay: ISSIZLIK
+  tarih: '20160526'
+  utc_ms: 1464265800000
+- olay: ISSIZLIK
+  tarih: '20160602'
+  utc_ms: 1464870600000
 - olay: NFP
   tarih: '20160603'
   utc_ms: 1464957000000
+- olay: ISSIZLIK
+  tarih: '20160609'
+  utc_ms: 1465475400000
+- olay: PPI
+  tarih: '20160615'
+  utc_ms: 1465993800000
 - olay: CPI
   tarih: '20160616'
   utc_ms: 1466080200000
+- olay: ISSIZLIK
+  tarih: '20160616'
+  utc_ms: 1466080200000
+- olay: ISSIZLIK
+  tarih: '20160623'
+  utc_ms: 1466685000000
+- olay: ISSIZLIK
+  tarih: '20160630'
+  utc_ms: 1467289800000
+- olay: ISSIZLIK
+  tarih: '20160707'
+  utc_ms: 1467894600000
 - olay: NFP
   tarih: '20160708'
   utc_ms: 1467981000000
+- olay: ISSIZLIK
+  tarih: '20160714'
+  utc_ms: 1468499400000
+- olay: PPI
+  tarih: '20160714'
+  utc_ms: 1468499400000
 - olay: CPI
   tarih: '20160715'
   utc_ms: 1468585800000
+- olay: ISSIZLIK
+  tarih: '20160721'
+  utc_ms: 1469104200000
+- olay: ISSIZLIK
+  tarih: '20160728'
+  utc_ms: 1469709000000
+- olay: ISSIZLIK
+  tarih: '20160804'
+  utc_ms: 1470313800000
 - olay: NFP
   tarih: '20160805'
   utc_ms: 1470400200000
+- olay: ISSIZLIK
+  tarih: '20160811'
+  utc_ms: 1470918600000
+- olay: PPI
+  tarih: '20160812'
+  utc_ms: 1471005000000
 - olay: CPI
   tarih: '20160816'
   utc_ms: 1471350600000
+- olay: ISSIZLIK
+  tarih: '20160818'
+  utc_ms: 1471523400000
+- olay: ISSIZLIK
+  tarih: '20160825'
+  utc_ms: 1472128200000
+- olay: ISSIZLIK
+  tarih: '20160901'
+  utc_ms: 1472733000000
 - olay: NFP
   tarih: '20160902'
   utc_ms: 1472819400000
+- olay: ISSIZLIK
+  tarih: '20160908'
+  utc_ms: 1473337800000
+- olay: ISSIZLIK
+  tarih: '20160915'
+  utc_ms: 1473942600000
+- olay: PPI
+  tarih: '20160915'
+  utc_ms: 1473942600000
 - olay: CPI
   tarih: '20160916'
   utc_ms: 1474029000000
+- olay: ISSIZLIK
+  tarih: '20160922'
+  utc_ms: 1474547400000
+- olay: ISSIZLIK
+  tarih: '20160929'
+  utc_ms: 1475152200000
+- olay: ISSIZLIK
+  tarih: '20161006'
+  utc_ms: 1475757000000
 - olay: NFP
   tarih: '20161007'
   utc_ms: 1475843400000
+- olay: ISSIZLIK
+  tarih: '20161013'
+  utc_ms: 1476361800000
+- olay: PPI
+  tarih: '20161014'
+  utc_ms: 1476448200000
 - olay: CPI
   tarih: '20161018'
   utc_ms: 1476793800000
+- olay: ISSIZLIK
+  tarih: '20161020'
+  utc_ms: 1476966600000
+- olay: ISSIZLIK
+  tarih: '20161027'
+  utc_ms: 1477571400000
+- olay: ISSIZLIK
+  tarih: '20161103'
+  utc_ms: 1478176200000
 - olay: NFP
   tarih: '20161104'
   utc_ms: 1478262600000
+- olay: ISSIZLIK
+  tarih: '20161110'
+  utc_ms: 1478784600000
+- olay: PPI
+  tarih: '20161116'
+  utc_ms: 1479303000000
 - olay: CPI
   tarih: '20161117'
   utc_ms: 1479389400000
+- olay: ISSIZLIK
+  tarih: '20161117'
+  utc_ms: 1479389400000
+- olay: ISSIZLIK
+  tarih: '20161123'
+  utc_ms: 1479907800000
+- olay: ISSIZLIK
+  tarih: '20161201'
+  utc_ms: 1480599000000
 - olay: NFP
   tarih: '20161202'
   utc_ms: 1480685400000
+- olay: ISSIZLIK
+  tarih: '20161208'
+  utc_ms: 1481203800000
+- olay: PPI
+  tarih: '20161214'
+  utc_ms: 1481722200000
 - olay: CPI
   tarih: '20161215'
   utc_ms: 1481808600000
+- olay: ISSIZLIK
+  tarih: '20161215'
+  utc_ms: 1481808600000
+- olay: ISSIZLIK
+  tarih: '20161222'
+  utc_ms: 1482413400000
+- olay: ISSIZLIK
+  tarih: '20161229'
+  utc_ms: 1483018200000
+- olay: ISSIZLIK
+  tarih: '20170105'
+  utc_ms: 1483623000000
 - olay: NFP
   tarih: '20170106'
   utc_ms: 1483709400000
+- olay: ISSIZLIK
+  tarih: '20170112'
+  utc_ms: 1484227800000
+- olay: PPI
+  tarih: '20170113'
+  utc_ms: 1484314200000
 - olay: CPI
   tarih: '20170118'
   utc_ms: 1484746200000
+- olay: ISSIZLIK
+  tarih: '20170119'
+  utc_ms: 1484832600000
+- olay: ISSIZLIK
+  tarih: '20170126'
+  utc_ms: 1485437400000
+- olay: ISSIZLIK
+  tarih: '20170202'
+  utc_ms: 1486042200000
 - olay: NFP
   tarih: '20170203'
   utc_ms: 1486128600000
+- olay: ISSIZLIK
+  tarih: '20170209'
+  utc_ms: 1486647000000
+- olay: PPI
+  tarih: '20170214'
+  utc_ms: 1487079000000
 - olay: CPI
   tarih: '20170215'
   utc_ms: 1487165400000
+- olay: ISSIZLIK
+  tarih: '20170216'
+  utc_ms: 1487251800000
+- olay: ISSIZLIK
+  tarih: '20170223'
+  utc_ms: 1487856600000
+- olay: ISSIZLIK
+  tarih: '20170302'
+  utc_ms: 1488461400000
+- olay: ISSIZLIK
+  tarih: '20170309'
+  utc_ms: 1489066200000
 - olay: NFP
   tarih: '20170310'
   utc_ms: 1489152600000
+- olay: PPI
+  tarih: '20170314'
+  utc_ms: 1489494600000
 - olay: CPI
   tarih: '20170315'
   utc_ms: 1489581000000
+- olay: ISSIZLIK
+  tarih: '20170316'
+  utc_ms: 1489667400000
+- olay: ISSIZLIK
+  tarih: '20170323'
+  utc_ms: 1490272200000
+- olay: ISSIZLIK
+  tarih: '20170330'
+  utc_ms: 1490877000000
+- olay: ISSIZLIK
+  tarih: '20170406'
+  utc_ms: 1491481800000
 - olay: NFP
   tarih: '20170407'
   utc_ms: 1491568200000
+- olay: ISSIZLIK
+  tarih: '20170413'
+  utc_ms: 1492086600000
+- olay: PPI
+  tarih: '20170413'
+  utc_ms: 1492086600000
 - olay: CPI
   tarih: '20170414'
   utc_ms: 1492173000000
+- olay: ISSIZLIK
+  tarih: '20170420'
+  utc_ms: 1492691400000
+- olay: ISSIZLIK
+  tarih: '20170427'
+  utc_ms: 1493296200000
+- olay: ISSIZLIK
+  tarih: '20170504'
+  utc_ms: 1493901000000
 - olay: NFP
   tarih: '20170505'
   utc_ms: 1493987400000
+- olay: ISSIZLIK
+  tarih: '20170511'
+  utc_ms: 1494505800000
+- olay: PPI
+  tarih: '20170511'
+  utc_ms: 1494505800000
 - olay: CPI
   tarih: '20170512'
   utc_ms: 1494592200000
+- olay: ISSIZLIK
+  tarih: '20170518'
+  utc_ms: 1495110600000
+- olay: ISSIZLIK
+  tarih: '20170525'
+  utc_ms: 1495715400000
+- olay: ISSIZLIK
+  tarih: '20170601'
+  utc_ms: 1496320200000
 - olay: NFP
   tarih: '20170602'
   utc_ms: 1496406600000
+- olay: ISSIZLIK
+  tarih: '20170608'
+  utc_ms: 1496925000000
+- olay: PPI
+  tarih: '20170613'
+  utc_ms: 1497357000000
 - olay: CPI
   tarih: '20170614'
   utc_ms: 1497443400000
+- olay: ISSIZLIK
+  tarih: '20170615'
+  utc_ms: 1497529800000
+- olay: ISSIZLIK
+  tarih: '20170622'
+  utc_ms: 1498134600000
+- olay: ISSIZLIK
+  tarih: '20170629'
+  utc_ms: 1498739400000
+- olay: ISSIZLIK
+  tarih: '20170706'
+  utc_ms: 1499344200000
 - olay: NFP
   tarih: '20170707'
   utc_ms: 1499430600000
+- olay: ISSIZLIK
+  tarih: '20170713'
+  utc_ms: 1499949000000
+- olay: PPI
+  tarih: '20170713'
+  utc_ms: 1499949000000
 - olay: CPI
   tarih: '20170714'
   utc_ms: 1500035400000
+- olay: ISSIZLIK
+  tarih: '20170720'
+  utc_ms: 1500553800000
+- olay: ISSIZLIK
+  tarih: '20170727'
+  utc_ms: 1501158600000
+- olay: ISSIZLIK
+  tarih: '20170803'
+  utc_ms: 1501763400000
 - olay: NFP
   tarih: '20170804'
   utc_ms: 1501849800000
+- olay: ISSIZLIK
+  tarih: '20170810'
+  utc_ms: 1502368200000
+- olay: PPI
+  tarih: '20170810'
+  utc_ms: 1502368200000
 - olay: CPI
   tarih: '20170811'
   utc_ms: 1502454600000
+- olay: ISSIZLIK
+  tarih: '20170817'
+  utc_ms: 1502973000000
+- olay: ISSIZLIK
+  tarih: '20170824'
+  utc_ms: 1503577800000
+- olay: ISSIZLIK
+  tarih: '20170831'
+  utc_ms: 1504182600000
 - olay: NFP
   tarih: '20170901'
   utc_ms: 1504269000000
+- olay: ISSIZLIK
+  tarih: '20170907'
+  utc_ms: 1504787400000
+- olay: PPI
+  tarih: '20170913'
+  utc_ms: 1505305800000
 - olay: CPI
   tarih: '20170914'
   utc_ms: 1505392200000
+- olay: ISSIZLIK
+  tarih: '20170914'
+  utc_ms: 1505392200000
+- olay: ISSIZLIK
+  tarih: '20170921'
+  utc_ms: 1505997000000
+- olay: ISSIZLIK
+  tarih: '20170928'
+  utc_ms: 1506601800000
+- olay: ISSIZLIK
+  tarih: '20171005'
+  utc_ms: 1507206600000
 - olay: NFP
   tarih: '20171006'
   utc_ms: 1507293000000
+- olay: ISSIZLIK
+  tarih: '20171012'
+  utc_ms: 1507811400000
+- olay: PPI
+  tarih: '20171012'
+  utc_ms: 1507811400000
 - olay: CPI
   tarih: '20171013'
   utc_ms: 1507897800000
+- olay: ISSIZLIK
+  tarih: '20171019'
+  utc_ms: 1508416200000
+- olay: ISSIZLIK
+  tarih: '20171026'
+  utc_ms: 1509021000000
+- olay: ISSIZLIK
+  tarih: '20171102'
+  utc_ms: 1509625800000
 - olay: NFP
   tarih: '20171103'
   utc_ms: 1509712200000
+- olay: ISSIZLIK
+  tarih: '20171109'
+  utc_ms: 1510234200000
+- olay: PPI
+  tarih: '20171114'
+  utc_ms: 1510666200000
 - olay: CPI
   tarih: '20171115'
   utc_ms: 1510752600000
+- olay: ISSIZLIK
+  tarih: '20171116'
+  utc_ms: 1510839000000
+- olay: ISSIZLIK
+  tarih: '20171122'
+  utc_ms: 1511357400000
+- olay: ISSIZLIK
+  tarih: '20171130'
+  utc_ms: 1512048600000
+- olay: ISSIZLIK
+  tarih: '20171207'
+  utc_ms: 1512653400000
 - olay: NFP
   tarih: '20171208'
   utc_ms: 1512739800000
+- olay: PPI
+  tarih: '20171212'
+  utc_ms: 1513085400000
 - olay: CPI
   tarih: '20171213'
   utc_ms: 1513171800000
+- olay: ISSIZLIK
+  tarih: '20171214'
+  utc_ms: 1513258200000
+- olay: ISSIZLIK
+  tarih: '20171221'
+  utc_ms: 1513863000000
+- olay: ISSIZLIK
+  tarih: '20171228'
+  utc_ms: 1514467800000
+- olay: ISSIZLIK
+  tarih: '20180104'
+  utc_ms: 1515072600000
 - olay: NFP
   tarih: '20180105'
   utc_ms: 1515159000000
+- olay: ISSIZLIK
+  tarih: '20180111'
+  utc_ms: 1515677400000
+- olay: PPI
+  tarih: '20180111'
+  utc_ms: 1515677400000
 - olay: CPI
   tarih: '20180112'
   utc_ms: 1515763800000
+- olay: ISSIZLIK
+  tarih: '20180118'
+  utc_ms: 1516282200000
+- olay: ISSIZLIK
+  tarih: '20180125'
+  utc_ms: 1516887000000
+- olay: ISSIZLIK
+  tarih: '20180201'
+  utc_ms: 1517491800000
 - olay: NFP
   tarih: '20180202'
   utc_ms: 1517578200000
+- olay: ISSIZLIK
+  tarih: '20180208'
+  utc_ms: 1518096600000
 - olay: CPI
   tarih: '20180214'
   utc_ms: 1518615000000
+- olay: ISSIZLIK
+  tarih: '20180215'
+  utc_ms: 1518701400000
+- olay: PPI
+  tarih: '20180215'
+  utc_ms: 1518701400000
+- olay: ISSIZLIK
+  tarih: '20180222'
+  utc_ms: 1519306200000
+- olay: ISSIZLIK
+  tarih: '20180301'
+  utc_ms: 1519911000000
+- olay: ISSIZLIK
+  tarih: '20180308'
+  utc_ms: 1520515800000
 - olay: NFP
   tarih: '20180309'
   utc_ms: 1520602200000
 - olay: CPI
   tarih: '20180313'
   utc_ms: 1520944200000
+- olay: PPI
+  tarih: '20180314'
+  utc_ms: 1521030600000
+- olay: ISSIZLIK
+  tarih: '20180315'
+  utc_ms: 1521117000000
+- olay: ISSIZLIK
+  tarih: '20180322'
+  utc_ms: 1521721800000
+- olay: ISSIZLIK
+  tarih: '20180329'
+  utc_ms: 1522326600000
+- olay: ISSIZLIK
+  tarih: '20180405'
+  utc_ms: 1522931400000
 - olay: NFP
   tarih: '20180406'
   utc_ms: 1523017800000
+- olay: PPI
+  tarih: '20180410'
+  utc_ms: 1523363400000
 - olay: CPI
   tarih: '20180411'
   utc_ms: 1523449800000
+- olay: ISSIZLIK
+  tarih: '20180412'
+  utc_ms: 1523536200000
+- olay: ISSIZLIK
+  tarih: '20180419'
+  utc_ms: 1524141000000
+- olay: ISSIZLIK
+  tarih: '20180426'
+  utc_ms: 1524745800000
+- olay: ISSIZLIK
+  tarih: '20180503'
+  utc_ms: 1525350600000
 - olay: NFP
   tarih: '20180504'
   utc_ms: 1525437000000
+- olay: PPI
+  tarih: '20180509'
+  utc_ms: 1525869000000
 - olay: CPI
   tarih: '20180510'
   utc_ms: 1525955400000
+- olay: ISSIZLIK
+  tarih: '20180510'
+  utc_ms: 1525955400000
+- olay: ISSIZLIK
+  tarih: '20180517'
+  utc_ms: 1526560200000
+- olay: ISSIZLIK
+  tarih: '20180524'
+  utc_ms: 1527165000000
+- olay: ISSIZLIK
+  tarih: '20180531'
+  utc_ms: 1527769800000
 - olay: NFP
   tarih: '20180601'
   utc_ms: 1527856200000
+- olay: ISSIZLIK
+  tarih: '20180607'
+  utc_ms: 1528374600000
 - olay: CPI
   tarih: '20180612'
   utc_ms: 1528806600000
+- olay: PPI
+  tarih: '20180613'
+  utc_ms: 1528893000000
+- olay: ISSIZLIK
+  tarih: '20180614'
+  utc_ms: 1528979400000
+- olay: ISSIZLIK
+  tarih: '20180621'
+  utc_ms: 1529584200000
+- olay: ISSIZLIK
+  tarih: '20180628'
+  utc_ms: 1530189000000
+- olay: ISSIZLIK
+  tarih: '20180705'
+  utc_ms: 1530793800000
 - olay: NFP
   tarih: '20180706'
   utc_ms: 1530880200000
+- olay: PPI
+  tarih: '20180711'
+  utc_ms: 1531312200000
 - olay: CPI
   tarih: '20180712'
   utc_ms: 1531398600000
+- olay: ISSIZLIK
+  tarih: '20180712'
+  utc_ms: 1531398600000
+- olay: ISSIZLIK
+  tarih: '20180719'
+  utc_ms: 1532003400000
+- olay: ISSIZLIK
+  tarih: '20180726'
+  utc_ms: 1532608200000
+- olay: ISSIZLIK
+  tarih: '20180802'
+  utc_ms: 1533213000000
 - olay: NFP
   tarih: '20180803'
   utc_ms: 1533299400000
+- olay: ISSIZLIK
+  tarih: '20180809'
+  utc_ms: 1533817800000
+- olay: PPI
+  tarih: '20180809'
+  utc_ms: 1533817800000
 - olay: CPI
   tarih: '20180810'
   utc_ms: 1533904200000
+- olay: ISSIZLIK
+  tarih: '20180816'
+  utc_ms: 1534422600000
+- olay: ISSIZLIK
+  tarih: '20180823'
+  utc_ms: 1535027400000
+- olay: ISSIZLIK
+  tarih: '20180830'
+  utc_ms: 1535632200000
+- olay: ISSIZLIK
+  tarih: '20180906'
+  utc_ms: 1536237000000
 - olay: NFP
   tarih: '20180907'
   utc_ms: 1536323400000
+- olay: PPI
+  tarih: '20180912'
+  utc_ms: 1536755400000
 - olay: CPI
   tarih: '20180913'
   utc_ms: 1536841800000
+- olay: ISSIZLIK
+  tarih: '20180913'
+  utc_ms: 1536841800000
+- olay: ISSIZLIK
+  tarih: '20180920'
+  utc_ms: 1537446600000
+- olay: ISSIZLIK
+  tarih: '20180927'
+  utc_ms: 1538051400000
+- olay: ISSIZLIK
+  tarih: '20181004'
+  utc_ms: 1538656200000
 - olay: NFP
   tarih: '20181005'
   utc_ms: 1538742600000
+- olay: PPI
+  tarih: '20181010'
+  utc_ms: 1539174600000
 - olay: CPI
   tarih: '20181011'
   utc_ms: 1539261000000
+- olay: ISSIZLIK
+  tarih: '20181011'
+  utc_ms: 1539261000000
+- olay: ISSIZLIK
+  tarih: '20181018'
+  utc_ms: 1539865800000
+- olay: ISSIZLIK
+  tarih: '20181025'
+  utc_ms: 1540470600000
+- olay: ISSIZLIK
+  tarih: '20181101'
+  utc_ms: 1541075400000
 - olay: NFP
   tarih: '20181102'
   utc_ms: 1541161800000
+- olay: ISSIZLIK
+  tarih: '20181108'
+  utc_ms: 1541683800000
+- olay: PPI
+  tarih: '20181109'
+  utc_ms: 1541770200000
 - olay: CPI
   tarih: '20181114'
   utc_ms: 1542202200000
+- olay: ISSIZLIK
+  tarih: '20181115'
+  utc_ms: 1542288600000
+- olay: ISSIZLIK
+  tarih: '20181121'
+  utc_ms: 1542807000000
+- olay: ISSIZLIK
+  tarih: '20181129'
+  utc_ms: 1543498200000
+- olay: ISSIZLIK
+  tarih: '20181206'
+  utc_ms: 1544103000000
 - olay: NFP
   tarih: '20181207'
   utc_ms: 1544189400000
+- olay: PPI
+  tarih: '20181211'
+  utc_ms: 1544535000000
 - olay: CPI
   tarih: '20181212'
   utc_ms: 1544621400000
+- olay: ISSIZLIK
+  tarih: '20181213'
+  utc_ms: 1544707800000
+- olay: ISSIZLIK
+  tarih: '20181220'
+  utc_ms: 1545312600000
+- olay: ISSIZLIK
+  tarih: '20181227'
+  utc_ms: 1545917400000
+- olay: ISSIZLIK
+  tarih: '20190103'
+  utc_ms: 1546522200000
 - olay: NFP
   tarih: '20190104'
   utc_ms: 1546608600000
+- olay: ISSIZLIK
+  tarih: '20190110'
+  utc_ms: 1547127000000
 - olay: CPI
   tarih: '20190111'
   utc_ms: 1547213400000
+- olay: PPI
+  tarih: '20190115'
+  utc_ms: 1547559000000
+- olay: ISSIZLIK
+  tarih: '20190117'
+  utc_ms: 1547731800000
+- olay: ISSIZLIK
+  tarih: '20190124'
+  utc_ms: 1548336600000
+- olay: ISSIZLIK
+  tarih: '20190131'
+  utc_ms: 1548941400000
 - olay: NFP
   tarih: '20190201'
   utc_ms: 1549027800000
+- olay: ISSIZLIK
+  tarih: '20190207'
+  utc_ms: 1549546200000
 - olay: CPI
   tarih: '20190213'
   utc_ms: 1550064600000
+- olay: ISSIZLIK
+  tarih: '20190214'
+  utc_ms: 1550151000000
+- olay: PPI
+  tarih: '20190214'
+  utc_ms: 1550151000000
+- olay: ISSIZLIK
+  tarih: '20190221'
+  utc_ms: 1550755800000
+- olay: ISSIZLIK
+  tarih: '20190228'
+  utc_ms: 1551360600000
+- olay: ISSIZLIK
+  tarih: '20190307'
+  utc_ms: 1551965400000
 - olay: NFP
   tarih: '20190308'
   utc_ms: 1552051800000
 - olay: CPI
   tarih: '20190312'
   utc_ms: 1552393800000
+- olay: PPI
+  tarih: '20190313'
+  utc_ms: 1552480200000
+- olay: ISSIZLIK
+  tarih: '20190314'
+  utc_ms: 1552566600000
+- olay: ISSIZLIK
+  tarih: '20190321'
+  utc_ms: 1553171400000
+- olay: ISSIZLIK
+  tarih: '20190328'
+  utc_ms: 1553776200000
+- olay: ISSIZLIK
+  tarih: '20190404'
+  utc_ms: 1554381000000
 - olay: NFP
   tarih: '20190405'
   utc_ms: 1554467400000
 - olay: CPI
   tarih: '20190410'
   utc_ms: 1554899400000
+- olay: ISSIZLIK
+  tarih: '20190411'
+  utc_ms: 1554985800000
+- olay: PPI
+  tarih: '20190411'
+  utc_ms: 1554985800000
+- olay: ISSIZLIK
+  tarih: '20190418'
+  utc_ms: 1555590600000
+- olay: ISSIZLIK
+  tarih: '20190425'
+  utc_ms: 1556195400000
+- olay: ISSIZLIK
+  tarih: '20190502'
+  utc_ms: 1556800200000
 - olay: NFP
   tarih: '20190503'
   utc_ms: 1556886600000
+- olay: ISSIZLIK
+  tarih: '20190509'
+  utc_ms: 1557405000000
+- olay: PPI
+  tarih: '20190509'
+  utc_ms: 1557405000000
 - olay: CPI
   tarih: '20190510'
   utc_ms: 1557491400000
+- olay: ISSIZLIK
+  tarih: '20190516'
+  utc_ms: 1558009800000
+- olay: ISSIZLIK
+  tarih: '20190523'
+  utc_ms: 1558614600000
+- olay: ISSIZLIK
+  tarih: '20190530'
+  utc_ms: 1559219400000
+- olay: ISSIZLIK
+  tarih: '20190606'
+  utc_ms: 1559824200000
 - olay: NFP
   tarih: '20190607'
   utc_ms: 1559910600000
+- olay: PPI
+  tarih: '20190611'
+  utc_ms: 1560256200000
 - olay: CPI
   tarih: '20190612'
   utc_ms: 1560342600000
+- olay: ISSIZLIK
+  tarih: '20190613'
+  utc_ms: 1560429000000
+- olay: ISSIZLIK
+  tarih: '20190620'
+  utc_ms: 1561033800000
+- olay: ISSIZLIK
+  tarih: '20190627'
+  utc_ms: 1561638600000
+- olay: ISSIZLIK
+  tarih: '20190703'
+  utc_ms: 1562157000000
 - olay: NFP
   tarih: '20190705'
   utc_ms: 1562329800000
 - olay: CPI
   tarih: '20190711'
   utc_ms: 1562848200000
+- olay: ISSIZLIK
+  tarih: '20190711'
+  utc_ms: 1562848200000
+- olay: PPI
+  tarih: '20190712'
+  utc_ms: 1562934600000
+- olay: ISSIZLIK
+  tarih: '20190718'
+  utc_ms: 1563453000000
+- olay: ISSIZLIK
+  tarih: '20190725'
+  utc_ms: 1564057800000
+- olay: ISSIZLIK
+  tarih: '20190801'
+  utc_ms: 1564662600000
 - olay: NFP
   tarih: '20190802'
   utc_ms: 1564749000000
+- olay: ISSIZLIK
+  tarih: '20190808'
+  utc_ms: 1565267400000
+- olay: PPI
+  tarih: '20190809'
+  utc_ms: 1565353800000
 - olay: CPI
   tarih: '20190813'
   utc_ms: 1565699400000
+- olay: ISSIZLIK
+  tarih: '20190815'
+  utc_ms: 1565872200000
+- olay: ISSIZLIK
+  tarih: '20190822'
+  utc_ms: 1566477000000
+- olay: ISSIZLIK
+  tarih: '20190829'
+  utc_ms: 1567081800000
+- olay: ISSIZLIK
+  tarih: '20190905'
+  utc_ms: 1567686600000
 - olay: NFP
   tarih: '20190906'
   utc_ms: 1567773000000
+- olay: PPI
+  tarih: '20190911'
+  utc_ms: 1568205000000
 - olay: CPI
   tarih: '20190912'
   utc_ms: 1568291400000
+- olay: ISSIZLIK
+  tarih: '20190912'
+  utc_ms: 1568291400000
+- olay: ISSIZLIK
+  tarih: '20190919'
+  utc_ms: 1568896200000
+- olay: ISSIZLIK
+  tarih: '20190926'
+  utc_ms: 1569501000000
+- olay: ISSIZLIK
+  tarih: '20191003'
+  utc_ms: 1570105800000
 - olay: NFP
   tarih: '20191004'
   utc_ms: 1570192200000
+- olay: PPI
+  tarih: '20191008'
+  utc_ms: 1570537800000
 - olay: CPI
   tarih: '20191010'
   utc_ms: 1570710600000
+- olay: ISSIZLIK
+  tarih: '20191010'
+  utc_ms: 1570710600000
+- olay: ISSIZLIK
+  tarih: '20191017'
+  utc_ms: 1571315400000
+- olay: ISSIZLIK
+  tarih: '20191024'
+  utc_ms: 1571920200000
+- olay: ISSIZLIK
+  tarih: '20191031'
+  utc_ms: 1572525000000
 - olay: NFP
   tarih: '20191101'
   utc_ms: 1572611400000
+- olay: ISSIZLIK
+  tarih: '20191107'
+  utc_ms: 1573133400000
 - olay: CPI
   tarih: '20191113'
   utc_ms: 1573651800000
+- olay: ISSIZLIK
+  tarih: '20191114'
+  utc_ms: 1573738200000
+- olay: PPI
+  tarih: '20191114'
+  utc_ms: 1573738200000
+- olay: ISSIZLIK
+  tarih: '20191121'
+  utc_ms: 1574343000000
+- olay: ISSIZLIK
+  tarih: '20191127'
+  utc_ms: 1574861400000
+- olay: ISSIZLIK
+  tarih: '20191205'
+  utc_ms: 1575552600000
 - olay: NFP
   tarih: '20191206'
   utc_ms: 1575639000000
 - olay: CPI
   tarih: '20191211'
   utc_ms: 1576071000000
+- olay: ISSIZLIK
+  tarih: '20191212'
+  utc_ms: 1576157400000
+- olay: PPI
+  tarih: '20191212'
+  utc_ms: 1576157400000
+- olay: ISSIZLIK
+  tarih: '20191219'
+  utc_ms: 1576762200000
+- olay: ISSIZLIK
+  tarih: '20191226'
+  utc_ms: 1577367000000
+- olay: ISSIZLIK
+  tarih: '20200102'
+  utc_ms: 1577971800000
+- olay: ISSIZLIK
+  tarih: '20200109'
+  utc_ms: 1578576600000
 - olay: NFP
   tarih: '20200110'
   utc_ms: 1578663000000
 - olay: CPI
   tarih: '20200114'
   utc_ms: 1579008600000
+- olay: PPI
+  tarih: '20200115'
+  utc_ms: 1579095000000
+- olay: ISSIZLIK
+  tarih: '20200116'
+  utc_ms: 1579181400000
+- olay: ISSIZLIK
+  tarih: '20200123'
+  utc_ms: 1579786200000
+- olay: ISSIZLIK
+  tarih: '20200130'
+  utc_ms: 1580391000000
+- olay: ISSIZLIK
+  tarih: '20200206'
+  utc_ms: 1580995800000
 - olay: NFP
   tarih: '20200207'
   utc_ms: 1581082200000
 - olay: CPI
   tarih: '20200213'
   utc_ms: 1581600600000
+- olay: ISSIZLIK
+  tarih: '20200213'
+  utc_ms: 1581600600000
+- olay: PPI
+  tarih: '20200219'
+  utc_ms: 1582119000000
+- olay: ISSIZLIK
+  tarih: '20200220'
+  utc_ms: 1582205400000
+- olay: ISSIZLIK
+  tarih: '20200227'
+  utc_ms: 1582810200000
+- olay: ISSIZLIK
+  tarih: '20200305'
+  utc_ms: 1583415000000
 - olay: NFP
   tarih: '20200306'
   utc_ms: 1583501400000
 - olay: CPI
   tarih: '20200311'
   utc_ms: 1583929800000
+- olay: ISSIZLIK
+  tarih: '20200312'
+  utc_ms: 1584016200000
+- olay: PPI
+  tarih: '20200312'
+  utc_ms: 1584016200000
+- olay: ISSIZLIK
+  tarih: '20200319'
+  utc_ms: 1584621000000
+- olay: ISSIZLIK
+  tarih: '20200326'
+  utc_ms: 1585225800000
+- olay: ISSIZLIK
+  tarih: '20200402'
+  utc_ms: 1585830600000
 - olay: NFP
   tarih: '20200403'
   utc_ms: 1585917000000
+- olay: ISSIZLIK
+  tarih: '20200409'
+  utc_ms: 1586435400000
+- olay: PPI
+  tarih: '20200409'
+  utc_ms: 1586435400000
 - olay: CPI
   tarih: '20200410'
   utc_ms: 1586521800000
+- olay: ISSIZLIK
+  tarih: '20200416'
+  utc_ms: 1587040200000
+- olay: ISSIZLIK
+  tarih: '20200423'
+  utc_ms: 1587645000000
+- olay: ISSIZLIK
+  tarih: '20200430'
+  utc_ms: 1588249800000
+- olay: ISSIZLIK
+  tarih: '20200507'
+  utc_ms: 1588854600000
 - olay: NFP
   tarih: '20200508'
   utc_ms: 1588941000000
 - olay: CPI
   tarih: '20200512'
   utc_ms: 1589286600000
+- olay: PPI
+  tarih: '20200513'
+  utc_ms: 1589373000000
+- olay: ISSIZLIK
+  tarih: '20200514'
+  utc_ms: 1589459400000
+- olay: ISSIZLIK
+  tarih: '20200521'
+  utc_ms: 1590064200000
+- olay: ISSIZLIK
+  tarih: '20200528'
+  utc_ms: 1590669000000
+- olay: ISSIZLIK
+  tarih: '20200604'
+  utc_ms: 1591273800000
 - olay: NFP
   tarih: '20200605'
   utc_ms: 1591360200000
 - olay: CPI
   tarih: '20200610'
   utc_ms: 1591792200000
+- olay: ISSIZLIK
+  tarih: '20200611'
+  utc_ms: 1591878600000
+- olay: PPI
+  tarih: '20200611'
+  utc_ms: 1591878600000
+- olay: ISSIZLIK
+  tarih: '20200618'
+  utc_ms: 1592483400000
+- olay: ISSIZLIK
+  tarih: '20200625'
+  utc_ms: 1593088200000
+- olay: ISSIZLIK
+  tarih: '20200702'
+  utc_ms: 1593693000000
 - olay: NFP
   tarih: '20200702'
   utc_ms: 1593693000000
+- olay: ISSIZLIK
+  tarih: '20200709'
+  utc_ms: 1594297800000
+- olay: PPI
+  tarih: '20200710'
+  utc_ms: 1594384200000
 - olay: CPI
   tarih: '20200714'
   utc_ms: 1594729800000
+- olay: ISSIZLIK
+  tarih: '20200716'
+  utc_ms: 1594902600000
+- olay: ISSIZLIK
+  tarih: '20200723'
+  utc_ms: 1595507400000
+- olay: ISSIZLIK
+  tarih: '20200730'
+  utc_ms: 1596112200000
+- olay: ISSIZLIK
+  tarih: '20200806'
+  utc_ms: 1596717000000
 - olay: NFP
   tarih: '20200807'
   utc_ms: 1596803400000
+- olay: PPI
+  tarih: '20200811'
+  utc_ms: 1597149000000
 - olay: CPI
   tarih: '20200812'
   utc_ms: 1597235400000
+- olay: ISSIZLIK
+  tarih: '20200813'
+  utc_ms: 1597321800000
+- olay: ISSIZLIK
+  tarih: '20200820'
+  utc_ms: 1597926600000
+- olay: ISSIZLIK
+  tarih: '20200827'
+  utc_ms: 1598531400000
+- olay: ISSIZLIK
+  tarih: '20200903'
+  utc_ms: 1599136200000
 - olay: NFP
   tarih: '20200904'
   utc_ms: 1599222600000
+- olay: ISSIZLIK
+  tarih: '20200910'
+  utc_ms: 1599741000000
+- olay: PPI
+  tarih: '20200910'
+  utc_ms: 1599741000000
 - olay: CPI
   tarih: '20200911'
   utc_ms: 1599827400000
+- olay: ISSIZLIK
+  tarih: '20200917'
+  utc_ms: 1600345800000
+- olay: ISSIZLIK
+  tarih: '20200924'
+  utc_ms: 1600950600000
+- olay: ISSIZLIK
+  tarih: '20201001'
+  utc_ms: 1601555400000
 - olay: NFP
   tarih: '20201002'
   utc_ms: 1601641800000
+- olay: ISSIZLIK
+  tarih: '20201008'
+  utc_ms: 1602160200000
 - olay: CPI
   tarih: '20201013'
   utc_ms: 1602592200000
+- olay: PPI
+  tarih: '20201014'
+  utc_ms: 1602678600000
+- olay: ISSIZLIK
+  tarih: '20201015'
+  utc_ms: 1602765000000
+- olay: ISSIZLIK
+  tarih: '20201022'
+  utc_ms: 1603369800000
+- olay: ISSIZLIK
+  tarih: '20201029'
+  utc_ms: 1603974600000
+- olay: ISSIZLIK
+  tarih: '20201105'
+  utc_ms: 1604583000000
 - olay: NFP
   tarih: '20201106'
   utc_ms: 1604669400000
 - olay: CPI
   tarih: '20201112'
   utc_ms: 1605187800000
+- olay: ISSIZLIK
+  tarih: '20201112'
+  utc_ms: 1605187800000
+- olay: PPI
+  tarih: '20201113'
+  utc_ms: 1605274200000
+- olay: ISSIZLIK
+  tarih: '20201119'
+  utc_ms: 1605792600000
+- olay: ISSIZLIK
+  tarih: '20201125'
+  utc_ms: 1606311000000
+- olay: ISSIZLIK
+  tarih: '20201203'
+  utc_ms: 1607002200000
 - olay: NFP
   tarih: '20201204'
   utc_ms: 1607088600000
 - olay: CPI
   tarih: '20201210'
   utc_ms: 1607607000000
+- olay: ISSIZLIK
+  tarih: '20201210'
+  utc_ms: 1607607000000
+- olay: PPI
+  tarih: '20201211'
+  utc_ms: 1607693400000
+- olay: ISSIZLIK
+  tarih: '20201217'
+  utc_ms: 1608211800000
+- olay: ISSIZLIK
+  tarih: '20201224'
+  utc_ms: 1608816600000
+- olay: ISSIZLIK
+  tarih: '20201231'
+  utc_ms: 1609421400000
+- olay: ISSIZLIK
+  tarih: '20210107'
+  utc_ms: 1610026200000
 - olay: NFP
   tarih: '20210108'
   utc_ms: 1610112600000
 - olay: CPI
   tarih: '20210113'
   utc_ms: 1610544600000
+- olay: ISSIZLIK
+  tarih: '20210114'
+  utc_ms: 1610631000000
+- olay: PPI
+  tarih: '20210115'
+  utc_ms: 1610717400000
+- olay: ISSIZLIK
+  tarih: '20210121'
+  utc_ms: 1611235800000
 - olay: FOMC
   tarih: '20210127'
   utc_ms: 1611774000000
+- olay: ISSIZLIK
+  tarih: '20210128'
+  utc_ms: 1611840600000
+- olay: ISSIZLIK
+  tarih: '20210204'
+  utc_ms: 1612445400000
 - olay: NFP
   tarih: '20210205'
   utc_ms: 1612531800000
 - olay: CPI
   tarih: '20210210'
   utc_ms: 1612963800000
+- olay: ISSIZLIK
+  tarih: '20210211'
+  utc_ms: 1613050200000
+- olay: PPI
+  tarih: '20210217'
+  utc_ms: 1613568600000
+- olay: ISSIZLIK
+  tarih: '20210218'
+  utc_ms: 1613655000000
+- olay: ISSIZLIK
+  tarih: '20210225'
+  utc_ms: 1614259800000
+- olay: ISSIZLIK
+  tarih: '20210304'
+  utc_ms: 1614864600000
 - olay: NFP
   tarih: '20210305'
   utc_ms: 1614951000000
 - olay: CPI
   tarih: '20210310'
   utc_ms: 1615383000000
+- olay: ISSIZLIK
+  tarih: '20210311'
+  utc_ms: 1615469400000
+- olay: PPI
+  tarih: '20210312'
+  utc_ms: 1615555800000
 - olay: FOMC
   tarih: '20210317'
   utc_ms: 1616004000000
+- olay: ISSIZLIK
+  tarih: '20210318'
+  utc_ms: 1616070600000
+- olay: ISSIZLIK
+  tarih: '20210325'
+  utc_ms: 1616675400000
+- olay: ISSIZLIK
+  tarih: '20210401'
+  utc_ms: 1617280200000
 - olay: NFP
   tarih: '20210402'
   utc_ms: 1617366600000
+- olay: ISSIZLIK
+  tarih: '20210408'
+  utc_ms: 1617885000000
+- olay: PPI
+  tarih: '20210409'
+  utc_ms: 1617971400000
 - olay: CPI
   tarih: '20210413'
   utc_ms: 1618317000000
+- olay: ISSIZLIK
+  tarih: '20210415'
+  utc_ms: 1618489800000
+- olay: ISSIZLIK
+  tarih: '20210422'
+  utc_ms: 1619094600000
 - olay: FOMC
   tarih: '20210428'
   utc_ms: 1619632800000
+- olay: ISSIZLIK
+  tarih: '20210429'
+  utc_ms: 1619699400000
+- olay: ISSIZLIK
+  tarih: '20210506'
+  utc_ms: 1620304200000
 - olay: NFP
   tarih: '20210507'
   utc_ms: 1620390600000
 - olay: CPI
   tarih: '20210512'
   utc_ms: 1620822600000
+- olay: ISSIZLIK
+  tarih: '20210513'
+  utc_ms: 1620909000000
+- olay: PPI
+  tarih: '20210513'
+  utc_ms: 1620909000000
+- olay: ISSIZLIK
+  tarih: '20210520'
+  utc_ms: 1621513800000
+- olay: ISSIZLIK
+  tarih: '20210527'
+  utc_ms: 1622118600000
+- olay: ISSIZLIK
+  tarih: '20210603'
+  utc_ms: 1622723400000
 - olay: NFP
   tarih: '20210604'
   utc_ms: 1622809800000
 - olay: CPI
   tarih: '20210610'
   utc_ms: 1623328200000
+- olay: ISSIZLIK
+  tarih: '20210610'
+  utc_ms: 1623328200000
+- olay: PPI
+  tarih: '20210615'
+  utc_ms: 1623760200000
 - olay: FOMC
   tarih: '20210616'
   utc_ms: 1623866400000
+- olay: ISSIZLIK
+  tarih: '20210617'
+  utc_ms: 1623933000000
+- olay: ISSIZLIK
+  tarih: '20210624'
+  utc_ms: 1624537800000
+- olay: ISSIZLIK
+  tarih: '20210701'
+  utc_ms: 1625142600000
 - olay: NFP
   tarih: '20210702'
   utc_ms: 1625229000000
+- olay: ISSIZLIK
+  tarih: '20210708'
+  utc_ms: 1625747400000
 - olay: CPI
   tarih: '20210713'
   utc_ms: 1626179400000
+- olay: PPI
+  tarih: '20210714'
+  utc_ms: 1626265800000
+- olay: ISSIZLIK
+  tarih: '20210715'
+  utc_ms: 1626352200000
+- olay: ISSIZLIK
+  tarih: '20210722'
+  utc_ms: 1626957000000
 - olay: FOMC
   tarih: '20210728'
   utc_ms: 1627495200000
+- olay: ISSIZLIK
+  tarih: '20210729'
+  utc_ms: 1627561800000
+- olay: ISSIZLIK
+  tarih: '20210805'
+  utc_ms: 1628166600000
 - olay: NFP
   tarih: '20210806'
   utc_ms: 1628253000000
 - olay: CPI
   tarih: '20210811'
   utc_ms: 1628685000000
+- olay: ISSIZLIK
+  tarih: '20210812'
+  utc_ms: 1628771400000
+- olay: PPI
+  tarih: '20210812'
+  utc_ms: 1628771400000
+- olay: ISSIZLIK
+  tarih: '20210819'
+  utc_ms: 1629376200000
+- olay: ISSIZLIK
+  tarih: '20210826'
+  utc_ms: 1629981000000
+- olay: ISSIZLIK
+  tarih: '20210902'
+  utc_ms: 1630585800000
 - olay: NFP
   tarih: '20210903'
   utc_ms: 1630672200000
+- olay: ISSIZLIK
+  tarih: '20210909'
+  utc_ms: 1631190600000
+- olay: PPI
+  tarih: '20210910'
+  utc_ms: 1631277000000
 - olay: CPI
   tarih: '20210914'
   utc_ms: 1631622600000
+- olay: ISSIZLIK
+  tarih: '20210916'
+  utc_ms: 1631795400000
 - olay: FOMC
   tarih: '20210922'
   utc_ms: 1632333600000
+- olay: ISSIZLIK
+  tarih: '20210923'
+  utc_ms: 1632400200000
+- olay: ISSIZLIK
+  tarih: '20210930'
+  utc_ms: 1633005000000
+- olay: ISSIZLIK
+  tarih: '20211007'
+  utc_ms: 1633609800000
 - olay: NFP
   tarih: '20211008'
   utc_ms: 1633696200000
 - olay: CPI
   tarih: '20211013'
   utc_ms: 1634128200000
+- olay: ISSIZLIK
+  tarih: '20211014'
+  utc_ms: 1634214600000
+- olay: PPI
+  tarih: '20211014'
+  utc_ms: 1634214600000
+- olay: ISSIZLIK
+  tarih: '20211021'
+  utc_ms: 1634819400000
+- olay: ISSIZLIK
+  tarih: '20211028'
+  utc_ms: 1635424200000
 - olay: FOMC
   tarih: '20211103'
   utc_ms: 1635962400000
+- olay: ISSIZLIK
+  tarih: '20211104'
+  utc_ms: 1636029000000
 - olay: NFP
   tarih: '20211105'
   utc_ms: 1636115400000
+- olay: PPI
+  tarih: '20211109'
+  utc_ms: 1636464600000
 - olay: CPI
   tarih: '20211110'
   utc_ms: 1636551000000
+- olay: ISSIZLIK
+  tarih: '20211110'
+  utc_ms: 1636551000000
+- olay: ISSIZLIK
+  tarih: '20211118'
+  utc_ms: 1637242200000
+- olay: ISSIZLIK
+  tarih: '20211124'
+  utc_ms: 1637760600000
+- olay: ISSIZLIK
+  tarih: '20211202'
+  utc_ms: 1638451800000
 - olay: NFP
   tarih: '20211203'
   utc_ms: 1638538200000
+- olay: ISSIZLIK
+  tarih: '20211209'
+  utc_ms: 1639056600000
 - olay: CPI
   tarih: '20211210'
   utc_ms: 1639143000000
+- olay: PPI
+  tarih: '20211214'
+  utc_ms: 1639488600000
 - olay: FOMC
   tarih: '20211215'
   utc_ms: 1639594800000
+- olay: ISSIZLIK
+  tarih: '20211216'
+  utc_ms: 1639661400000
+- olay: ISSIZLIK
+  tarih: '20211223'
+  utc_ms: 1640266200000
+- olay: ISSIZLIK
+  tarih: '20211230'
+  utc_ms: 1640871000000
+- olay: ISSIZLIK
+  tarih: '20220106'
+  utc_ms: 1641475800000
 - olay: NFP
   tarih: '20220107'
   utc_ms: 1641562200000
 - olay: CPI
   tarih: '20220112'
   utc_ms: 1641994200000
+- olay: ISSIZLIK
+  tarih: '20220113'
+  utc_ms: 1642080600000
+- olay: PPI
+  tarih: '20220113'
+  utc_ms: 1642080600000
+- olay: ISSIZLIK
+  tarih: '20220120'
+  utc_ms: 1642685400000
 - olay: FOMC
   tarih: '20220126'
   utc_ms: 1643223600000
+- olay: ISSIZLIK
+  tarih: '20220127'
+  utc_ms: 1643290200000
+- olay: ISSIZLIK
+  tarih: '20220203'
+  utc_ms: 1643895000000
 - olay: NFP
   tarih: '20220204'
   utc_ms: 1643981400000
 - olay: CPI
   tarih: '20220210'
   utc_ms: 1644499800000
+- olay: ISSIZLIK
+  tarih: '20220210'
+  utc_ms: 1644499800000
+- olay: PPI
+  tarih: '20220215'
+  utc_ms: 1644931800000
+- olay: ISSIZLIK
+  tarih: '20220217'
+  utc_ms: 1645104600000
+- olay: ISSIZLIK
+  tarih: '20220224'
+  utc_ms: 1645709400000
+- olay: ISSIZLIK
+  tarih: '20220303'
+  utc_ms: 1646314200000
 - olay: NFP
   tarih: '20220304'
   utc_ms: 1646400600000
 - olay: CPI
   tarih: '20220310'
   utc_ms: 1646919000000
+- olay: ISSIZLIK
+  tarih: '20220310'
+  utc_ms: 1646919000000
+- olay: PPI
+  tarih: '20220315'
+  utc_ms: 1647347400000
 - olay: FOMC
   tarih: '20220316'
   utc_ms: 1647453600000
+- olay: ISSIZLIK
+  tarih: '20220317'
+  utc_ms: 1647520200000
+- olay: ISSIZLIK
+  tarih: '20220324'
+  utc_ms: 1648125000000
+- olay: ISSIZLIK
+  tarih: '20220331'
+  utc_ms: 1648729800000
 - olay: NFP
   tarih: '20220401'
   utc_ms: 1648816200000
+- olay: ISSIZLIK
+  tarih: '20220407'
+  utc_ms: 1649334600000
 - olay: CPI
   tarih: '20220412'
   utc_ms: 1649766600000
+- olay: PPI
+  tarih: '20220413'
+  utc_ms: 1649853000000
+- olay: ISSIZLIK
+  tarih: '20220414'
+  utc_ms: 1649939400000
+- olay: ISSIZLIK
+  tarih: '20220421'
+  utc_ms: 1650544200000
+- olay: ISSIZLIK
+  tarih: '20220428'
+  utc_ms: 1651149000000
 - olay: FOMC
   tarih: '20220504'
   utc_ms: 1651687200000
+- olay: ISSIZLIK
+  tarih: '20220505'
+  utc_ms: 1651753800000
 - olay: NFP
   tarih: '20220506'
   utc_ms: 1651840200000
 - olay: CPI
   tarih: '20220511'
   utc_ms: 1652272200000
+- olay: ISSIZLIK
+  tarih: '20220512'
+  utc_ms: 1652358600000
+- olay: PPI
+  tarih: '20220512'
+  utc_ms: 1652358600000
+- olay: ISSIZLIK
+  tarih: '20220519'
+  utc_ms: 1652963400000
+- olay: ISSIZLIK
+  tarih: '20220526'
+  utc_ms: 1653568200000
+- olay: ISSIZLIK
+  tarih: '20220602'
+  utc_ms: 1654173000000
 - olay: NFP
   tarih: '20220603'
   utc_ms: 1654259400000
+- olay: ISSIZLIK
+  tarih: '20220609'
+  utc_ms: 1654777800000
 - olay: CPI
   tarih: '20220610'
   utc_ms: 1654864200000
+- olay: PPI
+  tarih: '20220614'
+  utc_ms: 1655209800000
 - olay: FOMC
   tarih: '20220615'
   utc_ms: 1655316000000
+- olay: ISSIZLIK
+  tarih: '20220616'
+  utc_ms: 1655382600000
+- olay: ISSIZLIK
+  tarih: '20220623'
+  utc_ms: 1655987400000
+- olay: ISSIZLIK
+  tarih: '20220630'
+  utc_ms: 1656592200000
+- olay: ISSIZLIK
+  tarih: '20220707'
+  utc_ms: 1657197000000
 - olay: NFP
   tarih: '20220708'
   utc_ms: 1657283400000
 - olay: CPI
   tarih: '20220713'
   utc_ms: 1657715400000
+- olay: ISSIZLIK
+  tarih: '20220714'
+  utc_ms: 1657801800000
+- olay: PPI
+  tarih: '20220714'
+  utc_ms: 1657801800000
+- olay: ISSIZLIK
+  tarih: '20220721'
+  utc_ms: 1658406600000
 - olay: FOMC
   tarih: '20220727'
   utc_ms: 1658944800000
+- olay: ISSIZLIK
+  tarih: '20220728'
+  utc_ms: 1659011400000
+- olay: ISSIZLIK
+  tarih: '20220804'
+  utc_ms: 1659616200000
 - olay: NFP
   tarih: '20220805'
   utc_ms: 1659702600000
 - olay: CPI
   tarih: '20220810'
   utc_ms: 1660134600000
+- olay: ISSIZLIK
+  tarih: '20220811'
+  utc_ms: 1660221000000
+- olay: PPI
+  tarih: '20220811'
+  utc_ms: 1660221000000
+- olay: ISSIZLIK
+  tarih: '20220818'
+  utc_ms: 1660825800000
+- olay: ISSIZLIK
+  tarih: '20220825'
+  utc_ms: 1661430600000
+- olay: ISSIZLIK
+  tarih: '20220901'
+  utc_ms: 1662035400000
 - olay: NFP
   tarih: '20220902'
   utc_ms: 1662121800000
+- olay: ISSIZLIK
+  tarih: '20220908'
+  utc_ms: 1662640200000
 - olay: CPI
   tarih: '20220913'
   utc_ms: 1663072200000
+- olay: PPI
+  tarih: '20220914'
+  utc_ms: 1663158600000
+- olay: ISSIZLIK
+  tarih: '20220915'
+  utc_ms: 1663245000000
 - olay: FOMC
   tarih: '20220921'
   utc_ms: 1663783200000
+- olay: ISSIZLIK
+  tarih: '20220922'
+  utc_ms: 1663849800000
+- olay: ISSIZLIK
+  tarih: '20220929'
+  utc_ms: 1664454600000
+- olay: ISSIZLIK
+  tarih: '20221006'
+  utc_ms: 1665059400000
 - olay: NFP
   tarih: '20221007'
   utc_ms: 1665145800000
+- olay: PPI
+  tarih: '20221012'
+  utc_ms: 1665577800000
 - olay: CPI
   tarih: '20221013'
   utc_ms: 1665664200000
+- olay: ISSIZLIK
+  tarih: '20221013'
+  utc_ms: 1665664200000
+- olay: ISSIZLIK
+  tarih: '20221020'
+  utc_ms: 1666269000000
+- olay: ISSIZLIK
+  tarih: '20221027'
+  utc_ms: 1666873800000
 - olay: FOMC
   tarih: '20221102'
   utc_ms: 1667412000000
+- olay: ISSIZLIK
+  tarih: '20221103'
+  utc_ms: 1667478600000
 - olay: NFP
   tarih: '20221104'
   utc_ms: 1667565000000
 - olay: CPI
   tarih: '20221110'
   utc_ms: 1668087000000
+- olay: ISSIZLIK
+  tarih: '20221110'
+  utc_ms: 1668087000000
+- olay: PPI
+  tarih: '20221115'
+  utc_ms: 1668519000000
+- olay: ISSIZLIK
+  tarih: '20221117'
+  utc_ms: 1668691800000
+- olay: ISSIZLIK
+  tarih: '20221123'
+  utc_ms: 1669210200000
+- olay: ISSIZLIK
+  tarih: '20221201'
+  utc_ms: 1669901400000
 - olay: NFP
   tarih: '20221202'
   utc_ms: 1669987800000
+- olay: ISSIZLIK
+  tarih: '20221208'
+  utc_ms: 1670506200000
+- olay: PPI
+  tarih: '20221209'
+  utc_ms: 1670592600000
 - olay: CPI
   tarih: '20221213'
   utc_ms: 1670938200000
 - olay: FOMC
   tarih: '20221214'
   utc_ms: 1671044400000
+- olay: ISSIZLIK
+  tarih: '20221215'
+  utc_ms: 1671111000000
+- olay: ISSIZLIK
+  tarih: '20221222'
+  utc_ms: 1671715800000
+- olay: ISSIZLIK
+  tarih: '20221229'
+  utc_ms: 1672320600000
+- olay: ISSIZLIK
+  tarih: '20230105'
+  utc_ms: 1672925400000
 - olay: NFP
   tarih: '20230106'
   utc_ms: 1673011800000
 - olay: CPI
   tarih: '20230112'
   utc_ms: 1673530200000
+- olay: ISSIZLIK
+  tarih: '20230112'
+  utc_ms: 1673530200000
+- olay: PPI
+  tarih: '20230118'
+  utc_ms: 1674048600000
+- olay: ISSIZLIK
+  tarih: '20230119'
+  utc_ms: 1674135000000
+- olay: ISSIZLIK
+  tarih: '20230126'
+  utc_ms: 1674739800000
 - olay: FOMC
   tarih: '20230201'
   utc_ms: 1675278000000
+- olay: ISSIZLIK
+  tarih: '20230202'
+  utc_ms: 1675344600000
 - olay: NFP
   tarih: '20230203'
   utc_ms: 1675431000000
+- olay: ISSIZLIK
+  tarih: '20230209'
+  utc_ms: 1675949400000
 - olay: CPI
   tarih: '20230214'
   utc_ms: 1676381400000
+- olay: ISSIZLIK
+  tarih: '20230216'
+  utc_ms: 1676554200000
+- olay: PPI
+  tarih: '20230216'
+  utc_ms: 1676554200000
+- olay: ISSIZLIK
+  tarih: '20230223'
+  utc_ms: 1677159000000
+- olay: ISSIZLIK
+  tarih: '20230302'
+  utc_ms: 1677763800000
+- olay: ISSIZLIK
+  tarih: '20230309'
+  utc_ms: 1678368600000
 - olay: NFP
   tarih: '20230310'
   utc_ms: 1678455000000
 - olay: CPI
   tarih: '20230314'
   utc_ms: 1678797000000
+- olay: PPI
+  tarih: '20230315'
+  utc_ms: 1678883400000
+- olay: ISSIZLIK
+  tarih: '20230316'
+  utc_ms: 1678969800000
 - olay: FOMC
   tarih: '20230322'
   utc_ms: 1679508000000
+- olay: ISSIZLIK
+  tarih: '20230323'
+  utc_ms: 1679574600000
+- olay: ISSIZLIK
+  tarih: '20230330'
+  utc_ms: 1680179400000
+- olay: ISSIZLIK
+  tarih: '20230406'
+  utc_ms: 1680784200000
 - olay: NFP
   tarih: '20230407'
   utc_ms: 1680870600000
 - olay: CPI
   tarih: '20230412'
   utc_ms: 1681302600000
+- olay: ISSIZLIK
+  tarih: '20230413'
+  utc_ms: 1681389000000
+- olay: PPI
+  tarih: '20230413'
+  utc_ms: 1681389000000
+- olay: ISSIZLIK
+  tarih: '20230420'
+  utc_ms: 1681993800000
+- olay: ISSIZLIK
+  tarih: '20230427'
+  utc_ms: 1682598600000
 - olay: FOMC
   tarih: '20230503'
   utc_ms: 1683136800000
+- olay: ISSIZLIK
+  tarih: '20230504'
+  utc_ms: 1683203400000
 - olay: NFP
   tarih: '20230505'
   utc_ms: 1683289800000
 - olay: CPI
   tarih: '20230510'
   utc_ms: 1683721800000
+- olay: ISSIZLIK
+  tarih: '20230511'
+  utc_ms: 1683808200000
+- olay: PPI
+  tarih: '20230511'
+  utc_ms: 1683808200000
+- olay: ISSIZLIK
+  tarih: '20230518'
+  utc_ms: 1684413000000
+- olay: ISSIZLIK
+  tarih: '20230525'
+  utc_ms: 1685017800000
+- olay: ISSIZLIK
+  tarih: '20230601'
+  utc_ms: 1685622600000
 - olay: NFP
   tarih: '20230602'
   utc_ms: 1685709000000
+- olay: ISSIZLIK
+  tarih: '20230608'
+  utc_ms: 1686227400000
 - olay: CPI
   tarih: '20230613'
   utc_ms: 1686659400000
+- olay: PPI
+  tarih: '20230614'
+  utc_ms: 1686745800000
 - olay: FOMC
   tarih: '20230614'
   utc_ms: 1686765600000
+- olay: ISSIZLIK
+  tarih: '20230615'
+  utc_ms: 1686832200000
+- olay: ISSIZLIK
+  tarih: '20230622'
+  utc_ms: 1687437000000
+- olay: ISSIZLIK
+  tarih: '20230629'
+  utc_ms: 1688041800000
+- olay: ISSIZLIK
+  tarih: '20230706'
+  utc_ms: 1688646600000
 - olay: NFP
   tarih: '20230707'
   utc_ms: 1688733000000
 - olay: CPI
   tarih: '20230712'
   utc_ms: 1689165000000
+- olay: ISSIZLIK
+  tarih: '20230713'
+  utc_ms: 1689251400000
+- olay: PPI
+  tarih: '20230713'
+  utc_ms: 1689251400000
+- olay: ISSIZLIK
+  tarih: '20230720'
+  utc_ms: 1689856200000
 - olay: FOMC
   tarih: '20230726'
   utc_ms: 1690394400000
+- olay: ISSIZLIK
+  tarih: '20230727'
+  utc_ms: 1690461000000
+- olay: ISSIZLIK
+  tarih: '20230803'
+  utc_ms: 1691065800000
 - olay: NFP
   tarih: '20230804'
   utc_ms: 1691152200000
 - olay: CPI
   tarih: '20230810'
   utc_ms: 1691670600000
+- olay: ISSIZLIK
+  tarih: '20230810'
+  utc_ms: 1691670600000
+- olay: PPI
+  tarih: '20230811'
+  utc_ms: 1691757000000
+- olay: ISSIZLIK
+  tarih: '20230817'
+  utc_ms: 1692275400000
+- olay: ISSIZLIK
+  tarih: '20230824'
+  utc_ms: 1692880200000
+- olay: ISSIZLIK
+  tarih: '20230831'
+  utc_ms: 1693485000000
 - olay: NFP
   tarih: '20230901'
   utc_ms: 1693571400000
+- olay: ISSIZLIK
+  tarih: '20230907'
+  utc_ms: 1694089800000
 - olay: CPI
   tarih: '20230913'
   utc_ms: 1694608200000
+- olay: ISSIZLIK
+  tarih: '20230914'
+  utc_ms: 1694694600000
+- olay: PPI
+  tarih: '20230914'
+  utc_ms: 1694694600000
 - olay: FOMC
   tarih: '20230920'
   utc_ms: 1695232800000
+- olay: ISSIZLIK
+  tarih: '20230921'
+  utc_ms: 1695299400000
+- olay: ISSIZLIK
+  tarih: '20230928'
+  utc_ms: 1695904200000
+- olay: ISSIZLIK
+  tarih: '20231005'
+  utc_ms: 1696509000000
 - olay: NFP
   tarih: '20231006'
   utc_ms: 1696595400000
+- olay: PPI
+  tarih: '20231011'
+  utc_ms: 1697027400000
 - olay: CPI
   tarih: '20231012'
   utc_ms: 1697113800000
+- olay: ISSIZLIK
+  tarih: '20231012'
+  utc_ms: 1697113800000
+- olay: ISSIZLIK
+  tarih: '20231019'
+  utc_ms: 1697718600000
+- olay: ISSIZLIK
+  tarih: '20231026'
+  utc_ms: 1698323400000
 - olay: FOMC
   tarih: '20231101'
   utc_ms: 1698861600000
+- olay: ISSIZLIK
+  tarih: '20231102'
+  utc_ms: 1698928200000
 - olay: NFP
   tarih: '20231103'
   utc_ms: 1699014600000
+- olay: ISSIZLIK
+  tarih: '20231109'
+  utc_ms: 1699536600000
 - olay: CPI
   tarih: '20231114'
   utc_ms: 1699968600000
+- olay: PPI
+  tarih: '20231115'
+  utc_ms: 1700055000000
+- olay: ISSIZLIK
+  tarih: '20231116'
+  utc_ms: 1700141400000
+- olay: ISSIZLIK
+  tarih: '20231122'
+  utc_ms: 1700659800000
+- olay: ISSIZLIK
+  tarih: '20231130'
+  utc_ms: 1701351000000
+- olay: ISSIZLIK
+  tarih: '20231207'
+  utc_ms: 1701955800000
 - olay: NFP
   tarih: '20231208'
   utc_ms: 1702042200000
 - olay: CPI
   tarih: '20231212'
   utc_ms: 1702387800000
+- olay: PPI
+  tarih: '20231213'
+  utc_ms: 1702474200000
 - olay: FOMC
   tarih: '20231213'
   utc_ms: 1702494000000
+- olay: ISSIZLIK
+  tarih: '20231214'
+  utc_ms: 1702560600000
+- olay: ISSIZLIK
+  tarih: '20231221'
+  utc_ms: 1703165400000
+- olay: ISSIZLIK
+  tarih: '20231228'
+  utc_ms: 1703770200000
+- olay: ISSIZLIK
+  tarih: '20240104'
+  utc_ms: 1704375000000
 - olay: NFP
   tarih: '20240105'
   utc_ms: 1704461400000
 - olay: CPI
   tarih: '20240111'
   utc_ms: 1704979800000
+- olay: ISSIZLIK
+  tarih: '20240111'
+  utc_ms: 1704979800000
+- olay: PPI
+  tarih: '20240112'
+  utc_ms: 1705066200000
+- olay: ISSIZLIK
+  tarih: '20240118'
+  utc_ms: 1705584600000
+- olay: ISSIZLIK
+  tarih: '20240125'
+  utc_ms: 1706189400000
 - olay: FOMC
   tarih: '20240131'
   utc_ms: 1706727600000
+- olay: ISSIZLIK
+  tarih: '20240201'
+  utc_ms: 1706794200000
 - olay: NFP
   tarih: '20240202'
   utc_ms: 1706880600000
+- olay: ISSIZLIK
+  tarih: '20240208'
+  utc_ms: 1707399000000
 - olay: CPI
   tarih: '20240213'
   utc_ms: 1707831000000
+- olay: ISSIZLIK
+  tarih: '20240215'
+  utc_ms: 1708003800000
+- olay: PPI
+  tarih: '20240216'
+  utc_ms: 1708090200000
+- olay: ISSIZLIK
+  tarih: '20240222'
+  utc_ms: 1708608600000
+- olay: ISSIZLIK
+  tarih: '20240229'
+  utc_ms: 1709213400000
+- olay: ISSIZLIK
+  tarih: '20240307'
+  utc_ms: 1709818200000
 - olay: NFP
   tarih: '20240308'
   utc_ms: 1709904600000
 - olay: CPI
   tarih: '20240312'
   utc_ms: 1710246600000
+- olay: ISSIZLIK
+  tarih: '20240314'
+  utc_ms: 1710419400000
+- olay: PPI
+  tarih: '20240314'
+  utc_ms: 1710419400000
 - olay: FOMC
   tarih: '20240320'
   utc_ms: 1710957600000
+- olay: ISSIZLIK
+  tarih: '20240321'
+  utc_ms: 1711024200000
+- olay: ISSIZLIK
+  tarih: '20240328'
+  utc_ms: 1711629000000
+- olay: ISSIZLIK
+  tarih: '20240404'
+  utc_ms: 1712233800000
 - olay: NFP
   tarih: '20240405'
   utc_ms: 1712320200000
 - olay: CPI
   tarih: '20240410'
   utc_ms: 1712752200000
+- olay: ISSIZLIK
+  tarih: '20240411'
+  utc_ms: 1712838600000
+- olay: PPI
+  tarih: '20240411'
+  utc_ms: 1712838600000
+- olay: ISSIZLIK
+  tarih: '20240418'
+  utc_ms: 1713443400000
+- olay: ISSIZLIK
+  tarih: '20240425'
+  utc_ms: 1714048200000
 - olay: FOMC
   tarih: '20240501'
   utc_ms: 1714586400000
+- olay: ISSIZLIK
+  tarih: '20240502'
+  utc_ms: 1714653000000
 - olay: NFP
   tarih: '20240503'
   utc_ms: 1714739400000
+- olay: ISSIZLIK
+  tarih: '20240509'
+  utc_ms: 1715257800000
+- olay: PPI
+  tarih: '20240514'
+  utc_ms: 1715689800000
 - olay: CPI
   tarih: '20240515'
   utc_ms: 1715776200000
+- olay: ISSIZLIK
+  tarih: '20240516'
+  utc_ms: 1715862600000
+- olay: ISSIZLIK
+  tarih: '20240523'
+  utc_ms: 1716467400000
+- olay: ISSIZLIK
+  tarih: '20240530'
+  utc_ms: 1717072200000
+- olay: ISSIZLIK
+  tarih: '20240606'
+  utc_ms: 1717677000000
 - olay: NFP
   tarih: '20240607'
   utc_ms: 1717763400000
@@ -1270,225 +4433,843 @@ olaylar:
 - olay: FOMC
   tarih: '20240612'
   utc_ms: 1718215200000
+- olay: ISSIZLIK
+  tarih: '20240613'
+  utc_ms: 1718281800000
+- olay: PPI
+  tarih: '20240613'
+  utc_ms: 1718281800000
+- olay: ISSIZLIK
+  tarih: '20240620'
+  utc_ms: 1718886600000
+- olay: ISSIZLIK
+  tarih: '20240627'
+  utc_ms: 1719491400000
+- olay: ISSIZLIK
+  tarih: '20240703'
+  utc_ms: 1720009800000
 - olay: NFP
   tarih: '20240705'
   utc_ms: 1720182600000
 - olay: CPI
   tarih: '20240711'
   utc_ms: 1720701000000
+- olay: ISSIZLIK
+  tarih: '20240711'
+  utc_ms: 1720701000000
+- olay: PPI
+  tarih: '20240712'
+  utc_ms: 1720787400000
+- olay: ISSIZLIK
+  tarih: '20240718'
+  utc_ms: 1721305800000
+- olay: ISSIZLIK
+  tarih: '20240725'
+  utc_ms: 1721910600000
 - olay: FOMC
   tarih: '20240731'
   utc_ms: 1722448800000
+- olay: ISSIZLIK
+  tarih: '20240801'
+  utc_ms: 1722515400000
 - olay: NFP
   tarih: '20240802'
   utc_ms: 1722601800000
+- olay: ISSIZLIK
+  tarih: '20240808'
+  utc_ms: 1723120200000
+- olay: PPI
+  tarih: '20240813'
+  utc_ms: 1723552200000
 - olay: CPI
   tarih: '20240814'
   utc_ms: 1723638600000
+- olay: ISSIZLIK
+  tarih: '20240815'
+  utc_ms: 1723725000000
+- olay: ISSIZLIK
+  tarih: '20240822'
+  utc_ms: 1724329800000
+- olay: ISSIZLIK
+  tarih: '20240829'
+  utc_ms: 1724934600000
+- olay: ISSIZLIK
+  tarih: '20240905'
+  utc_ms: 1725539400000
 - olay: NFP
   tarih: '20240906'
   utc_ms: 1725625800000
 - olay: CPI
   tarih: '20240911'
   utc_ms: 1726057800000
+- olay: ISSIZLIK
+  tarih: '20240912'
+  utc_ms: 1726144200000
+- olay: PPI
+  tarih: '20240912'
+  utc_ms: 1726144200000
 - olay: FOMC
   tarih: '20240918'
   utc_ms: 1726682400000
+- olay: ISSIZLIK
+  tarih: '20240919'
+  utc_ms: 1726749000000
+- olay: ISSIZLIK
+  tarih: '20240926'
+  utc_ms: 1727353800000
+- olay: ISSIZLIK
+  tarih: '20241003'
+  utc_ms: 1727958600000
 - olay: NFP
   tarih: '20241004'
   utc_ms: 1728045000000
 - olay: CPI
   tarih: '20241010'
   utc_ms: 1728563400000
+- olay: ISSIZLIK
+  tarih: '20241010'
+  utc_ms: 1728563400000
+- olay: PPI
+  tarih: '20241011'
+  utc_ms: 1728649800000
+- olay: ISSIZLIK
+  tarih: '20241017'
+  utc_ms: 1729168200000
+- olay: ISSIZLIK
+  tarih: '20241024'
+  utc_ms: 1729773000000
+- olay: ISSIZLIK
+  tarih: '20241031'
+  utc_ms: 1730377800000
 - olay: NFP
   tarih: '20241101'
   utc_ms: 1730464200000
+- olay: ISSIZLIK
+  tarih: '20241107'
+  utc_ms: 1730986200000
 - olay: FOMC
   tarih: '20241107'
   utc_ms: 1731006000000
 - olay: CPI
   tarih: '20241113'
   utc_ms: 1731504600000
+- olay: ISSIZLIK
+  tarih: '20241114'
+  utc_ms: 1731591000000
+- olay: PPI
+  tarih: '20241114'
+  utc_ms: 1731591000000
+- olay: ISSIZLIK
+  tarih: '20241121'
+  utc_ms: 1732195800000
+- olay: ISSIZLIK
+  tarih: '20241127'
+  utc_ms: 1732714200000
+- olay: ISSIZLIK
+  tarih: '20241205'
+  utc_ms: 1733405400000
 - olay: NFP
   tarih: '20241206'
   utc_ms: 1733491800000
 - olay: CPI
   tarih: '20241211'
   utc_ms: 1733923800000
+- olay: ISSIZLIK
+  tarih: '20241212'
+  utc_ms: 1734010200000
+- olay: PPI
+  tarih: '20241212'
+  utc_ms: 1734010200000
 - olay: FOMC
   tarih: '20241218'
   utc_ms: 1734548400000
+- olay: ISSIZLIK
+  tarih: '20241219'
+  utc_ms: 1734615000000
+- olay: ISSIZLIK
+  tarih: '20241226'
+  utc_ms: 1735219800000
+- olay: ISSIZLIK
+  tarih: '20250102'
+  utc_ms: 1735824600000
+- olay: ISSIZLIK
+  tarih: '20250109'
+  utc_ms: 1736429400000
 - olay: NFP
   tarih: '20250110'
   utc_ms: 1736515800000
+- olay: PPI
+  tarih: '20250114'
+  utc_ms: 1736861400000
 - olay: CPI
   tarih: '20250115'
   utc_ms: 1736947800000
+- olay: ISSIZLIK
+  tarih: '20250116'
+  utc_ms: 1737034200000
+- olay: ISSIZLIK
+  tarih: '20250123'
+  utc_ms: 1737639000000
 - olay: FOMC
   tarih: '20250129'
   utc_ms: 1738177200000
+- olay: ISSIZLIK
+  tarih: '20250130'
+  utc_ms: 1738243800000
+- olay: ISSIZLIK
+  tarih: '20250206'
+  utc_ms: 1738848600000
 - olay: NFP
   tarih: '20250207'
   utc_ms: 1738935000000
 - olay: CPI
   tarih: '20250212'
   utc_ms: 1739367000000
+- olay: ISSIZLIK
+  tarih: '20250213'
+  utc_ms: 1739453400000
+- olay: PPI
+  tarih: '20250213'
+  utc_ms: 1739453400000
+- olay: ISSIZLIK
+  tarih: '20250220'
+  utc_ms: 1740058200000
+- olay: ISSIZLIK
+  tarih: '20250227'
+  utc_ms: 1740663000000
+- olay: ISSIZLIK
+  tarih: '20250306'
+  utc_ms: 1741267800000
 - olay: NFP
   tarih: '20250307'
   utc_ms: 1741354200000
 - olay: CPI
   tarih: '20250312'
   utc_ms: 1741782600000
+- olay: ISSIZLIK
+  tarih: '20250313'
+  utc_ms: 1741869000000
+- olay: PPI
+  tarih: '20250313'
+  utc_ms: 1741869000000
 - olay: FOMC
   tarih: '20250319'
   utc_ms: 1742407200000
+- olay: ISSIZLIK
+  tarih: '20250320'
+  utc_ms: 1742473800000
+- olay: ISSIZLIK
+  tarih: '20250327'
+  utc_ms: 1743078600000
+- olay: ISSIZLIK
+  tarih: '20250403'
+  utc_ms: 1743683400000
 - olay: NFP
   tarih: '20250404'
   utc_ms: 1743769800000
 - olay: CPI
   tarih: '20250410'
   utc_ms: 1744288200000
+- olay: ISSIZLIK
+  tarih: '20250410'
+  utc_ms: 1744288200000
+- olay: PPI
+  tarih: '20250411'
+  utc_ms: 1744374600000
+- olay: ISSIZLIK
+  tarih: '20250417'
+  utc_ms: 1744893000000
+- olay: ISSIZLIK
+  tarih: '20250424'
+  utc_ms: 1745497800000
+- olay: ISSIZLIK
+  tarih: '20250501'
+  utc_ms: 1746102600000
 - olay: NFP
   tarih: '20250502'
   utc_ms: 1746189000000
 - olay: FOMC
   tarih: '20250507'
   utc_ms: 1746640800000
+- olay: ISSIZLIK
+  tarih: '20250508'
+  utc_ms: 1746707400000
 - olay: CPI
   tarih: '20250513'
   utc_ms: 1747139400000
+- olay: ISSIZLIK
+  tarih: '20250515'
+  utc_ms: 1747312200000
+- olay: PPI
+  tarih: '20250515'
+  utc_ms: 1747312200000
+- olay: ISSIZLIK
+  tarih: '20250522'
+  utc_ms: 1747917000000
+- olay: ISSIZLIK
+  tarih: '20250529'
+  utc_ms: 1748521800000
+- olay: ISSIZLIK
+  tarih: '20250605'
+  utc_ms: 1749126600000
 - olay: NFP
   tarih: '20250606'
   utc_ms: 1749213000000
 - olay: CPI
   tarih: '20250611'
   utc_ms: 1749645000000
+- olay: ISSIZLIK
+  tarih: '20250612'
+  utc_ms: 1749731400000
+- olay: PPI
+  tarih: '20250612'
+  utc_ms: 1749731400000
+- olay: ISSIZLIK
+  tarih: '20250618'
+  utc_ms: 1750249800000
 - olay: FOMC
   tarih: '20250618'
   utc_ms: 1750269600000
+- olay: ISSIZLIK
+  tarih: '20250626'
+  utc_ms: 1750941000000
+- olay: ISSIZLIK
+  tarih: '20250703'
+  utc_ms: 1751545800000
 - olay: NFP
   tarih: '20250703'
   utc_ms: 1751545800000
+- olay: ISSIZLIK
+  tarih: '20250710'
+  utc_ms: 1752150600000
 - olay: CPI
   tarih: '20250715'
   utc_ms: 1752582600000
+- olay: PPI
+  tarih: '20250716'
+  utc_ms: 1752669000000
+- olay: ISSIZLIK
+  tarih: '20250717'
+  utc_ms: 1752755400000
+- olay: ISSIZLIK
+  tarih: '20250724'
+  utc_ms: 1753360200000
 - olay: FOMC
   tarih: '20250730'
   utc_ms: 1753898400000
+- olay: ISSIZLIK
+  tarih: '20250731'
+  utc_ms: 1753965000000
 - olay: NFP
   tarih: '20250801'
   utc_ms: 1754051400000
+- olay: ISSIZLIK
+  tarih: '20250807'
+  utc_ms: 1754569800000
 - olay: CPI
   tarih: '20250812'
   utc_ms: 1755001800000
+- olay: ISSIZLIK
+  tarih: '20250814'
+  utc_ms: 1755174600000
+- olay: PPI
+  tarih: '20250814'
+  utc_ms: 1755174600000
+- olay: ISSIZLIK
+  tarih: '20250821'
+  utc_ms: 1755779400000
 - olay: FOMC
   tarih: '20250822'
   utc_ms: 1755885600000
+- olay: ISSIZLIK
+  tarih: '20250828'
+  utc_ms: 1756384200000
+- olay: ISSIZLIK
+  tarih: '20250904'
+  utc_ms: 1756989000000
 - olay: NFP
   tarih: '20250905'
   utc_ms: 1757075400000
+- olay: PPI
+  tarih: '20250910'
+  utc_ms: 1757507400000
 - olay: CPI
+  tarih: '20250911'
+  utc_ms: 1757593800000
+- olay: ISSIZLIK
   tarih: '20250911'
   utc_ms: 1757593800000
 - olay: FOMC
   tarih: '20250917'
   utc_ms: 1758132000000
+- olay: ISSIZLIK
+  tarih: '20250918'
+  utc_ms: 1758198600000
+- olay: ISSIZLIK
+  tarih: '20250925'
+  utc_ms: 1758803400000
 - olay: CPI
   tarih: '20251024'
   utc_ms: 1761309000000
 - olay: FOMC
   tarih: '20251029'
   utc_ms: 1761760800000
+- olay: ISSIZLIK
+  tarih: '20251120'
+  utc_ms: 1763645400000
 - olay: NFP
   tarih: '20251120'
   utc_ms: 1763645400000
+- olay: PPI
+  tarih: '20251125'
+  utc_ms: 1764077400000
+- olay: ISSIZLIK
+  tarih: '20251126'
+  utc_ms: 1764163800000
+- olay: ISSIZLIK
+  tarih: '20251204'
+  utc_ms: 1764855000000
 - olay: FOMC
   tarih: '20251210'
   utc_ms: 1765393200000
+- olay: ISSIZLIK
+  tarih: '20251211'
+  utc_ms: 1765459800000
 - olay: NFP
   tarih: '20251216'
   utc_ms: 1765891800000
 - olay: CPI
   tarih: '20251218'
   utc_ms: 1766064600000
+- olay: ISSIZLIK
+  tarih: '20251218'
+  utc_ms: 1766064600000
+- olay: ISSIZLIK
+  tarih: '20251224'
+  utc_ms: 1766583000000
+- olay: ISSIZLIK
+  tarih: '20251231'
+  utc_ms: 1767187800000
+- olay: ISSIZLIK
+  tarih: '20260108'
+  utc_ms: 1767879000000
 - olay: NFP
   tarih: '20260109'
   utc_ms: 1767965400000
 - olay: CPI
   tarih: '20260113'
   utc_ms: 1768311000000
+- olay: PPI
+  tarih: '20260114'
+  utc_ms: 1768397400000
+- olay: ISSIZLIK
+  tarih: '20260115'
+  utc_ms: 1768483800000
+- olay: ISSIZLIK
+  tarih: '20260122'
+  utc_ms: 1769088600000
 - olay: FOMC
   tarih: '20260128'
   utc_ms: 1769626800000
+- olay: ISSIZLIK
+  tarih: '20260129'
+  utc_ms: 1769693400000
+- olay: PPI
+  tarih: '20260130'
+  utc_ms: 1769779800000
+- olay: ISSIZLIK
+  tarih: '20260205'
+  utc_ms: 1770298200000
 - olay: NFP
   tarih: '20260211'
   utc_ms: 1770816600000
+- olay: ISSIZLIK
+  tarih: '20260212'
+  utc_ms: 1770903000000
 - olay: CPI
   tarih: '20260213'
   utc_ms: 1770989400000
+- olay: ISSIZLIK
+  tarih: '20260219'
+  utc_ms: 1771507800000
+- olay: ISSIZLIK
+  tarih: '20260226'
+  utc_ms: 1772112600000
+- olay: PPI
+  tarih: '20260227'
+  utc_ms: 1772199000000
+- olay: ISSIZLIK
+  tarih: '20260305'
+  utc_ms: 1772717400000
 - olay: NFP
   tarih: '20260306'
   utc_ms: 1772803800000
 - olay: CPI
   tarih: '20260311'
   utc_ms: 1773232200000
+- olay: ISSIZLIK
+  tarih: '20260312'
+  utc_ms: 1773318600000
+- olay: PPI
+  tarih: '20260318'
+  utc_ms: 1773837000000
 - olay: FOMC
   tarih: '20260318'
   utc_ms: 1773856800000
+- olay: ISSIZLIK
+  tarih: '20260319'
+  utc_ms: 1773923400000
+- olay: ISSIZLIK
+  tarih: '20260326'
+  utc_ms: 1774528200000
+- olay: ISSIZLIK
+  tarih: '20260402'
+  utc_ms: 1775133000000
 - olay: NFP
   tarih: '20260403'
   utc_ms: 1775219400000
+- olay: ISSIZLIK
+  tarih: '20260409'
+  utc_ms: 1775737800000
 - olay: CPI
   tarih: '20260410'
   utc_ms: 1775824200000
+- olay: PPI
+  tarih: '20260414'
+  utc_ms: 1776169800000
+- olay: ISSIZLIK
+  tarih: '20260416'
+  utc_ms: 1776342600000
+- olay: ISSIZLIK
+  tarih: '20260423'
+  utc_ms: 1776947400000
 - olay: FOMC
   tarih: '20260429'
   utc_ms: 1777485600000
+- olay: ISSIZLIK
+  tarih: '20260430'
+  utc_ms: 1777552200000
+- olay: ISSIZLIK
+  tarih: '20260507'
+  utc_ms: 1778157000000
 - olay: NFP
   tarih: '20260508'
   utc_ms: 1778243400000
 - olay: CPI
   tarih: '20260512'
   utc_ms: 1778589000000
+- olay: PPI
+  tarih: '20260513'
+  utc_ms: 1778675400000
+- olay: ISSIZLIK
+  tarih: '20260514'
+  utc_ms: 1778761800000
+- olay: ISSIZLIK
+  tarih: '20260521'
+  utc_ms: 1779366600000
+- olay: ISSIZLIK
+  tarih: '20260528'
+  utc_ms: 1779971400000
+- olay: ISSIZLIK
+  tarih: '20260604'
+  utc_ms: 1780576200000
 - olay: NFP
   tarih: '20260605'
   utc_ms: 1780662600000
 - olay: CPI
   tarih: '20260610'
   utc_ms: 1781094600000
+- olay: ISSIZLIK
+  tarih: '20260611'
+  utc_ms: 1781181000000
+- olay: PPI
+  tarih: '20260611'
+  utc_ms: 1781181000000
 - olay: FOMC
   tarih: '20260617'
   utc_ms: 1781719200000
+- olay: ISSIZLIK
+  tarih: '20260618'
+  utc_ms: 1781785800000
+- olay: ISSIZLIK
+  tarih: '20260625'
+  utc_ms: 1782390600000
+- olay: ISSIZLIK
+  tarih: '20260702'
+  utc_ms: 1782995400000
 - olay: NFP
   tarih: '20260702'
   utc_ms: 1782995400000
+- olay: ISSIZLIK
+  tarih: '20260709'
+  utc_ms: 1783600200000
 - olay: CPI
   tarih: '20260714'
   utc_ms: 1784032200000
+- olay: PPI
+  tarih: '20260715'
+  utc_ms: 1784118600000
+- olay: ISSIZLIK
+  tarih: '20260716'
+  utc_ms: 1784205000000
+- olay: ISSIZLIK
+  tarih: '20260723'
+  utc_ms: 1784809800000
 - olay: FOMC
   tarih: '20260729'
   utc_ms: 1785348000000
+- olay: ISSIZLIK
+  tarih: '20260730'
+  utc_ms: 1785414600000
+- olay: ISSIZLIK
+  tarih: '20260806'
+  utc_ms: 1786019400000
 - olay: NFP
   tarih: '20260807'
   utc_ms: 1786105800000
 - olay: CPI
   tarih: '20260812'
   utc_ms: 1786537800000
+- olay: ISSIZLIK
+  tarih: '20260813'
+  utc_ms: 1786624200000
+- olay: PPI
+  tarih: '20260813'
+  utc_ms: 1786624200000
+- olay: ISSIZLIK
+  tarih: '20260820'
+  utc_ms: 1787229000000
+- olay: ISSIZLIK
+  tarih: '20260827'
+  utc_ms: 1787833800000
+- olay: ISSIZLIK
+  tarih: '20260903'
+  utc_ms: 1788438600000
 - olay: NFP
   tarih: '20260904'
   utc_ms: 1788525000000
+- olay: ISSIZLIK
+  tarih: '20260910'
+  utc_ms: 1789043400000
+- olay: PPI
+  tarih: '20260910'
+  utc_ms: 1789043400000
 - olay: CPI
   tarih: '20260911'
   utc_ms: 1789129800000
 - olay: FOMC
   tarih: '20260916'
   utc_ms: 1789581600000
+- olay: ISSIZLIK
+  tarih: '20260917'
+  utc_ms: 1789648200000
+- olay: ISSIZLIK
+  tarih: '20260924'
+  utc_ms: 1790253000000
+- olay: ISSIZLIK
+  tarih: '20261001'
+  utc_ms: 1790857800000
 - olay: NFP
   tarih: '20261002'
   utc_ms: 1790944200000
+- olay: ISSIZLIK
+  tarih: '20261008'
+  utc_ms: 1791462600000
+- olay: ISSIZLIK
+  tarih: '20261015'
+  utc_ms: 1792067400000
+- olay: ISSIZLIK
+  tarih: '20261022'
+  utc_ms: 1792672200000
+- olay: ISSIZLIK
+  tarih: '20261029'
+  utc_ms: 1793277000000
+- olay: ISSIZLIK
+  tarih: '20261105'
+  utc_ms: 1793885400000
 - olay: NFP
   tarih: '20261106'
   utc_ms: 1793971800000
+- olay: ISSIZLIK
+  tarih: '20261112'
+  utc_ms: 1794490200000
+- olay: ISSIZLIK
+  tarih: '20261119'
+  utc_ms: 1795095000000
+- olay: ISSIZLIK
+  tarih: '20261125'
+  utc_ms: 1795613400000
+- olay: ISSIZLIK
+  tarih: '20261203'
+  utc_ms: 1796304600000
 - olay: NFP
   tarih: '20261204'
   utc_ms: 1796391000000
+- olay: ISSIZLIK
+  tarih: '20261210'
+  utc_ms: 1796909400000
+- olay: ISSIZLIK
+  tarih: '20261217'
+  utc_ms: 1797514200000
+- olay: ISSIZLIK
+  tarih: '20261224'
+  utc_ms: 1798119000000
+- olay: ISSIZLIK
+  tarih: '20261231'
+  utc_ms: 1798723800000
+- olay: ISSIZLIK
+  tarih: '20270107'
+  utc_ms: 1799328600000
+- olay: ISSIZLIK
+  tarih: '20270114'
+  utc_ms: 1799933400000
+- olay: ISSIZLIK
+  tarih: '20270121'
+  utc_ms: 1800538200000
+- olay: ISSIZLIK
+  tarih: '20270128'
+  utc_ms: 1801143000000
+- olay: ISSIZLIK
+  tarih: '20270204'
+  utc_ms: 1801747800000
+- olay: ISSIZLIK
+  tarih: '20270211'
+  utc_ms: 1802352600000
+- olay: ISSIZLIK
+  tarih: '20270218'
+  utc_ms: 1802957400000
+- olay: ISSIZLIK
+  tarih: '20270225'
+  utc_ms: 1803562200000
+- olay: ISSIZLIK
+  tarih: '20270304'
+  utc_ms: 1804167000000
+- olay: ISSIZLIK
+  tarih: '20270311'
+  utc_ms: 1804771800000
+- olay: ISSIZLIK
+  tarih: '20270318'
+  utc_ms: 1805373000000
+- olay: ISSIZLIK
+  tarih: '20270325'
+  utc_ms: 1805977800000
+- olay: ISSIZLIK
+  tarih: '20270401'
+  utc_ms: 1806582600000
+- olay: ISSIZLIK
+  tarih: '20270408'
+  utc_ms: 1807187400000
+- olay: ISSIZLIK
+  tarih: '20270415'
+  utc_ms: 1807792200000
+- olay: ISSIZLIK
+  tarih: '20270422'
+  utc_ms: 1808397000000
+- olay: ISSIZLIK
+  tarih: '20270429'
+  utc_ms: 1809001800000
+- olay: ISSIZLIK
+  tarih: '20270506'
+  utc_ms: 1809606600000
+- olay: ISSIZLIK
+  tarih: '20270513'
+  utc_ms: 1810211400000
+- olay: ISSIZLIK
+  tarih: '20270520'
+  utc_ms: 1810816200000
+- olay: ISSIZLIK
+  tarih: '20270527'
+  utc_ms: 1811421000000
+- olay: ISSIZLIK
+  tarih: '20270603'
+  utc_ms: 1812025800000
+- olay: ISSIZLIK
+  tarih: '20270610'
+  utc_ms: 1812630600000
+- olay: ISSIZLIK
+  tarih: '20270617'
+  utc_ms: 1813235400000
+- olay: ISSIZLIK
+  tarih: '20270624'
+  utc_ms: 1813840200000
+- olay: ISSIZLIK
+  tarih: '20270701'
+  utc_ms: 1814445000000
+- olay: ISSIZLIK
+  tarih: '20270708'
+  utc_ms: 1815049800000
+- olay: ISSIZLIK
+  tarih: '20270715'
+  utc_ms: 1815654600000
+- olay: ISSIZLIK
+  tarih: '20270722'
+  utc_ms: 1816259400000
+- olay: ISSIZLIK
+  tarih: '20270729'
+  utc_ms: 1816864200000
+- olay: ISSIZLIK
+  tarih: '20270805'
+  utc_ms: 1817469000000
+- olay: ISSIZLIK
+  tarih: '20270812'
+  utc_ms: 1818073800000
+- olay: ISSIZLIK
+  tarih: '20270819'
+  utc_ms: 1818678600000
+- olay: ISSIZLIK
+  tarih: '20270826'
+  utc_ms: 1819283400000
+- olay: ISSIZLIK
+  tarih: '20270902'
+  utc_ms: 1819888200000
+- olay: ISSIZLIK
+  tarih: '20270909'
+  utc_ms: 1820493000000
+- olay: ISSIZLIK
+  tarih: '20270916'
+  utc_ms: 1821097800000
+- olay: ISSIZLIK
+  tarih: '20270923'
+  utc_ms: 1821702600000
+- olay: ISSIZLIK
+  tarih: '20270930'
+  utc_ms: 1822307400000
+- olay: ISSIZLIK
+  tarih: '20271007'
+  utc_ms: 1822912200000
+- olay: ISSIZLIK
+  tarih: '20271014'
+  utc_ms: 1823517000000
+- olay: ISSIZLIK
+  tarih: '20271021'
+  utc_ms: 1824121800000
+- olay: ISSIZLIK
+  tarih: '20271028'
+  utc_ms: 1824726600000
+- olay: ISSIZLIK
+  tarih: '20271104'
+  utc_ms: 1825331400000
+- olay: ISSIZLIK
+  tarih: '20271110'
+  utc_ms: 1825853400000
+- olay: ISSIZLIK
+  tarih: '20271118'
+  utc_ms: 1826544600000
+- olay: ISSIZLIK
+  tarih: '20271124'
+  utc_ms: 1827063000000
+- olay: ISSIZLIK
+  tarih: '20271202'
+  utc_ms: 1827754200000
+- olay: ISSIZLIK
+  tarih: '20271209'
+  utc_ms: 1828359000000
+- olay: ISSIZLIK
+  tarih: '20271216'
+  utc_ms: 1828963800000
+- olay: ISSIZLIK
+  tarih: '20271223'
+  utc_ms: 1829568600000
+- olay: ISSIZLIK
+  tarih: '20271230'
+  utc_ms: 1830173400000
