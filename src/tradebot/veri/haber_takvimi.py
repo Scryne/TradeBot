@@ -1,17 +1,21 @@
-"""Yüksek etkili ABD veri takvimi (haber filtresi için): FOMC kararı, tarım dışı istihdam (NFP), TÜFE (CPI).
+"""Yüksek etkili ABD veri takvimi: FOMC kararı, tarım dışı istihdam (NFP), TÜFE (CPI); dalga 14'ten beri ayrıca ÜFE
+(PPI) ve haftalık işsizlik başvuruları (ISSIZLIK). Haber filtresi (`yukle`) yalnız ilk üçünü okur (Altın M15 ön kaydı).
 
 Kaynaklar resmidir ve tarihler yayından önce ilan edilir (BLS yıllık takvim, Fed toplantı takvimi), yani filtre geleceği
 görmez. Olağanüstü FOMC toplantıları ve ertelenen/iptal edilen BLS yayınları arşivde gerçekleştiği gibi durur.
 - FOMC: federalreserve.gov/monetarypolicy/fomccalendars.htm → `pressreleases/monetaryYYYYMMDDa.htm` (karar metni),
   14:00 New York (2013'ten beri sabit saat).
-- NFP / CPI: bls.gov/bls/news-release/{empsit,cpi}.htm arşivi → `archives/{empsit,cpi}_MMDDYYYY.htm`, 08:30 New York.
-  BLS, tarayıcı taklidi yapan istemciye 403 veriyor; iletişim adresli dürüst User-Agent ile açılıyor (ölçüldü).
+- NFP / CPI / PPI: bls.gov/bls/news-release/{empsit,cpi,ppi}.htm arşivi → `archives/<ad>_MMDDYYYY.htm`, 08:30 New
+  York. BLS, tarayıcı taklidi yapan istemciye 403 veriyor; iletişim adresli dürüst User-Agent ile açılıyor (ölçüldü).
+- ISSIZLIK: Çalışma Bakanlığı (DOL) haftalık başvuruları kuralla yayımlar: her perşembe 08:30 New York; perşembe
+  federal tatilse (yılbaşı, Juneteenth 2021'den, 4 Temmuz, Gaziler Günü, Şükran Günü, Noel) bir gün önce, çarşamba.
+  Kural önceden bilinir; arşiv yok, tarih üretilir (`issizlik_tarihleri`).
 Çıktı: `config/haber_takvimi.yaml` (commit edilir; kaynak sayfaların hash'i ham depoda).
 """
 from __future__ import annotations
 
 import re
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -41,29 +45,65 @@ def bls_tarihleri(sayfa: str, ad: str) -> list[str]:
     return sorted({f"{x[4:]}{x[:4]}" for x in re.findall(rf"archives/{ad}_(\d{{8}})\.htm", sayfa)})
 
 
-def olaylar(fomc_sayfa: str, nfp_sayfa: str, cpi_sayfa: str) -> list[dict]:
+def _persembe_tatili(g: date) -> bool:
+    """Perşembeye denk gelen federal tatil (gözlenen gün kayması perşembeyi etkilemez: yalnız cuma/pazartesi)."""
+    if (g.month, g.day) in {(1, 1), (7, 4), (11, 11), (12, 25)}:
+        return True
+    if (g.month, g.day) == (6, 19) and g.year >= 2021:
+        return True
+    return g.month == 11 and 22 <= g.day <= 28   # Kasım'ın dördüncü perşembesi: Şükran Günü
+
+
+def issizlik_tarihleri(bas: date, bit: date) -> list[str]:
+    """Haftalık işsizlik başvurularının yayın günleri (YYYYMMDD), [bas, bit]."""
+    g = bas + timedelta(days=(3 - bas.weekday()) % 7)   # ilk perşembe
+    out = []
+    while g <= bit:
+        y = g - timedelta(days=1) if _persembe_tatili(g) else g
+        out.append(y.strftime("%Y%m%d"))
+        g += timedelta(days=7)
+    return out
+
+
+def olaylar(fomc_sayfa: str, nfp_sayfa: str, cpi_sayfa: str, ppi_sayfa: str = "",
+            issizlik: tuple[date, date] | None = None) -> list[dict]:
     out = [{"olay": "FOMC", "tarih": t, "utc_ms": ny_ms(t, 14, 0)} for t in fomc_tarihleri(fomc_sayfa)]
     out += [{"olay": "NFP", "tarih": t, "utc_ms": ny_ms(t, 8, 30)} for t in bls_tarihleri(nfp_sayfa, "empsit")]
     out += [{"olay": "CPI", "tarih": t, "utc_ms": ny_ms(t, 8, 30)} for t in bls_tarihleri(cpi_sayfa, "cpi")]
-    return sorted(out, key=lambda o: o["utc_ms"])
+    out += [{"olay": "PPI", "tarih": t, "utc_ms": ny_ms(t, 8, 30)} for t in bls_tarihleri(ppi_sayfa, "ppi")]
+    if issizlik:
+        out += [{"olay": "ISSIZLIK", "tarih": t, "utc_ms": ny_ms(t, 8, 30)} for t in issizlik_tarihleri(*issizlik)]
+    return sorted(out, key=lambda o: (o["utc_ms"], o["olay"]))
 
 
 def indir(ham: HamDepo, http: NazikIstemci | None = None, cikti: Path = CIKTI) -> dict:
     http = http or NazikIstemci("haber_takvimi", aralik_sn=2.0)
     sayfalar = {}
-    for ad, url in (("fomc", FOMC), ("empsit", BLS.format("empsit")), ("cpi", BLS.format("cpi"))):
+    for ad, url in (("fomc", FOMC), ("empsit", BLS.format("empsit")), ("cpi", BLS.format("cpi")),
+                    ("ppi", BLS.format("ppi"))):
         icerik = http.al(url)
         _, sha, _ = ham.kaydet("haber_takvimi", f"{ad}/{datetime.now().date().isoformat()}", icerik, "html")
         sayfalar[ad] = (icerik.decode("utf-8", "ignore"), sha)
-    ol = olaylar(sayfalar["fomc"][0], sayfalar["empsit"][0], sayfalar["cpi"][0])
+    ol = olaylar(sayfalar["fomc"][0], sayfalar["empsit"][0], sayfalar["cpi"][0], sayfalar["ppi"][0],
+                 (date(2008, 1, 1), date(datetime.now().year + 1, 12, 31)))
     belge = {"aciklama": "Yüksek etkili ABD verileri (haber filtresi). Üreten: tradebot veri haber-takvimi",
              "kaynak_sha": {k: v[1] for k, v in sayfalar.items()}, "olaylar": ol}
     cikti.write_text(yaml.safe_dump(belge, allow_unicode=True, sort_keys=False, width=120), encoding="utf-8")
-    return {k: sum(o["olay"] == k for o in ol) for k in ("FOMC", "NFP", "CPI")}
+    return {k: sum(o["olay"] == k for o in ol) for k in TURLER}
 
 
-def yukle(yol: Path = CIKTI) -> list[int]:
-    """Olay anları (UTC ms, sıralı)."""
+TURLER = ("FOMC", "NFP", "CPI", "PPI", "ISSIZLIK")
+FILTRE_TURLERI = ("FOMC", "NFP", "CPI")   # Altın M15 haber filtresi (ön kayıt 2026-09-27)
+
+
+def yukle_turlu(yol: Path = CIKTI, turler: tuple[str, ...] = TURLER) -> list[tuple[str, int]]:
+    """(olay türü, UTC ms) sıralı."""
     if not yol.exists():
         return []
-    return sorted(int(o["utc_ms"]) for o in yaml.safe_load(yol.read_text(encoding="utf-8"))["olaylar"])
+    ol = yaml.safe_load(yol.read_text(encoding="utf-8"))["olaylar"]
+    return sorted(((o["olay"], int(o["utc_ms"])) for o in ol if o["olay"] in turler), key=lambda x: (x[1], x[0]))
+
+
+def yukle(yol: Path = CIKTI, turler: tuple[str, ...] = FILTRE_TURLERI) -> list[int]:
+    """Olay anları (UTC ms, sıralı). Varsayılan yalnız FOMC/NFP/CPI: haber filtresinin ön kaydı."""
+    return sorted(ms for _, ms in yukle_turlu(yol, turler))

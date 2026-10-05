@@ -43,6 +43,7 @@ from tradebot.cekirdek import StratejiTanimi, altin, nedensellik_testi, ornek
 from tradebot.cekirdek import aileler as al
 from tradebot.cekirdek import doviz_akis as da
 from tradebot.cekirdek import endeks_takvim as et
+from tradebot.cekirdek import haber as hb
 from tradebot.cekirdek.boyut import kaldirac_dogrula, panel_oynaklik_hedefi, yarim_kelly_tavani
 from tradebot.risk.motor import PortfoyIzleyici, RiskAyar
 from tradebot.veri.depo import BarDepo
@@ -90,6 +91,8 @@ STRATEJILER = {
     "ters_bant_donus": ("altin_m15", altin.ters_bant_donus, "tek"),
     "ters_sikisma_kirilim": ("altin_m15", altin.ters_sikisma_kirilim, "tek"),
     "ters_ea_birlesik": ("altin_m15", altin.ters_ea_birlesik, "tek"),
+    # Dalga 14: altın haber ivmesi / dönüşü, 1 dk (docs/turnuva/Dalga-14-Altin-Haber.md); yeni aile
+    "haber_ivme": ("altin_haber", hb.haber_ivme, "tek"),
 }
 
 
@@ -446,6 +449,10 @@ def dalga_oku(yol: Path) -> dict:
         from tradebot.veri.haber_takvimi import yukle
 
         altin.haber_ayarla(yukle())
+    if d.get("haber_olaylari"):  # dalga 14: türlü olay anları (FOMC/NFP/CPI/PPI/ISSIZLIK) → haber çekirdeği
+        from tradebot.veri.haber_takvimi import yukle_turlu
+
+        hb.olay_ayarla(yukle_turlu())
     if d.get("fomc_takvimi"):  # dalga 10: planlı FOMC karar günleri (önceden ilan edilir; olağanüstüler yok)
         da.fomc_ayarla(fomc_gunleri(Path(d["fomc_takvimi"])))
     return d

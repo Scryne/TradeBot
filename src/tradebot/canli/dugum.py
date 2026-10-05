@@ -24,6 +24,7 @@ import socket
 import time
 import uuid
 
+import numpy as np
 from nautilus_trader.adapters.binance import (
     BinanceDataClientConfig,
     BinanceDataClientFactory,
@@ -66,6 +67,7 @@ from tradebot.zeka.olay import aktif_vetolar
 
 SAAT_MS = 3_600_000
 ARDISIK_RET_SINIRI = 3  # aynı kol + enstrümanda art arda borsa reddi → kol durur (yalnız riski azaltan emir), alarm
+OTOMATIK_DURDURMA = {"mutabakat", "ardisik_ret"}  # düğümün kendi durdurmaları: pozisyon tutulur
 BINANCE = Venue("BINANCE")
 _log = log("canli.dugum")
 
@@ -106,6 +108,9 @@ class Beyin:
         self.risk = {k.ad: RiskMotoru(RiskAyar(kaldirac=k.ayar.kaldirac)) for k in kollar}
         self.stratejiler: dict[str, KolStratejisi] = {}
         self.durdurulan: set[str] = set()
+        # Elle (Telegram/CLI) durdurulan kol düzleşir (hedef 0; kural 7, kilit ve MT5 düğümleriyle aynı, 2026-10-05).
+        # Düğümün kendi durdurmaları (mutabakat, ardışık ret) yalnız yeni riski keser, pozisyonu tutar.
+        self.duzlesecek: set[str] = set()
         self.ardisik_ret: dict[tuple[str, str], int] = {}
         self.son_fiyat: dict[str, float] = {}
         self.son_kapanis_ms = 0
@@ -114,11 +119,13 @@ class Beyin:
         self._son_olay_id = olaylar[-1].id if olaylar else 0  # açılışta durum() olayları zaten uyguladı
         # Elle (Telegram/CLI) durdurulan kol yeniden başlatmada durdurulmuş kalır: son elle olay `durdur` ise. Mutabakat
         # durdurması kalkar (toparlanma sandbox'ı defterden kurar, fark ortadan kalkar).
-        son_elle: dict[str, str] = {}
+        son_elle: dict[str, tuple[str, str | None]] = {}
         for o in olaylar:
             if o.tur == "devam" or (o.tur == "durdur" and o.ayrinti.get("neden") != "mutabakat"):
-                son_elle[o.kol] = o.tur
-        self.durdurulan |= {k for k, t in son_elle.items() if t == "durdur" and k in self.durum}
+                son_elle[o.kol] = (o.tur, o.ayrinti.get("neden"))
+        self.durdurulan |= {k for k, (t, _) in son_elle.items() if t == "durdur" and k in self.durum}
+        self.duzlesecek |= {k for k, (t, n) in son_elle.items()
+                            if t == "durdur" and k in self.durum and n not in OTOMATIK_DURDURMA}
 
     # ------------------------------------------------------------------ karar
     def saat_kapandi(self, kapanis_ms: int, gecikmeli: bool = False) -> bool:
@@ -159,6 +166,8 @@ class Beyin:
             self._son_olay_id = o.id
             if o.kol in self.durum and o.tur == "durdur" and o.ayrinti.get("neden") != "mutabakat":
                 self.durdurulan.add(o.kol)
+                if o.ayrinti.get("neden") not in OTOMATIK_DURDURMA:
+                    self.duzlesecek.add(o.kol)
                 _log.warning("kol_elle_durduruldu", kol=o.kol, neden=o.ayrinti.get("neden"))
                 if o.ayrinti.get("neden") == GOZETMEN_NEDEN:
                     # Bağımsız gözetmen motor donmuş sanıp kolun pozisyonunu defterde kapattı; motor sonradan çözüldü.
@@ -169,6 +178,7 @@ class Beyin:
                     _log.error("gozetmen_kapatmasi_uygulandi", kol=o.kol)
             elif o.kol in self.durum and o.tur == "devam":
                 self.durdurulan.discard(o.kol)
+                self.duzlesecek.discard(o.kol)
                 _log.warning("kol_elle_devam", kol=o.kol)
             d = self.durum.get(o.kol)
             iz = d.izleyici if d is not None else None
@@ -206,6 +216,8 @@ class Beyin:
             katsayi = {k: v["katsayi"] for k, v in (self.dagitim or {}).get("kollar", {}).items()}
             hedef = dg.portfoy_hedef(katsayi, {k: self.durum[k].onceki_h for k in katsayi}, list(h.g.kimlikler),
                                      RiskAyar(kaldirac=kol.ayar.kaldirac).enstruman_tavani, kol.yon == "long_short")
+        if kol.ad in self.duzlesecek:
+            hedef = np.zeros(len(h.g.kimlikler))
         k = kr.karar_ver(kol, h, d, vetolu, hedef, habere_kor=kor)
         kid = self.defter.karar_yaz(k, h.g.veri_hash, gecikmeli)
         d.onceki_h = dict(zip(k.kimlikler, (float(x) for x in k.etkin_hedef), strict=True))

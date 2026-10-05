@@ -1,0 +1,41 @@
+# Turnuva dalga 14 — altın haber ivmesi / dönüşü (XAUUSD 1 dk, ABD makro yayınları): ÖN KAYIT (koşudan önce commit
+# edilir, koşu sırasında değişmez). Gerekçe: docs/turnuva/Dalga-14-Altin-Haber.md. Scryne (2026-10-05): "forex trade bot
+# üstünde ilerliycez", "haberlere göre işlem açan bot mu yaparsın, ne yaparsan yap". Veri Altın M15 turnuvasıyla aynı:
+# Dukascopy XAUUSD dakikalık BID, 2023-09-01 → 2026-09-25.
+
+dalga: 14
+veri_bitis: "2026-09-25"
+haber_olaylari: true              # config/haber_takvimi.yaml (FOMC, NFP, CPI, PPI, ISSIZLIK) → cekirdek.haber.olay_ayarla
+frenler: true
+boyut:
+  hedef_vol: 0.20                  # Altın M15 ile aynı
+  kaldirac: 3.0                    # sabit tavan (kural 6)
+  vol_pencere_gun: 30
+  bant: 0.25
+walk_forward: { is_yil: 1.5, oos_yil: 0.5 }
+# Stres 3x maliyet (Altın M15'te 2x): yayın dakikasında spread ve kayma olağan dakikanın birkaç katı; dakikalık ASK yok,
+# spread modelin varsayılanından gelir (aleyhte ama yayın anı için iyimser olabilir → stres sert tutuldu).
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 3.0 }
+
+planlar:
+  altin_haber:
+    kimlik: 2026-10-05-d14-altin-haber
+    hipotez: >-
+      ABD makro yayınlarının (FOMC kararı, NFP, CPI; geniş seçimde ayrıca PPI ve haftalık işsizlik başvuruları)
+      ardından XAUUSD'nin ilk k dakikadaki hareketi sonraki h dakikada ya sürer (ivme) ya da geri döner (aşırı tepki);
+      bu yönlü pozisyon maliyet (3x stres dahil) sonrası pozitif ve walk-forward'da kalıcı getiri verir. Sıfır hipotezi:
+      vermez (fiyat haberi yayın dakikasında tamamen fiyatlar, sonrası rastgele yürüyüş).
+
+gruplar:
+  xau_m1:
+    kimlikler: [DUKASCOPY:XAUUSD]
+    asgari_gecmis_gun: 30
+    yon: long_short
+    zd: [1m]
+
+# 16 deneme: k (yayından sonra kaç dakika beklenir) × h (kaç dakika tutulur) × yön (ivme/dönüş) × olay seçimi.
+kollar:
+  - strateji: haber_ivme
+    gruplar: [xau_m1]
+    zd: [1m]
+    izgara: { k: [1, 5], h: [15, 60], yon: [1, -1], secim: [buyuk, hepsi] }

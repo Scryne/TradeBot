@@ -38,7 +38,8 @@ Kurumsal, çok piyasalı, tamamen otonom bir trade sistemi (Scryne'ın kendi hes
 Aşağıdakiler tercih değil, kısıttır. Bir görev bunlardan birini ihlal ediyorsa görev yanlıştır.
 Gerekçeler: `docs/Final-Dokuman.md` ve `docs/Arastirma.md`.
 
-1. **Sıfırdan.** ScryneQuant projesine bakılmaz. Kararları, kodu ve ölçümleri taşınmaz (Scryne, 2026-09-24).
+1. **ScryneQuant kaynak olarak okunabilir.** 2026-09-24'teki "bakılmaz" kararını Scryne 2026-10-05'te kaldırdı:
+   "oradan bizde eksik olan bir şey var ise alabilirsin". Alınan her şey TradeBot'un kurallarıyla yeniden ölçülür.
 2. **Önce konuş, sonra yap.** Yön ya da kapsam değiştiren her şey Scryne'la konuşulup karara bağlanmadan
    dokümana ya da koda girmez.
 3. **Saf karar çekirdeği.** Strateji mantığı I/O yapmaz, yalnız t anına kadar kesilmiş veriyi görür (bozma

@@ -30,6 +30,15 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 12 | Gerçek para (koşullu) | ⏳ Bekliyor | Kanıt kapısı (DSR ≥ 0,95 ya da paper PSR(0) ≥ 0,95; mikro pilot yalnız Scryne'ın açık kararıyla) + aracı kurum/borsa + anahtar (çekim kapalı, IP kısıtlı) + vergi netliği; sabit tavanlı mikro sermaye; ilk emir Scryne onayıyla |
 | 13 | Sonraki dalgalar (koşullu) | ⏳ Bekliyor | Ölçüm fırsat gösterirse: ABD tek hisseleri (ücretli veri), CME vadelileri (Databento), VİOP; her biri ayrı kararla |
 
+**Yön değişikliği (2026-10-05, Scryne):** "sürekli işlem açıp kapatan", "forex trade bot üstünde ilerliycez", "tüm
+kolları kapat", "haberlere göre işlem açan bot mu yaparsın, ne yaparsan yap", "tek amacım 1 haftada maximum para".
+Otomatik pilot ve kilit → mikro pilot planı (Faz 12 notları) bitti. 17 kolun hepsine elle `durdur` yazıldı (17:00 UTC
+kapanışında kilit paper + Binance Demo, döviz kolu kapandı; Binance Demo pozisyonu yok). Paper düğümü artık elle
+durdurulan kolu düzleştirir (önceden yalnız yeni riski kesiyordu). Sık işlemin maliyet sonrası eksi olduğu kanıtı bir kez
+daha gösterildi; Scryne "ikisi birlikte"yi seçti: sürekli işlem botu demoda (Altın M15 `kanal_kirilim`, ölçülmüş en az
+kötü aile) + haber botu önce ölçülür (dalga 14, `docs/turnuva/Dalga-14-Altin-Haber.md`). ScryneQuant artık okunabilir
+(kural 1 değişti). Gerçek para ve kaldıraç tavanı (kural 6–7) yine Scryne'ın açık onayıyla.
+
 ## Faz Detayları
 
 ### Faz 0: Riskli kararların spike'ları

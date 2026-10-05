@@ -365,3 +365,41 @@ def test_ardisik_ret_kolu_durdurur(tmp_path, ayar):
     assert k.ad in b.durdurulan
     o = df.kol_olaylari(k.ad)
     assert [x.tur for x in o] == ["durdur"] and o[0].ayrinti["neden"] == "ardisik_ret" and o[0].ayrinti["sayi"] == 3
+
+
+def test_elle_durdurulan_kol_duzlesir(tmp_path, ayar, monkeypatch):
+    """Elle (Telegram/CLI) durdurma pozisyonu kapatır; düğümün kendi durdurması (ardışık ret) yalnız yeni riski keser."""
+    import dataclasses
+
+    from tradebot.canli import dugum
+    from tradebot.canli.defter import PaperDefter
+    from tradebot.db import metadata, motor
+
+    monkeypatch.setattr(dugum, "aktif_vetolar", lambda m, t: set())
+    m = motor(ayar)
+    metadata.create_all(m)
+    depo, t = sentetik_depo(tmp_path, n=24 * 40)
+    k1 = dataclasses.replace(kol_yap(frenler=False), baslangic_ozkaynak=100_000.0)
+    k2 = dataclasses.replace(k1, ad="ma_yon@test2@1h")
+    df = PaperDefter(m, "test")
+    for k in (k1, k2):
+        df.kol_ac(k, int(t[0]))
+    b = dugum.Beyin(m, [k1, k2], df, SahteBarlar(depo), KAYIT)
+    for k in (k1, k2):
+        b.stratejiler[k.ad] = SahteStrateji(b, k)
+    k1_once = None
+    for i, (kol_olay, neden) in enumerate([(None, None), (k1.ad, "telegram")]):
+        kapanis = int(t[-2 + i]) + SAAT
+        monkeypatch.setattr(dugum.time, "time", lambda k=kapanis: (k + 5_000) / 1000)
+        if kol_olay:
+            df.kol_olay_yaz(kol_olay, "durdur", {"neden": neden})
+            df.kol_olay_yaz(k2.ad, "durdur", {"neden": "ardisik_ret"})
+        assert b.saat_kapandi(kapanis)
+        if i == 0:
+            k1_once = dict(b.durum[k1.ad].adet)
+            k2_once = dict(b.durum[k2.ad].adet)
+    assert any(abs(v) > 0 for v in k1_once.values())
+    assert all(abs(v) < 1e-9 for v in b.durum[k1.ad].adet.values())          # elle durdurulan düzleşti
+    assert b.durum[k2.ad].adet == pytest.approx(k2_once)                      # otomatik durdurma pozisyonu tuttu
+    assert b.duzlesecek == {k1.ad} and b.durdurulan == {k1.ad, k2.ad}
+    assert dugum.Beyin(m, [k1, k2], df, SahteBarlar(depo), KAYIT).duzlesecek == {k1.ad}   # yeniden başlatmada kalır
