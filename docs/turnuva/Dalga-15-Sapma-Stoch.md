@@ -34,3 +34,20 @@ BIST100 günlük, BIST ilk 30 hisse günlük (videonun piyasası; tek hisse 4 sa
 
 Dalga 1 ile aynı: A = DSR ≥ 0,95 + walk-forward OOS + stres + yıllar; B = DSR'sız kapılar. Sonuca bakıp ızgara
 değiştirilmez (kural 10).
+
+## Sonuç (2026-10-05, koşu `dalga15`, ön kayıt 3c693da)
+
+**KALDI: 4 grubun hepsinde.** 32 deneme.
+
+| Grup | En iyi varyant | Sharpe | Yıllık | Düşüş | Walk-forward OOS | Pozitif varyant |
+| --- | --- | --- | --- | --- | --- | --- |
+| BIST hisse (ilk 30, günlük; videonun piyasası) | güvenli, %7, z −2 | −0,31 | −%6,2 | −%86 | −%11,9/yıl | 0 / 8 |
+| BIST100 günlük | güvenli, %7, z −1,5 | −0,03 | −%0,3 | −%23 | −%1,3/yıl | 0 / 8 |
+| BTC + ETH 4 saat | güvenli, %7, z −1,5 | 0,30 | +%3,1 | −%28 | +%0,6/yıl | 5 / 8 |
+| Altın 4 saat | riskli, %7, z −1,5 | 0,41 | +%2,8 | −%26 | +%1,5/yıl | 8 / 8 |
+
+- Videonun kendi piyasasında (BIST hisseleri) 8 varyantın hepsi eksi; en iyisi 2018'de −%50, 2011'de −%39.
+- Altın ve kriptodaki küçük artı yalnız alış yapan bir kuralın yükselen piyasadan aldığı paydır: altın 2025'te +%21,5
+  (altının kendisi aynı yıl çok daha fazla yükseldi), 2013 düşüşünde −%12,6. Al-tutu geçmiyor; DSR 0,24–0,37.
+- Videodaki örnekler (Ford Otomotiv, Ereğli, Garanti) seçilmiş geçmiş grafiklerdir; kural bütün hisselere ve yıllara
+  uygulanınca kazanç kalmıyor. Sonuca bakıp ızgara değiştirilmedi (kural 10).
