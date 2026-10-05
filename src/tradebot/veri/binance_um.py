@@ -46,7 +46,7 @@ class BinanceUM:
     def __init__(self, veri_dizini: Path, motor, isci: int = 16) -> None:
         self.ham = HamDepo(veri_dizini, motor)
         self.kok = Path(veri_dizini) / "um"
-        self.http = NazikIstemci("binance_um", aralik_sn=0.01)
+        self.http = NazikIstemci("binance_um", aralik_sn=0.01, baglanti=isci + 4)
         self.isci = isci
 
     def _liste(self, prefix: str, desen: str) -> list[str]:

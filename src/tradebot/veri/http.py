@@ -21,9 +21,13 @@ class YokHatasi(Exception):
 
 class NazikIstemci:
     def __init__(self, ad: str, aralik_sn: float = 0.0, deneme: int = 6, geri_cekilme_sn: float = 2.0,
-                 zaman_asimi: float = 60.0, basliklar: dict | None = None) -> None:
+                 zaman_asimi: float = 60.0, basliklar: dict | None = None, baglanti: int | None = None) -> None:
+        """`baglanti`: açık tutulan bağlantı sayısı (çok iş parçacıklı kullanım; varsayılan havuz 20 bağlantıyı açık
+        tutar, fazlası her istekte yeniden kurulur ve DNS'e yük biner)."""
         self.ad, self.aralik, self.deneme, self.geri = ad, aralik_sn, deneme, geri_cekilme_sn
-        self._c = httpx.Client(timeout=zaman_asimi, follow_redirects=True, headers={"User-Agent": UA, **(basliklar or {})})
+        limit = httpx.Limits(max_connections=baglanti, max_keepalive_connections=baglanti) if baglanti else None
+        self._c = httpx.Client(timeout=zaman_asimi, follow_redirects=True, headers={"User-Agent": UA, **(basliklar or {})},
+                               **({"limits": limit} if limit else {}))
         self._kilit = threading.Lock()
         self._son = 0.0
         self._log = log(f"http.{ad}")
