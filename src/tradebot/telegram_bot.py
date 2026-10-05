@@ -52,6 +52,10 @@ def kol_aciklamasi(k: PaperKol) -> str:
     if k.strateji == "kanal_kirilim" and k.grup_adi == "xau_m15":
         return ("gold intraday scalping arm on the demo account: 15-minute channel breakout with ATR stop and 2R target, "
                 "fixed 0.01 lot, real orders to the MT5 demo account, observation only")
+    if k.strateji == "mikro_ivme":
+        return ("gold seconds scalper on the demo account (the 'skalp' bot, TikTok video test): opens 0.01 lot about "
+                "every 10 seconds in the direction of the last 10-second move, small target and tight stop, real orders "
+                "to the MT5 demo account, observation only")
     if k.strateji == "doviz_tasima":
         return ("forex carry arm on the demo account: long the highest-interest G10 currency and short the lowest, "
                 "daily decisions, real orders to the MT5 demo account, observation only")
