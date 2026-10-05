@@ -255,6 +255,9 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
       `kurumsal_islem` → `kurumsal` olayı (B1: Yahoo bölünme/bedelsiz çapraz kontrolü için; tüketici henüz yok).
     - Servis KAP'ı canlı izliyor. Geçmiş doldurma 2024-01-01'den başladı. Ölçülen hız günde ~94 takvim günü (KAP'ın
       hız sınırı, 3 sn aralık): toplama ~10 gün (~2026-10-07), ardından toplu yargılama.
+    - 2026-10-05: iş 2026-09-28 18:22 UTC'de bir dağıtımın PostgreSQL yeniden başlatmasında ölmüş (2024-08-07'de),
+      bir hafta fark edilmedi. Gün toplama artık DB'yi bekleyip yeniden dener (83e1301); iş 2024-08-07'den yeniden
+      başladı. Kalan ~790 gün → toplama ~2026-10-14, ardından toplu yargılama.
     - 2026-09-27 denetimi: alınamayan bildirimler kalıcı delik oluyordu (24 saatte 72) → onarım turu; toplu yargılama
       parça parça (bellek). İş yeni kodla yeniden başlatıldı (`docs/Denetim-2026-09-27.md`).
   - **Kapsam kararı 2 (Claude, 2026-09-27; aynı ilke: girdisi olmayan rol girdinin doğduğu faza):**
@@ -278,11 +281,11 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     gerçek delist vetoları yerinde. LUNA, FTT, CVC (o tarihte gerçekten kaldırıldı, sonra yeniden listelendi) ve STG
     (6 Ekim birleşmesi) doğru. Düzeltme (a1520af): `usdt_pair_removed` seçildi ama metinde varlik/USDT yoksa karar
     belirsiz sayılır, yükseltme modeline gider; yükseltme yoksa belirsizlik kuralı yine veto verir.
-  - Faz 6'da kalan: B1 çapraz kontrolü (KAP geçmişi ~2026-10-07). Bitince Faz 6 kapanır.
+  - Faz 6'da kalan: B1 çapraz kontrolü (KAP geçmişi ~2026-10-14). Bitince Faz 6 kapanır.
   - B1 (tasarım, 2026-09-27): asıl değer düzeltilmemiş bölünmeyi yakalamak. Yahoo bir bedelsizi atlarsa seride kalıcı
     −%50 boşluk kalır; kalite raporunun sıçra-dön kuralı onu görmez (geri dönmüyor). Kural: BIST'te büyük, geri dönmeyen
     açılış boşluğu + ±30 gün içinde A2 `kurumsal` olayı + Yahoo'da bölünme kaydı yok → "düzeltilmemiş kurumsal işlem
-    şüphesi" (kalite UYARI). KAP geçmişi tamamlanınca (~2026-10-07) kurulur ve geçmişte ölçülür.
+    şüphesi" (kalite UYARI). KAP geçmişi tamamlanınca (~2026-10-14) kurulur ve geçmişte ölçülür.
 
 ### Faz 7: Paper canlı — kripto + ABD ETF
 - **İşler:** Nautilus canlı düğümleri (paper); sermaye dağıtıcı (haftalık); Jev'li ve Jev'siz kol çiftleri;
@@ -529,6 +532,12 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
     eklenir: iki satır ters çevrilip borsadan sorgulanan fiyatla yeniden yazıldı (denetim `dolum_fiyati_duzeltme`).
     Küçük sermaye etkisi: tek olayda net BTC koruması 0,001 BTC (~85 $) 50 $'lık kısayı aşıyor (~35 $ net BTC uzun);
     açık olay sayısı arttıkça yuvarlama payı küçülür.
+  - 2026-10-05 kontrol: 2–5 Ekim kararları zamanında (00:05, gecikme yok). Paper 4 olay açık (MOVE, CARV, BB, PUMP;
+    özkaynak 98.955, −%1,0), Demo 3 olay (MOVE, CARV, BB + 0,002 BTC; 989,1, −%1,1); borsa ↔ defter eşit
+    (`binance-kontrol`). **Sapma:** Demo PUMP girişini reddetti (`-4140 Invalid symbol status`): Demo borsasında
+    PUMPUSDT eski bir kontrat, durumu `SETTLING` (ana ağda `TRADING`). Ana ağda olmayacak bir Demo ortamı farkı; giriş
+    yalnız olay gününde denendiği için tekrar emir ya da açıkta kalan bacak yok. 3 Ekim'de host 4 saat kapalıydı
+    (13:32–17:11 UTC; karar saatine denk gelmedi).
 
 ### Faz 13: Sonraki dalgalar (koşullu)
 - **İşler:** Ücretli veriyle ABD tek hisseleri; Databento ile CME vadelileri; VİOP; gerekirse IB bağlantısı;
