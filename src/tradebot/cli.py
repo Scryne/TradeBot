@@ -284,6 +284,17 @@ def veri_binance(sinir: int = typer.Option(0, help="Yalnız ilk N sembol (deneme
     _yazdir(is_akisi.binance(a, m, sinir or None))
 
 
+@veri_uygulama.command("um")
+def veri_um(metrics: bool = typer.Option(True, help="Günlük 5 dk OI dosyaları (hacim eşiğini geçen aylar)"),
+            asgari_hacim: float = typer.Option(3e8, help="OI indirilecek ayın asgari quote hacmi (USDT)"),
+            sinir: int = typer.Option(0, help="Yalnız ilk N sembol (deneme); 0 = hepsi")) -> None:
+    """Binance USDT-M perp arşivi (kaldırılanlar dahil): 1h mum, funding, saatlik OI → data/um/."""
+    from tradebot.veri.binance_um import BinanceUM
+
+    a, m = _veri_baglam()
+    _yazdir(BinanceUM(a.veri_dizini, m).hepsi(metrics, asgari_hacim, sinir or None))
+
+
 @veri_uygulama.command("yahoo")
 def veri_yahoo(tam: bool = typer.Option(False, help="Tüm geçmişi yeniden indir")) -> None:
     """ABD ETF'leri + BIST (günlük) ve kurumsal işlemler."""
