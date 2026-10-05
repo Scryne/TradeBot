@@ -9,7 +9,8 @@ görmez. Olağanüstü FOMC toplantıları ve ertelenen/iptal edilen BLS yayınl
   York. BLS, tarayıcı taklidi yapan istemciye 403 veriyor; iletişim adresli dürüst User-Agent ile açılıyor (ölçüldü).
 - ISSIZLIK: Çalışma Bakanlığı (DOL) haftalık başvuruları kuralla yayımlar: her perşembe 08:30 New York; perşembe
   federal tatilse (yılbaşı, Juneteenth 2021'den, 4 Temmuz, Gaziler Günü, Şükran Günü, Noel) bir gün önce, çarşamba.
-  Kural önceden bilinir; arşiv yok, tarih üretilir (`issizlik_tarihleri`).
+  Kural önceden bilinir; arşiv yok, tarih üretilir (`issizlik_tarihleri`). Federal hükümet kapanmasında DOL ulusal
+  raporu yayımlamadı (1 Ekim → 12 Kasım 2025; kapanma o an kamuya açıktı, geleceği görmek değil): bu perşembeler yok.
 Çıktı: `config/haber_takvimi.yaml` (commit edilir; kaynak sayfaların hash'i ham depoda).
 """
 from __future__ import annotations
@@ -54,13 +55,17 @@ def _persembe_tatili(g: date) -> bool:
     return g.month == 11 and 22 <= g.day <= 28   # Kasım'ın dördüncü perşembesi: Şükran Günü
 
 
+YAYIMLANMADI = ((date(2025, 10, 1), date(2025, 11, 13)),)   # hükümet kapanması (13 Kasım: belirsiz, temkinle dışarıda)
+
+
 def issizlik_tarihleri(bas: date, bit: date) -> list[str]:
     """Haftalık işsizlik başvurularının yayın günleri (YYYYMMDD), [bas, bit]."""
     g = bas + timedelta(days=(3 - bas.weekday()) % 7)   # ilk perşembe
     out = []
     while g <= bit:
         y = g - timedelta(days=1) if _persembe_tatili(g) else g
-        out.append(y.strftime("%Y%m%d"))
+        if not any(a <= y <= b for a, b in YAYIMLANMADI):
+            out.append(y.strftime("%Y%m%d"))
         g += timedelta(days=7)
     return out
 

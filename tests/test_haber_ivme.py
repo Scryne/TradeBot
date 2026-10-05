@@ -67,5 +67,7 @@ def test_issizlik_kurali():
     assert "20251126" in g and "20251127" not in g     # Şükran Günü → çarşamba
     assert "20251224" in g and "20251225" not in g     # Noel perşembe → çarşamba
     assert "20260101" not in g and "20251231" in g     # yılbaşı perşembe → çarşamba
-    assert "20251106" in g and "20260108" in g          # olağan perşembeler
-    assert len(g) == 10
+    assert "20251120" in g and "20260108" in g          # olağan perşembeler
+    assert len(g) == 8                                  # 6 ve 13 Kasım: hükümet kapanması
+    kap = ht.issizlik_tarihleri(date(2025, 9, 20), date(2025, 11, 30))
+    assert kap == ["20250925", "20251120", "20251126"]   # hükümet kapanması: DOL yayımlamadı
