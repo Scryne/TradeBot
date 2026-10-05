@@ -792,6 +792,8 @@ def zeka_kap_geri_doldur(
     """Geçmiş KAP bildirimlerini gün gün toplar (kaldığı yerden devam eder) ve A2 ile yargılar."""
     from datetime import date, timedelta
 
+    from sqlalchemy.exc import OperationalError
+
     from tradebot.metin.kap import KapBildirim
     from tradebot.veri.depo import HamDepo
     from tradebot.zeka.servis import kur as zeka_kur
@@ -800,8 +802,20 @@ def zeka_kap_geri_doldur(
     t = KapBildirim(HamDepo(a.veri_dizini, m), m, aralik_sn=3.0, deneme=6)
     g, son = date.fromisoformat(bas), (date.fromisoformat(bit) if bit else date.today())
     kayitci, toplam = log("zeka.kap"), 0
+
+    def topla(gun) -> int:
+        # Dağıtım PostgreSQL'i yeniden başlatır; tek seferlik iş bunu atlatmalı (2026-09-28'de 2024-08-07'de ölmüştü).
+        # Gün yeniden toplanırsa bilinen bildirimler atlanır.
+        for deneme in range(30):
+            try:
+                return len(t.topla([gun]))
+            except OperationalError as e:
+                kayitci.warning("kap_db_bekleniyor", gun=gun.isoformat(), deneme=deneme + 1, hata=str(e)[:120])
+                time.sleep(30)
+        return len(t.topla([gun]))
+
     while g <= son:
-        n = len(t.topla([g]))
+        n = topla(g)
         toplam += n
         kayitci.info("kap_gun", gun=g.isoformat(), yeni=n)
         g += timedelta(days=1)
@@ -813,7 +827,7 @@ def zeka_kap_geri_doldur(
             break
         t.alinamayan = []
         for x in gunler:
-            toplam += len(t.topla([x]))
+            toplam += topla(x)
         kayitci.info("kap_onarim_turu", tur=tur + 1, gun=len(gunler), kalan=len(t.alinamayan))
     _yazdir({"yeni_metin": toplam, "alinamayan": [f"{x.isoformat()}:{no}" for x, no in t.alinamayan],
              "olay": zeka_kur(m, a).isle("kap") if yargila else 0})
