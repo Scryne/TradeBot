@@ -121,3 +121,18 @@ def test_durdurulan_kol_kapatir_ve_acmaz():
         kp.bid += 0.1
         _adim(n, saat)
     assert kp.poz == 0.0
+
+
+def test_deney_bitince_durur_ve_ozet_gonderir():
+    m, n, kp, saat, mesaj = _kur()
+    n.p = sk.SkalpParam(n.p.bekleme_ms, n.p.tp_usd, n.p.sl_oran, n.p.azami_ms, bitis_ms=int(saat() * 1000) + 30_000)
+    n.tur()
+    for _ in range(4):
+        kp.bid += 0.1
+        _adim(n, saat)
+    assert kp.poz == 0.01
+    for _ in range(8):                       # bitiş geçti: durur, açık işlem kapanır, yeni işlem açılmaz
+        kp.bid += 0.1
+        _adim(n, saat)
+    assert kp.poz == 0.0 and any("deneyi bitti" in x for x in mesaj)
+    assert [o.tur for o in n.defter.kol_olaylari(n.kol.ad)][-1] == "durdur"

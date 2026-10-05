@@ -19,6 +19,7 @@ import time
 from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime
 
 import numpy as np
 from sqlalchemy import insert, select
@@ -49,6 +50,7 @@ class SkalpParam:
     tp_usd: float
     sl_oran: float
     azami_ms: int
+    bitis_ms: int | None = None          # deney bitişi: bu andan sonra kol kendini durdurur (riski azaltan)
 
 
 def ayarlar(d: dict | None = None) -> tuple[AltinAyarlari, SkalpParam] | None:
@@ -57,8 +59,10 @@ def ayarlar(d: dict | None = None) -> tuple[AltinAyarlari, SkalpParam] | None:
     if ay is None:
         return None
     p = d[BLOK]["parametre"]
+    bitis = p.get("bitis_utc")
+    bitis_ms = int(datetime.fromisoformat(str(bitis).replace("Z", "+00:00")).timestamp() * 1000) if bitis else None
     return ay, SkalpParam(int(float(p["bekleme_sn"]) * 1000), float(p["tp_usd"]), float(p["sl_oran"]),
-                          int(float(p["azami_sn"]) * 1000))
+                          int(float(p["azami_sn"]) * 1000), bitis_ms)
 
 
 class SkalpDugumu(AltinDugumu):
@@ -106,6 +110,9 @@ class SkalpDugumu(AltinDugumu):
             adet = {self.ay.kimlik: d.adet} if d.adet else {}
             self.defter.ozkaynak_yaz(self.kol.ad, dakika, KolDurum(d.ozkaynak(orta), d.nakit, adet), {self.ay.kimlik: orta})
             self.son_dakika = dakika
+            d = self._d()
+        if self.p.bitis_ms and simdi >= self.p.bitis_ms and not d.durdurulmus:
+            self._bitir(simdi, orta)
             d = self._d()
         k = self._karar(d, kot, simdi)
         if k:
@@ -162,6 +169,18 @@ class SkalpDugumu(AltinDugumu):
             self.giris = None
         _log.info("skalp_karar", neden=neden, poz=poz, hedef=hedef, **sonuc)
         return {"karar_id": kid, "neden": neden, "hedef": hedef, **sonuc}
+
+    def _bitir(self, simdi: int, orta: float) -> None:
+        """Deney süresi doldu: kol durur (açık işlem bir sonraki karar turunda kapanır) ve son özet gönderilir."""
+        self.defter.kol_olay_yaz(self.kol.ad, "durdur", {"neden": "deney_bitti", "bitis_ms": self.p.bitis_ms}, simdi)
+        tum = self.istatistik(0)
+        oz = self._d().ozkaynak(orta)
+        metin = ("Skalp deneyi bitti (demo, altın, ~10 sn'de bir işlem). Bot durduruldu.\n"
+                 f"Toplam {tum['islem']} işlem: {tum['kazanan']} kazanç / {tum['islem'] - tum['kazanan']} kayıp.\n"
+                 f"Net {oz - self.kol.baslangic_ozkaynak:+.2f} $ (10.000 $'lık demo kol; gerçek spread ve dolum).")
+        _log.warning("skalp_deney_bitti", **tum, ozkaynak=round(oz, 2))
+        if self.bildir is not None:
+            self.bildir(metin)
 
     # ------------------------------------------------------------------ özet
     def istatistik(self, bas_ms: int) -> dict:
