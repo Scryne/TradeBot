@@ -25,6 +25,10 @@ Kural (sabit, ön kayıtlı):
 - Başlangıçlar: 2023-09'dan 2026-03'e her ay başı (31 başlangıç), her biri 26 hafta ya da hesap bitene kadar; tohum =
   başlangıç sırası. Spread 0,35 $ (XM standart hesap civarı) ve 0,70 $ (NCM'de 2026-10-05'te canlı ölçülen 0,65–0,81).
 
+Ek deneme (2026-10-05, ilk koşudan SONRA ayrı ön kayıt; ilk koşunun sonucu değiştirilmez): `--yon uzun` — aynı kural,
+bütün girişler alış. Soru: 2023–26 altın yükselişinde (≈ 1.900 → 4.300 $) yalnız alış yapan stopsuz bot kaç hafta
+"%100" görünür ve düşüşlerde ne olur? (Kanalın 14 haftalık serisi yükselen piyasada; yön üstünlüğü değil beta olabilir.)
+
 Çıktı: senaryo başına hesabı biten başlangıç oranı, bitene kadar geçen hafta, bitmeden önceki "%100" hafta serisi,
 haftalık getiri ortancası, 26 hafta sonu bakiye dağılımı. Kullanım (host): python research/altin/stopsuz.py [--cikti x]
 """
@@ -53,10 +57,10 @@ HAFTA_MS = 7 * 86_400_000
 PAZARTESI0 = 4 * 86_400_000     # 1970-01-05 Pazartesi: (t - PAZARTESI0) // HAFTA_MS = hafta no
 
 
-def simule(v: dict, bas: int, bit: int, lot: float, spread: float, tohum: int) -> dict:
+def simule(v: dict, bas: int, bit: int, lot: float, spread: float, tohum: int, uzun: bool = False) -> dict:
     t, h, lo, c, dk, sa, gun, hf = v["t"], v["h"], v["lo"], v["c"], v["dk"], v["sa"], v["gun"], v["hf"]
     rng = np.random.default_rng(tohum)
-    yonler = rng.choice([-1, 1], size=bit - bas).tolist()
+    yonler = [1] * (bit - bas) if uzun else rng.choice([-1, 1], size=bit - bas).tolist()
     bakiye = BAKIYE0
     acik: list[list[float]] = []          # [yön, giriş, ons]
     haftalar: list[dict] = []
@@ -111,6 +115,7 @@ def simule(v: dict, bas: int, bit: int, lot: float, spread: float, tohum: int) -
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--cikti", default="")
+    ap.add_argument("--yon", choices=["yazi_tura", "uzun"], default="yazi_tura")
     x = ap.parse_args()
     d = BarDepo(ayarlar().veri_dizini).oku("DUKASCOPY:XAUUSD", "1m").sort("acilis_ms")
     t = d["acilis_ms"].to_numpy().astype(np.int64)
@@ -133,10 +138,10 @@ def main() -> None:
                       "bit": datetime.fromtimestamp(t[-1] / 1000, UTC).isoformat(), "dakika": len(t)},
              "kural": {"tp": TP, "kaldirac": KALDIRAC, "stopout": STOPOUT, "azami_acik": AZAMI_ACIK,
                        "aralik_dk": ARALIK_DK, "bakiye0": BAKIYE0, "ufuk_hafta": UFUK_HAFTA},
-             "senaryolar": {}}
+             "yon": x.yon, "senaryolar": {}}
     for s in SPREADLER:
         for lot in LOTLAR:
-            sonuc = {ad: simule(v, i, j, lot, s, n) for n, (ad, i, j) in enumerate(baslar)}
+            sonuc = {ad: simule(v, i, j, lot, s, n, x.yon == "uzun") for n, (ad, i, j) in enumerate(baslar)}
             biten = [r for r in sonuc.values() if r["biten_ms"] is not None]
             sag = [r for r in sonuc.values() if r["biten_ms"] is None]
             ozet = {
