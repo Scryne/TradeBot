@@ -59,3 +59,19 @@ kural değiştirilmez (kural 10); yeni deneme yeni ön kayıt ister.
   3x stres bunun için. Demo kol canlı spread'i ölçecek.
 - Üç yıllık veri: `buyuk` seçimde ~95 olay. Küçük örneklem; DSR ve walk-forward bunu cezalandırır.
 - Sürpriz (beklentiden sapma) verisi yok: kural sürprizin işaretini ilk dakikanın fiyat hareketinden okur.
+
+## Sonuç (2026-10-05, koşu `dalga14`, ön kayıt 9746092 + takvim 5de70e2)
+
+**KALDI: 16 varyantın hepsi eksi; ne ivme ne dönüş.** En iyi varyant (k 5, h 60, büyük olaylar, ivme) Sharpe −0,14,
+walk-forward OOS −%2,1/yıl (OOS Sharpe −1,51), DSR 0,05.
+
+| Seçim | Varyant aralığı (Sharpe) | Olay (3 yıl) |
+| --- | --- | --- |
+| buyuk (FOMC/NFP/CPI) | −0,14 … −0,92 | ~92 |
+| hepsi (+ PPI + işsizlik) | −0,59 … −1,54 | ~250 |
+
+- Sorun maliyet değil: `maliyet_payi` 0,01–0,06 (maliyet brüt getirinin küçük bir kısmı). Brüt getiri de sıfır ya da
+  eksi; altın yayından 1–5 dakika sonra yönlü bir iz bırakmıyor. Aynı (k, h) çiftinde ivme ve dönüş birlikte eksi.
+- Geniş seçim (PPI + işsizlik) daha kötü: küçük yayınlar gürültü ekliyor.
+- Yıllar: 2023 +%0,7, 2024 −%0,7, 2025 −%0,9, 2026 +%0,1 (en iyi varyant; maruziyet %0,24, getiriler küçük).
+- Demo koluna girmez. Sonuca bakıp ızgara ya da kural değiştirilmedi (kural 10).
