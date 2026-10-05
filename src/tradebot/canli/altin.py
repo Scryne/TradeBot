@@ -77,18 +77,19 @@ class AltinAyarlari:
     magic: int
 
 
-def ayarlar(d: dict | None = None) -> AltinAyarlari | None:
-    """`config/paper.yaml` `altin` bloğu. Blok yoksa None (düğüm çalışmaz)."""
+def ayarlar(d: dict | None = None, blok: str = "altin", dugum: str = DUGUM, grup_adi: str = "xau_m15",
+            zd: str = "15m") -> AltinAyarlari | None:
+    """`config/paper.yaml` `altin` bloğu (skalp düğümü kendi bloğuyla çağırır). Blok yoksa None (düğüm çalışmaz)."""
     d = d or oku()
-    b = d.get("altin")
+    b = d.get(blok)
     if not b:
         return None
     risk = RiskAyar(kaldirac=float(b["risk"]["kaldirac"]))
     ayar = Ayar(hedef_vol=0.0, kaldirac=risk.kaldirac, vol_pencere_gun=0, frenler=bool(d.get("frenler", True)), bant=0.0)
     kimlik = f"NCMFX:{b['sembol']}"
-    grup = {"dugum": DUGUM, "yon": "long_short", "kimlikler": [kimlik], "sembol": b["sembol"], "lot": b["lot"],
-            "maliyet": b["maliyet"], "hesap": "NCM forex demo", "zd": "15m"}
-    kol = PaperKol(b["ad"], b["strateji"], "xau_m15", grup, "15m", ayar, dict(b["parametre"]), b.get("sinif", "B"),
+    grup = {"dugum": dugum, "yon": "long_short", "kimlikler": [kimlik], "sembol": b["sembol"], "lot": b["lot"],
+            "maliyet": b["maliyet"], "hesap": "NCM forex demo", "zd": zd}
+    kol = PaperKol(b["ad"], b["strateji"], grup_adi, grup, zd, ayar, dict(b["parametre"]), b.get("sinif", "B"),
                    float(b.get("baslangic_ozkaynak", 10_000)))
     return AltinAyarlari(kol, b["sembol"], kimlik, b["strateji"], dict(b["parametre"]), float(b["lot"]),
                          float(b.get("ons_lot", 100.0)), risk, float(b["maliyet"]["kayma_bps"]),
@@ -157,6 +158,8 @@ def durum_kur(defter: PaperDefter, ay: AltinAyarlari) -> AltinDurum:
 
 
 class AltinDugumu:
+    EID_ONEK, EID_BOLEN = "AL", BAR_MS        # istemci emir kimliği: önek + karar zamanı / bölen (tekil)
+
     def __init__(self, defter: PaperDefter, ay: AltinAyarlari, ist, saat: Callable[[], float] = time.time):
         self.defter, self.ay, self.ist, self.saat = defter, ay, ist, saat
         self.m: Engine = defter.motor
@@ -379,7 +382,7 @@ class AltinDugumu:
             if abs(lot) < 1e-9:
                 continue
             q = lot * self.ay.ons_lot
-            eid = f"AL{onek}{zaman // BAR_MS}-{i}"[:31]
+            eid = f"{self.EID_ONEK}{onek}{zaman // self.EID_BOLEN}-{i}"[:31]
             simdi = int(self.saat() * 1000)
             r = self.risk.onayla(EmirIstegi(self.ay.kimlik, SINIF, q, orta, self.kol.ad, simdi, eid),
                                  Piyasa(orta, tik_ms, SAAT_MS, True), pf)

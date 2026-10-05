@@ -381,11 +381,24 @@ def olu_adam(a: Ayarlar, sonuclar: list[Sonuc], zaman_asimi: float = 10.0) -> bo
         return False
 
 
+def skalp_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
+    """Skalp düğümünün kalp atışı (canli/skalp.py, dakikada bir işaret). Kol henüz açılmadıysa bilgi."""
+    from tradebot.canli.gozetmen import dugum_kollari
+    from tradebot.db import motor
+
+    try:
+        if not dugum_kollari(motor(a)).get("skalp"):
+            return Sonuc("skalp", "OK", "skalp kolu henüz açılmadı")
+    except Exception as e:  # noqa: BLE001
+        return Sonuc("skalp", "HATA", f"{type(e).__name__}: {e}"[:200])
+    return paper_kontrol(a, simdi_ms, "skalp")
+
+
 def hepsi(a: Ayarlar) -> list[Sonuc]:
     kontroller = [dns_kontrol, saat_kontrol, veritabani_kontrol, disk_kontrol, sir_kontrol]
     if a.ortam == "host" and a.veritabani_url is not None:
         kontroller += [paper_kontrol, kilit_kontrol, kilit_gercek_kontrol, doviz_kontrol, altin_kontrol, akis_kontrol,
-                       gece_kontrol]
+                       skalp_kontrol, gece_kontrol]
     if a.yedek_dizini is not None:
         kontroller.append(yedek_kontrol)
     if a.mt5_kopru_forex or a.mt5_kopru_viop:

@@ -119,6 +119,23 @@ altin:
   magic: 910
   baslangic_ozkaynak: 10000
 
+# Mikro ivme skalpı (Scryne 2026-10-05, TikTok "5 $ → 731 $" Strategy Tester videosu; "evet çalıştır"): GÖZLEM deneyi.
+# Ayrı düğüm (canli/skalp.py, compose `skalp`), NCM forex DEMO hesabı, sihirli sayı 912. Düzken son 10 sn'nin orta fiyat
+# yönünde 0,01 lot; spread düşülmüş kâr +0,30 $/ons'ta, zarar fiyatın %0,03'ünde (~1,2 $/ons), 5 dk'da kapanır. Dolum
+# MT5'in gerçek dolumu (ek kayma yok: deneyin sorusu gerçek spread). Sabit lot, martingale yok (kural 6).
+skalp:
+  ad: "sk10:mikro_ivme@xau_tik@10s"
+  sinif: B
+  sembol: GOLD
+  strateji: mikro_ivme
+  parametre: {bekleme_sn: 10, tp_usd: 0.30, sl_oran: 0.0003, azami_sn: 300}
+  lot: 0.01
+  ons_lot: 100
+  maliyet: {kayma_bps: 0.0, finansman_yillik: 0.04}
+  risk: {kaldirac: 1.0}
+  magic: 912
+  baslangic_ozkaynak: 10000
+
 # FOMC günü dolar kolu (Dalga 10 B; ön kayıt gereği demo GÖZLEM kolu, docs/turnuva/Dalga-10-Akis.md). Ayrı düğüm
 # (canli/akis.py, compose `akis`): NCM forex DEMO hesabında MT5 emri, döviz ve altın kollarıyla aynı hesap (sihirli
 # sayı ayrı). Planlı FOMC karar gününden önceki gün → karar günü, yedi yabancı paranın eşit sepeti uzun (USD kısa); yılda

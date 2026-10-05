@@ -115,8 +115,8 @@ def saglik_komutu(
         time.sleep(dongu)
 
 
-DUGUMLER = ("paper", "kilit", "kilit_gercek", "doviz", "altin", "akis")   # her süreç ayrı gözetmen (kalp atışı ayrı)
-MT5_DUGUMLER = ("doviz", "altin", "akis")                  # gözetmen bunlarda köprüden gerçek kapatma emri verir
+DUGUMLER = ("paper", "kilit", "kilit_gercek", "doviz", "altin", "akis", "skalp")   # her süreç ayrı gözetmen (kalp atışı ayrı)
+MT5_DUGUMLER = ("doviz", "altin", "akis", "skalp")                  # gözetmen bunlarda köprüden gerçek kapatma emri verir
 
 
 def _gozetmen_kur(a, **ayar):
@@ -133,10 +133,11 @@ def _gozetmen_kur(a, **ayar):
         if ist is not None:
             ayar |= {"binance": ist}
     if ayar.get("dugum") in MT5_DUGUMLER:
-        from tradebot.canli import akis, altin, doviz
+        from tradebot.canli import akis, altin, doviz, skalp
         from tradebot.mt5.istemci import Mt5Istemci
 
-        ay = {"doviz": doviz, "altin": altin, "akis": akis}[ayar["dugum"]].ayarlar()
+        ay = {"doviz": doviz, "altin": altin, "akis": akis, "skalp": skalp}[ayar["dugum"]].ayarlar()
+        ay = ay[0] if isinstance(ay, tuple) else ay
         if ay is not None and a.mt5_kopru_forex:
             ayar |= {"mt5": Mt5Istemci(a.mt5_kopru_forex, zaman_asimi=60), "magic": ay.magic}
     return Gozetmen(db_motor(a), binance_kotasyon(NazikIstemci("gozetmen", deneme=3, zaman_asimi=15).al), kod_surumu(),
@@ -1009,6 +1010,14 @@ def paper_altin(
         _yazdir(d.hesap_degisimi(hesap_degisti) if hesap_degisti else d.tur())
         return
     altin.calistir(sure_sn or None)
+
+
+@paper_uygulama.command("skalp")
+def paper_skalp(sure_sn: float = typer.Option(0, help="Saniye; 0 = süresiz (servis)")) -> None:
+    """Mikro ivme skalpı (altın, ~10 sn; NCM forex DEMO hesabı, MT5 emri; compose `skalp`). Gözlem deneyi."""
+    from tradebot.canli import skalp
+
+    skalp.calistir(sure_sn or None)
 
 
 @paper_uygulama.command("akis")
