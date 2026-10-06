@@ -104,3 +104,13 @@ def test_kesit_kos_funding_ve_fiyat():
     # uzun L 0,5 (funding −0,001 → uzun alır), kısa K 0,5 (funding +0,002 → kısa alır)
     assert r[0] == pytest.approx(0.5 * 0.10 + 0.5 * 0.001 + 0.5 * 0.002)
     assert devir == [pytest.approx(1.0)] and km == {}
+
+
+def test_kesit_kos_dengeleme_maliyeti_getiriye_yazilir():
+    gun = [PZT + i * G for i in range(-40, 3)]
+    fiyat = {s: {d: (100.0, 100.0, 1e6) for d in gun} for s in ("L", "K")}
+    fund = {"L": {d: -0.001 for d in gun}, "K": {d: 0.002 for d in gun}}
+    kural = fk.KesitKural(pencere=7, n=1, evren=2, brut=1.0)
+    _, r0, _, _ = um.kesit_kos(fiyat, fund, kural, MAL0, PZT, PZT + 2 * G)
+    _, r1, _, _ = um.kesit_kos(fiyat, fund, kural, {"ucret": 0.0005, "kayma_token": 0.001}, PZT, PZT + 2 * G)
+    assert r0[0] - r1[0] == pytest.approx(1.0 * 0.0015)     # devir 1x × (ücret + kayma)

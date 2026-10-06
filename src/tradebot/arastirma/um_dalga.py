@@ -285,6 +285,7 @@ def kesit_kos(fiyat: dict, fund: dict, kural: fk.KesitKural, maliyet: dict, bas:
     devir, kurulmadi = [], {}
     for i, d in enumerate(gunler):
         d = int(d)
+        E0, maliyet_g = E, 0.0
         if (d - PAZARTESI_KAYMA_MS) % HAFTA_MS == 0:
             hacim, ort = {}, {}
             for s, fs in fiyat.items():
@@ -303,10 +304,12 @@ def kesit_kos(fiyat: dict, fund: dict, kural: fk.KesitKural, maliyet: dict, bas:
                 kurulmadi["evren_kucuk"] = kurulmadi.get("evren_kucuk", 0) + 1
             hedef = {s: x * E for s, x in w.items()}
             dv = sum(abs(hedef.get(s, 0.0) - v.get(s, 0.0)) for s in set(hedef) | set(v))
-            E -= dv * c
-            devir.append(dv / max(E, 1e-12))
+            maliyet_g = dv * c          # yeniden dengeleme maliyeti o günün getirisine yazılır
+            E -= maliyet_g
+            devir.append(dv / max(E0, 1e-12))
             v = hedef
         if not v:
+            r[i] = -maliyet_g / E0
             continue
         p = 0.0
         yeni = {}
@@ -324,7 +327,7 @@ def kesit_kos(fiyat: dict, fund: dict, kural: fk.KesitKural, maliyet: dict, bas:
                 g = fiyat[s][d][1] / o0 - 1
                 p += x * g - abs(x * (1 + g)) * c
                 kurulmadi["islem_durdu"] = kurulmadi.get("islem_durdu", 0) + 1
-        r[i] = p / E
+        r[i] = (p - maliyet_g) / E0
         E += p
         v = yeni
     return gunler, r, devir, kurulmadi
