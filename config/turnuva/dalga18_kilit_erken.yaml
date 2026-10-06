@@ -1,0 +1,26 @@
+# Turnuva dalga 18 — kilit açılımı kolu, daha erken giriş (−30 / −14 gün), canlı kolun risk tavanlarıyla: ÖN KAYIT.
+# Neden: Keyrock (16.000+ açılım) baskının ortalama ~30 gün önce başladığını söylüyor; dalga 6'da −30/0 en yüksek
+# Sharpe'lı kollardandı ama %10 nominal / 3x brütle düşüş kapısında kaldı (−%49). Canlı kolun tavanlarıyla (nominal %5,
+# brüt ≤ 1x, BTC ≤ 0,5) hiç ölçülmedi. Gerekçe: docs/turnuva/Dalga-18-Kilit-Erken.md. Motor ve veri dalga 13 ile aynı.
+# Aynı aile: DSR dalga 6, 6b, 13 denemeleriyle birlikte sayılır (kural 10).
+
+dalga: 18
+plan:
+  kimlik: 2026-10-06-d18-kilit-erken
+  aile: kilit_kisa
+  hipotez: >-
+    Ekip ve yatırımcı cliff açılımlarından önceki arz baskısı 7 günden önce başlar (hedge eden alıcılar, OTC indirimli
+    satışların piyasaya yansıması). Eşik %0,5 ve nominal %5 ile (canlı d13 kolu) giriş açılımdan 30 ya da 14 gün önce
+    yapılırsa kol, aynı risk tavanlarıyla kapılardan geçer ve olay başına getirisi −7 girişinden yüksektir. Sıfır
+    hipotezi: erken giriş yalnız funding ve piyasa gürültüsü ekler; tavan dolduğu için olay sayısı da düşer.
+
+olay: { kategoriler: [insiders, privateSale], asgari_oran: 0.005 }
+notional: 0.05
+maliyet: { ucret: 0.0005, kayma_token: 0.001, kayma_btc: 0.0001 }
+tavan: { azami_brut: 1.0, azami_btc: 0.5 }
+donem: { bas: "2021-01-01", is_bitis: "2025-01-01", bit: "2026-09-20" }
+# 2 deneme: giriş −30 / −14, çıkış 0 (açılım günü), eşik %0,5 sabit
+izgara: { giris: [-30, -14], cikis: [0], asgari_oran: [0.005] }
+onceki_dalgalar: [dalga6, dalga6b, dalga13]
+olcut: { dsr_a: 0.95, yil_pozitif: 0.60, stres_maliyet: 2.0, en_kotu_hafta: -0.10, en_kotu_dusus: -0.30,
+         oos_asgari_yillik: 0.0 }
