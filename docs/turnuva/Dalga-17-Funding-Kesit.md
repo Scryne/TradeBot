@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-10-06
 type: turnuva-plani
-durum: ön kayıt (koşudan önce commit edildi)
+durum: sonuçlandı — 4/4 KALDI (17 ve 17b, 2026-10-06)
 ---
 # Turnuva — Dalga 17: kesitsel funding (ön kayıt)
 
@@ -40,3 +40,19 @@ pencere {3, 14 gün} × n {5, 10}. Dönem 2021-01-04 → 2026-09-28; örneklem i
 
 - Yüksek funding'li isimler çoğu zaman güçlü yükselişin içindedir: kısa bacak momentuma karşı durur (2021 boğası).
 - Haftalık devir yüksekse maliyet (gidiş-dönüş bacak başına ~%0,3) kenarı yiyebilir; devir raporlanır.
+
+## Sonuç (2026-10-06): **4/4 KALDI** (17b, maliyet düzeltmesiyle)
+
+Dalga 17 koşusunda (657ce76) yeniden dengeleme maliyeti özkaynaktan düşülüyor ama getiri serisine yazılmıyordu (stres
+2x = temel). Aynı ızgara 17b olarak (85f0730) düzeltilmiş motorla koşuldu; DSR iki koşuyu birlikte sayar (8 deneme).
+
+| Kol (17b) | Sharpe | Yıllık | En kötü düşüş | Kör (2025+) | Stres 2x | Haftalık devir |
+| --- | --- | --- | --- | --- | --- | --- |
+| pencere 3, n 5 | 0,02 | −%20 | −%93 | −%73 | −%28 | 1,29 |
+| pencere 14, n 5 | 0,06 | −%20 | −%93 | −%50 | −%26 | 0,97 |
+| pencere 3, n 10 | 0,14 | −%2,5 | −%81 | −%52 | −%11 | 1,17 |
+| **pencere 14, n 10** | **0,37** | **+%6,8** | **−%60** | **−%23** | **−%0,1** | **0,84** |
+
+Yıllar (en iyi kol): 2021 +%105, 2022 −%9, 2023 +%12, 2024 +%8, 2025 +%14, 2026 −%43. Etki 2021 boğasında güçlü, sonra
+söndü (literatürdeki BTC carry bulgusuyla aynı yön: Borri vd. 2025'te negatif). Kısa bacak pompalarda büyük kayıp
+veriyor (düşüş −%60…−%93). Aile kapanır.

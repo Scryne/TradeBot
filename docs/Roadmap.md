@@ -40,6 +40,11 @@ kötü aile) + haber botu önce ölçülür (dalga 14, `docs/turnuva/Dalga-14-Al
 (kural 1 değişti). Gerçek para ve kaldıraç tavanı (kural 6–7) yine Scryne'ın açık onayıyla.
 Aynı gece: dalga 14 KALDI; Scryne'ın gerçek para bütçesi en çok 5–10 $ (kilit en az ~500 $ ister) ve karar Claude'a
 bırakıldı → kilit d13 paper + Binance Demo yeniden açıldı (ölçülmüş tek kazanan), altın M15 demo sürüyor, gerçek para yok.
+**2026-10-06 (Scryne: "kârlı bir sinyalin olması için ne gerekiyorsa yap"):** zorunlu akış / konumlanma tabanlı üç dalga.
+Yeni veri: Binance USDT-M arşivi, kaldırılan perp'ler dahil 1h + funding + saatlik OI (`tradebot veri um`, `data/um/`,
+~900 perp). Dalga 16 (OI temizlenmesi sonrası dönüş, 12) KALDI: kaskattan sonra düşüş sürüyor. Dalga 17/17b (kesitsel
+funding, 4+4) KALDI: 2021'den sonra söndü (17'de maliyet hatası bulundu, 17b düzeltilmiş). Dalga 18 (kilit −30/−14
+giriş, 2) −30 B ama d13'ten zayıf; canlı kol değişmez. Tokyo fix hesapla elendi. Kilit d13 hâlâ tek A.
 
 ## Faz Detayları
 

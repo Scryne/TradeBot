@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-10-06
 type: turnuva-plani
-durum: ön kayıt (koşudan önce commit edildi)
+durum: sonuçlandı — 12/12 KALDI (2026-10-06)
 ---
 # Turnuva — Dalga 16: OI temizlenmesi sonrası dönüş (ön kayıt)
 
@@ -46,3 +46,19 @@ kör 2025-01 → 2026-09 (2025-10-10 kaskadı kör dönemde). Ölçüt dalga 13 
 - Saatlik karar kaskadın içindeki dönüşü kaçırır (fitil aynı saatte kapanır); yakalanan yalnız sonraki saatlerin devamı.
 - Ücretsiz likidasyon akışı 2024-03'ten sonra arşivde yok; OI düşüşü vekildir (kapanan uzun da kısa da OI'yi düşürür:
   fiyat düşüşüyle birlikte uzun kapanışı ağır basar).
+
+## Sonuç (2026-10-06, ön kayıt 657ce76, veri 1h + OI kaldırılanlar dahil): **12/12 KALDI**
+
+| Kol | Sharpe | Yıllık | En kötü düşüş | Kör (2025+) | Olay | Olay ort. (maliyet dahil) |
+| --- | --- | --- | --- | --- | --- | --- |
+| kontrol (OI yok), 4 s | −1,73 | −%42 | −%92 | −%57 | 10.208 | −%0,46 |
+| OI ≤ −%5, 4 s | −0,93 | −%11 | −%42 | −%18 | 2.501 | −%0,42 |
+| OI ≤ −%10, 4 s | −0,29 | −%2,6 | −%24 | −%14 | 829 | −%0,31 |
+| **OI ≤ −%10, 24 s (en iyi)** | **−0,07** | **−%2,0** | **−%23** | **−%6,4** | **815** | **−%0,14** |
+| OI ≤ −%10, 24 s, BTC hedge | −0,50 | −%6,1 | −%27 | −%8,1 | 685 | −%0,83 |
+
+Okuma: sert düşüşten sonra fiyat dönmüyor, sürüyor (kontrol kolu maliyet öncesi de eksi). OI düşüşü koşulu kaybı
+küçültüyor, yani zorunlu kapanış bilgisi bir şey söylüyor, ama işaret değişmiyor: en iyi kolda olay başına brüt ~+%0,16,
+maliyet ~%0,30. Hedge'li kollar daha kötü: kaskattan sonra token BTC'nin de gerisinde kalıyor. Yıllar (en iyi kol):
+2022 −%22, 2023 +%13, 2024 +%15, 2025 +%2, 2026 −%13. Aile kapanır; tersi (kaskattan sonra kısa) olay başına brüt
+~%0,16 ile maliyeti karşılamaz.
