@@ -1,7 +1,7 @@
 ---
 proje: TradeBot
 created: 2026-09-24
-updated: 2026-09-27
+updated: 2026-10-06
 type: roadmap
 status: aktif (sürüm 2 — kurumsal, çok piyasalı)
 ---
@@ -21,9 +21,9 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 3 | Araştırma motoru | ✅ Tamamlandı | Saf karar çekirdeği; piyasa başına maliyet modelleri; vektörel tarama; walk-forward + plato + DSR; deneme defteri; vektörel ↔ Nautilus parity testi geçiyor |
 | 4 | Risk motoru ve boyutlandırma | ✅ Tamamlandı | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
 | 5 | Turnuva — backtest dalgası 1 | ✅ Tamamlandı | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
-| 6 | Zekâ katmanı (Jev) | 🔄 Devam Ediyor | Toplayıcılar (Binance, KAP, RSS, Fed/ECB/TCMB); Jev servisi + NVIDIA yükseltme; A1, A2 canlı; B1 çapraz kontrolü; yargılar dondurulabiliyor; C1–C2 ölçüldü (A4, A5, D3, B2, B4 girdilerinin doğduğu faza taşındı, 2026-09-27) |
+| 6 | Zekâ katmanı (Jev) | ⏳ Bekliyor | Toplayıcılar (Binance, KAP, RSS, Fed/ECB/TCMB); Jev servisi + NVIDIA yükseltme; A1, A2 canlı; B1 çapraz kontrolü; yargılar dondurulabiliyor; C1–C2 ölçüldü (A4, A5, D3, B2, B4 girdilerinin doğduğu faza taşındı, 2026-09-27) |
 | 7 | Paper canlı — kripto + ABD ETF | ✅ Tamamlandı | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
-| 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | 🔄 Devam Ediyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
+| 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | ⏳ Bekliyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
 | 9 | Operasyon: gözetmen, Telegram, raporlar | ✅ Tamamlandı | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
 | 10 | Web pano | 🔄 Devam Ediyor | DESIGN.md dolu; PnL, pozisyon, turnuva tablosu, veto geçmişi, sağlık; Tailscale üzerinden telefondan erişim |
 | 11 | Paper turnuvası — 12 hafta | 🔄 Devam Ediyor | 12 hafta kesintisiz paper; kademeli sermaye çalıştı; hangi kolların kapıyı geçtiği ve Jev katkısı raporlandı; maliyet varsayımları ölçüldü |
@@ -45,6 +45,11 @@ Yeni veri: Binance USDT-M arşivi, kaldırılan perp'ler dahil 1h + funding + sa
 ~900 perp). Dalga 16 (OI temizlenmesi sonrası dönüş, 12) KALDI: kaskattan sonra düşüş sürüyor. Dalga 17/17b (kesitsel
 funding, 4+4) KALDI: 2021'den sonra söndü (17'de maliyet hatası bulundu, 17b düzeltilmiş). Dalga 18 (kilit −30/−14
 giriş, 2) −30 B ama d13'ten zayıf; canlı kol değişmez. Tokyo fix hesapla elendi. Kilit d13 hâlâ tek A.
+**Ana yol kilit (2026-10-06, Scryne: "en doğru olanı sen seç ve uygula"):** kilit d13 ana bot; araştırma durdu, yeni
+dalga yok. Video/bot önerileri yalnız doğrulanmış kayıtla (Myfxbook/MQL5) ölçülür. Kilit paper + Binance Demo kayıt
+biriktirir, altın M15 NCM demo izleme kolu. Takvim: 2026-10-29 mekanik kontrol, Aralık karar; kapı (PSR(0) ≥ 0,95,
+≥ 26 hafta: en erken ~2027-04-01) + ~500 $ sermaye + Scryne onayı. Faz 6 ve 8'in kalanı (KAP/B1, BIST ve MT5 piyasa
+kolları) kilit yolunu etkilemediği için beklemede.
 
 ## Faz Detayları
 
@@ -473,6 +478,12 @@ giriş, 2) −30 B ama d13'ten zayıf; canlı kol değişmez. Tokyo fix hesapla 
     Canlı veride bulunan: paper yeniden başlayınca `toparlanma` kayıtları (sandbox kurulumu) dolum sanılıyordu, ayrıldı.
   - Kalan: Scryne'ın telefonuna Tailscale (aynı hesap) → telefondan erişim bitti kriterinin son parçası; Scryne geri
     bildirimi.
+  - 2026-10-06 (ec6e3ff): Scryne'ın ScryneOS'ta kurduğu Nothing prototipi ana tema oldu (DESIGN.md yeniden yazıldı;
+    cam tema, uyum token'ları, üç font kaldırıldı). Yeni **kilit açılımı bölümü** (`pano/kilit.py` → `/api/pano`
+    `kilit`): paper/Demo yan yana, olay başına sonuç (dolumlardan, funding hariç), 26 segmentli kapı, açık olayların
+    7 günlük çubuğu, DefiLlama ham takviminden 30 günlük açılımlar, karar günlüğü ve Demo retleri. Elle durdurulan
+    kollar çalışan sayılmaz (kahraman 4 / 16 durduruldu, şeritte yok). 390 px'te Risk tablosu taşıyordu (kilit perp'leri
+    sütun ekliyordu), giderildi. Görsel doğrulama 4 genişlikte temiz. Telefon erişimi hâlâ doğrulanmadı.
 
 ### Faz 11: Paper turnuvası — 12 hafta
 - **İşler:** Sistem kendi başına çalışır; haftalık raporlar okunur; arızalar düzeltilir; kademeli sermaye
@@ -501,6 +512,9 @@ giriş, 2) −30 B ama d13'ten zayıf; canlı kol değişmez. Tokyo fix hesapla 
     Kaldırma riski artırır (kural 7): Scryne onayı bekliyor (`tradebot zeka veto-kaldir`).
   - 2026-09-30: forex'e geçiş (Faz 8 notu). Paper'da üç düğüm: `paper` (BTC/ETH trend), `kilit` (gerçek para adayı),
     `doviz` (NCM forex demo, gözlem). Kapı hepsinde aynı: kolun kendi paper haftalarında PSR(0) ≥ 0,95 ve ≥ 26 hafta.
+  - 2026-10-06: trend kolları 10-05'te durduruldu; turnuvada tek ciddi kol kilit d13 (paper 2026-10-01'de açıldı, kapı
+    en erken ~2027-04-01). 10-05 "hepsini kapat" kilit pozisyonlarını da kapattı (MOVE, CARV, BB, PUMP; paper −667 $);
+    kol `devam` ile açıldı ama bu olaylara geri girilmedi. Kayıtta bu bir kesinti olarak okunmalı.
 
 ### Faz 12: Gerçek para (koşullu)
 - **İşler:** Scryne kararı; aracı kurum/borsa seçimi; anahtar güvenliği; vergi; sabit tavanlı mikro
@@ -554,6 +568,12 @@ giriş, 2) −30 B ama d13'ten zayıf; canlı kol değişmez. Tokyo fix hesapla 
     PUMPUSDT eski bir kontrat, durumu `SETTLING` (ana ağda `TRADING`). Ana ağda olmayacak bir Demo ortamı farkı; giriş
     yalnız olay gününde denendiği için tekrar emir ya da açıkta kalan bacak yok. 3 Ekim'de host 4 saat kapalıydı
     (13:32–17:11 UTC; karar saatine denk gelmedi).
+  - 2026-10-06: Demo'da SEI açılışı Binance Demo `-1000 unknown error` ile düştü ve düğüm yeniden denemedi (paper ile
+    Demo ayrıştı). Düzeltme: gerçek kolda yalnız borsa düzeyinde düşen kalem 10 dk arayla yeniden denenir (açılış en çok
+    3 kez ve 06:00 UTC'ye kadar, yalnız borsada o perp'te pozisyon yokken; kapanış sınırsız, pozisyon durdukça); belirsiz
+    hata emri gerçekleştirdiyse ikinci emir gitmez, mutabakat kolu durdurur. Emir kimliği yeniden denemede R1, R2… eki
+    alır (aynı kimlikle ikinci kayıt tablonun tekilliğine takılıyordu). Sağlık bekçisine `kilit_takvim` eklendi: günün
+    DefiLlama takvimi 00:40 UTC'ye kadar yoksa uyarı, iki gün eksikse hata (takvimsiz gün yeni olay açılmaz).
 
 ### Faz 13: Sonraki dalgalar (koşullu)
 - **İşler:** Ücretli veriyle ABD tek hisseleri; Databento ile CME vadelileri; VİOP; gerekirse IB bağlantısı;

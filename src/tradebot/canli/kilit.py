@@ -57,6 +57,9 @@ SAAT_MS = 3_600_000
 KARAR_GECIKME_MS = 5 * 60_000          # 00:05 UTC: günlük mum kesinleşmiş, takvim güncel
 TAKVIM_SABIR_MS = 30 * 60_000          # takvim bu süre içinde alınamazsa gün yalnız kapanışlarla kararlanır
 GECIKMELI_MS = 30 * 60_000             # 00:30'dan sonra verilen karar "gecikmeli" (maliyet ölçümünde ayrılır)
+YENIDEN_ARALIK_MS = 10 * 60_000        # gerçek kolda borsa hatasıyla düşen emir en erken bu kadar sonra yeniden denenir
+YENIDEN_SON_MS = 6 * SAAT_MS           # açılış yalnız günün 06:00 UTC'sine kadar (backtest girişi açılışta)
+YENIDEN_AZAMI = 3                      # açılış başına en çok yeniden deneme
 NAKIT_GELIRI = {"FUNDING_FEE", "SPECIAL_FUNDING_FEE", "COMMISSION", "COMMISSION_REBATE", "INSURANCE_CLEAR"}   # gerçek kol nakdi
 FAPI = bv.FAPI
 _log = log("kilit")
@@ -302,21 +305,74 @@ class KilitDugumu:
         return b // GUN_MS * GUN_MS + (GUN_MS if b % GUN_MS > GECIKMELI_MS else 0)
 
     def _devam(self, d: Durum_, gun: int, karar_id: int) -> dict | None:
-        """Karar yazılıp emirleri tamamlanmadan süreç durduysa (yeniden başlatma) eksik kalan emirler: planlanan
-        kapanışlardan hâlâ açık olanlar, planlanan açılışlardan hiç emri olmayanlar. Emir kimliği tekildir."""
+        """Günün kararından eksik kalan emirler. (1) Yeniden başlatma: karar yazılıp emirleri tamamlanmadan süreç
+        durduysa planlanan kapanışlardan hâlâ açık olanlar, açılışlardan hiç emri olmayanlar. (2) Gerçek kolda borsa
+        hatası: daha önce denenmiş kalem yalnız bütün denemeleri borsa düzeyinde düştüyse (`hata:` / `borsa:`, risk
+        reddi değil), `YENIDEN_ARALIK_MS` arayla yeniden denenir. Açılış en çok `YENIDEN_AZAMI` kez ve günün
+        `YENIDEN_SON_MS`'ine kadar, yalnız borsada o perp'te pozisyon yokken (belirsiz hata emri gerçekleştirmiş
+        olabilir; o durumda mutabakat yakalar). Kapanış riski azaltır: sınırsız, borsada pozisyon durdukça."""
+        simdi = int(self.saat() * 1000)
         with self.m.connect() as b:
             ayr = b.execute(select(paper_karar.c.ayrinti).where(paper_karar.c.id == karar_id)).scalar() or {}
-            ids = set(b.execute(select(paper_emir.c.istemci_emir_id).where(paper_emir.c.karar_id == karar_id)).scalars())
+            emirler = list(b.execute(select(paper_emir.c.id, paper_emir.c.istemci_emir_id)
+                                     .where(paper_emir.c.karar_id == karar_id)))
+            olaylar: dict[int, list] = defaultdict(list)     # emir → [(tür, ayrıntı, zaman)]; zaman düğüm saatiyle
+            for eid, tur, a, z in b.execute(select(paper_emir_olay.c.emir_id, paper_emir_olay.c.tur,
+                                                   paper_emir_olay.c.ayrinti, paper_emir_olay.c.zaman_ms)
+                                            .where(paper_emir_olay.c.emir_id.in_([e.id for e in emirler] or [-1]))):
+                olaylar[int(eid)].append((tur, a or {}, int(z)))
         acik = {p.anahtar: p for p in d.acik}
-        kapat = [(acik[(x["sembol"], int(x["olay_ms"]))], x.get("neden", "cikis")) for x in ayr.get("kapat", [])
-                 if (x["sembol"], int(x["olay_ms"])) in acik]
-        ac = [ck.Pozisyon(x["sembol"], int(x["olay_ms"]), int(x["giris_ms"]), int(x["cikis_ms"]), float(x["notional"]))
-              for x in ayr.get("ac", [])
-              if _istemci(gun, x["sembol"], int(x["olay_ms"]), "ac", "token", self.yurutucu.onek) not in ids]
+        perp: dict[str, dict] = {}
+        borsa: dict[str, float] | None = None
+
+        def denemeler(x: dict, islem: str) -> list:
+            t = _istemci(gun, x["sembol"], int(x["olay_ms"]), islem, "token", self.yurutucu.onek)
+            return [e for e in emirler if e.istemci_emir_id == t or e.istemci_emir_id.startswith(f"{t[:33]}R")]
+
+        def borsa_hatasi(e) -> bool:
+            o = olaylar.get(int(e.id), [])
+            return bool(o) and all(t == "ret" and any(str(g).startswith(("hata:", "borsa:")) for g in a.get("gerekceler", []))
+                                   for t, a, _ in o)
+
+        def borsada(sembol: str) -> bool:
+            nonlocal perp, borsa
+            perp = perp or self.borsa.perpler()
+            borsa = self.yurutucu.ist.pozisyonlar() if borsa is None else borsa
+            return abs(borsa.get(perp.get(sembol, {}).get("sembol", ""), 0.0)) > 1e-12
+
+        def tekrar(dn: list, son: bool) -> bool:
+            son_ret = max(z for e in dn for _, _, z in olaylar.get(int(e.id), [(None, None, simdi)]))
+            return (self.yurutucu.gercek and all(borsa_hatasi(e) for e in dn)
+                    and simdi - son_ret >= YENIDEN_ARALIK_MS and son)
+
+        kapat, ac = [], []
+        for x in ayr.get("kapat", []):
+            a = (x["sembol"], int(x["olay_ms"]))
+            dn = denemeler(x, "kapat") if a in acik else []
+            if a in acik and (not dn or (tekrar(dn, True) and borsada(x["sembol"]))):
+                kapat.append((acik[a], x.get("neden", "cikis")))
+        for x in ayr.get("ac", []):
+            a = (x["sembol"], int(x["olay_ms"]))
+            dn = denemeler(x, "ac")
+            if a in acik or (dn and not tekrar(dn, not d.durdurulmus and len(dn) <= YENIDEN_AZAMI
+                                               and simdi - gun < YENIDEN_SON_MS)):
+                continue
+            if dn and borsada(x["sembol"]):
+                _log.error("kilit_yeniden_deneme_borsada_pozisyon_var", sembol=x["sembol"], deneme=len(dn))
+                continue
+            ac.append(ck.Pozisyon(x["sembol"], a[1], int(x["giris_ms"]), int(x["cikis_ms"]), float(x["notional"])))
         if not kapat and not ac:
             return None
-        _log.warning("kilit_karar_devam", gun=gun, kapat=len(kapat), ac=len(ac))
-        return self._yurut(d, karar_id, gun, kapat, ac, self.borsa.perpler())
+        _log.warning("kilit_karar_devam", gun=gun, kapat=[p.sembol for p, _ in kapat], ac=[p.sembol for p in ac])
+        return self._yurut(d, karar_id, gun, kapat, ac, perp or self.borsa.perpler())
+
+    def _kimlik(self, taban: str) -> str:
+        """Emir kimliği tablo genelinde ve Binance'te tekildir. Aynı karar kalemi yeniden denenirse R1, R2… eki alır
+        (Binance ≤ 36 karakter)."""
+        with self.m.connect() as b:
+            n = b.execute(select(func.count()).select_from(paper_emir).where(
+                (paper_emir.c.istemci_emir_id == taban) | paper_emir.c.istemci_emir_id.like(f"{taban[:33]}R%"))).scalar()
+        return taban if not n else f"{taban[:33]}R{n}"
 
     # ------------------------------------------------------------------ saatlik
     def _saatlik(self, d: Durum_, saat_bas: int) -> dict:
@@ -539,7 +595,7 @@ class KilitDugumu:
         s = kim[len(ONEK):]
         bid, ask = kot[s]
         on = ask if q > 0 else bid
-        eid_ist = istemci or _istemci(gun, p.sembol, p.olay_ms, islem, bacak, self.yurutucu.onek)
+        eid_ist = istemci or self._kimlik(_istemci(gun, p.sembol, p.olay_ms, islem, bacak, self.yurutucu.onek))
         ist = EmirIstegi(kim, SINIF, q, on, self.kol.ad, int(self.saat() * 1000), eid_ist)
         taban = next((t for t, v in perp.items() if v["sembol"] == s), None)
         piy = Piyasa(pf.fiyatlar.get(kim, (bid + ask) / 2), int(self.saat() * 1000), 60_000, True,

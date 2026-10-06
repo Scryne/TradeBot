@@ -203,6 +203,42 @@ def kilit_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
     return paper_kontrol(a, simdi_ms, "kilit")
 
 
+TAKVIM_SABIR_MS = 40 * 60_000      # günün takvimi 00:05'te iner; düğüm 30 dk daha dener (canli/kilit.TAKVIM_SABIR_MS)
+
+
+def kilit_takvim_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
+    """Kilit kolunun açılım takvimi (DefiLlama) tazeliği. Düğüm her gün 00:05 UTC'de o günün sayfasını ham depoya
+    yazar; alınamazsa gün yalnız kapanışlarla kararlanır ve yeni olay açılmaz. Bu sessiz kalmasın: bugünün takvimi
+    00:40'a kadar gelmediyse uyarı, iki gün ve fazlası eksikse hata."""
+    from sqlalchemy import select
+
+    from tradebot.canli.gozetmen import dugum_kollari
+    from tradebot.db import ham_dosya, motor
+
+    gun_ms = 86_400_000
+    try:
+        m = motor(a)
+        if not dugum_kollari(m).get("kilit"):
+            return Sonuc("kilit_takvim", "OK", "kilit kolu henüz açılmadı")
+        with m.connect() as b:
+            son = b.execute(select(ham_dosya.c.anahtar).where(ham_dosya.c.kaynak == "defillama",
+                                                              ham_dosya.c.anahtar.like("unlocks/gunluk/%"))
+                            .order_by(ham_dosya.c.id.desc()).limit(1)).scalar()
+    except Exception as e:  # noqa: BLE001
+        return Sonuc("kilit_takvim", "HATA", f"{type(e).__name__}: {e}"[:200])
+    if son is None:
+        return Sonuc("kilit_takvim", "HATA", "açılım takvimi hiç indirilmedi")
+    simdi_ms = simdi_ms or int(time.time() * 1000)
+    bugun = simdi_ms // gun_ms * gun_ms
+    takvim = int(son.rsplit("/", 1)[-1])
+    eksik = (bugun - takvim) // gun_ms - (1 if simdi_ms - bugun < TAKVIM_SABIR_MS else 0)
+    tarih = datetime.fromtimestamp(takvim / 1000, UTC).strftime("%Y-%m-%d")
+    if eksik <= 0:
+        return Sonuc("kilit_takvim", "OK", f"son takvim {tarih}")
+    return Sonuc("kilit_takvim", "UYARI" if eksik == 1 else "HATA",
+                 f"son takvim {tarih}, {eksik} gün eksik: yeni kilit olayı açılmıyor (yalnız kapanış)", {"eksik": eksik})
+
+
 def kilit_gercek_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
     """Gerçek kilit kolunun (Faz 12, Binance) kalp atışı. Kol hiç açılmadıysa bilgi."""
     from tradebot.canli.gozetmen import dugum_kollari
@@ -397,8 +433,8 @@ def skalp_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
 def hepsi(a: Ayarlar) -> list[Sonuc]:
     kontroller = [dns_kontrol, saat_kontrol, veritabani_kontrol, disk_kontrol, sir_kontrol]
     if a.ortam == "host" and a.veritabani_url is not None:
-        kontroller += [paper_kontrol, kilit_kontrol, kilit_gercek_kontrol, doviz_kontrol, altin_kontrol, akis_kontrol,
-                       skalp_kontrol, gece_kontrol]
+        kontroller += [paper_kontrol, kilit_kontrol, kilit_takvim_kontrol, kilit_gercek_kontrol, doviz_kontrol,
+                       altin_kontrol, akis_kontrol, skalp_kontrol, gece_kontrol]
     if a.yedek_dizini is not None:
         kontroller.append(yedek_kontrol)
     if a.mt5_kopru_forex or a.mt5_kopru_viop:

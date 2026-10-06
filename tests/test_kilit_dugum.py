@@ -214,9 +214,16 @@ class SahteHesap:
 
     def __init__(self, borsa):
         self.borsa, self.poz, self.gelirler, self.emirler, self.dolmayan = borsa, {}, [], [], set()
+        self.hata: dict[str, int] = {}          # sembol → kaç emir daha belirsiz borsa hatasıyla düşer
+        self.hata_dolar: set[str] = set()       # belirsiz hata, ama emir borsada gerçekleşti
 
     def emir(self, sembol, miktar, istemci_id, azaltan):
         self.emirler.append((sembol, miktar, istemci_id, azaltan))
+        if self.hata.get(sembol, 0) > 0:
+            self.hata[sembol] -= 1
+            if sembol in self.hata_dolar:
+                self.poz[sembol] = self.poz.get(sembol, 0.0) + miktar
+            raise RuntimeError("BorsaHatasi: -1000: An unknown error occurred while processing the request.")
         if sembol in self.dolmayan:
             return {"adet": 0.0, "fiyat": 0.0, "durum": "EXPIRED"}
         self.poz[sembol] = self.poz.get(sembol, 0.0) + miktar
@@ -288,3 +295,57 @@ def test_gercek_btc_dolmazsa_tokenlar_geri_kapanir(gercek):
     saat.ms = D0 + 6 * 60_000
     d.tur()
     assert _net(m, d.kol.ad) == {} and hesap.pozisyonlar() == {}  # açıkta kısa kalmaz
+
+
+def _ccc(hesap):
+    return [(q, i) for s_, q, i, _ in hesap.emirler if s_ == "CCCUSDT"]
+
+
+def test_gercek_borsa_hatasi_aralikla_yeniden_denenir(gercek):
+    m, d, saat, borsa, hesap = gercek
+    hesap.hata["CCCUSDT"] = 1                                    # 2026-10-06 SEI: Binance Demo −1000
+    saat.ms = D0 + 6 * 60_000
+    d.tur()
+    assert "BINANCEF:CCCUSDT" not in _net(m, d.kol.ad) and len(_ccc(hesap)) == 1
+    saat.ms = D0 + 12 * 60_000                                   # 10 dakika dolmadı: deneme yok
+    assert "devam" not in d.tur() and len(_ccc(hesap)) == 1
+    saat.ms = D0 + 17 * 60_000
+    r = d.tur()["devam"]
+    assert r["dolum"] >= 1 and _ccc(hesap)[-1][1].endswith("R1")   # yeni, tekil emir kimliği
+    net = _net(m, d.kol.ad)
+    assert "BINANCEF:CCCUSDT" in net
+    assert hesap.pozisyonlar() == pytest.approx({k[len("BINANCEF:"):]: q for k, q in net.items()})   # borsa = defter
+    saat.ms = D0 + 40 * 60_000
+    assert d.tur() == {}                                         # dolan kalem bir daha denenmez
+
+
+def test_gercek_belirsiz_hata_gerceklestiyse_ikinci_emir_yok(gercek):
+    m, d, saat, borsa, hesap = gercek
+    hesap.hata["CCCUSDT"] = 1
+    hesap.hata_dolar.add("CCCUSDT")                              # hata döndü ama emir borsada doldu
+    saat.ms = D0 + 6 * 60_000
+    d.tur()
+    saat.ms = D0 + 17 * 60_000
+    assert "devam" not in d.tur() and len(_ccc(hesap)) == 1      # borsada pozisyon var: tekrar yok
+    saat.ms = D0 + S + 60_000
+    r = d.tur()["isaret"]
+    assert "BINANCEF:CCCUSDT" in r["mutabakat"]                  # fark mutabakatta: kol durur
+    assert d.defter.kol_olaylari(d.kol.ad, "durdur")[-1].ayrinti["neden"] == "mutabakat_gercek"
+
+
+def test_gercek_yeniden_deneme_sinirli(gercek):
+    m, d, saat, borsa, hesap = gercek
+    hesap.hata["CCCUSDT"] = 99
+    for dk in (6, 17, 28, 39, 50, 61, 72):
+        saat.ms = D0 + dk * 60_000
+        d.tur()
+    assert len(_ccc(hesap)) == 1 + kd.YENIDEN_AZAMI and "BINANCEF:CCCUSDT" not in _net(m, d.kol.ad)
+    assert len({i for _, i in _ccc(hesap)}) == len(_ccc(hesap))   # her deneme ayrı kimlik
+
+
+def test_paper_kolda_yeniden_deneme_yok(kur):
+    m, d, saat, borsa = kur
+    saat.ms = D0 + 6 * 60_000
+    d.tur()
+    saat.ms = D0 + 30 * 60_000
+    assert d.tur() == {}                                         # 6. olay tavana takıldı (risk reddi), tekrar yok

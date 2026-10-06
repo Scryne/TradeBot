@@ -20,6 +20,30 @@ def _db(ayar):
     return m
 
 
+def test_kilit_takvim_tazeligi(ayar):
+    from sqlalchemy import insert
+
+    from tradebot.db import ham_dosya, paper_kol
+
+    g = 86_400_000
+    gun = T // g * g
+    m = _db(ayar)
+    assert saglik.kilit_takvim_kontrol(ayar, gun).durum == "OK"            # kilit kolu yok: bilgi
+    with m.begin() as b:
+        b.execute(insert(paper_kol).values(kol="d13:kilit_kisa@kilit_perp@1d", acilis=datetime.now(UTC),
+                                           baslangic_ms=gun, baslangic_ozkaynak=1e5, sinif="A", kod_surumu="t",
+                                           tanim={"grup_tanim": {"dugum": "kilit"}}))
+    assert saglik.kilit_takvim_kontrol(ayar, gun).durum == "HATA"          # hiç indirilmedi
+    with m.begin() as b:
+        b.execute(insert(ham_dosya).values(kaynak="defillama", anahtar=f"unlocks/gunluk/{gun}", yol="x", sha256="a" * 64,
+                                           boyut=1, indirildi=datetime.now(UTC)))
+    assert saglik.kilit_takvim_kontrol(ayar, gun + 3_600_000).durum == "OK"
+    assert saglik.kilit_takvim_kontrol(ayar, gun + g + 30 * 60_000).durum == "OK"     # yarının takvimi 00:40'a kadar
+    r = saglik.kilit_takvim_kontrol(ayar, gun + g + 50 * 60_000)
+    assert r.durum == "UYARI" and "yalnız kapanış" in r.ayrinti
+    assert saglik.kilit_takvim_kontrol(ayar, gun + 2 * g + 50 * 60_000).durum == "HATA"
+
+
 def test_paper_kalp_atisi(ayar):
     m = _db(ayar)
     assert saglik.paper_kontrol(ayar, T).durum == "HATA"  # hiç işaret yok

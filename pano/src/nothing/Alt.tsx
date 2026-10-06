@@ -83,6 +83,8 @@ export function Defter({ p }: { p: Pano }) {
 const AD: Record<string, string> = {
   dns: 'DNS', saat: 'Saat', veritabani: 'Veritabanı', disk: 'Disk', sirlar: 'Sırlar', paper: 'Paper kalp atışı',
   gece_isi: 'Gece işi', yedek: 'Yedek', mt5: 'MT5 köprüleri', saglik: 'Sağlık bekçisi',
+  kilit: 'Kilit kolu', kilit_takvim: 'Kilit takvimi', kilit_gercek: 'Kilit Demo', doviz: 'Döviz kolu',
+  altin: 'Altın M15', akis: 'FOMC dolar', skalp: 'Skalp',
 }
 
 const DURUM = {
