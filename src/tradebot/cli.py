@@ -288,12 +288,14 @@ def veri_binance(sinir: int = typer.Option(0, help="Yalnız ilk N sembol (deneme
 def veri_um(metrics: bool = typer.Option(True, help="Günlük 5 dk OI dosyaları (hacim eşiğini geçen aylar)"),
             asgari_hacim: float = typer.Option(3e8, help="OI indirilecek ayın asgari quote hacmi (USDT)"),
             sinir: int = typer.Option(0, help="Yalnız ilk N sembol (deneme); 0 = hepsi"),
-            isci: int = typer.Option(16, help="Paralel sembol")) -> None:
+            isci: int = typer.Option(16, help="Paralel sembol"),
+            semboller: str = typer.Option("", help="Yalnız bu semboller (virgülle; ör. SOLUSDT,YFIUSDT)")) -> None:
     """Binance USDT-M perp arşivi (kaldırılanlar dahil): 1h mum, funding, saatlik OI → data/um/."""
     from tradebot.veri.binance_um import BinanceUM
 
     a, m = _veri_baglam()
-    _yazdir(BinanceUM(a.veri_dizini, m, isci).hepsi(metrics, asgari_hacim, sinir or None))
+    _yazdir(BinanceUM(a.veri_dizini, m, isci).hepsi(metrics, asgari_hacim, sinir or None,
+                                                       [x for x in semboller.split(",") if x] or None))
 
 
 @veri_uygulama.command("yahoo")

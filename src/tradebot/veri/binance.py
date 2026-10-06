@@ -37,8 +37,9 @@ def kline_zip_oku(icerik: bytes) -> pl.DataFrame:
         ham = z.read(z.namelist()[0])
     ilk = ham.split(b"\n", 1)[0]
     baslik = not ilk[:1].isdigit()
+    # Tip çıkarımı yok: bazı dosyalarda ilk satırlar tamsayı görünüp sonradan ondalık geliyor (SOLUSDT perp, 2026-10-06)
     df = pl.read_csv(io.BytesIO(ham), has_header=False, skip_rows=1 if baslik else 0, new_columns=KLINE_KOLON,
-                     schema_overrides={"acilis": pl.Int64, "kapanis": pl.Int64})
+                     infer_schema_length=0, schema_overrides={"acilis": pl.Int64, "kapanis": pl.Int64})
     if df.is_empty():
         return df
     bolen = zaman_birimi_ms(int(df["acilis"][0]))

@@ -118,8 +118,9 @@ class BinanceUM:
                 oi_gun = len(op)
         return {"sembol": s, "bar": bar.height, "funding": len(fp), "oi_gun": oi_gun}
 
-    def hepsi(self, metrics: bool = True, asgari_hacim: float = 3e8, sinir: int | None = None) -> dict:
-        ss = self.semboller()[:sinir] if sinir else self.semboller()
+    def hepsi(self, metrics: bool = True, asgari_hacim: float = 3e8, sinir: int | None = None,
+              secili: list[str] | None = None) -> dict:
+        ss = secili or (self.semboller()[:sinir] if sinir else self.semboller())
         sonuc, hata = [], []
         with ThreadPoolExecutor(max_workers=self.isci) as h:
             fs = {h.submit(self.sembol, s, metrics, asgari_hacim): s for s in ss}

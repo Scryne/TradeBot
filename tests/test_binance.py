@@ -36,3 +36,11 @@ def test_baslik_satiri_atlanir():
 def test_funding():
     df = funding_zip_oku(_zip("calc_time,funding_interval_hours,last_funding_rate\n1704067200000,8,0.0001\n"))
     assert df.to_dicts() == [{"zaman_ms": 1704067200000, "oran": 0.0001, "aralik_saat": 8}]
+
+
+def test_tamsayi_gorunen_sutun_sonra_ondalik():
+    satirlar = "".join(f"{1704067200000 + i * 3600000},100,101,99,100,{i},{1704070799999 + i * 3600000},1000,5,1,100,0\n"
+                       for i in range(150))
+    satirlar += "1704607200000,100,101,99,100,7893.5,1704610799999,1017592.90,5,1.5,100.25,0\n"
+    df = kline_zip_oku(_zip(satirlar))
+    assert len(df) == 151 and df["volume"][-1] == 7893.5 and df["quote_volume"][-1] == 1017592.90

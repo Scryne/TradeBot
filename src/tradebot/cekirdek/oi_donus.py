@@ -47,7 +47,9 @@ def ozellik(open_: np.ndarray, close: np.ndarray, qv: np.ndarray, oi: np.ndarray
     doi = np.full(n, np.nan)
     with np.errstate(invalid="ignore", divide="ignore"):
         doi[1:] = oi[1:] / oi[:-1] - 1
-    return {"z": bar / sig, "doi": doi, "hacim": hacim}
+    with np.errstate(invalid="ignore", divide="ignore"):
+        z = bar / sig
+    return {"z": z, "doi": doi, "hacim": hacim}
 
 
 def olay_mu(z: float, doi: float, hacim: float, kural: DonusKural) -> bool:
