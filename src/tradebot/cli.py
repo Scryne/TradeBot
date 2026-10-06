@@ -1175,7 +1175,7 @@ def pano_calis(
         from tradebot.pano.ornek import kur as ornek_kur
 
         dizin = Path(tempfile.mkdtemp(prefix="pano_ornek_"))
-        m = ornek_kur(f"sqlite:///{dizin / 'ornek.db'}", int(time.time() * 1000), veri_dizini=dizin)
+        m = ornek_kur(f"sqlite:///{dizin / 'ornek.db'}", int(time.time() * 1000), veri_dizini=dizin, kilit=True)
         a = a.model_copy(update={"veri_dizini": dizin})
 
         from tradebot.pano.sunucu import SaglikOnbellek

@@ -82,7 +82,10 @@ export function Kahraman({ p }: { p: Pano }) {
             {d.bayat ? '--' : String(d.kol).padStart(2, '0')}
           </p>
           <div className="pb-2">
-            <p className="etiket text-ikincil">kol çalışıyor</p>
+            <p className="etiket text-ikincil">
+              kol çalışıyor
+              {d.durdurulan > 0 && <span className="text-ucuncul"> · {d.durdurulan} durduruldu</span>}
+            </p>
             <h1 id="durum-baslik" aria-live="polite" className={`mt-2 text-baslik leading-tight text-balance ${cumleRenk}`}>
               <span className="sr-only">{d.kol} kol çalışıyor. </span>
               {cumle}

@@ -40,7 +40,10 @@ function ciftler(kollar: Kol[]): { ciftler: Cift[]; tekler: Kol[] } {
 }
 
 export function Kollar({ p, onSec }: { p: Pano; onSec: (kol: string) => void }) {
-  const { ciftler: cs, tekler } = ciftler(p.kollar)
+  // Kilit kolları kendi bölümünde (Kilit.tsx); burada yalnız trend turnuvası
+  const trend = p.kollar.filter((k) => k.strateji !== 'kilit_kisa')
+  const { ciftler: cs, tekler } = ciftler(trend)
+  const durdu = trend.filter((k) => k.durduruldu).length
   return (
     <section aria-labelledby="kollar-baslik">
       <BolumBasi id="kollar-baslik" baslik="Kollar">
@@ -62,6 +65,12 @@ export function Kollar({ p, onSec }: { p: Pano; onSec: (kol: string) => void }) 
       <p className="mt-3 max-w-[62ch] text-govde-sm text-pretty text-ikincil">
         Her strateji iki kopya koşuyor: biri Jev vetosuyla, biri vetosuz. Aradaki fark Jev'in değeri. Sıralama Jev'li kopyanın
         başlangıçtan getirisine göre.
+        {durdu > 0 && (
+          <span className="text-birincil">
+            {' '}
+            {durdu === trend.length ? 'Bu kolların hepsi durduruldu;' : `${durdu} kol durduruldu;`} tablo son durumlarını gösteriyor.
+          </span>
+        )}
       </p>
 
       <table className="mt-8 w-full border-collapse text-left">
@@ -111,7 +120,7 @@ export function Kollar({ p, onSec }: { p: Pano; onSec: (kol: string) => void }) 
                   </span>
                 </td>
                 <td className="hidden py-4 pl-4 text-right md:table-cell">
-                  <DurumEtiketi d={k.durum} />
+                  <DurumEtiketi d={k.durum} durduruldu={k.durduruldu} />
                 </td>
               </tr>
             )

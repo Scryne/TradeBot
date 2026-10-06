@@ -1,7 +1,7 @@
 ---
 version: alpha
-name: TradeBot · Nothing denemesi
-description: TradeBot panosunun monokrom, tipografik, endüstriyel deneme varyantı (dal deneme/nothing-pano); tek kullanıcı, masaüstü ve telefon, yalnız Tailscale.
+name: TradeBot
+description: Scryne'ın otonom paper trade sisteminin özel kontrol panosu; monokrom, tipografik, endüstriyel. Tek kullanıcı, masaüstü ve telefon, yalnız Tailscale.
 colors:
   siyah: "#000000"
   yuzey: "#111111"
@@ -84,19 +84,18 @@ components:
     rounded: "0px"
 ---
 
-# TradeBot · Nothing denemesi
+# TradeBot
 
-> **Deneme dalı.** Bu dosya yalnız `deneme/nothing-pano` dalında geçerli; `main`'deki Haliç gecesi `DESIGN.md`'si
-> yerinde. Varyant `pano/nothing.html`'de, karşılaştırma için eski pano aynı dalda `/` adresinde duruyor. Kaynak
-> stil: `nothing-design` skill'i (yerel geçersiz kılmalarıyla).
+Kaynak stil: `nothing-design` skill'i (yerel geçersiz kılmalarıyla). 2026-10-06'da Scryne'ın seçimiyle panonun tek
+dili oldu; önceki "Haliç gecesi" cam teması ve uyum token'ları kaldırıldı.
 
 ## Overview
 
 Pano bir ölçüm aletidir: karanlık odada bir enstrüman paneli, beyaz veriler siyahın üstünde parlıyor. Beş saniyede üç
-soruya cevap verir: sistem sağlıklı mı, son kararlar ne, kollar nasıl gidiyor. Süs yoktur: gradient, cam, gölge, blur
+soruya cevap verir: sistem sağlıklı mı, ana bot (kilit açılımı kolu) nasıl gidiyor, sıradaki olay ne. Süs yoktur: gradient, cam, gölge, blur
 yok. Hiyerarşiyi boyut, boşluk ve gri tonları kurar; renk bir olaydır.
 
-Değişmeyen içerik kuralları (main'deki DESIGN.md'den aynen): pano salt okunurdur; sır gösterilmez; her zaman damgası
+Değişmeyen içerik kuralları: pano salt okunurdur; sır gösterilmez; her zaman damgası
 İstanbul ve UTC birlikte yazılır; veri 2 saatten bayatsa bu açıkça söylenir; sayı biçimi Türkçedir (binlik nokta,
 ondalık virgül, eksi U+2212). Yalnız koyu tema.
 
@@ -122,7 +121,12 @@ ondalık virgül, eksi U+2212). Yalnız koyu tema.
 
 ## Layout
 
-- Tek sayfa, önem sırasıyla: kahraman + karar şeridi, kollar, risk ve Jev (7/5), araştırma defteri, sağlık.
+- Tek sayfa, önem sırasıyla: kahraman, kilit açılımı (ana bot), karar şeridi, kollar, risk ve Jev (7/5), araştırma
+  defteri, sağlık.
+- Kilit bölümü: üstte 7/5 (paper ve Demo yan yana + ortak getiri çizgisi / gerçek para kapısı), altında açık olaylar
+  tam genişlik, en altta 7/5 (yaklaşan açılımlar / sonuçlanan olaylar + karar günlüğü).
+- Elle durdurulan kollar çalışan sayılmaz: kahraman yalnız çalışanları sayar, karar şeridinde görünmezler, kollar
+  tablosunda `[DURDURULDU]` etiketiyle son durumlarıyla kalırlar.
 - Asimetri: kahramanda büyük sol (sayı + cümle), dar sağ (turnuva cetveli + 24 saat sayaçları).
 - Gruplama önce boşlukla: bölüm arası 96 px, grup arası 32–48 px, öğe arası 16 px. Ayırıcı çizgi yalnız yapısal olarak
   aynı satırların olduğu listelerde. Kahraman kutulanmaz, siyahın üstünde durur.
@@ -142,9 +146,14 @@ Kartlar 12 px, teknik öğeler 4 px, etiket ve buton hap. Segmentler ve şerit n
 - **Segmentli çubuk (imza):** ayrık bloklar, 2 px aralık. Turnuva cetveli 84 gün = 84 segment; maruziyet 10 segment;
   pozisyon merkezden iki yana 12'şer segment, 10. segment tavandır, tavanı aşan segmentler `kirmizi`. Çubuğun yanında
   her zaman sayı yazar: çubuk oran, sayı kesinlik.
+- **Kanıt kapısı:** 26 hafta = 26 segment (gerçek para kapısının asgari paper süresi); yanında `n / 26 hafta` ve PSR.
+- **Olay zaman çubuğu:** girişten açılıma her gün bir segment (7); geçen günler `ekran`.
+- **Açılım takvimi:** önümüzdeki 31 gün = 31 nokta, bugün çerçeveli; dolu nokta girilebilir açılım, `pasif` nokta
+  yalnız perp'siz açılım. Takvim kaynağı ve günü her zaman yazılır.
 - **Karar şeridi:** satırlar kollar, sütunlar son 72 saat; her hücre bir nokta, noktanın saydamlığı brüt maruziyet.
   Dolum noktası büyür, veto üstte `amber` çentik, fren altta `kirmizi` çizgi, sağ kenarda `ekran` şimdi çizgisi.
-- **Durum etiketi:** köşeli parantezli metin: `[NORMAL]`, `[GÜNLÜK FREN]`, `[VETO]`. Bildirim balonu (toast) yok.
+- **Durum etiketi:** köşeli parantezli metin: `[NORMAL]`, `[GÜNLÜK FREN]`, `[VETO]`, `[DURDURULDU]`, `[AÇIK]`,
+  `[GİRİŞ 10 EKİ]`. Paper ile Demo ayrıştığında satır içinde `[DEMO]` önekiyle söylenir (amber değil: amber Jev'in). Bildirim balonu (toast) yok.
 - **Yükleniyor:** `[YÜKLENİYOR]` metni; iskelet ekran yok. **Hata:** `[HATA]` önekli satır içi metin, kırmızı arka
   plan yok.
 - İkonlar Lucide, ince çizgi, 16 px; dolgulu ikon ve emoji yok.

@@ -29,8 +29,26 @@ export function bps(x: number | null | undefined): string {
   return `${x < 0 ? EKSI : ''}${sayiBicim(1).format(Math.abs(x))} bps`
 }
 
-export function para(x: number): string {
-  return `${x < 0 ? EKSI : ''}${sayiBicim(0).format(Math.abs(x))} $`
+export function para(x: number, basamak = 0): string {
+  const s = sayiBicim(basamak).format(Math.abs(x))
+  return `${x < 0 && s !== sayiBicim(basamak).format(0) ? EKSI : ''}${s} $`
+}
+
+/** İşaretli tutar: +27 $, −854 $ (sıfır işaretsiz). */
+export function paraIsaretli(x: number | null | undefined, basamak = 0): string {
+  if (x == null || !Number.isFinite(x)) return '—'
+  const s = sayiBicim(basamak).format(Math.abs(x))
+  if (s === sayiBicim(basamak).format(0)) return `${s} $`
+  return `${x > 0 ? '+' : EKSI}${s} $`
+}
+
+/** Geleceğe kalan süre: "4 sa 12 dk", "2 gün 3 sa". */
+export function kalan(ms: number, simdi: number): string {
+  const dk = Math.max(0, Math.round((ms - simdi) / 60_000))
+  if (dk < 60) return `${dk} dk`
+  const sa = Math.floor(dk / 60)
+  if (sa < 48) return `${sa} sa ${dk % 60} dk`
+  return `${Math.floor(sa / 24)} gün ${sa % 24} sa`
 }
 
 const tr = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('tr-TR', { timeZone: 'Europe/Istanbul', ...o })
@@ -60,22 +78,38 @@ const STRATEJI: Record<string, string> = {
   donchian_ls: 'Donchian L/S',
   agresif: 'Agresif',
   portfoy: 'Portföy',
+  kilit_kisa: 'Kilit açılımı',
+  kanal_kirilim: 'Kanal kırılımı',
+  mikro_ivme: 'Mikro ivme',
+  fomc_dolar: 'FOMC dolar',
+  doviz_tasima: 'Döviz taşıma',
 }
 
 export const stratejiAdi = (s: string) => STRATEJI[s] ?? s
 
 /** Kol kısa adı: "Donchian L/S · 4h · D2" */
-export function kolAdi(k: { strateji: string; zd: string | null; dalga: string; tur: string }): string {
+export function kolAdi(k: { strateji: string; zd: string | null; dalga: string; tur: string; hesap?: string | null }): string {
   if (k.tur !== 'kol') return stratejiAdi(k.strateji)
-  return [stratejiAdi(k.strateji), k.zd, k.dalga.toUpperCase()].filter(Boolean).join(' · ')
+  return [stratejiAdi(k.strateji), k.zd, k.dalga.toUpperCase(), k.hesap === 'gercek' ? 'Demo' : null].filter(Boolean).join(' · ')
 }
 
-const KISA: Record<string, string> = { ma_yon: 'MA', tsmom: 'TSM', donchian_ls: 'DON', agresif: 'Agresif', portfoy: 'Portföy' }
+const KISA: Record<string, string> = {
+  ma_yon: 'MA',
+  tsmom: 'TSM',
+  donchian_ls: 'DON',
+  agresif: 'Agresif',
+  portfoy: 'Portföy',
+  kilit_kisa: 'KİLİT',
+  kanal_kirilim: 'KANAL',
+  mikro_ivme: 'SKALP',
+  fomc_dolar: 'FOMC',
+  doviz_tasima: 'TAŞIMA',
+}
 
 /** Dar ekran için: "DON 4h D2" */
-export function kolKisa(k: { strateji: string; zd: string | null; dalga: string; tur: string }): string {
+export function kolKisa(k: { strateji: string; zd: string | null; dalga: string; tur: string; hesap?: string | null }): string {
   if (k.tur !== 'kol') return KISA[k.strateji] ?? k.strateji
-  return [KISA[k.strateji] ?? k.strateji, k.zd, k.dalga.toUpperCase()].filter(Boolean).join(' ')
+  return [KISA[k.strateji] ?? k.strateji, k.zd, k.dalga.toUpperCase(), k.hesap === 'gercek' ? 'DEMO' : null].filter(Boolean).join(' ')
 }
 
 export const ENSTRUMAN: Record<string, string> = { 'BINANCE:BTCUSDT': 'BTC', 'BINANCE:ETHUSDT': 'ETH' }

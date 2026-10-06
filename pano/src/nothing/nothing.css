@@ -6,10 +6,10 @@
 @import "@fontsource/space-mono/700.css";
 @import "@fontsource-variable/doto/full.css"; /* wght + ROND ekseni: yuvarlak nokta */
 
-/* Deneme varyantı yalnız koyu temadır (DESIGN.md › Overview). */
+/* Pano yalnız koyu temadır (DESIGN.md › Overview). */
 @custom-variant dark (&:is(*));
 
-/* DESIGN.md frontmatter (deneme/nothing-pano dalı); değerler oradan. */
+/* DESIGN.md frontmatter; değerler oradan. */
 @theme {
   --color-siyah: #000000;
   --color-yuzey: #111111;
@@ -44,23 +44,6 @@
 
   /* Gölge yok (DESIGN.md › Elevation). shadcn sheet'in shadow-lg'si de düz. */
   --shadow-lg: 0 0 #0000;
-
-  /* Eski bileşen uyumu: kol çekmecesi (KolCekmece) main'deki token adlarını kullanıyor; deneme için Nothing
-     değerlerine bağlandı. Varyant benimsenirse çekmece yeni adlara taşınır, bu blok silinir. */
-  --color-gece: var(--color-siyah);
-  --color-sis: var(--color-birincil);
-  --color-kursun: var(--color-ikincil);
-  --color-soluk: var(--color-ucuncul);
-  --color-sodyum: var(--color-amber);
-  --color-kazanc: var(--color-yesil);
-  --color-kayip: var(--color-kirmizi-metin);
-  --font-display: var(--font-sans);
-  --text-display-md: 24px;
-  --text-body-sm: 13px;
-  --text-data-lg: 24px;
-  --tracking-display-md: -0.01em;
-  --radius-control: 4px;
-  --radius-panel: 12px;
 }
 
 @theme inline {
@@ -138,22 +121,6 @@
   .kart {
     background: var(--color-yuzey);
     border-radius: var(--radius-kart);
-  }
-  /* Eski bileşen uyumu (KolCekmece) */
-  .etiket-ust {
-    font-family: var(--font-mono);
-    font-size: var(--text-etiket);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    line-height: 1.2;
-  }
-  .sayi {
-    font-family: var(--font-mono);
-    font-variant-numeric: tabular-nums slashed-zero;
-  }
-  .cam {
-    background: var(--color-yuzey);
-    border-color: var(--color-cizgi-belirgin);
   }
 }
 

@@ -14,7 +14,7 @@ SIMDI = 1_790_608_000_000
 @pytest.fixture(scope="module")
 def ortam(tmp_path_factory):
     d = tmp_path_factory.mktemp("pano")
-    m = kur(f"sqlite:///{d / 'o.db'}", SIMDI, gun=10, veri_dizini=d)
+    m = kur(f"sqlite:///{d / 'o.db'}", SIMDI, gun=10, veri_dizini=d, kilit=True)
     return m, d
 
 
@@ -29,7 +29,7 @@ def test_kol_bilgi_adlari_ayirir():
 def test_pano_ozeti_defterle_tutarli(ortam):
     m, d = ortam
     p = veri.pano(m, SIMDI, d, "test")
-    assert p["durum"]["kol"] == 12 and not p["durum"]["bayat"]
+    assert p["durum"]["kol"] == 14 and not p["durum"]["bayat"]
     assert p["turnuva"]["gun"] == 11 and p["turnuva"]["toplam_gun"] == 84
     # şerit: her kol bir satır, 72 saat; maruziyet özkaynak işaretinden
     assert len(p["serit"]["saatler"]) == veri.SERIT_SAAT
@@ -73,6 +73,62 @@ def test_kol_ayrintisi_ikiziyle(ortam):
     assert veri.kol(m, "yok@x", SIMDI) is None
 
 
+def test_kilit_kollari_olay_sonucu_ve_takvim(ortam):
+    from tradebot.pano import kilit as pk
+    from tradebot.pano.ornek import KILIT
+
+    m, d = ortam
+    k = veri.pano(m, SIMDI, d)["kilit"]
+    paper, demo = k["kollar"]
+    assert (paper["kol"], paper["gercek"], demo["kol"], demo["ortam"]) == (KILIT, False, KILIT + "#gercek", "demo")
+    assert k["kural"]["giris"] == -7 and k["kapi"]["asgari_hafta"] == 26
+    assert k["sonraki_karar_ms"] > SIMDI and k["sonraki_karar_ms"] % pk.GUN_MS == pk.KARAR_GECIKME_MS
+    # paper: MOVE ve CARV açılım gününde kapandı, SEI ve STRK açık; olay sonucu nakit + açık bacak değeri
+    assert {e["sembol"] for e in paper["acik"]} == {"SEI", "STRK"}
+    kap = {e["sembol"]: e for e in paper["kapanan"]}
+    assert set(kap) == {"MOVE", "CARV"} and all(e["neden"] == "cikis" and e["btc_dahil"] for e in kap.values())
+    dkap = {e["sembol"]: e for e in demo["kapanan"]}                  # Demo'da olay = yalnız token bacağı
+    assert dkap["CARV"]["sonuc"] < 0 < dkap["MOVE"]["sonuc"]          # token düştüyse kısa kazanır
+    assert paper["kapanan_ozet"] == {"adet": 2, "kazanan": sum(e["sonuc"] > 0 for e in kap.values()),
+                                     "toplam": pytest.approx(sum(e["sonuc"] for e in kap.values()))}
+    assert paper["fonlama"] > 0                                       # kısa bacak funding alır (örnek)
+    # Demo: SEI kararda var ama borsa düşürdü → dolum yok, ret gerekçesi görünür; BTC koruması olaya bağlı değil
+    sei = next(x for kr in demo["kararlar"] for x in kr["ac"] if x["sembol"] == "SEI")
+    assert sei["dolum"] is False and "-1000" in demo["retler"][0]["gerekce"]
+    assert {e["sembol"] for e in demo["acik"]} == {"STRK"} and not any(e["btc_dahil"] for e in demo["acik"])
+    # yaklaşan: takvim hamdan; durum paper koluna göre
+    y = {e["sembol"]: e["durum"] for e in k["yaklasan"]["olaylar"]}
+    assert y == {"SEI": "acik", "STRK": "acik", "ARB": "kacti", "QUAI": "perp_yok", "ZRO": "bekliyor",
+                 "APR": "bekliyor", "EIGEN": "bekliyor"}
+
+
+def test_durdurulan_kol_calisan_sayilmaz(tmp_path):
+    from sqlalchemy import insert
+
+    from tradebot.db import paper_kol_olay
+
+    m = kur(f"sqlite:///{tmp_path / 'o.db'}", SIMDI, gun=4)
+    kol = "ma_yon@kripto_btc_eth@1h"
+    once = veri.pano(m, SIMDI)
+    with m.begin() as b:
+        b.execute(insert(paper_kol_olay).values(kol=kol, zaman_ms=SIMDI - 1000, tur="durdur", kod_surumu="t",
+                                                ayrinti={"neden": "scryne_hepsini_kapat"}))
+    p = veri.pano(m, SIMDI)
+    assert (p["durum"]["kol"], p["durum"]["durdurulan"]) == (once["durum"]["kol"] - 1, 1)
+    assert kol not in {s["kol"] for s in p["serit"]["satirlar"]}
+    assert next(k for k in p["kollar"] if k["kol"] == kol)["durduruldu"]
+    k = veri.kol_bilgi("d13:kilit_kisa@kilit_perp@1d#gercek")
+    assert (k["zd"], k["hesap"], k["strateji"], k["dalga"]) == ("1d", "gercek", "kilit_kisa", "d13")
+
+
+def test_kilit_durdurulan_kol_gizlenir():
+    from tradebot.pano.kilit import durduruldu
+
+    assert durduruldu([("durdur", {"neden": "scryne_hepsini_kapat"})])
+    assert not durduruldu([("durdur", {"neden": "x"}), ("devam", {"neden": "y"})])
+    assert not durduruldu([("durdur", {"neden": "mutabakat"})])       # mutabakat durdurması elle sayılmaz
+
+
 def test_ornek_veri_canliya_yazmaz():
     with pytest.raises(ValueError):
         kur("postgresql+psycopg://x@y/z", SIMDI)
@@ -89,7 +145,7 @@ def istemci(ortam):
 
 def test_api_salt_okunur_ve_basliklar(istemci):
     r = istemci.get("/api/pano")
-    assert r.status_code == 200 and r.json()["durum"]["kol"] == 12
+    assert r.status_code == 200 and r.json()["durum"]["kol"] == 14
     assert "frame-ancestors 'none'" in r.headers["content-security-policy"]
     assert r.headers["cache-control"] == "no-store"
     for yontem in ("post", "put", "delete", "patch"):

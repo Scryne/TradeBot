@@ -1,13 +1,14 @@
 import { useState } from 'react'
 
-import { KolCekmece } from '@/components/KolCekmece'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ikiSaat } from '@/lib/bicim'
 import { usePano, useSaglik } from '@/lib/veri'
 
 import { Defter, SaglikBolumu, UstCubuk } from './Alt'
+import { KolCekmece } from './Cekmece'
 import { Jev } from './Jev'
 import { Kahraman } from './Kahraman'
+import { Kilit } from './Kilit'
 import { Kollar } from './Kollar'
 import { Risk } from './Risk'
 import { Serit } from './Serit'
@@ -41,6 +42,9 @@ export default function App() {
           <>
             <div className={`${KAP} belir`}>
               <Kahraman p={p} />
+            </div>
+            <div className={KAP}>
+              <Kilit p={p} />
             </div>
             <div className={KAP}>
               <Serit p={p} onSec={setSecili} />

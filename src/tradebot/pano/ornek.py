@@ -38,7 +38,9 @@ def _dt(ms: int) -> datetime:
     return datetime.fromtimestamp(ms / 1000, UTC)
 
 
-def kur(url: str, simdi_ms: int, gun: int = 16, veri_dizini: Path | None = None, tohum: int = 7) -> Engine:
+def kur(url: str, simdi_ms: int, gun: int = 16, veri_dizini: Path | None = None, tohum: int = 7,
+        kilit: bool = False) -> Engine:
+    """`kilit`: kilit kolu (paper + Demo) ve takvimi de kurulur (pano; gözetmen testleri yalnız paper düğümü ister)."""
     if not url.startswith("sqlite"):
         raise ValueError("örnek veri yalnız SQLite'a yazılır")
     m = create_engine(url, future=True)
@@ -112,6 +114,8 @@ def kur(url: str, simdi_ms: int, gun: int = 16, veri_dizini: Path | None = None,
                     kol=k, zaman_ms=int(t[i]), ozkaynak=oz, nakit=nakit,
                     pozisyon={BTC: float(poz[0]), ETH: float(poz[1])} if poz.any() else {},
                     fiyat={BTC: float(p[0]), ETH: float(p[1])} if poz.any() else {}))
+        if kilit:
+            _kilit(b, t, fiyat[:, 0], rng)
         b.execute(insert(paper_dagitim).values(
             portfoy="portfoy@kripto_btc_eth", hafta_ms=int(bas), hesap_ms=int(bas) + 2000, kod_surumu="ornek", kaldirac=0.0,
             ayrinti={"kollar": {k + "+jev": {"sinif": "B", "agirlik": 0.0, "katsayi": 0.0} for k in KAYNAKLAR}}))
@@ -152,4 +156,118 @@ def kur(url: str, simdi_ms: int, gun: int = 16, veri_dizini: Path | None = None,
             (d / f"{kol.replace('@', '__')}.json").write_text(json.dumps(
                 {"plan": plan, "kol": kol, "karar": karar, "en_iyi": {"sharpe": sh, "yillik_bilesik": sh / 10},
                  "dsr": {"dsr": 0.3}}), encoding="utf-8")
+        if kilit:
+            _kilit_ham(m, Path(veri_dizini), son)
     return m
+
+
+# ---------------------------------------------------------------------------------------------------- kilit kolu
+GUN = 24 * SAAT
+KILIT = "d13:kilit_kisa@kilit_perp@1d"
+KILIT_TANIM = {"zd": "1d", "strateji": "kilit_kisa", "grup": "kilit_perp", "sinif": "A",
+               "parametre": {"giris": -7, "cikis": 0, "notional": 0.05, "azami_btc": 0.5, "azami_brut": 1.0},
+               "grup_tanim": {"yon": "kisa_notr", "dugum": "kilit", "kimlikler": ["BINANCEF:*USDT"],
+                              "olay": {"asgari_oran": 0.005, "kategoriler": ["insiders", "privateSale"]}}}
+# (sembol, açılım günü (bugüne göre), giriş fiyatı, giriş → açılım token getirisi). Açılımı gelecekte olanlar açık.
+KILIT_OLAY = [("MOVE", -2, 0.118, -0.061), ("CARV", -1, 0.214, 0.083), ("SEI", 2, 0.287, -0.022),
+              ("STRK", 4, 0.131, 0.011)]
+KILIT_TAKVIM = [("SEI", 2, 0.0106, "insiders"), ("STRK", 4, 0.0208, "privateSale"), ("ARB", 6, 0.0093, "insiders"),
+                ("QUAI", 7, 0.0096, "insiders"), ("ZRO", 11, 0.0236, "insiders"), ("APR", 15, 0.1167, "privateSale"),
+                ("EIGEN", 23, 0.029, "insiders")]
+
+
+def _kilit(b, t: np.ndarray, btc: np.ndarray, rng) -> None:
+    """Kilit kolu (paper + Demo) örneği: kapanmış ve açık olaylar, günlük kararlar, funding; Demo'da emri borsa
+    düşürür (2026-10-06'da SEI'de gerçekte de oldu: −1000)."""
+    gun0 = int(t[-1]) // GUN * GUN
+    olaylar = [(s_, gun0 + g * GUN, gun0 + (g - 7) * GUN, px, r) for s_, g, px, r in KILIT_OLAY
+               if gun0 + (g - 7) * GUN > int(t[0])]
+    for kol, oz0, gercek in ((KILIT, 100_000.0, False), (KILIT + "#gercek", 1_000.0, True)):
+        grup = KILIT_TANIM["grup_tanim"] | ({"dugum": "kilit_gercek", "ortam": "demo"} if gercek else {})
+        b.execute(insert(paper_kol).values(kol=kol, acilis=_dt(int(t[0])), baslangic_ms=int(t[0]), baslangic_ozkaynak=oz0,
+                                           sinif="A", tanim=KILIT_TANIM | {"grup_tanim": grup}, kod_surumu="ornek"))
+        dolum: list[tuple[int, str, float, float, dict]] = []
+        ac: dict[int, list[dict]] = {}
+        kapat: dict[int, list[dict]] = {}
+        for s_, olay_ms, giris, px, getiri in olaylar:
+            perp = f"BINANCEF:{s_}USDT"
+            poz = {"sembol": s_, "olay_ms": olay_ms, "giris_ms": giris, "cikis_ms": olay_ms, "notional": 0.05}
+            ac.setdefault(giris, []).append(poz)
+            if gercek and s_ == "SEI":
+                continue
+            ortak = {"sembol": s_, "olay_ms": olay_ms, "gun_ms": giris, "cikis_ms": olay_ms, "notional": 0.05}
+            i = int(np.searchsorted(t, giris + SAAT))
+            q = -round(0.05 * oz0 / px)
+            dolum.append((int(t[i]), perp, q, px, ortak | {"bacak": "token", "islem": "ac", "perp": perp}))
+            if not gercek:
+                dolum.append((int(t[i]), "BINANCEF:BTCUSDT", -q * px / btc[i], float(btc[i]),
+                              ortak | {"bacak": "btc", "islem": "ac", "perp": None}))
+            if olay_ms <= gun0:
+                j = int(np.searchsorted(t, olay_ms + SAAT))
+                kapat.setdefault(olay_ms, []).append(poz | {"neden": "cikis"})
+                dolum.append((int(t[j]), perp, -q, px * (1 + getiri),
+                              ortak | {"bacak": "token", "islem": "kapat", "neden": "cikis", "perp": perp}))
+                if not gercek:
+                    dolum.append((int(t[j]), "BINANCEF:BTCUSDT", q * px / btc[i], float(btc[j]),
+                                  ortak | {"bacak": "btc", "islem": "kapat", "neden": "cikis", "perp": None}))
+        for g in range(int(t[0]) // GUN * GUN + GUN, gun0 + 1, GUN):
+            b.execute(insert(paper_karar).values(
+                kol=kol, bar_ms=g, karar_ms=g + 5 * 60_000 + 3_000, kod_surumu="ornek", veri_hash="d" * 64, durum="normal",
+                ayrinti={"tur": "kilit_kisa", "olay_sayisi": 38 + g // GUN % 3, "ac": ac.get(g, []),
+                         "kapat": kapat.get(g, []), "takvim_hatasi": None, "gecikmeli": False,
+                         "red": [{"sembol": "PEAQ", "olay_ms": g + 7 * GUN, "oran": 0.0145, "neden": "islem_gormuyor"}]
+                         if g == gun0 else []}))
+        for giris in [o[2] for o in olaylar if gercek and o[0] == "SEI"]:
+            b.execute(insert(paper_emir_olay).values(
+                emir_id=0, kol=kol, tur="ret", enstruman="BINANCEF:SEIUSDT", miktar=-174.0, fiyat=None, ucret=0.0,
+                zaman_ms=giris + 5 * 60_000 + 9_000,
+                ayrinti={"gerekceler": ["hata: BorsaHatasi: -1000: An unknown error occurred while processing the request."]}))
+        dolum.sort(key=lambda x: x[0])
+        for z, kim, q, p, ay in dolum:
+            b.execute(insert(paper_emir_olay).values(emir_id=0, kol=kol, tur="dolum", enstruman=kim, miktar=q, fiyat=p,
+                                                     ucret=abs(q * p) * 0.0005, zaman_ms=z, ayrinti=ay))
+        # Saatlik işaret; token fiyatı girişten açılıma doğrusal + gürültü. Funding 8 saatte bir (kısa bacak alır).
+        nakit, adet, k = oz0, {}, 0
+        for i, z in enumerate(t):
+            while k < len(dolum) and dolum[k][0] <= z:
+                _, kim, q, p, _ = dolum[k]
+                adet[kim] = adet.get(kim, 0.0) + q
+                nakit -= q * p + abs(q * p) * 0.0005
+                k += 1
+            fy = {}
+            for kim, a in adet.items():
+                if abs(a) < 1e-12:
+                    continue
+                if kim == "BINANCEF:BTCUSDT":
+                    fy[kim] = float(btc[i])
+                    continue
+                _, olay_ms, giris, px, getiri = next(o for o in olaylar if f"BINANCEF:{o[0]}USDT" == kim)
+                ilerleme = min(1.0, max(0.0, (int(z) - giris) / (olay_ms - giris)))
+                fy[kim] = px * (1 + getiri * ilerleme + float(rng.normal(0, 0.004)))
+            if int(z) % (8 * SAAT) == 0 and fy:
+                gelir = sum(-a * fy[kk] * 0.0001 for kk, a in adet.items() if kk in fy and a < 0)
+                b.execute(insert(paper_emir_olay).values(
+                    emir_id=0, kol=kol, tur="fonlama", enstruman="BINANCEF:SEIUSDT", miktar=0.0, fiyat=None, ucret=-gelir,
+                    zaman_ms=int(z), ayrinti={"funding_ms": int(z), "oran": 0.0001}))
+                nakit += gelir
+            oz = nakit + sum(a * fy[kk] for kk, a in adet.items() if kk in fy)
+            b.execute(insert(paper_ozkaynak).values(kol=kol, zaman_ms=int(z), ozkaynak=oz, nakit=nakit, fiyat=fy,
+                                                    pozisyon={kk: a for kk, a in adet.items() if abs(a) > 1e-12}))
+
+
+def _kilit_ham(m: Engine, veri_dizini: Path, son: int) -> None:
+    """Düğümün ham depoya yazdığı iki dosyanın örneği: DefiLlama sayfası (`__NEXT_DATA__`) ve Binance exchangeInfo."""
+    from tradebot.veri.depo import HamDepo
+
+    gun0 = son // GUN * GUN
+    veri = [{"tSymbol": s_, "maxSupply": 1_000_000, "name": s_, "gecko_id": s_.lower(),
+             "events": [{"unlockType": "cliff", "noOfTokens": [oran * 1_000_000], "timestamp": (gun0 + g * GUN) // 1000,
+                         "category": kat}]} for s_, g, oran, kat in KILIT_TAKVIM]
+    html = ('<html><script id="__NEXT_DATA__" type="application/json">'
+            + json.dumps({"props": {"pageProps": {"data": veri}}}) + "</script></html>").encode()
+    perp = {"symbols": [{"contractType": "PERPETUAL", "quoteAsset": "USDT", "baseAsset": s_, "symbol": f"{s_}USDT",
+                         "status": "TRADING", "onboardDate": 0, "deliveryDate": 4133404800000, "filters": []}
+                        for s_ in ("BTC", "SEI", "STRK", "ARB", "ZRO", "APR", "EIGEN")]}
+    h = HamDepo(veri_dizini, m)
+    h.kaydet("defillama", f"unlocks/gunluk/{gun0}", html, "html")
+    h.kaydet("binancef", "exchangeInfo", json.dumps(perp).encode(), "json")

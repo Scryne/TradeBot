@@ -30,6 +30,8 @@ from tradebot.db import (
     paper_ozkaynak,
     test_plani,
 )
+from tradebot.pano.kilit import durduruldu
+from tradebot.pano.kilit import kilit as _kilit
 from tradebot.risk.motor import RiskAyar
 
 SAAT_MS = 3_600_000
@@ -41,16 +43,18 @@ PAPER_ENSTRUMANLARI = ("BINANCE:BTCUSDT", "BINANCE:ETHUSDT")
 
 
 def kol_bilgi(kol: str) -> dict:
-    """Kol adından görünen parçalar: `d2:donchian_ls@kripto_btc_eth@4h+jev` → strateji, dalga, zaman dilimi, Jev."""
+    """Kol adından görünen parçalar: `d2:donchian_ls@kripto_btc_eth@4h+jev` → strateji, dalga, zaman dilimi, Jev.
+    `#gercek` soneki (borsada yürüyen kopya, ör. kilit Demo) `hesap` olarak ayrılır."""
     jev = kol.endswith("+jev")
     taban = kol[: -len("+jev")] if jev else kol
     dalga, govde = (taban.split(":", 1) + [""])[:2] if ":" in taban else ("d1", taban)
+    govde, _, hesap = govde.partition("#")
     parca = govde.split("@")
     strateji = parca[0]
     zd = parca[2] if len(parca) > 2 else None
     tur = "agresif" if strateji == "agresif" else ("portfoy" if strateji == "portfoy" else "kol")
     return {"kol": kol, "taban": taban, "jev": jev, "strateji": strateji, "dalga": dalga, "zd": zd, "grup": parca[1]
-            if len(parca) > 1 else "", "tur": tur}
+            if len(parca) > 1 else "", "tur": tur, "hesap": hesap or None}
 
 
 def _maruziyet(ozkaynak: float, pozisyon: dict, fiyat: dict) -> tuple[float, dict[str, float]]:
@@ -199,6 +203,10 @@ def pano(motor: Engine, simdi_ms: int, veri_dizini: Path | None = None, kod_suru
             select(paper_karar.c.kol, paper_karar.c.durum, paper_karar.c.karar_ms)
             .where(paper_karar.c.id.in_(select(func.max(paper_karar.c.id)).group_by(paper_karar.c.kol))))}
         kol_olay = b.execute(select(paper_kol_olay).order_by(paper_kol_olay.c.zaman_ms.desc()).limit(20)).all()
+        elle: dict[str, list] = defaultdict(list)
+        for k, tur, ayr in b.execute(select(paper_kol_olay.c.kol, paper_kol_olay.c.tur, paper_kol_olay.c.ayrinti)
+                                     .order_by(paper_kol_olay.c.zaman_ms)):
+            elle[k].append((tur, ayr))
         dagitim = b.execute(select(paper_dagitim).order_by(paper_dagitim.c.hafta_ms.desc()).limit(1)).first()
         son24 = b.execute(select(func.count()).select_from(paper_karar)
                           .where(paper_karar.c.karar_ms >= simdi_ms - GUN_MS)).scalar()
@@ -221,23 +229,25 @@ def pano(motor: Engine, simdi_ms: int, veri_dizini: Path | None = None, kod_suru
                        "islem": t.get("islem", 0), "karar": t.get("karar", 0), "yurutme_bps": t.get("yurutme_bps"),
                        "gecikme_bps": t.get("gecikme_bps"), "fren": t.get("fren", 0), "veto": t.get("veto", 0),
                        "durum": sk.durum if sk else None, "son_karar_ms": int(sk.karar_ms) if sk else None,
+                       "durduruldu": durduruldu(elle[ad]),
                        "maruziyet": round(brut, 4), "pozisyon": {k: round(v, 4) for k, v in oran.items()},
                        "seri": _seyrelt(seri, 4 * SAAT_MS)})
 
     son_isaret = max((v[-1][0] for v in isaret.values() if v), default=None)
     son_karar_ms = max((k["son_karar_ms"] for k in kollar if k["son_karar_ms"]), default=None)
-    durumlar = [k["durum"] for k in kollar if k["durum"]]
+    calisan = [k for k in kollar if not k["durduruldu"]]     # elle durdurulan kollar sayılmaz, şeritte görünmez
+    durumlar = [k["durum"] for k in calisan if k["durum"]]
     return {
         "simdi_ms": simdi_ms, "kod_surumu": kod_surumu, "turnuva": tv,
         "durum": {"son_isaret_ms": son_isaret, "son_karar_ms": son_karar_ms,
                   "bayat": son_isaret is None or simdi_ms - son_isaret > BAYAT_MS,
-                  "kol": len(kollar), "normal": durumlar.count("normal"),
+                  "kol": len(calisan), "durdurulan": len(kollar) - len(calisan), "normal": durumlar.count("normal"),
                   "fren": sum(1 for d in durumlar if d.startswith("fren")), "acil": durumlar.count("acil_durdurma"),
                   "karar_24s": int(son24 or 0), "ret_24s": int(emir_ret or 0),
                   "islem_24s": sum(k["islem"] for k in gunluk.values()),
                   "veto_24s": sum(k["veto"] for k in gunluk.values())},
         "kollar": kollar,
-        "serit": _serit(motor, isaret, sorted(kayit), simdi_ms),
+        "serit": _serit(motor, isaret, [k["kol"] for k in calisan], simdi_ms),
         "tavan": {"enstruman": RiskAyar().enstruman_tavani, "sinif": RiskAyar().sinif_tavani,
                   "kaldirac": KALDIRAC_TAVANI, "gunluk_fren": RiskAyar().gunluk_fren,
                   "haftalik_fren": RiskAyar().haftalik_fren, "acil_durdurma": RiskAyar().acil_durdurma},
@@ -245,6 +255,7 @@ def pano(motor: Engine, simdi_ms: int, veri_dizini: Path | None = None, kod_suru
         "dagitim": None if dagitim is None else {"portfoy": dagitim.portfoy, "hafta_ms": int(dagitim.hafta_ms),
                                                   "kaldirac": float(dagitim.kaldirac),
                                                   "kollar": (dagitim.ayrinti or {}).get("kollar", {})},
+        "kilit": _kilit(motor, simdi_ms, kayit, isaret),
         "olaylar": _olaylar(motor, simdi_ms),
         "defter": _defter(motor, veri_dizini),
     }

@@ -35,8 +35,9 @@ function PozisyonCubugu({ deger, tavan, etiket }: { deger: number; tavan: number
 
 export function Risk({ p }: { p: Pano }) {
   const t = p.tavan
-  const kollar = satirSirasi(p.kollar)
-  const ens = [...new Set(p.kollar.flatMap((k) => Object.keys(k.pozisyon)))].sort()
+  // Kilit kollarının pozisyonları kendi bölümünde (olay başına); burada yalnız trend turnuvası
+  const kollar = satirSirasi(p.kollar.filter((k) => k.strateji !== 'kilit_kisa'))
+  const ens = [...new Set(kollar.flatMap((k) => Object.keys(k.pozisyon)))].sort()
   const gosterilen = ens.length ? ens : ['BINANCE:BTCUSDT', 'BINANCE:ETHUSDT']
   return (
     <div>
@@ -44,7 +45,8 @@ export function Risk({ p }: { p: Pano }) {
         <h3 className="etiket text-ikincil">Pozisyonlar ve tavanlar</h3>
         <p className="etiket text-ucuncul">10 segment = tavan</p>
       </div>
-      <table className="mt-5 w-full">
+      <div className="mt-5 overflow-x-auto">
+      <table className="w-full">
         <thead>
           <tr className="etiket text-ucuncul">
             <th scope="col" className="pb-3 text-left font-normal">Kol</th>
@@ -72,6 +74,7 @@ export function Risk({ p }: { p: Pano }) {
           ))}
         </tbody>
       </table>
+      </div>
       <dl className="mt-10 grid gap-x-10 sm:grid-cols-2">
         <StatSatiri ad="Enstrüman tavanı" deger={oran(t.enstruman)} />
         <StatSatiri ad="Günlük fren" deger={yuzde(t.gunluk_fren, 0)} />

@@ -35,7 +35,8 @@ export function MaruziyetCubugu({ x, etiket }: { x: number; etiket: string }) {
   return <Segmentler hucreler={hucreler} yuk={6} etiket={etiket} className="w-[84px]" />
 }
 
-export function DurumEtiketi({ d }: { d: string | null }) {
+export function DurumEtiketi({ d, durduruldu = false }: { d: string | null; durduruldu?: boolean }) {
+  if (durduruldu) return <span className="etiket text-ucuncul">[durduruldu]</span>
   if (!d || d === 'normal') return <span className="etiket text-ucuncul">[normal]</span>
   return <span className="etiket text-kirmizi-metin">[{durumAdi(d)}]</span>
 }
