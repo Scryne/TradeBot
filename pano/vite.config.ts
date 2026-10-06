@@ -8,4 +8,6 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: { alias: { '@': path.resolve(__dirname, './src') } },
   server: { proxy: { '/api': 'http://127.0.0.1:8080' } },
+  // deneme/nothing-pano: Nothing varyantı ayrı giriş, eski pano karşılaştırma için / adresinde kalıyor
+  build: { rollupOptions: { input: { main: path.resolve(__dirname, 'index.html'), nothing: path.resolve(__dirname, 'nothing.html') } } },
 })

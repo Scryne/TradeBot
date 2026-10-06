@@ -1,178 +1,157 @@
 ---
 version: alpha
-name: TradeBot
-description: Scryne'ın otonom paper trade sisteminin özel kontrol panosu; tek kullanıcı, masaüstü ve telefon, yalnız Tailscale.
+name: TradeBot · Nothing denemesi
+description: TradeBot panosunun monokrom, tipografik, endüstriyel deneme varyantı (dal deneme/nothing-pano); tek kullanıcı, masaüstü ve telefon, yalnız Tailscale.
 colors:
-  gece: "#0B0D1A"
-  yuzey: "#12152A"
-  yuzey-ust: "#1A1E38"
-  cizgi: "#2A2F52"
-  mesh-indigo: "#262A6B"
-  mesh-petrol: "#0C4A55"
-  mesh-murdum: "#4A1D44"
-  sis: "#E8ECF6"
-  kursun: "#9AA3BD"
-  soluk: "#7D86A6"
-  sodyum: "#F2B35B"
-  sodyum-koyu: "#3A2A12"
-  kazanc: "#5ED3A6"
-  kayip: "#FF7F73"
+  siyah: "#000000"
+  yuzey: "#111111"
+  yuzey-ust: "#1A1A1A"
+  cizgi: "#222222"
+  cizgi-belirgin: "#333333"
+  pasif: "#666666"
+  ucuncul: "#858585"
+  ikincil: "#999999"
+  birincil: "#E8E8E8"
+  ekran: "#FFFFFF"
+  kirmizi: "#D71921"
+  kirmizi-metin: "#FF4D55"
+  yesil: "#4A9E5C"
+  amber: "#D4A843"
 typography:
-  display-xl:
-    fontFamily: Big Shoulders
-    fontSize: 64px
-    fontWeight: 800
-    lineHeight: 0.95
-    letterSpacing: -0.01em
-  display-md:
-    fontFamily: Big Shoulders
-    fontSize: 32px
+  hero:
+    fontFamily: Doto
+    fontSize: 120px
     fontWeight: 700
-    lineHeight: 1
-    letterSpacing: 0.01em
-  body-md:
-    fontFamily: Onest
+    lineHeight: 0.9
+    letterSpacing: -0.02em
+  baslik:
+    fontFamily: Space Grotesk
+    fontSize: 24px
+    fontWeight: 400
+    lineHeight: 1.2
+    letterSpacing: -0.01em
+  govde:
+    fontFamily: Space Grotesk
     fontSize: 15px
     fontWeight: 400
     lineHeight: 1.5
-  body-sm:
-    fontFamily: Onest
+  govde-sm:
+    fontFamily: Space Grotesk
     fontSize: 13px
     fontWeight: 400
     lineHeight: 1.45
-  data-lg:
-    fontFamily: Azeret Mono
-    fontSize: 22px
-    fontWeight: 500
+  veri-lg:
+    fontFamily: Space Mono
+    fontSize: 24px
+    fontWeight: 400
     lineHeight: 1.1
-    fontFeature: '"tnum" 1, "zero" 1'
-  data-md:
-    fontFamily: Azeret Mono
+  veri:
+    fontFamily: Space Mono
     fontSize: 13px
     fontWeight: 400
     lineHeight: 1.4
-    fontFeature: '"tnum" 1, "zero" 1'
-  label-sm:
-    fontFamily: Azeret Mono
+  etiket:
+    fontFamily: Space Mono
     fontSize: 11px
-    fontWeight: 500
+    fontWeight: 400
     lineHeight: 1.2
-    letterSpacing: 0.12em
+    letterSpacing: 0.08em
 rounded:
-  control: 8px
-  panel: 14px
-  full: 9999px
+  teknik: 4px
+  kart: 12px
+  hap: 999px
 spacing:
   gutter: 16px
-  panel: 20px
-  section: 72px
+  panel: 24px
+  bolum: 96px
 components:
   ust-cubuk:
-    backgroundColor: "rgba(18, 21, 42, 0.55)"
-    textColor: "{colors.sis}"
+    backgroundColor: "{colors.siyah}"
+    textColor: "{colors.birincil}"
     height: 56px
-  panel:
+  kart:
     backgroundColor: "{colors.yuzey}"
-    textColor: "{colors.sis}"
-    rounded: "{rounded.panel}"
+    textColor: "{colors.birincil}"
+    rounded: "{rounded.kart}"
     padding: "{spacing.panel}"
-  cam-panel:
-    backgroundColor: "rgba(255, 255, 255, 0.06)"
-    textColor: "{colors.sis}"
-    rounded: "{rounded.panel}"
-    padding: "{spacing.panel}"
-  etiket:
-    backgroundColor: "{colors.yuzey-ust}"
-    textColor: "{colors.kursun}"
-    typography: "{typography.label-sm}"
-    rounded: "{rounded.full}"
-  etiket-dikkat:
-    backgroundColor: "{colors.sodyum-koyu}"
-    textColor: "{colors.sodyum}"
-    typography: "{typography.label-sm}"
-    rounded: "{rounded.full}"
-  serit-hucre:
-    backgroundColor: "{colors.sis}"
-    size: 10px
+  durum-etiketi:
+    backgroundColor: "transparent"
+    textColor: "{colors.ikincil}"
+    typography: "{typography.etiket}"
+    rounded: "{rounded.hap}"
+  segment:
+    backgroundColor: "{colors.ekran}"
+    rounded: "0px"
 ---
 
-# TradeBot
+# TradeBot · Nothing denemesi
+
+> **Deneme dalı.** Bu dosya yalnız `deneme/nothing-pano` dalında geçerli; `main`'deki Haliç gecesi `DESIGN.md`'si
+> yerinde. Varyant `pano/nothing.html`'de, karşılaştırma için eski pano aynı dalda `/` adresinde duruyor. Kaynak
+> stil: `nothing-design` skill'i (yerel geçersiz kılmalarıyla).
 
 ## Overview
 
-Pano, TradeBot'un gece de çalışan bir ölçüm aletidir: sakin, kesin, abartısız. Beş saniyede üç soruya cevap verir:
-sistem sağlıklı mı, son kararlar ne, kollar nasıl gidiyor. Kumarhane ekranı değildir: yanıp sönen mum grafiği, neon
-yeşil/kırmızı ve "kazan" dili yok. Sistem her kararı emirden önce kaydeder, ön kayıt yapar, zinciri hash'ler; pano da
-bu disiplini gösterir: her sayı bir kaynaktan gelir, her zaman damgası UTC ile birlikte yerel saati de verir.
+Pano bir ölçüm aletidir: karanlık odada bir enstrüman paneli, beyaz veriler siyahın üstünde parlıyor. Beş saniyede üç
+soruya cevap verir: sistem sağlıklı mı, son kararlar ne, kollar nasıl gidiyor. Süs yoktur: gradient, cam, gölge, blur
+yok. Hiyerarşiyi boyut, boşluk ve gri tonları kurar; renk bir olaydır.
 
-Taban disiplin global dark glassmorphism'dir. Bu dosya onun üstüne projeye özgü katmanı koyar: Haliç gecesi paleti,
-tabela kökenli dar display yazı ve imza öğe olarak **karar şeridi**.
-
-Pano yalnız koyu temadır. Tek kullanıcı, çoğunlukla gece ve telefondan bakıyor. Açık tema yok; `prefers-color-scheme`
-açık olsa da aynı koyu görünüm verilir.
+Değişmeyen içerik kuralları (main'deki DESIGN.md'den aynen): pano salt okunurdur; sır gösterilmez; her zaman damgası
+İstanbul ve UTC birlikte yazılır; veri 2 saatten bayatsa bu açıkça söylenir; sayı biçimi Türkçedir (binlik nokta,
+ondalık virgül, eksi U+2212). Yalnız koyu tema.
 
 ## Colors
 
-- Arka plan düz `gece` değildir. Üç derin leke (`mesh-indigo` sol üst, `mesh-petrol` sağ orta, `mesh-murdum` sol alt)
-  sabit bir mesh kurar. Işık sol üstten gelir, sağ alt en koyudur. Mesh hareket etmez.
-- `sodyum` tek marka aksanıdır ve "şimdi / dikkat" anlamı taşır: şeritteki şimdi çizgisi, aktif sekme, odak halkası, Jev
-  vetosu. Başka hiçbir öğe sodyum renkte olmaz; dekorasyon için kullanılmaz.
-- `kazanc` ve `kayip` yalnız işaretli sayılar ve getiri çizgileri içindir. Hiçbir zaman tek başına anlam taşımaz: her
-  işaretli sayıda `+` / `−` işareti de yazılır.
-- Fren ve acil durdurma `kayip` ile, veto `sodyum` ile gösterilir. Maruziyet (pozisyon büyüklüğü) iyi ya da kötü
-  değildir: `sis`in saydamlık rampasıyla çizilir, renkle değil.
-- Metin hiyerarşisi üç adımdır: `sis` (birincil), `kursun` (ikincil), `soluk` (üçüncül: tablo başlığı, eksen, ikiz
-  satır). Üçü de en koyu yüzey olan `yuzey-ust` üzerinde 4,5:1'i geçer; yeni bir metin rengi bu çıtanın altına inmez.
-  Kenarlar `cizgi` renginde 1 px'tir.
+- Arka plan düz `siyah` (OLED). Yüzeyler `yuzey` → `yuzey-ust`, aralarında 1 px `cizgi`. Derinlik katmanla verilir.
+- Metin dört gri adımdır: `ekran` (kahraman sayı, ekranda bir tane), `birincil` (gövde), `ikincil` (etiket, açıklama),
+  `ucuncul` (tablo başlığı, zaman damgası). `ucuncul` upstream'deki `#666` yerine `#858585`'tir: `yuzey-ust`
+  üstünde 4,7:1. `pasif` (`#666`) yalnız devre dışı öğede ve süste kullanılır, okunacak metne verilmez.
+- Durum renkleri yalnız değere uygulanır, etikete ya da satır arka planına değil: kazanç `yesil`, kayıp ve fren
+  `kirmizi`, Jev vetosu `amber`. Metin olarak kırmızı `kirmizi-metin`'dir (`#D71921` küçük metinde 4,05:1, AA'yı
+  geçmez); dolgu, çizgi ve nokta `kirmizi`. Her işaretli sayıda `+` / `−` de yazılır, renk tek başına anlam taşımaz.
+- Kırmızı bir kesintidir: acil bir şey yoksa ekranda kırmızı dolgu yoktur. "Şimdi" çizgisi ve odak halkası `ekran`.
+- Maruziyet iyi ya da kötü değildir: `ekran`ın saydamlık rampasıyla ya da segment sayısıyla çizilir.
 
 ## Typography
 
-- **Big Shoulders** (dar, tabela kökenli; kalkış panosu, gösterge levhası) yalnız iki yerde: kahraman durum cümlesi
-  (`display-xl`) ve bölüm başlıkları (`display-md`). Gövde metninde, butonda, tabloda kullanılmaz. Masaüstünde
-  `display-xl` 88 px'e kadar büyür; telefonda 44 px'e iner.
-- **Onest** bütün arayüz metnidir: açıklama, veto gerekçesi, sağlık ayrıntısı.
-- **Azeret Mono** her sayının, saatin, hash'in ve kol adının yazısıdır. Rakamlar tabular ve sıfır çizgilidir, sütunlar
-  hizalı durur. `label-sm` büyük harf, geniş aralıklı üst etikettir (bölüm içi alt başlık, tablo başlığı).
-- Sayı biçimi Türkçedir: binlik nokta, ondalık virgül (`1.199.332`, `−%0,06`). Eksi işareti U+2212'dir.
+- **Doto** (nokta matris) yalnız kahraman sayıda: ekran başına bir kez, 72 px'ten büyük.
+- **Space Grotesk** başlık ve gövde. **Space Mono** her sayı, saat, hash ve etiket. Etiketler BÜYÜK HARF, 11 px,
+  0,08em aralık; `lang="tr"` olduğu için `i` → `İ` doğru büyür.
+- Bütçe: Doto hariç üç ana boyut (24 / 15 / 11; 13 yalnız tablo ve ikincil gövde). Ağırlık 400; 700 yalnız Doto'da.
+  Kalın gövde metni yok.
 
 ## Layout
 
-- Tek sayfa, yukarıdan aşağı okunur. Sıra önem sırasıdır: durum cümlesi ve karar şeridi, kollar, pozisyon ve risk,
-  Jev ve veto, araştırma defteri, sağlık. Kol ayrıntısı sağdan açılan bir çekmecede görünür, sayfa değişmez.
-- Bölümler aynı kalıbı tekrarlamaz: kahraman tam genişlik, şerit kenardan kenara bant, kollar yoğun liste, risk ve veto
-  7/5 asimetrik bölünme, defter liste, sağlık sıkı ızgara.
-- İçerik genişliği en çok 1320 px; kenar boşluğu `gutter`. Bölümler arası `section`, panel içi `panel`.
-- Telefonda (390 px) her şey tek sütundur. Karar şeridi kendi kutusunda yatay kayar, kol adları solda sabit kalır;
-  sayfa asla yatay kaymaz.
+- Tek sayfa, önem sırasıyla: kahraman + karar şeridi, kollar, risk ve Jev (7/5), araştırma defteri, sağlık.
+- Asimetri: kahramanda büyük sol (sayı + cümle), dar sağ (turnuva cetveli + 24 saat sayaçları).
+- Gruplama önce boşlukla: bölüm arası 96 px, grup arası 32–48 px, öğe arası 16 px. Ayırıcı çizgi yalnız yapısal olarak
+  aynı satırların olduğu listelerde. Kahraman kutulanmaz, siyahın üstünde durur.
+- Telefonda (390 px) tek sütun; karar şeridi kendi kutusunda yatay kayar, sayfa asla kaymaz.
 
 ## Elevation & Depth
 
-- Cam (`backdrop-filter: blur(12px)`) yalnız üç yüzeyde: üst çubuk, kahraman durum paneli ve kol çekmecesi. Diğer
-  paneller düz `yuzey` renktedir; blur yığılmaz.
-- Derinlik gölgeyle değil katmanla verilir: `gece` → `yuzey` → `yuzey-ust`, aralarında 1 px `cizgi`. Gölge yalnız
-  çekmecede.
-- `backdrop-filter` desteklenmezse cam yüzeyler opak `yuzey` olur.
+Gölge yok, blur yok. Kol çekmecesi `yuzey` + 1 px `cizgi-belirgin`; arkası `siyah` %80.
 
 ## Shapes
 
-- Paneller `panel`, kontroller `control`, etiketler `full` yarıçaplıdır. Karar şeridi hücreleri kare köşelidir:
-  şerit bir ölçüm kaydıdır, dekoratif değildir.
+Kartlar 12 px, teknik öğeler 4 px, etiket ve buton hap. Segmentler ve şerit noktaları köşesizdir/yuvarlaktır, süs değil
+ölçümdür.
 
 ## Components
 
-- **Karar şeridi (imza):** satırlar kollar, sütunlar son 72 saatin saatleri. Hücre dolgusu o saatteki brüt maruziyettir
-  (`sis`, saydamlık 0,06 → 0,9). Veto olan saatin üstünde `sodyum` bir çentik, frenli kararın altında `kayip` bir çizgi
-  vardır. Sağ kenarda `sodyum` şimdi çizgisi. Hücreye dokunmak ya da üzerine gelmek o kararın ayrıntısını gösterir.
-- **Kol satırı:** kol adı, Jev'li ve Jev'siz kopyanın ikiz getiri çizgisi (aralarındaki alan hangisi öndeyse onun
-  rengiyle, düşük opaklıkta), toplam getiri, en kötü düşüş, işlem sayısı, yürütme maliyeti. Satır çekmeceyi açar.
-- **Etiket:** durum bildirir (`normal`, `fren`, `veto`, `KALDI`, `açık`). Rengin yanında her zaman metin vardır.
-- İkonlar Lucide, 16 px, `currentColor`. Emoji yok.
+- **Segmentli çubuk (imza):** ayrık bloklar, 2 px aralık. Turnuva cetveli 84 gün = 84 segment; maruziyet 10 segment;
+  pozisyon merkezden iki yana 12'şer segment, 10. segment tavandır, tavanı aşan segmentler `kirmizi`. Çubuğun yanında
+  her zaman sayı yazar: çubuk oran, sayı kesinlik.
+- **Karar şeridi:** satırlar kollar, sütunlar son 72 saat; her hücre bir nokta, noktanın saydamlığı brüt maruziyet.
+  Dolum noktası büyür, veto üstte `amber` çentik, fren altta `kirmizi` çizgi, sağ kenarda `ekran` şimdi çizgisi.
+- **Durum etiketi:** köşeli parantezli metin: `[NORMAL]`, `[GÜNLÜK FREN]`, `[VETO]`. Bildirim balonu (toast) yok.
+- **Yükleniyor:** `[YÜKLENİYOR]` metni; iskelet ekran yok. **Hata:** `[HATA]` önekli satır içi metin, kırmızı arka
+  plan yok.
+- İkonlar Lucide, ince çizgi, 16 px; dolgulu ikon ve emoji yok.
 
 ## Do's and Don'ts
 
-- Don't: panoya hiçbir emir, durdurma, yeniden başlatma ya da ayar kontrolü koyma. Pano salt okunurdur.
-- Don't: sır, anahtar, hesap numarası ya da parola gösterme.
-- Do: her zaman damgasını UTC ve İstanbul saatiyle birlikte yaz; veri bayatsa (son işaret 2 saatten eskiyse) bunu açıkça
-  söyle.
-- Don't: `sodyum`u dekorasyon için kullanma.
-- Don't: hareketli arka plan, sürekli animasyon ya da animasyonlu blur.
+- Don't: gradient, gölge, blur, yaylanan animasyon, zebra satır.
+- Don't: panoya emir, durdurma ya da ayar kontrolü koyma; sır gösterme.
+- Do: ekran başına tek kırılma (kahraman Doto sayısı); geri kalanı sakin ve tutarlı.
+- Do: hareket yalnız opaklık, 150–250 ms ease-out.

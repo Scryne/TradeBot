@@ -1,0 +1,178 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource/space-mono/400.css";
+@import "@fontsource/space-mono/700.css";
+@import "@fontsource-variable/doto/full.css"; /* wght + ROND ekseni: yuvarlak nokta */
+
+/* Deneme varyantı yalnız koyu temadır (DESIGN.md › Overview). */
+@custom-variant dark (&:is(*));
+
+/* DESIGN.md frontmatter (deneme/nothing-pano dalı); değerler oradan. */
+@theme {
+  --color-siyah: #000000;
+  --color-yuzey: #111111;
+  --color-yuzey-ust: #1a1a1a;
+  --color-cizgi: #222222;
+  --color-cizgi-belirgin: #333333;
+  --color-pasif: #666666;
+  --color-ucuncul: #858585;
+  --color-ikincil: #999999;
+  --color-birincil: #e8e8e8;
+  --color-ekran: #ffffff;
+  --color-kirmizi: #d71921;
+  --color-kirmizi-metin: #ff4d55;
+  --color-yesil: #4a9e5c;
+  --color-amber: #d4a843;
+
+  --font-dot: "Doto Variable", "Doto", "Space Mono", monospace;
+  --font-sans: "Space Grotesk Variable", "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+
+  --text-baslik: 24px;
+  --text-govde: 15px;
+  --text-govde-sm: 13px;
+  --text-veri-lg: 24px;
+  --text-etiket: 11px;
+
+  --radius-teknik: 4px;
+  --radius-kart: 12px;
+  --spacing-gutter: 16px;
+  --spacing-panel: 24px;
+  --spacing-bolum: 96px;
+
+  /* Gölge yok (DESIGN.md › Elevation). shadcn sheet'in shadow-lg'si de düz. */
+  --shadow-lg: 0 0 #0000;
+
+  /* Eski bileşen uyumu: kol çekmecesi (KolCekmece) main'deki token adlarını kullanıyor; deneme için Nothing
+     değerlerine bağlandı. Varyant benimsenirse çekmece yeni adlara taşınır, bu blok silinir. */
+  --color-gece: var(--color-siyah);
+  --color-sis: var(--color-birincil);
+  --color-kursun: var(--color-ikincil);
+  --color-soluk: var(--color-ucuncul);
+  --color-sodyum: var(--color-amber);
+  --color-kazanc: var(--color-yesil);
+  --color-kayip: var(--color-kirmizi-metin);
+  --font-display: var(--font-sans);
+  --text-display-md: 24px;
+  --text-body-sm: 13px;
+  --text-data-lg: 24px;
+  --tracking-display-md: -0.01em;
+  --radius-control: 4px;
+  --radius-panel: 12px;
+}
+
+@theme inline {
+  --color-background: var(--color-siyah);
+  --color-foreground: var(--color-birincil);
+  --color-card: var(--color-yuzey);
+  --color-card-foreground: var(--color-birincil);
+  --color-popover: var(--color-yuzey);
+  --color-popover-foreground: var(--color-birincil);
+  --color-primary: var(--color-ekran);
+  --color-primary-foreground: var(--color-siyah);
+  --color-secondary: var(--color-yuzey-ust);
+  --color-secondary-foreground: var(--color-birincil);
+  --color-muted: var(--color-yuzey-ust);
+  --color-muted-foreground: var(--color-ikincil);
+  --color-accent: var(--color-yuzey-ust);
+  --color-accent-foreground: var(--color-birincil);
+  --color-destructive: var(--color-kirmizi);
+  --color-border: var(--color-cizgi);
+  --color-input: var(--color-cizgi-belirgin);
+  --color-ring: var(--color-ekran);
+  --radius-sm: 4px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+}
+
+:root {
+  --z-bar: 30;
+  --z-cekmece: 50;
+  --z-ipucu: 60;
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/60;
+  }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-siyah text-birincil antialiased;
+    font-size: var(--text-govde);
+    line-height: 1.5;
+    min-height: 100dvh;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ekran);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: rgb(255 255 255 / 0.2);
+  }
+  /* Kol çekmecesinin arkası: düz siyah %80, blur yok */
+  [data-slot="sheet-overlay"] {
+    background: rgb(0 0 0 / 0.8);
+  }
+}
+
+@layer components {
+  /* Enstrüman paneli etiketi: Space Mono, BÜYÜK HARF */
+  .etiket {
+    font-family: var(--font-mono);
+    font-size: var(--text-etiket);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .veri {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums slashed-zero;
+  }
+  .kart {
+    background: var(--color-yuzey);
+    border-radius: var(--radius-kart);
+  }
+  /* Eski bileşen uyumu (KolCekmece) */
+  .etiket-ust {
+    font-family: var(--font-mono);
+    font-size: var(--text-etiket);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .sayi {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums slashed-zero;
+  }
+  .cam {
+    background: var(--color-yuzey);
+    border-color: var(--color-cizgi-belirgin);
+  }
+}
+
+/* Hareket yalnız opaklık (DESIGN.md › Do's) */
+@keyframes belir {
+  from {
+    opacity: 0;
+  }
+}
+.belir {
+  animation: belir 220ms cubic-bezier(0.25, 0.1, 0.25, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
