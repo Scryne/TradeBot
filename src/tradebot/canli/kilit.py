@@ -265,6 +265,14 @@ class GercekYurutucu:
             return f"borsa: {r.get('durum', 'dolmadı')}"
         return Dolum(r["adet"], r["fiyat"], 0.0, {"borsa_emir": r.get("emir_id"), "durum": r.get("durum")})
 
+    def islemde(self) -> set[str] | None:
+        """Emrin gideceği ortamda işlem gören semboller; okunamazsa None (o gün yeni olay açılmaz)."""
+        try:
+            return self.ist.islemde()
+        except Exception as e:  # noqa: BLE001
+            _log.warning("ortam_sembolleri_okunamadi", hata=f"{type(e).__name__}: {e}"[:200])
+            return None
+
 
 # ---------------------------------------------------------------------------------------------------- düğüm
 class KilitDugumu:
@@ -477,6 +485,10 @@ class KilitDugumu:
             _log.error("takvim_yok_yalniz_kapanis", hata=takvim_hatasi)
         iz, _ = izleyici(d.gecmis, self.kol.baslangic_ozkaynak, self.ay.risk)
         islem = {s for s, v in perp.items() if _islemde(v)}
+        if self.yurutucu.gercek:   # yeni olay yalnız emrin gideceği ortamda da işlem görüyorsa; açıkların kapanışı değişmez
+            ortam = self.yurutucu.islemde() or set()
+            tut = {p.sembol for p in d.acik}
+            islem = {s for s in islem if s in tut or perp[s]["sembol"] in ortam}
         k = ck.gun_karari(gun, olaylar, d.acik, islem, self.ay.kural, yeni_risk=iz.durum == Durum.NORMAL
                           and takvim_hatasi is None, hepsini_kapat=d.durdurulmus)
         ayr = {"tur": KILIT, "takvim_sha": sha, "takvim_hatasi": takvim_hatasi, "gecikmeli": simdi - gun > GECIKMELI_MS,

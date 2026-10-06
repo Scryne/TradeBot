@@ -216,6 +216,13 @@ class SahteHesap:
         self.borsa, self.poz, self.gelirler, self.emirler, self.dolmayan = borsa, {}, [], [], set()
         self.hata: dict[str, int] = {}          # sembol → kaç emir daha belirsiz borsa hatasıyla düşer
         self.hata_dolar: set[str] = set()       # belirsiz hata, ama emir borsada gerçekleşti
+        self.ortam_disi: set[str] = set()       # ana ağda işlemde, bu ortamda değil (Demo'da SETTLING)
+        self.ortam_hata = False
+
+    def islemde(self):
+        if self.ortam_hata:
+            raise ConnectionError("exchangeInfo yok")
+        return {v["sembol"] for v in self.borsa.perp.values() if v["durum"] == "TRADING"} - self.ortam_disi
 
     def emir(self, sembol, miktar, istemci_id, azaltan):
         self.emirler.append((sembol, miktar, istemci_id, azaltan))
@@ -295,6 +302,36 @@ def test_gercek_btc_dolmazsa_tokenlar_geri_kapanir(gercek):
     saat.ms = D0 + 6 * 60_000
     d.tur()
     assert _net(m, d.kol.ad) == {} and hesap.pozisyonlar() == {}  # açıkta kısa kalmaz
+
+
+def test_gercek_ortamda_islem_gormeyen_acilmaz(gercek):
+    m, d, saat, borsa, hesap = gercek
+    hesap.ortam_disi.add("CCCUSDT")                              # 2026-10-04 PUMP: Demo'da SETTLING → −4140
+    saat.ms = D0 + 6 * 60_000
+    d.tur()
+    assert "BINANCEF:CCCUSDT" not in _net(m, d.kol.ad) and not _ccc(hesap)   # emir hiç gitmez
+    with m.connect() as b:
+        ayr = b.execute(select(paper_karar.c.ayrinti)).scalar()
+    assert {"CCC", "ZZZ"} == {x["sembol"] for x in ayr["red"] if x["neden"] == "islem_gormuyor"}
+
+
+def test_gercek_ortam_okunamazsa_yeni_olay_yok(gercek):
+    m, d, saat, borsa, hesap = gercek
+    hesap.ortam_hata = True
+    saat.ms = D0 + 6 * 60_000
+    r = d.tur()["karar"]
+    assert r["ac"] == 0 and hesap.emirler == []
+
+
+def test_gercek_ortam_okunamazsa_aciklar_erken_kapanmaz(gercek):
+    m, d, saat, borsa, hesap = gercek
+    saat.ms = D0 + 6 * 60_000
+    d.tur()
+    hesap.ortam_hata = True
+    saat.ms = D0 + G + 6 * 60_000                                # ara gün: açıklar "işlem görmüyor" sayılmaz
+    assert d.tur()["karar"]["kapat"] == 0 and len(hesap.pozisyonlar()) == 6
+    saat.ms = D0 + 7 * G + 6 * 60_000                            # açılım günü: planlı kapanış
+    assert d.tur()["karar"]["kapat"] == 5 and hesap.pozisyonlar() == {}
 
 
 def _ccc(hesap):

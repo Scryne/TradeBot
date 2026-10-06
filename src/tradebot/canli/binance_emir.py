@@ -98,6 +98,13 @@ class VadeliIstemci:
                 return out
             bas = int(r[-1]["time"]) + 1
 
+    def islemde(self) -> set[str]:
+        """Bu ortamda `TRADING` durumdaki semboller (anahtarsız uç). Demo'nun sembol durumu ana ağdan ayrışabilir
+        (2026-10-07: PUMP Demo'da SETTLING, ana ağda TRADING → −4140)."""
+        r = self.http.get(f"{self.taban}/fapi/v1/exchangeInfo")
+        r.raise_for_status()
+        return {x["symbol"] for x in r.json()["symbols"] if x.get("status") == "TRADING"}
+
     def emir_sorgu(self, sembol: str, istemci_id: str) -> dict:
         return self._imzali("GET", "/fapi/v1/order", {"symbol": sembol, "origClientOrderId": istemci_id})
 
