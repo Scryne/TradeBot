@@ -1,7 +1,7 @@
 ---
 proje: TradeBot
 created: 2026-09-24
-updated: 2026-10-06
+updated: 2026-10-07
 type: roadmap
 status: aktif (sürüm 2 — kurumsal, çok piyasalı)
 ---
@@ -50,6 +50,10 @@ dalga yok. Video/bot önerileri yalnız doğrulanmış kayıtla (Myfxbook/MQL5) 
 biriktirir, altın M15 NCM demo izleme kolu. Takvim: 2026-10-29 mekanik kontrol, Aralık karar; kapı (PSR(0) ≥ 0,95,
 ≥ 26 hafta: en erken ~2027-04-01) + ~500 $ sermaye + Scryne onayı. Faz 6 ve 8'in kalanı (KAP/B1, BIST ve MT5 piyasa
 kolları) kilit yolunu etkilemediği için beklemede.
+**Canlı kontrol öne alındı (2026-10-07, Scryne: "29 Ekim'e kadar beklemiycez", `docs/turnuva/Canli-Kontrol-2026-10-07.md`):**
+canlı veri kilidin kenarını ~2 yıl içinde kanıtlayamaz (olay başına +%1,77, σ ≈ %16), görevi mekaniktir. 29 Ekim
+tarihi yerine olay kapısı: Demo'da 3 doğal tam tur paper ile aynı günlerde + temiz mutabakat (en erken 10-14/16). Kanıt
+kapısı DSR yolu (d13 DSR 0,98); 26 haftalık PSR şartı kalktı. Sonrası Scryne'ın: ana ağ anahtarı + `onay`.
 
 ## Faz Detayları
 
@@ -574,6 +578,10 @@ kolları) kilit yolunu etkilemediği için beklemede.
     hata emri gerçekleştirdiyse ikinci emir gitmez, mutabakat kolu durdurur. Emir kimliği yeniden denemede R1, R2… eki
     alır (aynı kimlikle ikinci kayıt tablonun tekilliğine takılıyordu). Sağlık bekçisine `kilit_takvim` eklendi: günün
     DefiLlama takvimi 00:40 UTC'ye kadar yoksa uyarı, iki gün eksikse hata (takvimsiz gün yeni olay açılmaz).
+  - 2026-10-07 kontrol (`docs/turnuva/Canli-Kontrol-2026-10-07.md`): kararlar zamanında, Demo'da 5 açılıştan 2'si
+    düştü (PUMP ortam farkı, SEI geçici hata). bafd457: gerçek kol yeni olayı yalnız emrin gideceği ortamın
+    `exchangeInfo`'sunda da `TRADING` ise açar (okunamazsa o gün yeni olay yok, kapanış değişmez). Plan: mekanik kapı =
+    Demo'da 3 doğal tam tur + temiz mutabakat; kanıt kapısı DSR (0,98). Geçince ana ağ anahtarı ve `onay` Scryne'dan.
 
 ### Faz 13: Sonraki dalgalar (koşullu)
 - **İşler:** Ücretli veriyle ABD tek hisseleri; Databento ile CME vadelileri; VİOP; gerekirse IB bağlantısı;
