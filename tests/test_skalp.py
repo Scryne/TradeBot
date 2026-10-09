@@ -136,3 +136,8 @@ def test_deney_bitince_durur_ve_ozet_gonderir():
         _adim(n, saat)
     assert kp.poz == 0.0 and any("deneyi bitti" in x for x in mesaj)
     assert [o.tur for o in n.defter.kol_olaylari(n.kol.ad)][-1] == "durdur"
+    adet = len(mesaj)
+    for _ in range(3):                       # duran ve düz kol: 30 dk'lık özet artık gelmez
+        saat.ms += sk.OZET_MS
+        n.tur()
+    assert len(mesaj) == adet

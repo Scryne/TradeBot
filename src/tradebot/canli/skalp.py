@@ -205,6 +205,8 @@ class SkalpDugumu(AltinDugumu):
     def _ozet(self, simdi: int, orta: float) -> None:
         self.son_ozet = simdi
         d = self._d()
+        if d.durdurulmus and not d.adet:     # duran ve düz kol: özet gürültü (deney bitince 30 dk'da bir "0 işlem")
+            return
         son = self.istatistik(simdi - OZET_MS)
         tum = self.istatistik(0)
         sp = float(np.median(self.spreadler)) if self.spreadler else float("nan")
@@ -239,8 +241,9 @@ def calistir(sure_sn: float | None = None, dongu_sn: float = 3.0) -> None:
     dugum = SkalpDugumu(PaperDefter(db_motor(a), os.environ.get("TRADEBOT_KOD_SURUMU", "yerel")), ay, p,
                         Mt5Istemci(a.mt5_kopru_forex, zaman_asimi=30), bildir=lambda m: bildirici.gonder("BILGI", m))
     dugum.ac()
-    bildirici.gonder("BILGI", f"Skalp botu başladı (NCM demo, altın 0,01 lot, ~{p.bekleme_ms // 1000} sn'de bir işlem "
-                              f"denemesi). Her 30 dakikada özet gelir.")
+    if not dugum._d().durdurulmus:
+        bildirici.gonder("BILGI", f"Skalp botu başladı (NCM demo, altın 0,01 lot, ~{p.bekleme_ms // 1000} sn'de bir "
+                                  f"işlem denemesi). Her 30 dakikada özet gelir.")
     bas = time.monotonic()
     while sure_sn is None or time.monotonic() - bas < sure_sn:
         try:
