@@ -64,6 +64,10 @@ MODELLER = {
     # içinden geniş; Alpaca paper OPG'yi müzayede fiyatıyla değil anlık bid/ask'tan dolduruyor (2021 ölçümü 12–43 bps
     # sapma, docs/turnuva/Dalga-19-Nasdaq.md). Gidiş-dönüş 11 bps. Açığa satış yıllık %1 (kollar yalnız uzun).
     "NASDAQ:hisse": MaliyetModeli("nasdaq_hisse", 0.5, 2.0, 3.0, aciga_satis_yillik=0.01),
+    # Gün içi QQQ (dalga 20; veri Dukascopy Nasdaq 100 CFD saatlik, uygulama Alpaca'da QQQ): QQQ kotasyon spread'i
+    # ~1 sent (~0,2 bps) → yarım spread 0,5 bps (aleyhte), kayma 1,2 bps (seans içi piyasa emri), ücret 0,3 bps (satışta
+    # SEC/TAF) → taraf başı 2 bps, gidiş-dönüş 4 bps. Pozisyon gece taşınmaz: finansman yok. Kısa: ödünç %1/yıl.
+    "ABD:qqq_gun_ici": MaliyetModeli("qqq_gun_ici", 0.3, 0.5, 1.2, aciga_satis_yillik=0.01),
     "BIST:hisse": MaliyetModeli("bist_hisse", 4.0, 5.0, 5.0, ucret_vergisi=0.05),
     "BIST:endeks": MaliyetModeli("bist_endeks_vadeli_vekil", 2.0, 2.0, 2.0),  # endeks doğrudan alınamaz; VİOP vekili
     "VIOP:endeks_vadeli": MaliyetModeli("viop_endeks", 2.0, 2.0, 2.0, finansman_yillik=0.012, ucret_vergisi=0.05),

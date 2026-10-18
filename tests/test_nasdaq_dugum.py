@@ -199,3 +199,29 @@ def test_emekli_dugum_alarm_uretmez_gozetmen_kapatmasi_emeklilik_degil(ortam):
     assert aktif_kollar(m, "nasdaq") == []                      # durdurulmuş + düz: emekli
     d.defter.kol_olay_yaz(kol, "durdur", {"neden": NEDEN})
     assert aktif_kollar(m, "nasdaq") == [kol]                   # donma kapatması: motor hâlâ izlenir
+
+
+def test_gozetmen_nasdaq_donmasinda_yalniz_kendi_sembollerini_kapatir(ortam):
+    from tradebot.canli.gozetmen import Gozetmen, net_pozisyonlar
+
+    d, s = _dugum(ortam)
+    d.tur()
+    s["t"] = PZT_ACILIS + 4 * 60_000
+    d.tur()                                                   # iç yürütme: pozisyonlar açıldı, işaret yazıldı
+    kol = d.ay.kollar[0].ad
+    acik = net_pozisyonlar(ortam[0])[kol]
+
+    class Kapatan:
+        def __init__(self):
+            self.kapanan = []
+
+        def kapat(self, sembol):
+            self.kapanan.append(sembol)
+
+    alp = Kapatan()
+    t = {"ms": PZT_ACILIS + 4 * 3_600_000}
+    g = Gozetmen(ortam[0], lambda ks: {k: (100.0, 100.0) for k in ks}, "test", dugum="nasdaq", alpaca=alp,
+                 onay_tur=1, isinma_sn=0, saat=lambda: t["ms"] / 1000)
+    r = g.kontrol()
+    assert r["durum"] == "donma" and sorted(alp.kapanan) == sorted(k.split(":")[1] for k in acik)
+    assert not net_pozisyonlar(ortam[0]).get(kol)

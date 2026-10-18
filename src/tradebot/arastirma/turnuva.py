@@ -43,6 +43,7 @@ from tradebot.cekirdek import StratejiTanimi, altin, nedensellik_testi, ornek
 from tradebot.cekirdek import aileler as al
 from tradebot.cekirdek import doviz_akis as da
 from tradebot.cekirdek import endeks_takvim as et
+from tradebot.cekirdek import gun_ici as gi
 from tradebot.cekirdek import haber as hb
 from tradebot.cekirdek import hisse as hs
 from tradebot.cekirdek import sapma_stoch as ss
@@ -104,6 +105,8 @@ STRATEJILER = {
     "kisa_donus": ("ortalamaya_donus", hs.kisa_donus, "panel"),
     "dusuk_oynaklik": ("dusuk_oynaklik", hs.dusuk_oynaklik, "panel"),
     "esit_agirlik": ("trend", hs.esit_agirlik, "panel"),
+    # Dalga 20: gün içi ivme, Nasdaq 100 saatlik (docs/turnuva/Dalga-20-Gun-Ici.md); yeni aile
+    "gun_ici_ivme": ("gun_ici_ivme", gi.gun_ici_ivme, "tek"),
 }
 
 

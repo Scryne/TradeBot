@@ -188,10 +188,6 @@ class Gozetmen:
             return self._binance_donma(simdi_ms, int(son), yas_dk, durdurulacak, kollar)
         if self.mt5 is not None:
             return self._mt5_donma(simdi_ms, int(son), yas_dk, durdurulacak)
-        if self.alpaca is not None and not self.kuru:
-            # Nasdaq (Alpaca paper): aracı kurum düğümden bağımsızdır; bütün pozisyonlar orada da kapatılır. Defter aşağıda
-            # son fiyattan aleyhte kapatılır (düğüm geri gelince mutabakat ikisini karşılaştırır).
-            self.alpaca.hepsini_kapat()
         acik = {k: v for k, v in net_pozisyonlar(self.motor).items() if k in kollar}
         if not durdurulacak and not acik:
             return {"durum": "donma", "yas_dk": yas_dk, "kapatilan": {}, "durdurulan": []}
@@ -199,6 +195,12 @@ class Gozetmen:
             return {"durum": "donma", "yas_dk": yas_dk, "kuru": True, "kapatilacak": acik, "durdurulacak": durdurulacak}
         kimlikler = sorted({k for v in acik.values() for k in v})
         fiyat = self.fiyat_al(kimlikler) if kimlikler else {}   # hata yükselir: kapatılamadı, bir sonraki tur dener
+        if self.alpaca is not None:
+            # Nasdaq (Alpaca paper): aracı kurum düğümden bağımsızdır; düğümün sembolleri orada da kapatılır (hesap iki
+            # düğümce paylaşılır: yalnız bu düğümün sembolleri). Defter son fiyattan aleyhte kapatılır; düğüm geri gelince
+            # mutabakat ikisini karşılaştırır.
+            for k in kimlikler:
+                self.alpaca.kapat(k.split(":", 1)[1].replace(".", "-"))
         kapatilan = self._kapat(acik, fiyat, simdi_ms, int(son))
         for k in durdurulacak:
             self._olay(k, simdi_ms, {"neden": NEDEN, "son_isaret_ms": int(son), "kapatilan": kapatilan.get(k, {})})

@@ -1,0 +1,40 @@
+# Turnuva dalga 20 — Nasdaq 100 gün içi ivme (saatlik): ÖN KAYIT (koşudan önce commit edilir, koşu sırasında değişmez).
+# Gerekçe: docs/turnuva/Dalga-20-Gun-Ici.md. Veri Dukascopy Nasdaq 100 CFD saatlik (BID, 2011-09 →), pozisyon yalnız
+# XNYS seansında; uygulama Alpaca'da QQQ (ABD:qqq_gun_ici, taraf başı 2 bps). Pozisyon gece taşınmaz.
+
+dalga: 20
+veri_bitis: "2026-01-01"        # 2026-01 → kör (seçilen varyant sonradan ölçülür; bilgi, kapı değil)
+frenler: true
+boyut:
+  hedef_vol: 0.25
+  kaldirac: 1.0
+  vol_pencere_gun: 60
+  bant: 0.0
+walk_forward: { is_yil: 3, oos_yil: 1 }
+# Çıta 0: kol zamanın ~%4–8'inde pozisyondadır; backtest nakdi faizsiz sayar (aleyhte), gerçek hesapta nakit bacağı
+# faizi ayrıca kazanır. Ölçülen getiri saf gün içi fazla getiridir (dalga 11'deki çoğunlukla nakitte kalan kollar gibi).
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0, risksiz_yillik: 0.0 }
+
+planlar:
+  gun_ici_ivme:
+    kimlik: 2026-10-18-d20-gun-ici-ivme
+    hipotez: >-
+      Nasdaq 100'de günün ilk yarım saatinin getirisi (önceki 16:00 NY → 10:00 NY) son saatin (15:00/14:00 → 16:00 NY)
+      yönünü öngörür (Gao, Han, Li, Zhou 2018, JFE). QQQ maliyeti (gidiş-dönüş 4 bps) sonrası pozitif ve walk-forward'da
+      kalıcıdır. Yeni aile. Sıfır hipotezi: değildir.
+
+gruplar:
+  nasdaq100_saatlik:
+    kimlikler: [DUKASCOPY:USATECHIDXUSD]
+    seans: XNYS
+    maliyet_modeli: ABD:qqq_gun_ici
+    asgari_gecmis_gun: 60
+    yon: long_short
+    zd: [1h]
+
+# 4 deneme
+kollar:
+  - strateji: gun_ici_ivme
+    gruplar: [nasdaq100_saatlik]
+    zd: [1h]
+    izgara: { tutma: [1, 2], kisa: [false, true] }

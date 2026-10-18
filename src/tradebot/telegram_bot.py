@@ -281,11 +281,12 @@ class Telegram:
 def ayri_dugum_kollari() -> list[PaperKol]:
     """Nautilus dışı düğümlerin kolları (kilit, MT5 demo kolları). "Hepsini durdur" bunları da kapsar (kural 7: riski
     azaltan her şey otomatik); 2026-09-30'a kadar yalnız kilit vardı, MT5 kolları dışarıda kalıyordu."""
-    from tradebot.canli import akis, altin, doviz, kilit, nasdaq, skalp
+    from tradebot.canli import akis, altin, doviz, kilit, nasdaq, nasdaq_gun_ici, skalp
 
     sk = skalp.ayarlar()
     nq = nasdaq.ayarlar()
-    return list(nq.kollar if nq else ()) + [
+    gi = nasdaq_gun_ici.ayarlar()
+    return list(nq.kollar if nq else ()) + ([gi.kol] if gi else []) + [
         ay.kol for ay in (kilit.ayarlar(), kilit.ayarlar(blok=kilit.GERCEK_BLOK), doviz.ayarlar(), altin.ayarlar(),
                           akis.ayarlar(), sk[0] if sk else None) if ay is not None]
 

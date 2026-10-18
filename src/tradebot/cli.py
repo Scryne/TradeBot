@@ -125,7 +125,7 @@ def saglik_komutu(
         time.sleep(dongu)
 
 
-DUGUMLER = ("nasdaq", "paper", "kilit", "kilit_gercek", "doviz", "altin", "akis", "skalp")   # her süreç ayrı gözetmen
+DUGUMLER = ("nasdaq", "nasdaq_gun_ici", "paper", "kilit", "kilit_gercek", "doviz", "altin", "akis", "skalp")
 MT5_DUGUMLER = ("doviz", "altin", "akis", "skalp")                  # gözetmen bunlarda köprüden gerçek kapatma emri verir
 
 
@@ -143,7 +143,7 @@ def _gozetmen_kur(a, **ayar):
         if ist is not None:
             ayar |= {"binance": ist}
     fiyat_al = binance_kotasyon(NazikIstemci("gozetmen", deneme=3, zaman_asimi=15).al)
-    if ayar.get("dugum") == "nasdaq":   # Yahoo son fiyatı; Alpaca anahtarı varsa orada da kapatır
+    if ayar.get("dugum") in ("nasdaq", "nasdaq_gun_ici"):   # Yahoo son fiyatı; Alpaca anahtarı varsa orada da kapatır
         from tradebot.canli.gozetmen import yahoo_kotasyon
         from tradebot.canli.nasdaq import alpaca_istemci
 
@@ -1077,6 +1077,15 @@ def paper_nasdaq(sure: float = typer.Option(0.0, help="Saniye; 0 = süresiz"),
     from tradebot.canli import nasdaq
 
     nasdaq.calistir(sure or None, dongu)
+
+
+@paper_uygulama.command("nasdaq-gun-ici")
+def paper_nasdaq_gun_ici(sure: float = typer.Option(0.0, help="Saniye; 0 = süresiz"),
+                         dongu: float = typer.Option(20.0, help="Tur aralığı (saniye)")) -> None:
+    """Nasdaq gün içi paper düğümü (compose `nasdaq-gun-ici`; dalga 20, QQQ): saat başı karar, 15:59 NY çıkış."""
+    from tradebot.canli import nasdaq_gun_ici
+
+    nasdaq_gun_ici.calistir(sure or None, dongu)
 
 
 @paper_uygulama.command("alpaca-kontrol")

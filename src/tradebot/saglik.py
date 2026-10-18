@@ -274,6 +274,19 @@ def nasdaq_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
     return paper_kontrol(a, simdi_ms, "nasdaq")
 
 
+def nasdaq_gun_ici_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
+    """Nasdaq gün içi düğümünün kalp atışı (canli/nasdaq_gun_ici.py, saatte bir işaret). Kol yoksa bilgi."""
+    from tradebot.canli.gozetmen import dugum_kollari
+    from tradebot.db import motor
+
+    try:
+        if not dugum_kollari(motor(a)).get("nasdaq_gun_ici"):
+            return Sonuc("nasdaq_gun_ici", "OK", "gün içi kolu henüz açılmadı")
+    except Exception as e:  # noqa: BLE001
+        return Sonuc("nasdaq_gun_ici", "HATA", f"{type(e).__name__}: {e}"[:200])
+    return paper_kontrol(a, simdi_ms, "nasdaq_gun_ici")
+
+
 def doviz_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
     """Döviz düğümünün kalp atışı (canli/doviz.py, saatte bir işaret). Kol henüz açılmadıysa bilgi."""
     from tradebot.canli.gozetmen import dugum_kollari
@@ -464,8 +477,8 @@ def skalp_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
 def hepsi(a: Ayarlar) -> list[Sonuc]:
     kontroller = [dns_kontrol, saat_kontrol, veritabani_kontrol, disk_kontrol, sir_kontrol]
     if a.ortam == "host" and a.veritabani_url is not None:
-        kontroller += [nasdaq_kontrol, paper_kontrol, kilit_kontrol, kilit_takvim_kontrol, kilit_gercek_kontrol,
-                       doviz_kontrol, altin_kontrol, akis_kontrol, skalp_kontrol, gece_kontrol]
+        kontroller += [nasdaq_kontrol, nasdaq_gun_ici_kontrol, paper_kontrol, kilit_kontrol, kilit_takvim_kontrol,
+                       kilit_gercek_kontrol, doviz_kontrol, altin_kontrol, akis_kontrol, skalp_kontrol, gece_kontrol]
     if a.yedek_dizini is not None:
         kontroller.append(yedek_kontrol)
     if a.mt5_kopru_forex or a.mt5_kopru_viop:

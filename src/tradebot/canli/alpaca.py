@@ -104,6 +104,15 @@ class AlpacaPaper:
     def emir_iptal(self, emir_id: str) -> None:
         self._iste("DELETE", f"/v2/orders/{emir_id}")
 
+    def kapat(self, sembol: str) -> dict | None:
+        """Tek sembolün pozisyonunu piyasa emriyle kapatır (gözetmen; yalnız düğümün kendi sembolleri). Yoksa None."""
+        try:
+            return self._iste("DELETE", f"/v2/positions/{sembol}")
+        except AlpacaHatasi as e:
+            if e.durum == 404:
+                return None
+            raise
+
     def hepsini_kapat(self) -> list[dict]:
         """Bütün açık emirleri iptal eder, bütün pozisyonları piyasa emriyle kapatır (gözetmen; riski azaltan)."""
         return self._iste("DELETE", "/v2/positions", params={"cancel_orders": "true"}) or []

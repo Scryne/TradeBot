@@ -159,6 +159,14 @@ services:
     depends_on:
       goc: { condition: service_completed_successfully }
 
+  nasdaq-gun-ici:
+    <<: *ortak
+    # Nasdaq gün içi paper düğümü (canli/nasdaq_gun_ici.py; dalga 20, QQQ): saat başı karar (backtest fonksiyonu QQQ
+    # dakikalıklarından kurulan saatlik barla), 15:59 NY'de çıkış, gece pozisyon yok. Kalp atışı ayrı (`nasdaq_gun_ici`).
+    command: ["tradebot", "paper", "nasdaq-gun-ici"]
+    depends_on:
+      goc: { condition: service_completed_successfully }
+
   paper:
     <<: *ortak
     profiles: ["eski"]   # kripto Nautilus düğümü; kolları 2026-10-05'ten beri durdurulmuş (emekli)
