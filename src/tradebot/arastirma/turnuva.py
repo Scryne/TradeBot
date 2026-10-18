@@ -461,8 +461,11 @@ def _aile_haftalik_sr(defter: Defter, aile: str) -> list[float]:
     from tradebot.db import deneme
 
     with defter.motor.connect() as b:
-        return [m.get("sharpe_haftalik", 0.0) for m in
-                b.execute(select(deneme.c.metrik).where(deneme.c.aile == aile, deneme.c.tur == "tarama")).scalars()]
+        # Alanı olmayan eski kayıt (haftalık Sharpe ölçülmeden yazılmış) dışarıda: 0 yazmak varyansı şişirip DSR eşiğini
+        # bozardı (2026-10-18 denetimi)
+        return [m["sharpe_haftalik"] for m in
+                b.execute(select(deneme.c.metrik).where(deneme.c.aile == aile, deneme.c.tur == "tarama")).scalars()
+                if "sharpe_haftalik" in m]
 
 
 # ------------------------------------------------------------------ dalga dosyası

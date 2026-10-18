@@ -163,6 +163,8 @@ SECIMLI_SIRLAR = ("binance_anahtar", "binance_gizli",   # yalnız gerçek kilit 
 
 
 def sir_kontrol(a: Ayarlar) -> Sonuc:
+    if not a.sir_denetimi:
+        return Sonuc("sirlar", "OK", "bu süreçte sır yok (pano); denetim bekçide")
     tanimli = {ad: getattr(a, ad) is not None for ad in SIR_ALANLARI}
     eksik = [ad for ad, v in tanimli.items() if not v and ad not in SECIMLI_SIRLAR]
     durum = "OK" if not eksik else "UYARI"

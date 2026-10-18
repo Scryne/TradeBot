@@ -143,7 +143,18 @@ services:
     # Faz 10: salt okunur web pano. Port yalnız 127.0.0.1'e açılır (LAN'a değil); telefona/ana bilgisayara Tailscale
     # taşır: host'ta bir kez `tailscale serve --bg --tcp=8080` (tools/host/pano_tailscale.ps1). Yedek dizini sağlık için.
     command: ["tradebot", "pano", "calis", "--port", "8080"]
+    # Pano yalnız okur: .env (Binance/Alpaca/Telegram/TypeSafe anahtarları) verilmez; ortam aşağıda açıkça (compose
+    # değişken yerleştirmesi .env'i ayrıca okur). Panodaki bir açık sırları açığa çıkarmasın (2026-10-18 denetimi).
+    env_file: []
     ports: ["127.0.0.1:8080:8080"]
+    environment:
+      TRADEBOT_ORTAM: ${TRADEBOT_ORTAM:-host}
+      TRADEBOT_VERITABANI_URL: postgresql+psycopg://tradebot:${POSTGRES_PASSWORD}@postgres:5432/tradebot
+      TRADEBOT_LOG_DIZINI: /app/log
+      TRADEBOT_VERI_DIZINI: /app/data
+      TRADEBOT_YEDEK_DIZINI: /yedek
+      TRADEBOT_KOD_SURUMU: ${KOD_SURUMU:-bilinmiyor}
+      TRADEBOT_SIR_DENETIMI: "false"
     volumes:
       - veri:/app/data
       - log:/app/log

@@ -47,6 +47,8 @@ class Ayarlar(BaseSettings):
     mt5_kopru_viop: str | None = None
     # Gece işinin adımları (sırayla). 2026-10-18 Nasdaq dönüşü: kripto/MT5/Dukascopy kolları emekli; compose `veri`
     # servisi yalnız Nasdaq ve kalan Yahoo/kalite/evren adımlarını koşar (TRADEBOT_GECE_ADIMLARI, JSON liste).
+    # Sırsız süreç (pano): .env verilmez, sır denetimi bu süreçte anlamsızdır (bekçi denetler)
+    sir_denetimi: bool = True
     gece_adimlari: tuple[str, ...] = ("nasdaq", "binance", "yahoo", "mt5", "kalite", "evren", "dukascopy")
 
     # Sağlık eşikleri (Spike 02/03: bu evde DNS 5–15 sn, saat 1 sn kaymıştı)

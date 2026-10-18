@@ -16,6 +16,8 @@ import numpy as np
 
 from tradebot.arastirma.maliyet import YIL_MS, MaliyetModeli
 
+ANLAMLI_DEVIR = 0.005
+
 
 @dataclass(frozen=True)
 class Sonuc:
@@ -30,15 +32,17 @@ class Sonuc:
 
     @property
     def islem_sayisi(self) -> int:
-        return int((self.devir > 1e-9).sum())
+        """Anlamlı işlem: devri özkaynağın ≥ %0,5'i olan bar. Fiyat kaymasının her bar ürettiği küçük dengelemeler
+        sayılmaz (2026-10-18 denetimi: bant 0'da 20 bar pozisyonda kalan tek giriş "yeterli işlem" kapısını geçiyordu)."""
+        return int((self.devir >= ANLAMLI_DEVIR).sum())
 
 
 def calistir(t: np.ndarray, fiyat: np.ndarray, sinyal: np.ndarray, mm: MaliyetModeli,
              yari_spread_bps: np.ndarray | None = None, bar_ms: int | None = None, bant: float = 0.0,
              izleyici=None) -> Sonuc:
-    """`bant`: yeniden dengeleme bandı. Hedef değişmedikçe ağırlık fiyatla kayar; kayan ağırlık hedeften `bant`'tan fazla
-    saparsa hedefe döndürülür. 0 = her bar hedefe dengele (sabit ağırlık); büyük bant = adedi tut (yalnız sinyal
-    değişince işlem; Nautilus'taki emir mantığıyla aynı).
+    """`bant`: yeniden dengeleme bandı (oransal, panel motoruyla aynı: |h − kaymış| > bant × |h|). Hedef değişmedikçe
+    ağırlık fiyatla kayar; kayan ağırlık hedeften fazla saparsa hedefe döndürülür. 0 = her bar hedefe dengele (sabit
+    ağırlık); büyük bant = adedi tut (yalnız sinyal değişince işlem; Nautilus'taki emir mantığıyla aynı).
 
     `izleyici`: `risk.motor.PortfoyIzleyici`. Verilirse her bar başında özkaynakla güncellenir: fren → yeni risk yok
     (pozisyon küçülebilir, büyüyemez); acil durdurma → pozisyon 0 ve öyle kalır (onaysız yeniden başlama yok)."""
@@ -72,7 +76,7 @@ def calistir(t: np.ndarray, fiyat: np.ndarray, sinyal: np.ndarray, mm: MaliyetMo
                 h = float(np.sign(h) * min(abs(h), abs(kaymis))) if np.sign(h) == np.sign(kaymis) else 0.0
         degisti = i == 0 or h != onceki_h  # etkin hedef değişti mi (sinyal ya da fren)
         onceki_h = h
-        if degisti or abs(h - kaymis) > bant:
+        if degisti or abs(h - kaymis) > bant * abs(h):
             w[i], devir[i] = h, abs(h - kaymis)
         else:
             w[i], devir[i] = kaymis, 0.0
