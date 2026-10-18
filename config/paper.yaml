@@ -159,3 +159,25 @@ akis:
   spread_bekle_dk: 30
   magic: 911
   baslangic_ozkaynak: 10000
+
+# Nasdaq günlük kolu (dalga 19 B; docs/turnuva/Dalga-19-Nasdaq.md). Ayrı düğüm (canli/nasdaq.py, compose `nasdaq`):
+# kapanış + 25 dk karar (backtest zinciri: PIT Nasdaq-100 üyeliği + dönem kapsamı), ertesi açılışta dolum (Alpaca paper
+# anahtarı varsa Alpaca, yoksa iç simülasyon). Grup ve boyut dalga dosyasıyla birebir (kol tanımı değişirse yeni kol adı).
+nasdaq:
+  yurutme: otomatik
+  baslangic_ozkaynak: 100000
+  boyut: {hedef_vol: 0.20, kaldirac: 1.0, vol_pencere_gun: 60, bant: 0.25}
+  grup: {dinamik: nasdaq, uyelik: nasdaq100, kapsam_tolerans_gun: 10, asgari_gecmis_gun: 60, yon: long}
+  kollar:
+    - {ad: "d19:esit_agirlik@nasdaq100@1d", strateji: esit_agirlik, parametre: {filtre_gun: 200, aylik: true}, sinif: B}
+
+# Nasdaq gün içi kolu (dalga 20 KALDI; ön kayıt gereği en iyi varyant GÖZLEM kolu; docs/turnuva/Dalga-20-Gun-Ici.md).
+# Ayrı düğüm (canli/nasdaq_gun_ici.py, compose `nasdaq-gun-ici`): QQQ, 14:00 NY'de r1 > 0 ise uzun, 15:59 NY'de kapanır.
+nasdaq_gun_ici:
+  ad: "d20:gun_ici_ivme@qqq@1h"
+  strateji: gun_ici_ivme
+  parametre: {tutma: 2, kisa: false}
+  sinif: gozlem
+  boyut: {hedef_vol: 0.25, kaldirac: 1.0, vol_pencere_gun: 60}
+  yurutme: otomatik
+  baslangic_ozkaynak: 100000

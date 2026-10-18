@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-10-18
 type: turnuva-plani
-durum: ön kayıt (koşudan önce commit edildi)
+durum: sonuçlandı — B (esit_agirlik), diğerleri KALDI (2026-10-18)
 ---
 # Turnuva — Dalga 19: Nasdaq-100 hisseleri, günlük (ön kayıt)
 
@@ -75,3 +75,30 @@ Kıyas (bilgi, deneme değil): evrenin eşit ağırlıklı al-tutu ve QQQ.
   varyant "gözlem kolu" etiketiyle paper'a girer ve haftalık raporda backtest sonucuyla birlikte gösterilir. Gerçek
   para kapısı değişmez (Final Doküman: DSR ≥ 0,95 + plato ya da paper PSR(0) ≥ 0,95; kural 7 onayı).
 - Sonuca bakıp ızgara ya da ölçüt değiştirilmez (kural 10); ek fikir yeni dalgadır.
+
+## Sonuç (2026-10-18, koşu `dalga19`, ön kayıt 4b51541)
+
+**B: `esit_agirlik` (filtre 200 gün). KALDI: momentum, kısa vadeli dönüş, düşük oynaklık.** 18 deneme; DSR nihai deneme
+sayılarıyla (`arastirma sonlandir`). Dönem 2007-02 → 2025-12; kör 2026-01 → 10-16 (bilgi).
+
+| Strateji | En iyi varyant | Yıllık | Sharpe | En kötü düşüş | En kötü hafta | OOS yıllık | DSR (deneme) | Kör 2026 | Neden |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| esit_agirlik | filtre 200 | +%8,7 | 0,72 | −%25 | −%6,9 | +%12,4 | 0,00 (679) | +%10,2 | **B** (DSR şartı yok) |
+| hisse_momentum | 126 gün, ilk 10, filtresiz | +%15,6 | 0,85 | −%33 | −%15,7 | +%12,3 | 0,72 (50) | +%31,7 | en kötü hafta < −%10, 2 acil durdurma |
+| dusuk_oynaklik | 60 gün, ilk 20, filtresiz | +%10,8 | 0,82 | −%33 | −%11,3 | +%13,7 | 1,00 (4) | +%8,2 | en kötü hafta < −%10, 1 acil durdurma |
+| kisa_donus | 10 gün, en kötü 10, trend 200 | +%8,9 | 0,56 | −%31 | −%12,4 | +%10,6 | 0,11 (84) | +%31,3 | en kötü hafta, 3 acil durdurma |
+
+Kıyas (bilgi, deneme değil): evrenin eşit ağırlıklı al-tutu +%11,0/yıl, Sharpe 0,72, düşüş −%36 (kör 2026 +%18,7);
+QQQ al-tut +%15,9/yıl, Sharpe 0,80, düşüş −%52 (kör 2026 +%22,1).
+
+- **Hayatta kalma yanlılığı büyük ve ölçüldü:** verisi olan üye-gün oranı 2007–2013'te %60–70, 2016'da %76, 2020'de
+  %87, 2024'te %96. Kaynakta olmayan üyeler çoğunlukla satın alınanlar (ATVI, CELG, XLNX, YHOO, SGEN, SPLK…) ve 2012
+  öncesi eski üyelerdir; erken yılların sonuçları iyimser olabilir. Grup bu yüzden en fazla B'ydi.
+- **esit_agirlik B:** al-tutun getirisini yaklaşık korurken (OOS +%12,4) düşüşü −%36'dan −%25'e indiriyor; 2022'de
+  −%13. Trend ailesi 679 denemeyle sayıldığı için DSR ~0: A olamaz, sermayesiz paper gözlemi sınıfıdır (Final Doküman).
+- **Momentum ve düşük oynaklık** getiri ve walk-forward'da güçlü, ama ön kayıtlı tam dönem kapısını (kol başına en kötü
+  hafta ≥ −%10) 2008/2020 çöküş haftalarında geçemedi. Sonuca bakıp kapı gevşetilmez (kural 10); daha sıkı risk
+  katmanıyla (ör. oynaklık hedefi ya da piyasa filtresi zorunlu) yeni ön kayıt ayrı dalga olur.
+- Kısa vadeli dönüş büyük hisselerde zayıf (Hou-Xue-Zhang 2020 ile tutarlı): yüksek devir (yılda 54x), DSR 0,11.
+
+**Paper'a giren (ön kayıt gereği):** `d19:esit_agirlik@nasdaq100@1d` (filtre 200, aylık), sınıf B, Nasdaq düğümü.

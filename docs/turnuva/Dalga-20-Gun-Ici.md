@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-10-18
 type: turnuva-plani
-durum: ön kayıt (koşudan önce commit edildi)
+durum: sonuçlandı — KALDI (2026-10-18)
 ---
 # Turnuva — Dalga 20: Nasdaq 100 gün içi ivme, saatlik (ön kayıt)
 
@@ -58,3 +58,22 @@ taraf başı 2 bps, gidiş-dönüş 4 bps. Kısa bacakta ödünç %1/yıl. Stres
 - **Hiçbiri geçmezse:** Scryne'ın gün içi kol seçimi gereği walk-forward OOS Sharpe'ı en yüksek varyant "gözlem kolu"
   etiketiyle paper'da çalışır; haftalık raporda backtest sonucuyla birlikte gösterilir. Gerçek para kapısı değişmez.
 - Sonuca bakıp ızgara değiştirilmez (kural 10).
+
+## Sonuç (2026-10-18, koşu `dalga20`, ön kayıt 113bbda)
+
+**KALDI: 4 varyantın hepsi eksi.** 2011-09 → 2025-12; kör 2026 bilgi.
+
+| Varyant | Yıllık | Sharpe | En kötü düşüş | Maruziyet | Kör 2026 |
+| --- | --- | --- | --- | --- | --- |
+| yalnız uzun, son 2 saat (en iyi) | −%1,6 | −0,52 | −%21 | %2,1 | −%0,3 |
+| yalnız uzun, son saat | −%2,6 | −1,13 | −%32 | %1,1 | +%0,1 |
+| iki yönlü, son 2 saat | −%3,6 | −0,75 | −%41 | %3,9 | +%3,3 |
+| iki yönlü, son saat | −%4,2 | −1,22 | −%46 | %1,9 | −%0,6 |
+
+- En iyi varyant 14 tam yılın yalnız 2'sinde artı (2020, 2022: yüksek oynaklık yılları); walk-forward OOS −%2,1/yıl,
+  stres altında −%4,2. Sinyalin brüt kenarı gidiş-dönüş 4 bps maliyeti karşılamıyor; saatlik çözünürlük (son yarım saat
+  yerine son saat) etkiyi seyreltmiş olabilir: Alpaca QQQ dakikalığıyla (2016+) son yarım saat versiyonu ayrı ön kayıtla
+  ölçülebilir.
+
+**Paper'a giren (ön kayıt gereği, hiçbiri geçmediği için):** en iyi varyant (yalnız uzun, son 2 saat)
+`d20:gun_ici_ivme@qqq@1h` **gözlem kolu** olarak; beklentisi sıfırın altındadır ve haftalık raporda böyle gösterilir.

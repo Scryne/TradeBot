@@ -1,7 +1,9 @@
 # TradeBot
 
-Scryne'ın kendi hesabı için kurumsal kalitede, çok piyasalı, tamamen otonom trade sistemi. İlk aşama yalnız paper.
-Motor NautilusTrader v2. Etrafındaki katmanlar bize ait: zekâ (Jev), araştırma/turnuva, risk ve operasyon.
+Scryne'ın kendi hesabı için kurumsal kalitede, tamamen otonom trade sistemi. İlk aşama yalnız paper.
+**2026-10-18'den beri odak Nasdaq (ABD hisseleri):** point-in-time Nasdaq-100 evreni, günlük kesitsel kol ve QQQ gün içi
+kolu, Alpaca paper (anahtar yoksa iç simülasyon). Kripto/forex kolları emekli. Etrafındaki katmanlar bize ait: araştırma
+/turnuva (ön kayıt, deneme defteri, DSR), beş katmanlı risk, zekâ (Jev), operasyon (gözetmen, Telegram, pano).
 
 | Soru | Belge |
 | --- | --- |
@@ -29,6 +31,10 @@ docker compose run --rm --no-deps saglik tradebot saglik   # sağlık raporu
 | `tradebot saglik [--dongu SN] [--json]` | DNS, saat kayması (NTP + Binance), veritabanı + denetim izi zinciri, disk, sırlar |
 | `tradebot db yukselt` | Alembic göçlerini uygular |
 | `tradebot db denetim-dogrula` | Denetim izinin hash zincirini doğrular |
+| `tradebot veri nasdaq [--guncel]` | Nasdaq-100 PIT üyelik + bütün tarihî üyelerin Yahoo günlük barları |
+| `tradebot arastirma turnuva --dosya config/turnuva/dalga19_nasdaq.yaml` | Ön kayıtlı dalgayı koşar (her varyant deneme defterine) |
+| `tradebot paper nasdaq` · `tradebot paper nasdaq-gun-ici` | Nasdaq günlük ve gün içi paper düğümleri (compose `nasdaq`, `nasdaq-gun-ici`) |
+| `tradebot paper alpaca-kontrol` | Alpaca PAPER hesabını salt okur (anahtar: `tools/host/alpaca_anahtar.ps1`) |
 
 > Kişisel araştırma yazılımıdır; yatırım tavsiyesi değildir, para kaybettirebilir. Yalnız sahibinin kendi
 > hesabında ve kendi sermayesiyle çalışır.

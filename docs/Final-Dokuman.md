@@ -19,6 +19,21 @@ dağıtır. Emir yürütmeyi, muhasebeyi ve mutabakatı olgun bir motor (Nautilu
 farklı kılan katmanlar projeye özeldir: turnuva, sermaye dağıtıcı, beş katmanlı risk ve Jev tabanlı zekâ
 katmanı. İlk aşama tamamen paper'dır.
 
+## Yön (2026-10-18, Scryne)
+
+"Nasdaq gibi borsalarda çalışan bir trade bot olucak", günlük ve gün içi kollarla, host'ta 7/24 paper. Kripto, forex,
+BIST ve MT5 kolları emeklidir (durdurulmuş, düz; kodları ve defterleri durur, compose `eski` profilinde). Odak:
+
+| Katman | Nasdaq kararı |
+| --- | --- |
+| Evren | Nasdaq-100 point-in-time üyelik (n100tickers, sabit commit; 2007-02 →), bütün tarihî üyeler; sembol eşleme + dönem kapsamı |
+| Veri | Yahoo günlük toplam getiri (ücretsiz); Alpaca IEX/SIP (anahtar gelince; 2016+, kapanan semboller dahil) |
+| Aracı kurum | Alpaca **paper** (herkese açık; yalnız paper uç noktası kodda). Anahtar yoksa iç simülasyon (aynı maliyet modeli) |
+| Günlük kol | Kapanıştan sonra karar, ertesi açılışta dolum; kesitsel stratejiler (dalga 19), nakit hesap, brüt ≤ 1x |
+| Gün içi kol | QQQ, son saat gün içi ivme (dalga 20); 15:59 NY'de kapanır, gece pozisyon yok |
+| Maliyet | Hisse taraf başı 5,5 bps (ücret 0,5 + yarım spread 2 + kayma 3); QQQ gün içi 2 bps |
+| Gerçek para | Değişmedi: kanıt kapısı + Scryne'ın açık onayı (kural 7); Alpaca canlı uç noktası ayrı, onaylı karar |
+
 ## Teknoloji Stack
 
 | Katman | Seçim | Gerekçe |
@@ -101,6 +116,7 @@ katmanı. İlk aşama tamamen paper'dır.
 | FX, metaller, emtia, endeks CFD | Dukascopy: saatlik (aylık dosya) 20 yıl, dakikalık son 2–3 yıl; nazik indirici (Spike 03) | MT5 demo + Windows köprü servisi (Spike 05) | Merkez bankası metinleri, GDELT (dosya dökümü) |
 | ABD ETF'leri | Yahoo günlük (`period1/period2`; SPY 1993→) | Alpaca paper IEX akışı, kendi istemcimiz (Spike 05) | SEC EDGAR |
 | BIST (günlük) | Yahoo (.IS) + borsapy yedek; bedelsiz = Yahoo split + KAP (B1) | Yahoo/borsapy gecikmeli, kendi istemcimiz, sandbox dolum | KAP (borsapy üzerinden, HTML'den metin) |
+| Nasdaq-100 hisseleri (2026-10-18) | Yahoo günlük, PIT üyelik (n100tickers); 271 tarihî üyenin 74'ü kaynakta yok (raporlanır) | Alpaca paper (kesirli `day` emri, açılıştan 1 dk sonra) ya da iç simülasyon; son fiyat Yahoo/Alpaca IEX | SEC EDGAR 8-K (A3, sonraki adım) |
 
 **Sonraki dalgalar (ölçüm fırsat gösterirse, ayrı kararla):** ABD tek hisseleri (batmış hisseleri de
 içeren ücretli veri), CME vadelileri (Databento; 125 $ kredi, Nautilus'ta yerleşik bağlantı), VİOP

@@ -1,7 +1,7 @@
 ---
 proje: TradeBot
 created: 2026-09-24
-updated: 2026-10-07
+updated: 2026-10-18
 type: roadmap
 status: aktif (sürüm 2 — kurumsal, çok piyasalı)
 ---
@@ -29,6 +29,13 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 11 | Paper turnuvası — 12 hafta | 🔄 Devam Ediyor | 12 hafta kesintisiz paper; kademeli sermaye çalıştı; hangi kolların kapıyı geçtiği ve Jev katkısı raporlandı; maliyet varsayımları ölçüldü |
 | 12 | Gerçek para (koşullu) | ⏳ Bekliyor | Kanıt kapısı (DSR ≥ 0,95 ya da paper PSR(0) ≥ 0,95; mikro pilot yalnız Scryne'ın açık kararıyla) + aracı kurum/borsa + anahtar (çekim kapalı, IP kısıtlı) + vergi netliği; sabit tavanlı mikro sermaye; ilk emir Scryne onayıyla |
 | 13 | Sonraki dalgalar (koşullu) | ⏳ Bekliyor | Ölçüm fırsat gösterirse: ABD tek hisseleri (ücretli veri), CME vadelileri (Databento), VİOP; her biri ayrı kararla |
+| 14 | Nasdaq dönüşü — ABD hisse paper (günlük + gün içi) | 🔄 Devam Ediyor | PIT Nasdaq-100 evreni + Yahoo verisi host'ta güncel; dalga 19 (günlük) ve 20 (gün içi) sonuçlandı ve belgelendi; Nasdaq günlük ve gün içi paper düğümleri host'ta 7/24 (kalp atışı, gözetmen, Telegram, pano); Alpaca paper anahtarı gelince emir yolu Alpaca'da uçtan uca doğrulandı; 4 hafta kesintisiz paper |
+
+**Nasdaq dönüşü (2026-10-18, Scryne: "nasdaq gibi borsalarda çalışan bir trade bot olucak", "her şeyi sana bırakıyorum";
+günlük + gün içi, host'ta 7/24 paper):** 10-09 dondurması kalktı. Önce tam denetim (risk motorunda NaN ile tavan delinmesi,
+ters dönüşte kapatma reddi, Yahoo temettü ölçek kayması, gece işinde ve düğümlerde sessiz arızalar, log yapılandırması
+olmayan düğüm süreçleri; ayrıntı commit 83e701d). Kripto/forex kolları emekli (compose `eski` profili; durdurulmuş ve düz
+düğüm alarm üretmez). Yeni yol Faz 14.
 
 **Yön değişikliği (2026-10-05, Scryne):** "sürekli işlem açıp kapatan", "forex trade bot üstünde ilerliycez", "tüm
 kolları kapat", "haberlere göre işlem açan bot mu yaparsın, ne yaparsan yap", "tek amacım 1 haftada maximum para".
@@ -587,4 +594,17 @@ kapısı DSR yolu (d13 DSR 0,98); 26 haftalık PSR şartı kalktı. Sonrası Scr
 - **İşler:** Ücretli veriyle ABD tek hisseleri; Databento ile CME vadelileri; VİOP; gerekirse IB bağlantısı;
   A3 SEC 8-K rolü (Faz 6'dan taşındı).
 - **Bitti Kriteri:** tablodaki gibi.
+- **Notlar:**
+
+### Faz 14: Nasdaq dönüşü — ABD hisse paper (günlük + gün içi)
+- **İşler:** Nasdaq-100 point-in-time üyelik (`veri/nasdaq100.py`, n100tickers sabit commit; sembol eşleme ve dönem
+  kapsamı), bütün tarihî üyelerin Yahoo günlük verisi (`tradebot veri nasdaq`, gece işi); maliyet modeli (Alpaca nakit
+  hesabı: taraf başı 5,5 bps günlük, QQQ gün içi 2 bps); dalga 19 (günlük kesitsel: momentum, kısa vadeli dönüş, düşük
+  oynaklık, trend filtresi) ve dalga 20 (gün içi ivme, Gao ve ark. 2018); paper düğümleri `canli/nasdaq.py` (günlük;
+  karar kapanış + 25 dk, dolum ertesi açılış) ve `canli/nasdaq_gun_ici.py` (QQQ, 15:00 → 15:59 NY); Alpaca paper
+  istemcisi (yalnız paper uç noktası) ve anahtar betiği `tools/host/alpaca_anahtar.ps1`; gözetmen, sağlık, Telegram.
+- **Bitti Kriteri:** tablodaki gibi.
+- **Sınırlar (bilinen):** ücretsiz kaynakta 271 tarihî üyenin 74'ünün fiyatı yok (hayatta kalma yanlılığı; dalga 19 en
+  fazla B). Alpaca 2016+ verisiyle (kapanan semboller dahil) yeniden ölçüm ve gün içi kolun QQQ dakikalığıyla doğrulanması
+  anahtar gelince. A3 SEC 8-K Jev rolü (risk azaltan veto) sonraki adım.
 - **Notlar:**
