@@ -65,6 +65,21 @@ def binance_kotasyon(http_al) -> FiyatAl:
     return al
 
 
+def yahoo_kotasyon(http_al) -> FiyatAl:
+    """Nasdaq hisseleri için son fiyat (Yahoo; anahtar yok). Bid/ask yok: ikisi de son fiyat, kayma ayrıca aleyhte."""
+    import json
+
+    def al(kimlikler: list[str]) -> dict[str, tuple[float, float]]:
+        out = {}
+        for k in kimlikler:
+            s = k.split(":", 1)[1].replace(".", "-")
+            d = json.loads(http_al(f"https://query1.finance.yahoo.com/v8/finance/chart/{s}?interval=1m&range=1d"))
+            p = float(d["chart"]["result"][0]["meta"]["regularMarketPrice"])
+            out[k] = (p, p)
+        return out
+    return al
+
+
 def dugum_kollari(motor: Engine) -> dict[str, list[str]]:
     """Kollar süreçlerine göre: `paper` (Nautilus düğümü, saatlik) ve ayrı düğümler (tanımda `grup_tanim.dugum`, ör.
     `kilit`). Her düğümün kalp atışı ayrı izlenir: birinin işareti ötekinin donmasını gizlemesin."""
@@ -74,6 +89,23 @@ def dugum_kollari(motor: Engine) -> dict[str, list[str]]:
     for kol, t in rows:
         out[((t or {}).get("grup_tanim") or {}).get("dugum", "paper")].append(kol)
     return dict(out)
+
+
+def aktif_kollar(motor: Engine, dugum: str) -> list[str]:
+    """Düğümün korunacak kolları: son elle olayı `durdur` olup defterde pozisyonu da olmayan kol emeklidir (koruyacak
+    bir şeyi yoktur). Bütün kolları emekli düğümün kalp atışı beklenmez: dondurulmuş eski düğümler (2026-10-18 Nasdaq
+    dönüşünden önceki kripto/forex kolları) sahte donma alarmı ve gözetmen kapatması üretmesin."""
+    kollar = dugum_kollari(motor).get(dugum, [])
+    if not kollar:
+        return []
+    with motor.connect() as b:
+        olaylar = b.execute(select(paper_kol_olay.c.kol, paper_kol_olay.c.tur, paper_kol_olay.c.ayrinti).where(
+            paper_kol_olay.c.kol.in_(kollar), paper_kol_olay.c.tur.in_(("durdur", "devam")))
+            .order_by(paper_kol_olay.c.id)).all()
+    # Gözetmenin donma kapatması emeklilik değildir: motor hâlâ donuk, sağlık bunu göstermeye devam etmeli
+    son = {k: (t, (a or {}).get("neden")) for k, t, a in olaylar}
+    acik = net_pozisyonlar(motor)
+    return [k for k in kollar if son.get(k, ("", None))[0] != "durdur" or son[k][1] == NEDEN or acik.get(k)]
 
 
 def son_isaret_ms(motor: Engine, dugum: str) -> int | None:
@@ -116,6 +148,9 @@ class Gozetmen:
     mt5: object | None = None               # MT5 düğümü: köprü istemcisi (Mt5Istemci); kapatma köprüden
     binance: object | None = None           # gerçek kilit kolu: VadeliIstemci; kapatma Binance'te reduceOnly
     magic: int | None = None                # MT5 düğümünün sihirli sayısı
+    alpaca: object | None = None            # Nasdaq düğümü: AlpacaPaper (donmada bütün pozisyonları kapatır)
+    ucret: float = UCRET                    # defter kapatmasının aleyhte maliyeti (düğümün piyasasına göre)
+    kayma: float = KAYMA
     donma_ms: int = DONMA_MS
     onay_tur: int = ONAY_TUR
     isinma_sn: float = ISINMA_SN
@@ -129,7 +164,7 @@ class Gozetmen:
     def kontrol(self) -> dict:
         """Bir tur. Döndürür: durum (`paper_yok` | `canli` | `donma_suphesi` | `donma`) ve ayrıntı."""
         simdi_ms = int(self.saat() * 1000)
-        kollar = dugum_kollari(self.motor).get(self.dugum, [])
+        kollar = aktif_kollar(self.motor, self.dugum)
         son = son_isaret_ms(self.motor, self.dugum)
         if son is None or not kollar:
             return {"durum": "paper_yok"}
@@ -153,6 +188,10 @@ class Gozetmen:
             return self._binance_donma(simdi_ms, int(son), yas_dk, durdurulacak, kollar)
         if self.mt5 is not None:
             return self._mt5_donma(simdi_ms, int(son), yas_dk, durdurulacak)
+        if self.alpaca is not None and not self.kuru:
+            # Nasdaq (Alpaca paper): aracı kurum düğümden bağımsızdır; bütün pozisyonlar orada da kapatılır. Defter aşağıda
+            # son fiyattan aleyhte kapatılır (düğüm geri gelince mutabakat ikisini karşılaştırır).
+            self.alpaca.hepsini_kapat()
         acik = {k: v for k, v in net_pozisyonlar(self.motor).items() if k in kollar}
         if not durdurulacak and not acik:
             return {"durum": "donma", "yas_dk": yas_dk, "kapatilan": {}, "durdurulan": []}
@@ -240,8 +279,8 @@ class Gozetmen:
                     q = -adet
                     bid, ask = fiyat[kim]
                     ref = bid if q < 0 else ask
-                    px = ref * (1 - KAYMA) if q < 0 else ref * (1 + KAYMA)
-                    ucret = abs(q) * px * UCRET
+                    px = ref * (1 - self.kayma) if q < 0 else ref * (1 + self.kayma)
+                    ucret = abs(q) * px * self.ucret
                     eid = b.execute(insert(paper_emir).values(
                         kol=kol, karar_id=None, istemci_emir_id=f"G-{uuid.uuid4().hex[:20]}", enstruman=kim, istenen=q,
                         onaylanan=q, karar_fiyati=ref, gonderim_fiyati=ref, zaman_ms=simdi_ms, tur="gozetmen",

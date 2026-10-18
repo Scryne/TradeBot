@@ -12,6 +12,16 @@ from tradebot.ayar import ayarlar
 from tradebot.kayit import kur, log
 
 uygulama = typer.Typer(help="TradeBot — kurumsal, çok piyasalı, otonom trade sistemi", no_args_is_help=True)
+
+
+@uygulama.callback()
+def _baslat() -> None:
+    """Her komut log yapılandırmasıyla başlar (JSON dosyası + sır maskeleme). 2026-10-18 denetimi: düğüm komutları
+    (paper, kilit, döviz, altın…) bunu kurmuyordu; hataları log dosyasına düşmüyor (bekçinin triyajı görmüyordu) ve
+    maskeleyici devrede değildi."""
+    kur(ayarlar())
+
+
 db_uygulama = typer.Typer(help="Veritabanı işlemleri", no_args_is_help=True)
 uygulama.add_typer(db_uygulama, name="db")
 veri_uygulama = typer.Typer(help="Veri platformu (Faz 2)", no_args_is_help=True)
@@ -115,7 +125,7 @@ def saglik_komutu(
         time.sleep(dongu)
 
 
-DUGUMLER = ("paper", "kilit", "kilit_gercek", "doviz", "altin", "akis", "skalp")   # her süreç ayrı gözetmen (kalp atışı ayrı)
+DUGUMLER = ("nasdaq", "paper", "kilit", "kilit_gercek", "doviz", "altin", "akis", "skalp")   # her süreç ayrı gözetmen
 MT5_DUGUMLER = ("doviz", "altin", "akis", "skalp")                  # gözetmen bunlarda köprüden gerçek kapatma emri verir
 
 
@@ -132,6 +142,14 @@ def _gozetmen_kur(a, **ayar):
         ist = kilit.gercek_istemci(ay, a) if ay is not None else None
         if ist is not None:
             ayar |= {"binance": ist}
+    fiyat_al = binance_kotasyon(NazikIstemci("gozetmen", deneme=3, zaman_asimi=15).al)
+    if ayar.get("dugum") == "nasdaq":   # Yahoo son fiyatı; Alpaca anahtarı varsa orada da kapatır
+        from tradebot.canli.gozetmen import yahoo_kotasyon
+        from tradebot.canli.nasdaq import alpaca_istemci
+
+        fiyat_al = yahoo_kotasyon(NazikIstemci("gozetmen_yahoo", deneme=3, zaman_asimi=15,
+                                                basliklar={"User-Agent": "Mozilla/5.0"}).al)
+        ayar |= {"alpaca": alpaca_istemci(a), "ucret": 0.00005, "kayma": 0.0010}
     if ayar.get("dugum") in MT5_DUGUMLER:
         from tradebot.canli import akis, altin, doviz, skalp
         from tradebot.mt5.istemci import Mt5Istemci
@@ -140,8 +158,7 @@ def _gozetmen_kur(a, **ayar):
         ay = ay[0] if isinstance(ay, tuple) else ay
         if ay is not None and a.mt5_kopru_forex:
             ayar |= {"mt5": Mt5Istemci(a.mt5_kopru_forex, zaman_asimi=60), "magic": ay.magic}
-    return Gozetmen(db_motor(a), binance_kotasyon(NazikIstemci("gozetmen", deneme=3, zaman_asimi=15).al), kod_surumu(),
-                    **ayar)
+    return Gozetmen(db_motor(a), fiyat_al, kod_surumu(), **ayar)
 
 
 def _gozetmen_tur(g, bildirici, kayitci) -> dict:
@@ -305,6 +322,16 @@ def veri_yahoo(tam: bool = typer.Option(False, help="Tüm geçmişi yeniden indi
 
     a, m = _veri_baglam()
     _yazdir(is_akisi.yahoo(a, m, tam))
+
+
+@veri_uygulama.command("nasdaq")
+def veri_nasdaq(tam: bool = typer.Option(False, help="Tüm geçmişi yeniden indir"),
+                guncel: bool = typer.Option(False, help="Yalnız bugünkü üyeler (hızlı)")) -> None:
+    """Nasdaq-100 point-in-time üyelik (sabit commit) + bütün tarihî üyelerin Yahoo günlük barları."""
+    from tradebot.veri import nasdaq
+
+    a, m = _veri_baglam()
+    _yazdir(nasdaq.guncelle(a, m, tam=tam, yalniz_guncel=guncel))
 
 
 @veri_uygulama.command("haber-takvimi")
@@ -1040,6 +1067,30 @@ def paper_altin(
         _yazdir(d.hesap_degisimi(hesap_degisti) if hesap_degisti else d.tur())
         return
     altin.calistir(sure_sn or None)
+
+
+@paper_uygulama.command("nasdaq")
+def paper_nasdaq(sure: float = typer.Option(0.0, help="Saniye; 0 = süresiz"),
+                 dongu: float = typer.Option(60.0, help="Tur aralığı (saniye)")) -> None:
+    """Nasdaq paper düğümü (compose `nasdaq`): günlük karar kapanıştan sonra, dolum ertesi açılışta (Alpaca paper ya
+    da iç simülasyon), saatte bir işaret."""
+    from tradebot.canli import nasdaq
+
+    nasdaq.calistir(sure or None, dongu)
+
+
+@paper_uygulama.command("alpaca-kontrol")
+def paper_alpaca_kontrol() -> None:
+    """Alpaca PAPER hesabı salt okuma kontrolü: hesap durumu, saat, pozisyonlar (emir göndermez)."""
+    from tradebot.canli.nasdaq import alpaca_istemci
+
+    alp = alpaca_istemci(ayarlar())
+    if alp is None:
+        raise typer.BadParameter("TRADEBOT_ALPACA_ANAHTAR / TRADEBOT_ALPACA_GIZLI tanımlı değil (host .env)")
+    h = alp.hesap()
+    _yazdir({"hesap": {k: h.get(k) for k in ("status", "currency", "equity", "cash", "buying_power",
+                                              "pattern_day_trader", "trading_blocked", "account_blocked")},
+             "saat": alp.saat(), "pozisyon": alp.pozisyonlar()})
 
 
 @paper_uygulama.command("skalp")

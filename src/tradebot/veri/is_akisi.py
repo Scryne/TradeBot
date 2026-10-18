@@ -39,6 +39,12 @@ def yahoo(a: Ayarlar, m: Engine, tam: bool = False) -> dict:
     return {"enstruman": len(r), "tam_yenileme": sum(x["tam"] for x in r), "olay": sum(x["olay"] for x in r)}
 
 
+def nasdaq(a: Ayarlar, m: Engine) -> dict:
+    from tradebot.veri import nasdaq as nq
+
+    return nq.guncelle(a, m)
+
+
 def dukascopy(a: Ayarlar, m: Engine, butce_dk: float) -> dict:
     r = Dukascopy(a.veri_dizini, m).evren_guncelle(butce_dk=butce_dk)
     return {"enstruman": len(r), "dosya": sum(x.get("yeni_dosya", 0) for x in r)}
@@ -102,6 +108,7 @@ def evren_kur(a: Ayarlar, m: Engine) -> dict:
         "kripto": ([k["kimlik"] for k in kayit if k["sinif"] == "kripto"], "1h", "2017-08-01"),
         "bist": ([k["kimlik"] for k in kayit if k["piyasa"] == "BIST" and k["sinif"] == "hisse"], "1d", "2000-01-01"),
         "abd_etf": ([k["kimlik"] for k in kayit if k["piyasa"] == "ARCA"], "1d", "1993-01-01"),
+        "nasdaq": ([k["kimlik"] for k in kayit if k["piyasa"] == "NASDAQ"], "1d", "2006-01-01"),
         "dukascopy": ([k["kimlik"] for k in kayit if k["piyasa"] == "DUKASCOPY"], "1h", "2010-01-01"),
     }
     out = {}
@@ -133,11 +140,14 @@ def gece(a: Ayarlar, m: Engine, dukascopy_butce_dk: float = 240.0) -> dict:
     kesilir. Önceden sondan bir önceki adımdı; iş hiç kalite/evren adımına ulaşamadı (2026-09-27 denetimi: kalite
     raporu ve gece_isi denetim kaydı hiç yazılmamıştı). Dukascopy verisinin kalitesi bir sonraki gece raporlanır."""
     t0 = time.monotonic()
-    sonuc: dict = {"basla": datetime.now(UTC).isoformat()}
-    _adimlar([("binance", lambda: binance(a, m)), ("yahoo", lambda: yahoo(a, m)), ("mt5", lambda: mt5(a, m)),
-              ("kalite", lambda: kalite_hepsi(a, m)), ("evren", lambda: evren_kur(a, m))], sonuc)
+    sonuc: dict = {"basla": datetime.now(UTC).isoformat(), "adimlar": list(a.gece_adimlari)}
+    tum = [("nasdaq", lambda: nasdaq(a, m)), ("binance", lambda: binance(a, m)), ("yahoo", lambda: yahoo(a, m)),
+           ("mt5", lambda: mt5(a, m)), ("kalite", lambda: kalite_hepsi(a, m)), ("evren", lambda: evren_kur(a, m))]
+    _adimlar([x for x in tum if x[0] in a.gece_adimlari], sonuc)
     sonuc["sure_dk"] = round((time.monotonic() - t0) / 60, 1)
     denetim.kaydet(m, "veri", "gece_isi", sonuc)
+    if "dukascopy" not in a.gece_adimlari:
+        return sonuc
     d: dict = {"basla": datetime.now(UTC).isoformat()}
     _adimlar([("dukascopy", lambda: dukascopy(a, m, dukascopy_butce_dk))], d)
     denetim.kaydet(m, "veri", "gece_isi_dukascopy", d)

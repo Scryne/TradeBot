@@ -10,6 +10,7 @@ Varsayımlar (2026-09; paper aşamasında gerçek dolumlarla ölçülüp güncel
 - Dukascopy (FX/CFD): komisyon 0,5 bps (doğrulanmamış, kötü yönde tahmin), spread veriden, kayma 0,5 bps; finansman
   yıllık FX %2, metal %4, emtia %4, endeks %6 (≈ gösterge faiz + aracı kurum payı).
 - ABD ETF: komisyon 1 bps, yarım spread 1 bps, kayma 1 bps; açığa satışta yıllık %1 ödünç maliyeti.
+- Nasdaq-100 hisseleri: ücret 0,5 bps (SEC/TAF/CAT, komisyon 0), yarım spread 2 bps, kayma 3 bps (açılış dolumu).
 - BIST hisse: komisyon 4 bps + BSMV (%5), yarım spread 5 bps, kayma 5 bps.
 - VİOP (NCM): komisyon 2 bps + BSMV (%5). Spike 08 demo işleminde (2026-09-28) F_USDTRY 1 kontrat, taraf başı
   7,91 TL = 1,5 bps + BSMV; gerçek hesap sözleşmesi ve borsa/takas payları için 0,5 bps pay bırakıldı.
@@ -57,6 +58,12 @@ MODELLER = {
     "DUKASCOPY:emtia": MaliyetModeli("cfd_emtia", 0.5, 1.5, 0.5, finansman_yillik=0.04, spread_veriden=True),
     "DUKASCOPY:endeks": MaliyetModeli("cfd_endeks", 0.5, 0.5, 0.5, finansman_yillik=0.06, spread_veriden=True),
     "ARCA": MaliyetModeli("abd_etf", 1.0, 1.0, 1.0, aciga_satis_yillik=0.01),
+    # Nasdaq-100 hisseleri (2026-10-18, Alpaca nakit hesabı): komisyon 0; düzenleyici ücretler satışta (SEC 20,6 $/milyon
+    # ≈ 0,21 bps, FINRA TAF hisse başı ≤ 8,30 $, CAT) → taraf başı 0,5 bps (aleyhte yuvarlandı). Yarım spread 2 bps
+    # (büyük hisselerde kotasyon spread'i ~1–3 bps). Kayma 3 bps: dolum açılışta (OPG / ilk dakika), açılış spread'i gün
+    # içinden geniş; Alpaca paper OPG'yi müzayede fiyatıyla değil anlık bid/ask'tan dolduruyor (2021 ölçümü 12–43 bps
+    # sapma, docs/turnuva/Dalga-19-Nasdaq.md). Gidiş-dönüş 11 bps. Açığa satış yıllık %1 (kollar yalnız uzun).
+    "NASDAQ:hisse": MaliyetModeli("nasdaq_hisse", 0.5, 2.0, 3.0, aciga_satis_yillik=0.01),
     "BIST:hisse": MaliyetModeli("bist_hisse", 4.0, 5.0, 5.0, ucret_vergisi=0.05),
     "BIST:endeks": MaliyetModeli("bist_endeks_vadeli_vekil", 2.0, 2.0, 2.0),  # endeks doğrudan alınamaz; VİOP vekili
     "VIOP:endeks_vadeli": MaliyetModeli("viop_endeks", 2.0, 2.0, 2.0, finansman_yillik=0.012, ucret_vergisi=0.05),

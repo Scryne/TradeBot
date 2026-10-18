@@ -182,7 +182,7 @@ class Yahoo:
         en.kaydet(self.motor, etf + bist)
         sonuc = []
         for e in etf + bist:
-            bas = self.evren["abd_etf" if e.piyasa == "ARCA" else "bist"]["baslangic"]
+            bas = self.evren[{"ARCA": "abd_etf", "NASDAQ": "nasdaq"}.get(e.piyasa, "bist")]["baslangic"]
             try:
                 r = self.gunluk(e, bas, tam=tam)
             except YokHatasi:

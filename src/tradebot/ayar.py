@@ -45,6 +45,9 @@ class Ayarlar(BaseSettings):
     # MT5 köprüleri (host Windows, tools/host/mt5kopru.ps1); tanımlıysa bekçi denetler
     mt5_kopru_forex: str | None = None
     mt5_kopru_viop: str | None = None
+    # Gece işinin adımları (sırayla). 2026-10-18 Nasdaq dönüşü: kripto/MT5/Dukascopy kolları emekli; compose `veri`
+    # servisi yalnız Nasdaq ve kalan Yahoo/kalite/evren adımlarını koşar (TRADEBOT_GECE_ADIMLARI, JSON liste).
+    gece_adimlari: tuple[str, ...] = ("nasdaq", "binance", "yahoo", "mt5", "kalite", "evren", "dukascopy")
 
     # Sağlık eşikleri (Spike 02/03: bu evde DNS 5–15 sn, saat 1 sn kaymıştı)
     dns_uyari_sn: float = 1.0

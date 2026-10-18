@@ -118,12 +118,21 @@ services:
   veri:
     <<: *ortak
     # Gece işi: her gün 01:30 UTC (04:30 TRT). --hemen: servis ilk kalktığında bir kez çalıştırır (ilk yükleme).
+    # 2026-10-18 Nasdaq dönüşü: yalnız Nasdaq + Yahoo (ABD ETF/BIST) + kalite + evren; kripto, MT5, Dukascopy emekli.
     command: ["tradebot", "veri", "zamanla", "--saat", "01:30", "--hemen", "--dukascopy-butce-dk", "900"]
+    environment:
+      TRADEBOT_ORTAM: ${TRADEBOT_ORTAM:-host}
+      TRADEBOT_VERITABANI_URL: postgresql+psycopg://tradebot:${POSTGRES_PASSWORD}@postgres:5432/tradebot
+      TRADEBOT_LOG_DIZINI: /app/log
+      TRADEBOT_VERI_DIZINI: /app/data
+      TRADEBOT_KOD_SURUMU: ${KOD_SURUMU:-bilinmiyor}
+      TRADEBOT_GECE_ADIMLARI: '["nasdaq", "yahoo", "kalite", "evren"]'
     depends_on:
       goc: { condition: service_completed_successfully }
 
   zeka:
     <<: *ortak
+    profiles: ["eski"]   # A1 Binance / A2 KAP: kripto ve BIST kolları içindi (2026-10-18'den beri emekli)
     # Zekâ katmanı (Faz 6): Binance duyuruları → Jev (A1) → veto/uyarı olayları. Her 60 sn bir tur.
     command: ["tradebot", "zeka", "calis"]
     depends_on:
@@ -142,8 +151,17 @@ services:
     depends_on:
       goc: { condition: service_completed_successfully }
 
+  nasdaq:
+    <<: *ortak
+    # Nasdaq paper düğümü (canli/nasdaq.py; dalga 19): günlük karar kapanış + 25 dk, dolum ertesi açılışta (Alpaca
+    # paper anahtarı .env'de varsa Alpaca, yoksa iç simülasyon), saatte bir işaret. Kalp atışı ayrı izlenir (`nasdaq`).
+    command: ["tradebot", "paper", "nasdaq"]
+    depends_on:
+      goc: { condition: service_completed_successfully }
+
   paper:
     <<: *ortak
+    profiles: ["eski"]   # kripto Nautilus düğümü; kolları 2026-10-05'ten beri durdurulmuş (emekli)
     # Faz 7: paper düğümü (Nautilus sandbox, Binance canlı veri). Kararlar her 1h kapanışında; defter PostgreSQL'de.
     # Duman testi 2026-09-27: 1h kolları karar → risk → sandbox dolum → defter uçtan uca çalıştı.
     command: ["tradebot", "paper", "calis"]
@@ -154,6 +172,7 @@ services:
 
   kilit:
     <<: *ortak
+    profiles: ["eski"]   # 2026-10-09 dondurma, 2026-10-18 Nasdaq dönüşü: emekli (kollar durdurulmuş, pozisyon yok)
     # Dalga 6b kilit açılımı kolu (canli/kilit.py): Nautilus dışı ayrı süreç. Günde bir karar 00:05 UTC (DefiLlama takvimi
     # ham depoya, Binance USDT-M perp kotasyonu, risk motoru), saatte bir işaret + funding. Kalp atışı ayrı izlenir
     # (gözetmen `kilit` düğümü). Defter emirden önce yazılır; yeniden başlatmada eksik emirler tamamlanır.
@@ -173,6 +192,7 @@ services:
 
   doviz:
     <<: *ortak
+    profiles: ["eski"]   # 2026-10-09 dondurma, 2026-10-18 Nasdaq dönüşü: emekli (kollar durdurulmuş, pozisyon yok)
     # Dalga 9 döviz taşıma gözlem kolu (canli/doviz.py): NCM forex DEMO hesabına MT5 köprüsünden gerçek emir (köprü
     # gerçek hesapta emri reddeder). İş günü 07:00 UTC karar, saatte bir işaret + taşıma tahakkuku. Kalp atışı ayrı
     # izlenir (bekçi `doviz`). Defter emirden önce yazılır; yeniden başlatmada MT5 işlem geçmişinden kurtarılır.
@@ -182,6 +202,7 @@ services:
 
   altin:
     <<: *ortak
+    profiles: ["eski"]   # 2026-10-09 dondurma, 2026-10-18 Nasdaq dönüşü: emekli (kollar durdurulmuş, pozisyon yok)
     # Altın M15 scalping gözlem kolu (canli/altin.py): EA tarzı gün içi XAUUSD, NCM forex DEMO hesabına MT5 emri (köprü
     # gerçek hesapta reddeder). Her M15 kapanışında karar, saatte bir işaret. Kalp atışı ayrı izlenir (bekçi `altin`).
     command: ["tradebot", "paper", "altin"]
@@ -190,6 +211,7 @@ services:
 
   skalp:
     <<: *ortak
+    profiles: ["eski"]   # 2026-10-09 dondurma, 2026-10-18 Nasdaq dönüşü: emekli (kollar durdurulmuş, pozisyon yok)
     # Mikro ivme skalpı (canli/skalp.py; GÖZLEM deneyi): NCM forex DEMO hesabına MT5 emri (köprü gerçek hesapta reddeder).
     # 3 sn'lik döngü, dakikada bir işaret, 30 dk'da bir Telegram özeti. Kalp atışı ayrı izlenir (bekçi `skalp`).
     command: ["tradebot", "paper", "skalp"]
@@ -198,6 +220,7 @@ services:
 
   akis:
     <<: *ortak
+    profiles: ["eski"]   # 2026-10-09 dondurma, 2026-10-18 Nasdaq dönüşü: emekli (kollar durdurulmuş, pozisyon yok)
     # FOMC günü dolar gözlem kolu (canli/akis.py; dalga 10 B): NCM forex DEMO hesabına MT5 emri (köprü gerçek hesapta
     # reddeder). Saatlik karar (yalnız takvim sinyali ya da açık pozisyon varken), saatte bir işaret. Kalp atışı ayrı
     # izlenir (bekçi `akis`).

@@ -1,0 +1,35 @@
+# Nasdaq (ABD hisse) evreni ve kolları. Yön: Scryne 2026-10-18 ("nasdaq gibi borsalarda çalışan bir trade bot").
+# Veri kuralları: src/tradebot/veri/nasdaq100.py; ön kayıt: docs/turnuva/Dalga-19-Nasdaq.md.
+
+uyelik:
+  kaynak: "github.com/jmccarrell/n100tickers (MIT)"
+  # Sabit commit (2026-10-13, sürüm 2026.12.1; kapsam 2007-02-01 → 2026-10-11). Değiştirmek yeni veri sürümüdür.
+  commit: 2d7be392976e339174ece643acbb00a53e973eb8
+  ilk_yil: 2007
+
+# Aynı şirketin yeni sembolü (n100 dosyası o gün işlem gören sembolü yazar; Yahoo yalnız bugünkü sembolü tutar).
+# Her satır gerekçeli; yalnız şirketin hukuki devamlılığı açıksa eşlenir. Kapsam yine dönem bazlı doğrulanır.
+sembol_esleme:
+  FB: META        # 2022-06-09 sembol değişikliği (Meta Platforms)
+  PCLN: BKNG      # 2018-02-27 Priceline Group → Booking Holdings
+  KFT: MDLZ       # 2012-10-02 Kraft Foods Inc. → Mondelez (bölünmede hukuki devam eden taraf; KRFT ayrı şirket)
+  HANS: MNST      # 2012-01-05 Hansen Natural → Monster Beverage
+  CTRP: TCOM      # 2019-10-25 Ctrip → Trip.com
+  SYMC: GEN       # 2019-11-04 Symantec → NortonLifeLock (NLOK) → 2022-11-08 Gen Digital
+  NLOK: GEN
+  RIMM: BB        # 2013-02-04 Research In Motion → BlackBerry (Yahoo geçmişi BB altında)
+  MYL: VTRS       # 2020-11-16 Mylan N.V. → Viatris (hukuki devam eden taraf Mylan)
+
+# Yahoo'da aynı sembolle BAŞKA bir varlığın geçmişi olan semboller (dönem kapsamı zaten çoğunu dışlar; bunlar ayrıca).
+dislanan:
+  GENZ: "Genzyme 2011'de satın alındı; Yahoo GENZ = VanEck ETF (2008'den), üyelik dönemiyle çakışıyor"
+  GOLD: "Randgold Resources; Yahoo GOLD = Gold.com"
+  JAVA: "Sun Microsystems; Yahoo JAVA = JPMorgan ETF"
+  MEDI: "MedImmune; Yahoo MEDI = Harbor ETF"
+  SHLD: "Sears Holdings; Yahoo SHLD = Global X ETF"
+  SPLS: "Staples; Yahoo SPLS = PIMCO ETF"
+  LIFE: "Life Technologies; Yahoo LIFE = Ethos Technologies"
+  MICC: "Millicom (2011'e kadar); Yahoo MICC = Magnum Ice Cream"
+
+# Dönem kapsamı: serinin üyelik döneminin başından en çok bu kadar seans sonra başlamasına izin var
+kapsam_tolerans_gun: 10

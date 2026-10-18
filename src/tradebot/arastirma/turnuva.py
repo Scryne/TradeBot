@@ -44,6 +44,7 @@ from tradebot.cekirdek import aileler as al
 from tradebot.cekirdek import doviz_akis as da
 from tradebot.cekirdek import endeks_takvim as et
 from tradebot.cekirdek import haber as hb
+from tradebot.cekirdek import hisse as hs
 from tradebot.cekirdek import sapma_stoch as ss
 from tradebot.cekirdek.boyut import kaldirac_dogrula, panel_oynaklik_hedefi, yarim_kelly_tavani
 from tradebot.risk.motor import PortfoyIzleyici, RiskAyar
@@ -96,6 +97,13 @@ STRATEJILER = {
     "haber_ivme": ("altin_haber", hb.haber_ivme, "tek"),
     # Dalga 15: YouTube "sapma + stokastik RSI + EMA" sistemi (docs/turnuva/Dalga-15-Sapma-Stoch.md); yeni aile
     "sapma_stoch": ("sapma_stoch", ss.sapma_stoch, "tek"),
+    # Dalga 19: Nasdaq-100 hisseleri (docs/turnuva/Dalga-19-Nasdaq.md). Aynı fikirler önceki ailelerinde sayılır (kural
+    # 10, DSR bütün denemelerle): momentum dalga 1'in kesitsel momentumu, eşit ağırlık + filtre trend ailesi, kısa vadeli
+    # dönüş ortalamaya dönüş ailesi. Düşük oynaklık yeni aile.
+    "hisse_momentum": ("kesitsel_momentum", hs.hisse_momentum, "panel"),
+    "kisa_donus": ("ortalamaya_donus", hs.kisa_donus, "panel"),
+    "dusuk_oynaklik": ("dusuk_oynaklik", hs.dusuk_oynaklik, "panel"),
+    "esit_agirlik": ("trend", hs.esit_agirlik, "panel"),
 }
 
 
@@ -141,11 +149,12 @@ def bar_yil(zd: str, takvim_adi: str) -> float:
 
 
 def cevir(p: dict, bg: float) -> dict:
-    """`*_gun` parametrelerini bara çevirir (en az 1)."""
+    """`*_gun` parametrelerini bara çevirir (en az 1). 0 "kapalı" demektir ve 0 kalır (2026-10-18: `filtre_gun: 0`
+    1 bara dönüşüp 1 günlük filtre olurdu: e > SMA(e, 1) hiç doğru olmadığından kol hep nakitte kalırdı)."""
     out = {}
     for k, v in p.items():
         if k.endswith("_gun"):
-            out[k.removesuffix("_gun")] = max(1, int(round(v * bg)))
+            out[k.removesuffix("_gun")] = 0 if v == 0 else max(1, int(round(v * bg)))
         else:
             out[k] = v
     return out
@@ -183,6 +192,8 @@ def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bi
         adaylar = sorted(k for k, v in kayit.items() if v["piyasa"] == "BINANCE" and not kripto_dislanir_mi(k))
     elif tanim.get("dinamik") == "bist":
         adaylar = sorted(k for k, v in kayit.items() if v["piyasa"] == "BIST" and v["sinif"] == "hisse")
+    elif tanim.get("dinamik") == "nasdaq":   # Nasdaq-100'ün bütün tarihî üyeleri (evren üyelikle ayrıca kısıtlanır)
+        adaylar = sorted(k for k, v in kayit.items() if v["piyasa"] == "NASDAQ" and v["sinif"] == "hisse")
     else:
         adaylar = [k for k in tanim["kimlikler"] if k in kayit]
     ev = {k: tanim[k] for k in ("ilk_n", "likidite_gun", "asgari_gecmis_gun", "asgari_oynaklik") if k in tanim}
@@ -193,6 +204,18 @@ def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bi
         adaylar = [k for j, k in enumerate(gd.kimlikler) if e[:, j].any()]
     g = grup_yukle(depo, adaylar, zd, bit_ms=bit_ms)
     evrende, lik = evren_maskesi(g, **ev)  # likidite yerel para cinsinden (sıralama için yeterli)
+    if tanim.get("uyelik") == "nasdaq100":
+        # Point-in-time endeks üyeliği (kural 9) ∧ dönem kapsamı (serisi dönemin başından olan üyelik; yeniden kullanılan
+        # sembolün başka şirkete ait verisi sızmasın). Üyelik kaynağının hash'i veri kimliğine girer.
+        import hashlib
+
+        from tradebot.veri import nasdaq as nqv
+        from tradebot.veri import nasdaq100 as nq
+
+        uy = nqv.uyelik_dosyadan(depo.kok.parent)
+        um = nq.uyelik_maskesi(g.t, g.kimlikler, uy.donem)
+        evrende &= nq.kapsam_maskesi(um, g.bar_var, int(tanim.get("kapsam_tolerans_gun", 10)))
+        g = replace(g, veri_hash=hashlib.sha256(f"{g.veri_hash}|uyelik:{uy.kaynak_sha}".encode()).hexdigest())
     if tanim.get("seans"):  # yalnız borsa seansında pozisyon (tatil, yarım gün dahil; çekirdek dışı takvim)
         from tradebot.veri.takvim import takvim
 

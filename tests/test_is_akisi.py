@@ -9,11 +9,11 @@ def test_gece_sirasi_ve_denetim(ayar, monkeypatch):
     m = create_engine(ayar.veritabani_url.get_secret_value())
     metadata.create_all(m)
     sira = []
-    for ad in ("binance", "yahoo", "dukascopy", "kalite_hepsi", "evren_kur"):
+    for ad in ("nasdaq", "binance", "yahoo", "mt5", "dukascopy", "kalite_hepsi", "evren_kur"):
         monkeypatch.setattr(is_akisi, ad, lambda *_a, _ad=ad, **_k: sira.append(_ad) or {})
     monkeypatch.setattr(is_akisi, "yahoo", lambda *_a, **_k: (_ for _ in ()).throw(RuntimeError("yahoo düştü")))
     sonuc = is_akisi.gece(ayar, m, 1.0)
-    assert sira == ["binance", "kalite_hepsi", "evren_kur", "dukascopy"]  # hata diğerlerini durdurmaz
+    assert sira == ["nasdaq", "binance", "mt5", "kalite_hepsi", "evren_kur", "dukascopy"]  # hata diğerlerini durdurmaz
     assert "hata" in sonuc["yahoo"]
     with m.connect() as b:
         olaylar = [r.olay for r in b.execute(select(denetim_izi).order_by(denetim_izi.c.id))]
@@ -35,3 +35,14 @@ def test_telafi_yalniz_eski_gece_isinde(tmp_path):
     denetim.kaydet(m, "veri", "gece_isi", {}, zaman=simdi - timedelta(hours=3))
     assert not telafi_gerekli(m, simdi)                                        # dağıtım sonrası: koşma
     assert telafi_gerekli(m, simdi + timedelta(hours=21))                      # kesinti sonrası: telafi
+
+
+def test_gece_adimlari_ayarla_kisilir(ayar, monkeypatch):
+    m = create_engine(ayar.veritabani_url.get_secret_value())
+    metadata.create_all(m)
+    sira = []
+    for ad in ("nasdaq", "binance", "yahoo", "mt5", "dukascopy", "kalite_hepsi", "evren_kur"):
+        monkeypatch.setattr(is_akisi, ad, lambda *_a, _ad=ad, **_k: sira.append(_ad) or {})
+    a = ayar.model_copy(update={"gece_adimlari": ("nasdaq", "kalite", "evren")})
+    sonuc = is_akisi.gece(a, m, 1.0)
+    assert sira == ["nasdaq", "kalite_hepsi", "evren_kur"] and "dukascopy" not in sonuc

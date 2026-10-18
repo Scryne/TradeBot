@@ -1,0 +1,70 @@
+# Turnuva dalga 19 — Nasdaq-100 hisseleri (günlük): ÖN KAYIT (koşudan önce commit edilir, koşu sırasında değişmez).
+# Gerekçe: docs/turnuva/Dalga-19-Nasdaq.md. Evren point-in-time Nasdaq-100 üyeliği (2007-02 →), Yahoo günlük toplam
+# getiri, Alpaca nakit hesabı maliyeti (NASDAQ:hisse, taraf başı 5,5 bps). Yalnız uzun, brüt ≤ 1x (nakit hesap).
+
+dalga: 19
+veri_bitis: "2026-01-01"        # 2026-01 → 10 kör (seçilen varyant sonradan ölçülür; bilgi, kapı değil)
+frenler: true
+boyut:
+  hedef_vol: 0.20
+  kaldirac: 1.0
+  vol_pencere_gun: 60
+  bant: 0.25
+walk_forward: { is_yil: 3, oos_yil: 1 }
+# Çıta: USD T-bill (Arastirma-Plani; Denetim-2026-09-28 kararı). Hisse getirisi nakit üstü değil: OOS yıllık %4,5'i geçmeli.
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0, risksiz_yillik: 0.045 }
+
+planlar:
+  kesitsel_momentum:
+    kimlik: 2026-10-18-d19-nasdaq-momentum
+    hipotez: >-
+      Nasdaq-100 hisselerinde 6–12 aylık kesitsel momentum (Jegadeesh-Titman 1993; son ay atlanır), point-in-time
+      üyelikle, aylık yeniden dengeleme ve Alpaca maliyeti sonrası risksiz faizi aşar ve walk-forward'da kalıcıdır.
+      Aile dalga 1 kesitsel momentum ailesi (DSR önceki denemelerle). Sıfır hipotezi: aşmaz.
+  ortalamaya_donus:
+    kimlik: 2026-10-18-d19-nasdaq-kisa-donus
+    hipotez: >-
+      Nasdaq-100'de son 1–2 haftanın en çok düşen hisseleri (kısa vadeli dönüş; Lehmann 1990, Nagel 2012), haftalık
+      tutulup maliyet sonrası risksiz faizi aşar. Aile dalga 1 ortalamaya dönüş ailesi. Sıfır hipotezi: aşmaz.
+  dusuk_oynaklik:
+    kimlik: 2026-10-18-d19-nasdaq-dusuk-oynaklik
+    hipotez: >-
+      Nasdaq-100'ün en düşük oynaklıklı hisseleri (Ang ve ark. 2006, Blitz-van Vliet 2007) risk ayarlı olarak evrenin
+      eşit ağırlıklı al-tutunu geçer ve maliyet sonrası risksiz faizi aşar. Yeni aile. Sıfır hipotezi: aşmaz.
+  trend:
+    kimlik: 2026-10-18-d19-nasdaq-trend
+    hipotez: >-
+      Nasdaq-100 eşit ağırlıklı sepeti, sepetin kendi 100/200 günlük ortalamasının üstündeyken tutulup altındayken nakde
+      geçilince (Faber 2007 zaman serisi trendi) maliyet sonrası risksiz faizi aşar ve düşüşü al-tuta göre azaltır. Aile
+      dalga 1 trend ailesi (DSR bütün trend denemeleriyle). Sıfır hipotezi: aşmaz.
+
+gruplar:
+  nasdaq100:
+    dinamik: nasdaq
+    uyelik: nasdaq100
+    kapsam_tolerans_gun: 10
+    asgari_gecmis_gun: 60
+    yon: long
+    zd: [1d]
+    # Ücretsiz kaynakta satın alınan/kapanan üyelerin bir kısmının fiyatı yok (hayatta kalma yanlılığı, ölçülüp
+    # raporlanır): en fazla B (Alpaca 2016+ verisiyle yeniden ölçülmeden A olamaz).
+    en_fazla: B
+
+# 18 deneme (kesitsel_momentum 8, ortalamaya_donus 4, dusuk_oynaklik 4, trend 2)
+kollar:
+  - strateji: hisse_momentum
+    gruplar: [nasdaq100]
+    zd: [1d]
+    izgara: { geriye_gun: [126, 252], atla_gun: [21], ust_n: [10, 20], filtre_gun: [0, 200], aylik: [true] }
+  - strateji: kisa_donus
+    gruplar: [nasdaq100]
+    zd: [1d]
+    izgara: { geriye_gun: [5, 10], alt_n: [10], trend_gun: [0, 200], filtre_gun: [0] }
+  - strateji: dusuk_oynaklik
+    gruplar: [nasdaq100]
+    zd: [1d]
+    izgara: { pencere_gun: [60, 250], ust_n: [20], filtre_gun: [0, 200], aylik: [true] }
+  - strateji: esit_agirlik
+    gruplar: [nasdaq100]
+    zd: [1d]
+    izgara: { filtre_gun: [100, 200], aylik: [true] }

@@ -158,7 +158,8 @@ def disk_kontrol(a: Ayarlar) -> Sonuc:
     return Sonuc("disk", durum, f"{yol.resolve()} boş {bos_gb:.0f} GB", {"bos_gb": round(bos_gb, 1)})
 
 
-SECIMLI_SIRLAR = ("binance_anahtar", "binance_gizli")   # yalnız gerçek kol (Faz 12) çalışırken gerekir
+SECIMLI_SIRLAR = ("binance_anahtar", "binance_gizli",   # yalnız gerçek kilit kolu (Faz 12) çalışırken
+                  "alpaca_anahtar", "alpaca_gizli")       # yoksa Nasdaq kolu iç simülasyonla çalışır
 
 
 def sir_kontrol(a: Ayarlar) -> Sonuc:
@@ -178,12 +179,16 @@ def _yas_sinifla(ad: str, yas_sn: float | None, uyari_sn: float, hata_sn: float,
 
 def paper_kontrol(a: Ayarlar, simdi_ms: int | None = None, dugum: str = "paper") -> Sonuc:
     """Kalp atışı: paper düğümü her saat kapanışında özkaynak işareti yazar. > 70 dk uyarı, > 2 saat hata. Düğüm başına
-    (gozetmen.dugum_kollari): kilit düğümünün saatlik işareti Nautilus düğümünün donmasını gizlemez."""
-    from tradebot.canli.gozetmen import son_isaret_ms
+    (gozetmen.dugum_kollari): kilit düğümünün saatlik işareti Nautilus düğümünün donmasını gizlemez. Bütün kolları
+    durdurulmuş ve düz düğüm emeklidir (`gozetmen.aktif_kollar`): kalp atışı beklenmez."""
+    from tradebot.canli.gozetmen import aktif_kollar, dugum_kollari, son_isaret_ms
     from tradebot.db import motor
 
     try:
-        son = son_isaret_ms(motor(a), dugum)
+        m = motor(a)
+        if dugum_kollari(m).get(dugum) and not aktif_kollar(m, dugum):
+            return Sonuc(dugum, "OK", "emekli: bütün kollar durdurulmuş, pozisyon yok")
+        son = son_isaret_ms(m, dugum)
     except Exception as e:  # noqa: BLE001
         return Sonuc(dugum, "HATA", f"{type(e).__name__}: {e}"[:200])
     simdi_ms = simdi_ms or int(time.time() * 1000)
@@ -220,6 +225,10 @@ def kilit_takvim_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
         m = motor(a)
         if not dugum_kollari(m).get("kilit"):
             return Sonuc("kilit_takvim", "OK", "kilit kolu henüz açılmadı")
+        from tradebot.canli.gozetmen import aktif_kollar
+
+        if not aktif_kollar(m, "kilit"):
+            return Sonuc("kilit_takvim", "OK", "emekli: kilit kolu durdurulmuş")
         with m.connect() as b:
             son = b.execute(select(ham_dosya.c.anahtar).where(ham_dosya.c.kaynak == "defillama",
                                                               ham_dosya.c.anahtar.like("unlocks/gunluk/%"))
@@ -250,6 +259,19 @@ def kilit_gercek_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
     except Exception as e:  # noqa: BLE001
         return Sonuc("kilit_gercek", "HATA", f"{type(e).__name__}: {e}"[:200])
     return paper_kontrol(a, simdi_ms, "kilit_gercek")
+
+
+def nasdaq_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
+    """Nasdaq düğümünün kalp atışı (canli/nasdaq.py, saatte bir işaret). Kol henüz açılmadıysa bilgi."""
+    from tradebot.canli.gozetmen import dugum_kollari
+    from tradebot.db import motor
+
+    try:
+        if not dugum_kollari(motor(a)).get("nasdaq"):
+            return Sonuc("nasdaq", "OK", "Nasdaq kolu henüz açılmadı")
+    except Exception as e:  # noqa: BLE001
+        return Sonuc("nasdaq", "HATA", f"{type(e).__name__}: {e}"[:200])
+    return paper_kontrol(a, simdi_ms, "nasdaq")
 
 
 def doviz_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
@@ -442,8 +464,8 @@ def skalp_kontrol(a: Ayarlar, simdi_ms: int | None = None) -> Sonuc:
 def hepsi(a: Ayarlar) -> list[Sonuc]:
     kontroller = [dns_kontrol, saat_kontrol, veritabani_kontrol, disk_kontrol, sir_kontrol]
     if a.ortam == "host" and a.veritabani_url is not None:
-        kontroller += [paper_kontrol, kilit_kontrol, kilit_takvim_kontrol, kilit_gercek_kontrol, doviz_kontrol,
-                       altin_kontrol, akis_kontrol, skalp_kontrol, gece_kontrol]
+        kontroller += [nasdaq_kontrol, paper_kontrol, kilit_kontrol, kilit_takvim_kontrol, kilit_gercek_kontrol,
+                       doviz_kontrol, altin_kontrol, akis_kontrol, skalp_kontrol, gece_kontrol]
     if a.yedek_dizini is not None:
         kontroller.append(yedek_kontrol)
     if a.mt5_kopru_forex or a.mt5_kopru_viop:
@@ -464,6 +486,16 @@ def mt5_kontrol(a: Ayarlar) -> Sonuc:
     olmaması normaldir (yalnız bilgi)."""
     from tradebot.mt5.istemci import KopruHatasi, Mt5Istemci
 
+    if a.veritabani_url is not None:   # MT5 kolları emekliyse (2026-10-18'den beri) kapalı köprü sorun değildir
+        try:
+            from tradebot.canli.gozetmen import aktif_kollar
+            from tradebot.db import motor
+
+            m = motor(a)
+            if not any(aktif_kollar(m, d) for d in ("doviz", "altin", "akis", "skalp")):
+                return Sonuc("mt5", "OK", "MT5 düğümleri emekli (kollar durdurulmuş, pozisyon yok)")
+        except Exception:  # noqa: BLE001 — veritabanı sorunu kendi kontrolünde raporlanır
+            pass
     parcalar, kotu, olcum = [], [], {}
     for hesap, url in (("forex", a.mt5_kopru_forex), ("viop", a.mt5_kopru_viop)):
         if not url:

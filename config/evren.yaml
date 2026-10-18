@@ -37,6 +37,15 @@ abd_etf:
   liste: [SPY, QQQ, IWM, DIA, TLT, IEF, SHY, GLD, SLV, USO, XLF, XLK, XLE, XLV, XLY, XLP, XLI, XLU, XLB, XLRE, XLC,
           EEM, EFA, VNQ, HYG, LQD]
 
+nasdaq:
+  # Nasdaq-100'ün 2007'den bugüne bütün üyeleri (Scryne 2026-10-18 yön kararı). Üyelik point-in-time:
+  # config/nasdaq.yaml + veri/nasdaq100.py. Kaynak Yahoo günlük (bölünme + temettü düzeltmeli toplam getiri).
+  piyasa: NASDAQ
+  sinif: hisse
+  takvim: XNYS                      # Nasdaq ile aynı işlem günleri, saatler ve yarım günler
+  para_birimi: USD
+  baslangic: "2006-01-01"
+
 bist:
   piyasa: BIST
   sinif: hisse
