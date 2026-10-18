@@ -46,3 +46,16 @@ def test_gun_ici_ivme_nedensel():
     b = _barlar("2026-01-05", 30, tohum=3)
     nedensellik_testi(StratejiTanimi("gi", "gun_ici_ivme", gun_ici_ivme, {"tutma": 2, "kisa": True},
                                      yon="long_short"), b)
+
+
+def test_dakika_surumu_son_yarim_saat_ve_nedensel():
+    from tradebot.cekirdek.gun_ici import gun_ici_ivme_dk
+
+    t = _ms("2026-07-06T08:00:00") + np.arange(5 * 48, dtype=np.int64) * 1_800_000   # 30 dk, 7/24 (uzatılmış dahil)
+    rng = np.random.default_rng(2)
+    c = 100 * np.exp(np.cumsum(rng.normal(0, 0.001, len(t))))
+    b = Barlar(t, c, c, c, c, np.ones(len(t)))
+    s = gun_ici_ivme_dk(b, tutma_dk=30, kisa=True)
+    _, saat = ny_saat(t + 1_800_000)
+    assert set(saat[s != 0]) <= {15.5} and (s != 0).sum() >= 3
+    nedensellik_testi(StratejiTanimi("gd", "gun_ici_ivme", gun_ici_ivme_dk, {"tutma_dk": 60}, yon="long_short"), b)

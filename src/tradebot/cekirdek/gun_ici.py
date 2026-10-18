@@ -52,3 +52,28 @@ def gun_ici_ivme(b: Barlar, tutma: int = 1, kisa: bool = False) -> np.ndarray:
         if r1_gun == g and np.isfinite(r1) and bas_saat <= s < 16.0:
             out[i] = 1.0 if r1 > 0 else (-1.0 if (kisa and r1 < 0) else 0.0)
     return out
+
+
+def gun_ici_ivme_dk(b: Barlar, tutma_dk: int = 30, kisa: bool = False) -> np.ndarray:
+    """Gün içi ivmenin dakika çözünürlüklü hali (dalga 20b; Gao ve ark.'nın özgün tanımı: son yarım saat). Bar süresi
+    `tutma_dk`'yı ve 30 dakikayı bölmeli (ör. 30 dk barlar). r1 = close(10:00 NY) / close(önceki 16:00 NY) − 1; kapanışı
+    [16:00 − tutma_dk, 16:00) aralığındaki barlarda işaret(r1), sonraki bar(lar) 16:00'a kadar tutulur."""
+    n = len(b)
+    out = np.zeros(n)
+    if n < 2 or not 0 < tutma_dk <= 300:
+        return out
+    bar = int(np.min(np.diff(b.t)))
+    if bar > 30 * 60_000 or (30 * 60_000) % bar or (tutma_dk * 60_000) % bar:
+        raise ValueError("gun_ici_ivme_dk: bar süresi 30 dk'yı ve tutma süresini bölmeli")
+    gun, saat = ny_saat(np.asarray(b.t, dtype=np.int64) + bar)      # barın KAPANIŞ anı (NY)
+    onceki_kapanis, r1, r1_gun = np.nan, np.nan, None
+    bas_saat = 16.0 - tutma_dk / 60.0
+    for i in range(n):
+        g, s = gun[i], saat[i]
+        if s == 10.0 and np.isfinite(onceki_kapanis):
+            r1, r1_gun = b.close[i] / onceki_kapanis - 1.0, g
+        if s == 16.0:
+            onceki_kapanis = b.close[i]
+        if r1_gun == g and np.isfinite(r1) and bas_saat <= s < 16.0:
+            out[i] = 1.0 if r1 > 0 else (-1.0 if (kisa and r1 < 0) else 0.0)
+    return out

@@ -320,8 +320,7 @@ def test_kol_kos_uctan_uca(ortam, strateji, izgara):
 def test_cevir_ve_bar_gun():
     assert tv.cevir({"ufuk_gun": 30, "ust_n": 3}, 24.0) == {"ufuk": 720, "ust_n": 3}
     assert tv.bar_gun("4h", "kripto_7x24") == 6 and tv.bar_gun("1d", "XNYS") == 1
-    with pytest.raises(ValueError):
-        tv.bar_gun("1h", "XNYS")
+    assert tv.bar_gun("30m", "XNYS") == 32          # borsa gün içi: Alpaca uzatılmış seans (16 saat)
 
 
 def test_karar_kurallari():

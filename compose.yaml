@@ -126,7 +126,7 @@ services:
       TRADEBOT_LOG_DIZINI: /app/log
       TRADEBOT_VERI_DIZINI: /app/data
       TRADEBOT_KOD_SURUMU: ${KOD_SURUMU:-bilinmiyor}
-      TRADEBOT_GECE_ADIMLARI: '["nasdaq", "yahoo", "kalite", "evren"]'
+      TRADEBOT_GECE_ADIMLARI: '["nasdaq", "alpaca", "yahoo", "kalite", "evren"]'
     depends_on:
       goc: { condition: service_completed_successfully }
 

@@ -9,11 +9,11 @@ def test_gece_sirasi_ve_denetim(ayar, monkeypatch):
     m = create_engine(ayar.veritabani_url.get_secret_value())
     metadata.create_all(m)
     sira = []
-    for ad in ("nasdaq", "binance", "yahoo", "mt5", "dukascopy", "kalite_hepsi", "evren_kur"):
+    for ad in ("nasdaq", "alpaca", "binance", "yahoo", "mt5", "dukascopy", "kalite_hepsi", "evren_kur"):
         monkeypatch.setattr(is_akisi, ad, lambda *_a, _ad=ad, **_k: sira.append(_ad) or {})
     monkeypatch.setattr(is_akisi, "yahoo", lambda *_a, **_k: (_ for _ in ()).throw(RuntimeError("yahoo düştü")))
     sonuc = is_akisi.gece(ayar, m, 1.0)
-    assert sira == ["nasdaq", "binance", "mt5", "kalite_hepsi", "evren_kur", "dukascopy"]  # hata diğerlerini durdurmaz
+    assert sira == ["nasdaq", "alpaca", "binance", "mt5", "kalite_hepsi", "evren_kur", "dukascopy"]  # hata diğerlerini durdurmaz
     assert "hata" in sonuc["yahoo"]
     with m.connect() as b:
         olaylar = [r.olay for r in b.execute(select(denetim_izi).order_by(denetim_izi.c.id))]
@@ -41,7 +41,7 @@ def test_gece_adimlari_ayarla_kisilir(ayar, monkeypatch):
     m = create_engine(ayar.veritabani_url.get_secret_value())
     metadata.create_all(m)
     sira = []
-    for ad in ("nasdaq", "binance", "yahoo", "mt5", "dukascopy", "kalite_hepsi", "evren_kur"):
+    for ad in ("nasdaq", "alpaca", "binance", "yahoo", "mt5", "dukascopy", "kalite_hepsi", "evren_kur"):
         monkeypatch.setattr(is_akisi, ad, lambda *_a, _ad=ad, **_k: sira.append(_ad) or {})
     a = ayar.model_copy(update={"gece_adimlari": ("nasdaq", "kalite", "evren")})
     sonuc = is_akisi.gece(a, m, 1.0)

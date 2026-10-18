@@ -21,7 +21,8 @@ import pandas as pd
 
 NY = ZoneInfo("America/New_York")
 IST = ZoneInfo("Europe/Istanbul")
-ZAMAN_DILIMI_MS = {"1m": 60_000, "5m": 300_000, "15m": 900_000, "1h": 3_600_000, "4h": 14_400_000, "1d": 86_400_000}
+ZAMAN_DILIMI_MS = {"1m": 60_000, "5m": 300_000, "15m": 900_000, "30m": 1_800_000, "1h": 3_600_000, "4h": 14_400_000,
+                   "1d": 86_400_000}
 
 
 def ms(t: datetime) -> int:

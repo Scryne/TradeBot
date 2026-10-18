@@ -334,6 +334,17 @@ def veri_nasdaq(tam: bool = typer.Option(False, help="Tüm geçmişi yeniden ind
     _yazdir(nasdaq.guncelle(a, m, tam=tam, yalniz_guncel=guncel))
 
 
+@veri_uygulama.command("alpaca")
+def veri_alpaca(guncel: bool = typer.Option(False, help="Yalnız bugünkü üyeler"),
+                gun_ici: bool = typer.Option(True, help="QQQ 30 dk barları da")) -> None:
+    """Alpaca (SIP, 2016+): Nasdaq-100'ün bütün üyelik dönemleri (kapanan şirketler dahil, o günkü sembolle) + QQQ 30 dk.
+    Ayrı depo: veri/alpaca/. Anahtar: Alpaca paper (host .env)."""
+    from tradebot.veri import alpaca_veri
+
+    a, m = _veri_baglam()
+    _yazdir(alpaca_veri.guncelle(a, m, yalniz_guncel=guncel, gun_ici=gun_ici))
+
+
 @veri_uygulama.command("haber-takvimi")
 def veri_haber_takvimi() -> None:
     """FOMC, NFP, CPI yayın anlarını resmi arşivlerden indirir → config/haber_takvimi.yaml (haber filtresi)."""

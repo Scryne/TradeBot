@@ -107,6 +107,8 @@ STRATEJILER = {
     "esit_agirlik": ("trend", hs.esit_agirlik, "panel"),
     # Dalga 20: gün içi ivme, Nasdaq 100 saatlik (docs/turnuva/Dalga-20-Gun-Ici.md); yeni aile
     "gun_ici_ivme": ("gun_ici_ivme", gi.gun_ici_ivme, "tek"),
+    # Dalga 20b: aynı fikir, QQQ 30 dk (Alpaca, 2016+): AYNI aile (DSR dalga 20'nin denemeleriyle)
+    "gun_ici_ivme_dk": ("gun_ici_ivme", gi.gun_ici_ivme_dk, "tek"),
 }
 
 
@@ -141,8 +143,8 @@ def bar_gun(zd: str, takvim_adi: str) -> float:
     """Bir işlem gününde bar sayısı. 24 saatlik piyasalar (kripto, FX/CFD) için gün / zd; borsalarda yalnız 1d."""
     if takvim_adi in ("kripto_7x24", "fx_24x5"):
         return 86_400_000 / ZAMAN_DILIMI_MS[zd]
-    if zd != "1d":
-        raise ValueError(f"{takvim_adi} için yalnız 1d (gün içi borsa verisi yok)")
+    if zd != "1d":   # borsa gün içi: Alpaca uzatılmış seans barları (04:00–20:00 ET, 16 saat; veri/alpaca_veri.py)
+        return 16 * 3_600_000 / ZAMAN_DILIMI_MS[zd]
     return 1.0
 
 
@@ -189,8 +191,10 @@ class HazirGrup:
 
 def grup_hazirla(depo: BarDepo, kayit: dict[str, dict], tanim: dict, zd: str, bit_ms: int | None = None,
                  vetolar: list[tuple[str, int, int | None]] | None = None) -> HazirGrup:
-    """`tanim`: dalga planındaki grup (kimlikler listesi ya da `dinamik: kripto|bist` + ilk_n; `kur`: USD'ye çevirme;
-    `seans`: pozisyon yalnız bu borsa takviminin seansında)."""
+    """`tanim`: dalga planındaki grup (kimlikler listesi ya da `dinamik: kripto|bist|nasdaq` + ilk_n; `kur`: USD'ye çevirme;
+    `seans`: pozisyon yalnız bu borsa takviminin seansında; `depo: alpaca`: barlar Alpaca deposundan)."""
+    if tanim.get("depo") == "alpaca":   # veri/alpaca_veri.py: ayrı depo (Yahoo ile karışmaz); üyelik dosyası yanında
+        depo = BarDepo(depo.kok.parent / "alpaca")
     if tanim.get("dinamik") == "kripto":
         adaylar = sorted(k for k, v in kayit.items() if v["piyasa"] == "BINANCE" and not kripto_dislanir_mi(k))
     elif tanim.get("dinamik") == "bist":

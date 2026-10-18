@@ -49,7 +49,7 @@ class Ayarlar(BaseSettings):
     # servisi yalnız Nasdaq ve kalan Yahoo/kalite/evren adımlarını koşar (TRADEBOT_GECE_ADIMLARI, JSON liste).
     # Sırsız süreç (pano): .env verilmez, sır denetimi bu süreçte anlamsızdır (bekçi denetler)
     sir_denetimi: bool = True
-    gece_adimlari: tuple[str, ...] = ("nasdaq", "binance", "yahoo", "mt5", "kalite", "evren", "dukascopy")
+    gece_adimlari: tuple[str, ...] = ("nasdaq", "alpaca", "binance", "yahoo", "mt5", "kalite", "evren", "dukascopy")
 
     # Sağlık eşikleri (Spike 02/03: bu evde DNS 5–15 sn, saat 1 sn kaymıştı)
     dns_uyari_sn: float = 1.0

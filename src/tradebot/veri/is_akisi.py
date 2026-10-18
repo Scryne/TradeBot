@@ -45,6 +45,15 @@ def nasdaq(a: Ayarlar, m: Engine) -> dict:
     return nq.guncelle(a, m)
 
 
+def alpaca(a: Ayarlar, m: Engine) -> dict:
+    """Alpaca anahtarı yoksa atlanır (hata değil: Nasdaq kolu iç simülasyonla Yahoo verisinde çalışabilir)."""
+    if a.alpaca_anahtar is None:
+        return {"atlandi": "Alpaca anahtarı yok"}
+    from tradebot.veri import alpaca_veri
+
+    return alpaca_veri.guncelle(a, m)
+
+
 def dukascopy(a: Ayarlar, m: Engine, butce_dk: float) -> dict:
     r = Dukascopy(a.veri_dizini, m).evren_guncelle(butce_dk=butce_dk)
     return {"enstruman": len(r), "dosya": sum(x.get("yeni_dosya", 0) for x in r)}
@@ -141,7 +150,8 @@ def gece(a: Ayarlar, m: Engine, dukascopy_butce_dk: float = 240.0) -> dict:
     raporu ve gece_isi denetim kaydı hiç yazılmamıştı). Dukascopy verisinin kalitesi bir sonraki gece raporlanır."""
     t0 = time.monotonic()
     sonuc: dict = {"basla": datetime.now(UTC).isoformat(), "adimlar": list(a.gece_adimlari)}
-    tum = [("nasdaq", lambda: nasdaq(a, m)), ("binance", lambda: binance(a, m)), ("yahoo", lambda: yahoo(a, m)),
+    tum = [("nasdaq", lambda: nasdaq(a, m)), ("alpaca", lambda: alpaca(a, m)), ("binance", lambda: binance(a, m)),
+           ("yahoo", lambda: yahoo(a, m)),
            ("mt5", lambda: mt5(a, m)), ("kalite", lambda: kalite_hepsi(a, m)), ("evren", lambda: evren_kur(a, m))]
     _adimlar([x for x in tum if x[0] in a.gece_adimlari], sonuc)
     sonuc["sure_dk"] = round((time.monotonic() - t0) / 60, 1)
