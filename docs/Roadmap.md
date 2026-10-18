@@ -610,4 +610,5 @@ kapısı DSR yolu (d13 DSR 0,98); 26 haftalık PSR şartı kalktı. Sonrası Scr
 - **Notlar:** 2026-10-18: Alpaca paper anahtarı geldi (iki düğüm Alpaca modunda). Alpaca verisiyle (kapanan üyeler
   dahil, kapsam ~%100) dalga 19b aynı kararı verdi: esit_agirlik B, kolu d19b (Alpaca veri + yürütme) oldu; dalga 20b
   (QQQ 30 dk, özgün son yarım saat) KALDI. A3 SEC 8-K Jev vetosu canlıda (spike 09: 23/23), Jev'li ikiz kol iç
-  simülasyonda. Kalan: 4 hafta kesintisiz paper ve Alpaca dolum/mutabakatının uçtan uca gözlemi.
+  simülasyonda. Dalga 21 (oynaklık yönetimli, Scryne'ın kararıyla): düşük oynaklık A (DSR 0,97; çekinceler belgede),
+  momentum B → iki yeni iç simülasyon kolu. Kalan: 4 hafta kesintisiz paper ve Alpaca dolum/mutabakatının gözlemi.

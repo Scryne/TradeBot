@@ -99,8 +99,11 @@ def ayarlar(d: dict | None = None) -> NasdaqAyarlari | None:
         grup = dict(b["grup"]) | dict(k.get("grup") or {}) | {
             "dugum": DUGUM, "hesap": "Alpaca paper" if yur != "ic" else "iç simülasyon"}
         # `jev: true`: A3 (SEC 8-K) vetolu ikiz; zekâ servisi kör ise yeni giriş yarım boyut (Final Doküman, katman 5)
-        ayar = Ayar(hedef_vol=float(bo["hedef_vol"]), kaldirac=kaldirac, vol_pencere_gun=int(bo["vol_pencere_gun"]),
-                    frenler=bool(d.get("frenler", True)), bant=float(bo["bant"]), jev_veto=bool(k.get("jev", False)))
+        kb = bo | dict(k.get("boyut") or {})   # kol satırında `boyut` dalga dosyasının boyutunu birebir taşır (ör. dalga 21)
+        if kaldirac_dogrula(float(kb["kaldirac"])) > 1.0:
+            raise ValueError(f"{k['ad']}: Nasdaq nakit kolu brüt ≤ 1x")
+        ayar = Ayar(hedef_vol=float(kb["hedef_vol"]), kaldirac=float(kb["kaldirac"]), vol_pencere_gun=int(kb["vol_pencere_gun"]),
+                    frenler=bool(d.get("frenler", True)), bant=float(kb["bant"]), jev_veto=bool(k.get("jev", False)))
         kollar.append(PaperKol(k["ad"], k["strateji"], b.get("grup_adi", "nasdaq100"), grup, "1d", ayar,
                                dict(k["parametre"]), k.get("sinif", "B"), float(b.get("baslangic_ozkaynak", 100_000))))
         if "yurutme" in k:

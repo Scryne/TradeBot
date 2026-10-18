@@ -177,6 +177,14 @@ nasdaq:
        grup: {depo: alpaca}}
     - {ad: "d19b:esit_agirlik@nasdaq100@1d+jev", strateji: esit_agirlik, parametre: {filtre_gun: 200, aylik: true},
        sinif: B, grup: {depo: alpaca}, jev: true, yurutme: ic}
+    # Dalga 21 (oynaklık yönetimli; docs/turnuva/Dalga-21-Risk-Katmanli.md): düşük oynaklık A, momentum B. Ön kayıt gereği
+    # iç simülasyonda (tek Alpaca paper hesabında pozisyon katlanmasın); boyut dalga 21 dosyasıyla birebir.
+    - {ad: "d21:dusuk_oynaklik@nasdaq100@1d", strateji: dusuk_oynaklik, sinif: A, grup: {depo: alpaca}, yurutme: ic,
+       parametre: {pencere_gun: 60, ust_n: 20, filtre_gun: 0, aylik: true},
+       boyut: {hedef_vol: 0.12, kaldirac: 1.0, vol_pencere_gun: 20, bant: 0.25}}
+    - {ad: "d21:hisse_momentum@nasdaq100@1d", strateji: hisse_momentum, sinif: B, grup: {depo: alpaca}, yurutme: ic,
+       parametre: {geriye_gun: 126, atla_gun: 21, ust_n: 10, filtre_gun: 0, aylik: true},
+       boyut: {hedef_vol: 0.12, kaldirac: 1.0, vol_pencere_gun: 20, bant: 0.25}}
 
 # Nasdaq gün içi kolu (dalga 20 KALDI; ön kayıt gereği en iyi varyant GÖZLEM kolu; docs/turnuva/Dalga-20-Gun-Ici.md).
 # Ayrı düğüm (canli/nasdaq_gun_ici.py, compose `nasdaq-gun-ici`): QQQ, 14:00 NY'de r1 > 0 ise uzun, 15:59 NY'de kapanır.
