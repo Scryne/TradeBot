@@ -63,6 +63,7 @@ EK_KAYMA = 0.0001                    # Alpaca paper dolumuna ek aleyhte kayma (p
 SEC_UCRET = 20.6e-6                  # satış notional'ı başına (2026-04-04'ten)
 TAF_HISSE, TAF_TAVAN = 0.000166, 8.30
 FINAL = ("dolum", "ret", "iptal")
+DAKIKALIK_EMIR = 250
 # Risk motorunun bayatlık birimi (2 birim = eşik). Borsa günlük barı takvim gününe değil seansa bağlıdır: Cuma barıyla
 # Pazar verilen telafi kararı 2 takvim gününü aşar (2026-10-18: ilk kararın 100 emri "veri bayat" ile reddedildi).
 # 3 gün × 2 = 6 gün hafta sonu + tatili kapsar; barın son kapanmış seansa ait olduğu ayrıca `_kol_karar`'da denetlenir.
@@ -106,8 +107,10 @@ def ayarlar(d: dict | None = None) -> NasdaqAyarlari | None:
             kol_yurutme[k["ad"]] = yur
     if len({k.ad for k in kollar}) != len(kollar):
         raise ValueError("kol adları tekil olmalı")
-    return NasdaqAyarlari(tuple(kollar), b.get("yurutme", "otomatik"), RiskAyar(kaldirac=kaldirac), model("NASDAQ", SINIF),
-                          kol_yurutme)
+    # Emir hızı sınırı kaçak döngüye karşıdır; günlük dengeleme bir dakikada ~100 hisselik emir üretir (2026-10-18: varsayılan
+    # 30/dk eşit ağırlık kolunun 70 emrini reddetti). Kol başına en çok 2 tam evren dengelemesi.
+    risk = RiskAyar(kaldirac=kaldirac, dakikalik_emir_sayisi=DAKIKALIK_EMIR)
+    return NasdaqAyarlari(tuple(kollar), b.get("yurutme", "otomatik"), risk, model("NASDAQ", SINIF), kol_yurutme)
 
 
 def sembol(kimlik: str) -> str:

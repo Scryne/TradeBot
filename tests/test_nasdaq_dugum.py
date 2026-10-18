@@ -252,3 +252,27 @@ def test_jev_ikizi_ic_simulasyonda_vetolu_hisseyi_almaz_mutabakata_girmez(ortam)
     d.tur()
     s["t"] = _ms("2026-10-19T15:00:10")
     assert d.tur()["isaret"]["mutabakat"] == {"tamam": True}
+
+
+def test_yuz_hisselik_dengeleme_emir_hizina_takilmaz(ayar):
+    """2026-10-18: varsayılan 30 emir/dk sınırı eşit ağırlık kolunun 100 emrinin 70'ini reddetti."""
+    m = motor(ayar)
+    metadata.create_all(m)
+    depo = BarDepo(ayar.veri_dizini)
+    gunler = takvim("XNYS").gunluk_barlar(_ms("2025-06-02"), _ms("2026-10-17"))
+    donem, kayit = {}, {}
+    for j in range(100):
+        c = 100 * np.exp(np.cumsum(np.full(len(gunler), 0.001)) + 0.01 * np.sin(np.arange(len(gunler)) + j))
+        k = f"NASDAQ:S{j}"
+        depo.yaz(k, "1d", pl.DataFrame({"acilis_ms": gunler, "open": c, "high": c, "low": c, "close": c,
+                                         "volume": np.full(len(gunler), 1e6)}))
+        donem[k] = [(int(gunler[0]), None)]
+        kayit[k] = {"kimlik": k, "piyasa": "NASDAQ", "sinif": "hisse", "takvim": "XNYS"}
+    nqv.uyelik_yaz(ayar.veri_dizini, nqv.Uyelik(donem, "sha"), "commit")
+    y = _yapi({})
+    y["nasdaq"]["kollar"] = [{"ad": "d:esit", "strateji": "esit_agirlik", "parametre": {"filtre_gun": 200, "aylik": True}}]
+    d = nd.NasdaqDugumu(PaperDefter(m, "test"), nd.ayarlar(y), SahteKaynak(depo), depo, lambda: kayit,
+                        saat=lambda: CUMA_KARAR / 1000)
+    d.ac()
+    r = d.tur()["karar"]["d:esit"]
+    assert r["emir"] == 100 and r["onay"] == 100 and not r["ret"]
