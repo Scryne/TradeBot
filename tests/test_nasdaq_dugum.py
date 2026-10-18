@@ -170,8 +170,9 @@ def test_alpaca_acilistan_sonra_gonderir_dolumu_yazar_mutabakat_tamam(ortam):
 
 def test_kacan_karar_ertesi_acilistan_once_telafi_sonra_atlanir(ortam):
     d, s = _dugum(ortam)
-    s["t"] = _ms("2026-10-18T10:00:00")                  # Pazar: Cuma'nın kararı telafi edilir
-    assert "karar" in d.tur()
+    s["t"] = _ms("2026-10-18T10:00:00")                  # Pazar: Cuma'nın kararı telafi edilir (emirler bayat sayılmaz)
+    r = d.tur()
+    assert r["karar"]["d19:hisse_momentum@nasdaq100@1d"]["onay"] >= 1
     d2, s2 = _dugum(ortam)
     s2["t"] = PZT_ACILIS + 3_600_000                     # açılış geçti: Cuma kararı yine yazılmaz (zaten var) …
     assert "karar" not in d2.tur()

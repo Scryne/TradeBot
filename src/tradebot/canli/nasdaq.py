@@ -61,6 +61,10 @@ EK_KAYMA = 0.0001                    # Alpaca paper dolumuna ek aleyhte kayma (p
 SEC_UCRET = 20.6e-6                  # satış notional'ı başına (2026-04-04'ten)
 TAF_HISSE, TAF_TAVAN = 0.000166, 8.30
 FINAL = ("dolum", "ret", "iptal")
+# Risk motorunun bayatlık birimi (2 birim = eşik). Borsa günlük barı takvim gününe değil seansa bağlıdır: Cuma barıyla
+# Pazar verilen telafi kararı 2 takvim gününü aşar (2026-10-18: ilk kararın 100 emri "veri bayat" ile reddedildi).
+# 3 gün × 2 = 6 gün hafta sonu + tatili kapsar; barın son kapanmış seansa ait olduğu ayrıca `_kol_karar`'da denetlenir.
+BAYAT_BIRIM_MS = 3 * GUN_MS
 _log = log("nasdaq")
 
 
@@ -340,7 +344,7 @@ class NasdaqDugumu:
             f = fiyat[kim]
             istemci = f"NQ{bar_ms // GUN_MS}-{uuid.uuid4().hex[:10]}-{sembol(kim)}"[:48]
             r = self.risk[kol.ad].onayla(EmirIstegi(kim, SINIF, q, f, kol.ad, simdi, istemci),
-                                         Piyasa(f, bar_ms, GUN_MS, True, ADET_ADIMI), pf)
+                                         Piyasa(f, bar_ms, BAYAT_BIRIM_MS, True, ADET_ADIMI), pf)
             onay = (q if (r.risk_azaltan and r.miktar == q) else _adima(r.miktar)) if r.onay else 0.0
             risk = {"onay": r.onay, "gerekceler": list(r.gerekceler), "risk_azaltan": r.risk_azaltan}
             eid = self.defter.emir_yaz(kol.ad, karar_id, istemci, kim, q, onay, f, tur, risk)
