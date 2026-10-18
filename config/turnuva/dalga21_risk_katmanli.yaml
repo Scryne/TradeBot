@@ -1,0 +1,49 @@
+# Turnuva dalga 21 — momentum ve düşük oynaklık, oynaklık yönetimli risk katmanıyla (Alpaca 2016+): ÖN KAYIT (koşudan
+# önce commit edilir). Gerekçe: docs/turnuva/Dalga-21-Risk-Katmanli.md. Aileler dalga 1/19/19b ile ortak: DSR bütün
+# denemelerle (kural 10). Fark yalnız boyut: kol oynaklık hedefi %12 (19b: %20), tahmin penceresi 20 gün (19b: 60).
+
+dalga: 21
+veri_bitis: "2026-01-01"        # 2026-01 → 10 kör (bilgi)
+frenler: true
+boyut:
+  hedef_vol: 0.12
+  kaldirac: 1.0
+  vol_pencere_gun: 20
+  bant: 0.25
+walk_forward: { is_yil: 3, oos_yil: 1 }
+olcut: { dsr_a: 0.95, dsr_b: 0.0, yil_pozitif: 0.60, rejim_t: -2.0, stres_maliyet: 2.0, risksiz_yillik: 0.045 }
+
+planlar:
+  kesitsel_momentum:
+    kimlik: 2026-10-18-d21-momentum-oynaklik-yonetimli
+    hipotez: >-
+      Nasdaq-100 kesitsel momentumu (6–12 ay, son ay atlanır), kol oynaklığı hızlı tahminle (20 gün) %12'ye
+      ölçeklenince (Barroso, Santa-Clara 2015, JFE 116(1): oynaklık yönetimli momentum çöküşleri yarıya indirir) en kötü
+      hafta ≥ −%10 ve acil durdurmasız kalır, maliyet sonrası T-bill'i aşar. Sıfır hipotezi: aşmaz ya da kapıyı geçemez.
+  dusuk_oynaklik:
+    kimlik: 2026-10-18-d21-dusuk-oynaklik-yonetimli
+    hipotez: >-
+      Nasdaq-100'ün en düşük oynaklıklı 20 hissesi, kol oynaklığı 20 günlük tahminle %12'ye ölçeklenince (Moreira, Muir
+      2017, JF 72(4)) acil durdurmasız kalır ve maliyet sonrası T-bill'i aşar. Sıfır hipotezi: aşmaz.
+
+gruplar:
+  nasdaq100:
+    dinamik: nasdaq
+    uyelik: nasdaq100
+    depo: alpaca
+    kapsam_tolerans_gun: 10
+    asgari_gecmis_gun: 60
+    yon: long
+    zd: [1d]
+    en_fazla: A
+
+# 6 deneme (kesitsel_momentum 4, dusuk_oynaklik 2)
+kollar:
+  - strateji: hisse_momentum
+    gruplar: [nasdaq100]
+    zd: [1d]
+    izgara: { geriye_gun: [126, 252], atla_gun: [21], ust_n: [10, 20], filtre_gun: [0], aylik: [true] }
+  - strateji: dusuk_oynaklik
+    gruplar: [nasdaq100]
+    zd: [1d]
+    izgara: { pencere_gun: [60, 250], ust_n: [20], filtre_gun: [0], aylik: [true] }
