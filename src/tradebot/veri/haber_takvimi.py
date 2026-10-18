@@ -70,9 +70,23 @@ def issizlik_tarihleri(bas: date, bit: date) -> list[str]:
     return out
 
 
+PLANLI_FOMC = Path(__file__).resolve().parents[3] / "config" / "fomc_planli.yaml"
+
+
+def planli_fomc(yol: Path = PLANLI_FOMC) -> list[str]:
+    """Önceden ilan edilmiş FOMC karar günleri (YYYYMMDD). Karar metni bağlantısı yalnız GEÇMİŞ toplantılar için var:
+    bunlar olmadan canlı haber filtresi yaklaşan toplantıyı görmezdi (2026-10-18 denetimi: son FOMC 2026-09-16'ydı)."""
+    if not yol.exists():
+        return []
+    return sorted(str(g) for g in yaml.safe_load(yol.read_text(encoding="utf-8"))["gunler"])
+
+
 def olaylar(fomc_sayfa: str, nfp_sayfa: str, cpi_sayfa: str, ppi_sayfa: str = "",
-            issizlik: tuple[date, date] | None = None) -> list[dict]:
-    out = [{"olay": "FOMC", "tarih": t, "utc_ms": ny_ms(t, 14, 0)} for t in fomc_tarihleri(fomc_sayfa)]
+            issizlik: tuple[date, date] | None = None, planli: list[str] | None = None) -> list[dict]:
+    gecmis = fomc_tarihleri(fomc_sayfa)
+    son = max(gecmis) if gecmis else ""
+    ileri = [t for t in (planli or []) if t > son]      # yalnız son karar metninden SONRAKİ ilan edilmiş toplantılar
+    out = [{"olay": "FOMC", "tarih": t, "utc_ms": ny_ms(t, 14, 0)} for t in gecmis + ileri]
     out += [{"olay": "NFP", "tarih": t, "utc_ms": ny_ms(t, 8, 30)} for t in bls_tarihleri(nfp_sayfa, "empsit")]
     out += [{"olay": "CPI", "tarih": t, "utc_ms": ny_ms(t, 8, 30)} for t in bls_tarihleri(cpi_sayfa, "cpi")]
     out += [{"olay": "PPI", "tarih": t, "utc_ms": ny_ms(t, 8, 30)} for t in bls_tarihleri(ppi_sayfa, "ppi")]
@@ -90,7 +104,13 @@ def indir(ham: HamDepo, http: NazikIstemci | None = None, cikti: Path = CIKTI) -
         _, sha, _ = ham.kaydet("haber_takvimi", f"{ad}/{datetime.now().date().isoformat()}", icerik, "html")
         sayfalar[ad] = (icerik.decode("utf-8", "ignore"), sha)
     ol = olaylar(sayfalar["fomc"][0], sayfalar["empsit"][0], sayfalar["cpi"][0], sayfalar["ppi"][0],
-                 (date(2008, 1, 1), date(datetime.now().year + 1, 12, 31)))
+                 (date(2008, 1, 1), date(datetime.now().year + 1, 12, 31)), planli_fomc())
+    # Sayfa yapısı değişir ya da engellenirse regex az eşleşir: commit'li takvim sessizce eksik haliyle ezilmesin.
+    eski = {k: len(v) for k, v in _turlere(yukle_turlu(cikti)).items()}
+    yeni = {k: sum(o["olay"] == k for o in ol) for k in TURLER}
+    az = {k: (eski[k], yeni[k]) for k in eski if yeni.get(k, 0) < 0.95 * eski[k]}
+    if az:
+        raise RuntimeError(f"haber takvimi eksik geldi (eski, yeni): {az}; dosya değiştirilmedi")
     belge = {"aciklama": "Yüksek etkili ABD verileri (haber filtresi). Üreten: tradebot veri haber-takvimi",
              "kaynak_sha": {k: v[1] for k, v in sayfalar.items()}, "olaylar": ol}
     cikti.write_text(yaml.safe_dump(belge, allow_unicode=True, sort_keys=False, width=120), encoding="utf-8")
@@ -98,6 +118,13 @@ def indir(ham: HamDepo, http: NazikIstemci | None = None, cikti: Path = CIKTI) -
 
 
 TURLER = ("FOMC", "NFP", "CPI", "PPI", "ISSIZLIK")
+
+
+def _turlere(liste: list[tuple[str, int]]) -> dict[str, list[int]]:
+    out: dict[str, list[int]] = {}
+    for tur, t in liste:
+        out.setdefault(tur, []).append(t)
+    return out
 FILTRE_TURLERI = ("FOMC", "NFP", "CPI")   # Altın M15 haber filtresi (ön kayıt 2026-09-27)
 
 

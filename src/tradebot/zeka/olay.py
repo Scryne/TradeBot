@@ -35,8 +35,13 @@ def kaldir(motor: Engine, veto_id: int, gecerli_ms: int, neden: str, onay: str) 
         v = b.execute(select(olay).where(olay.c.id == veto_id, olay.c.tur == "veto")).one_or_none()
     if v is None:
         raise ValueError(f"veto yok: {veto_id}")
-    return yaz(motor, "kaldir", v.enstruman, gecerli_ms, neden, "manuel", v.metin_id, v.yargi_id, None,
-               {"veto_id": veto_id, "onay": onay})
+    kid = yaz(motor, "kaldir", v.enstruman, gecerli_ms, neden, "manuel", v.metin_id, v.yargi_id, None,
+              {"veto_id": veto_id, "onay": onay})
+    from tradebot import denetim  # riski artıran elle işlem: hash zincirli denetim izine de girer (acil-kaldir gibi)
+
+    denetim.kaydet(motor, "zeka", "veto_kaldirildi", {"veto_id": veto_id, "kaldir_id": kid, "enstruman": v.enstruman,
+                                                      "gecerli_ms": gecerli_ms, "neden": neden[:300], "onay": onay})
+    return kid
 
 
 def _bitisler(b) -> dict[int, int]:

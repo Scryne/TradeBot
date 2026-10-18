@@ -343,16 +343,24 @@ class LogTriyaj:
         for f in dosyalar:
             boy = f.stat().st_size
             bas = self.konum.get(f, 0)
+            parca = b""
             if boy < bas:
+                # Döndü (RotatingFileHandler): son okunan konumdan sonra eski dosyaya yazılanlar `.jsonl.1`'de kaldı.
+                eski = f.with_name(f.name + ".1")
+                if eski.exists() and eski.stat().st_size > bas:
+                    with eski.open("rb") as fh:
+                        fh.seek(bas)
+                        parca = fh.read()
+                    parca = parca[: parca.rfind(b"\n") + 1]
                 bas = 0
-            if boy == bas:
+            if boy == bas and not parca:
                 continue
             with f.open("rb") as fh:
                 fh.seek(bas)
-                parca = fh.read(boy - bas)
-            son_satir = parca.rfind(b"\n") + 1   # yarım satırı sonraki tura bırak
+                yeni = fh.read(boy - bas)
+            son_satir = yeni.rfind(b"\n") + 1   # yarım satırı sonraki tura bırak
             self.konum[f] = bas + son_satir
-            for satir in parca[:son_satir].splitlines():
+            for satir in (parca + yeni[:son_satir]).splitlines():
                 try:
                     k = json.loads(satir)
                 except ValueError:
@@ -363,7 +371,8 @@ class LogTriyaj:
         return out
 
 
-KRITIK = ("paper", "kilit", "gece_isi", "yedek", "veritabani")
+KRITIK = ("paper", "kilit", "kilit_gercek", "doviz", "altin", "akis", "skalp", "nasdaq", "nasdaq_gun_ici",
+          "gece_isi", "yedek", "veritabani")   # HATA'ları dış ölü adam kanalına /fail gider
 ORTAM = ("dns", "saat", "disk", "mt5")   # anlık dalgalanan ortam ölçümleri: bildirim için art arda onay ister
 _AGIRLIK = {"OK": 0, "UYARI": 1, "HATA": 2}
 
@@ -439,7 +448,15 @@ def hepsi(a: Ayarlar) -> list[Sonuc]:
         kontroller.append(yedek_kontrol)
     if a.mt5_kopru_forex or a.mt5_kopru_viop:
         kontroller.append(mt5_kontrol)
-    return [f(a) for f in kontroller]
+    out = []
+    for f in kontroller:
+        # Bir kontrolün çökmesi bekçi döngüsünü (ve aynı süreçteki gözetmenleri) öldürmesin: HATA olarak raporlanır.
+        try:
+            out.append(f(a))
+        except Exception as e:  # noqa: BLE001
+            ad = f.__name__.removesuffix("_kontrol")
+            out.append(Sonuc(ad, "HATA", f"kontrol çöktü: {type(e).__name__}: {e}"[:200]))
+    return out
 
 
 def mt5_kontrol(a: Ayarlar) -> Sonuc:

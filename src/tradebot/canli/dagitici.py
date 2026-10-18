@@ -47,6 +47,8 @@ class DagiticiAyar:
     def __post_init__(self) -> None:
         if not 0 <= self.kelly_kesri <= 0.5:
             raise ValueError(f"kelly_kesri {self.kelly_kesri}: yarım Kelly'nin üstü yok")
+        if any(not 0 <= float(o) <= 1 for _, o in self.kademe):   # kademe > 1 kaldıracı 3x'in üstüne taşırdı (kural 6)
+            raise ValueError(f"kademe oranları [0, 1] aralığında olmalı: {self.kademe}")
 
     def sozluk(self) -> dict:
         return {k: (list(map(list, v)) if k == "kademe" else v) for k, v in asdict(self).items()}
@@ -144,8 +146,8 @@ def dagit(getiri: dict[str, dict[int, float]], paper_gun: dict[str, float], sini
         kd = kademe_orani(satir[k]["gun"], ayar)
         a_mi = satir[k]["sinif"] == "A"
         satir[k] |= {"agirlik": float(w[j]), "kademe": kd, "katsayi": float(L * w[j] * kd) if a_mi else 0.0}
-    sonuc |= {"kaldirac_golge": L, "mu_p": mu_p, "sigma_p": math.sqrt(var_p),
-              "kaldirac": float(sum(satir[k]["katsayi"] for k in uygun))}
+    sonuc |= {"kaldirac_golge": L, "mu_p": mu_p, "sigma_p": math.sqrt(var_p), "uygun": uygun,
+              "kaldirac": kaldirac_dogrula(float(sum(satir[k]["katsayi"] for k in uygun)))}
     return sonuc
 
 

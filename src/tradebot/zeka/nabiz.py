@@ -46,11 +46,14 @@ def kor_mu(veri_dizini: Path, simdi_ms: int, esik_ms: int = ESIK_MS) -> tuple[bo
     n = oku(veri_dizini)
     if n is None:
         return True, "nabız yok"
-    if simdi_ms - int(n.get("zaman_ms") or 0) > esik_ms:
-        return True, "zekâ servisi tur atmıyor"
-    if simdi_ms - int((n.get("son_basari") or {}).get(A1_KAYNAGI) or 0) > esik_ms:
-        return True, "Binance duyuruları çekilemiyor"
-    hata, basari = n.get("jev_son_hata_ms"), n.get("jev_son_basari_ms")
-    if hata is not None and hata > (basari or 0):
-        return True, "son Jev çağrısı hatalı"
+    try:
+        if simdi_ms - int(n.get("zaman_ms") or 0) > esik_ms:
+            return True, "zekâ servisi tur atmıyor"
+        if simdi_ms - int((n.get("son_basari") or {}).get(A1_KAYNAGI) or 0) > esik_ms:
+            return True, "Binance duyuruları çekilemiyor"
+        hata, basari = n.get("jev_son_hata_ms"), n.get("jev_son_basari_ms")
+        if hata is not None and hata > (basari or 0):
+            return True, "son Jev çağrısı hatalı"
+    except (AttributeError, TypeError, ValueError):   # bozuk nabız: karar döngüsünü düşürmek yerine kör mod
+        return True, "nabız okunamadı"
     return False, ""

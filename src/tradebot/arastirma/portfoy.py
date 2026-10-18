@@ -57,11 +57,13 @@ def birlestir(seriler: dict[str, dict], maruziyet: dict[str, float], asgari_haft
 def _ozet(r: np.ndarray) -> dict:
     if len(r) == 0:
         return {}
+    r = np.maximum(r, -1.0)          # kaldıraçla −%100'ün altı: hesap sıfırlanır (özkaynak negatif olamaz)
     lg = np.log1p(np.maximum(r, -0.999999))
     oz = np.cumprod(1 + r)
     tepe = np.maximum.accumulate(np.r_[1.0, oz])[1:]
     sd = float(r.std(ddof=1)) if len(r) > 1 else 0.0
-    return {"puan": float(lg.mean()), "yillik": float(oz[-1] ** (mt.YIL_HAFTA / len(r)) - 1),
+    return {"puan": float(lg.mean()), "yillik": float(oz[-1] ** (mt.YIL_HAFTA / len(r)) - 1) if oz[-1] > 0 else -1.0,
+            "sifirlandi": bool((oz <= 0).any()),
             "sharpe": float(r.mean() / sd * math.sqrt(mt.YIL_HAFTA)) if sd > 0 else 0.0,
             "en_kotu_hafta": float(r.min()), "en_kotu_dusus": float((oz / tepe - 1).min()),
             "karli_hafta": float((r > 0).mean())}

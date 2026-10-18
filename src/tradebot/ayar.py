@@ -13,7 +13,7 @@ from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 SIR_ALANLARI = ("veritabani_url", "typesafe_api_key", "nvidia_api_key", "telegram_token", "binance_anahtar",
-                "binance_gizli")
+                "binance_gizli", "alpaca_anahtar", "alpaca_gizli")
 
 
 class Ayarlar(BaseSettings):
@@ -35,6 +35,9 @@ class Ayarlar(BaseSettings):
     # Binance USDⓈ-M (Faz 12 gerçek kol): çekim izni kapalı, IP kısıtlı anahtar; yalnız host .env (kural 12)
     binance_anahtar: SecretStr | None = None
     binance_gizli: SecretStr | None = None
+    # Alpaca PAPER hesabı (Nasdaq kolu): yalnız paper-api.alpaca.markets; canlı uç kodda yok (kural 7, gerçek para onayı)
+    alpaca_anahtar: SecretStr | None = None
+    alpaca_gizli: SecretStr | None = None
     telegram_sohbet: str | None = None    # Scryne'ın sohbet kimliği (sır değil; bot yalnız buraya yazar)
     yedek_dizini: Path | None = None      # compose `yedek`in hedefi; tanımlıysa sağlık yedek yaşını denetler
     olu_adam_url: str | None = None       # healthchecks.io ping adresi (yalnız .env'de): host kapanırsa dışarıdan alarm
@@ -65,6 +68,8 @@ class Ayarlar(BaseSettings):
             v = getattr(self, ad)
             if v is not None and v.get_secret_value():
                 out.append(v.get_secret_value())
+        if self.olu_adam_url:   # ping adresi de gizlidir (adresi bilen sahte "ok" gönderebilir)
+            out.append(self.olu_adam_url)
         return out
 
 

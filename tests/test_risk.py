@@ -133,7 +133,8 @@ def test_fiyat_bandi_riski_azaltani_engellemez():
     k = m.onayla(_e(-0.2, fiyat=60_000.0, emir="a"), PIY, pf)                        # %20 sapma, pozisyonu kapatır
     assert k.onay and k.risk_azaltan and k.miktar == -0.2
     assert not m.onayla(_e(0.1, fiyat=60_000.0, emir="b"), PIY, pf).onay            # artıran: bant uygulanır
-    assert not m.onayla(_e(-0.5, fiyat=60_000.0, emir="c"), PIY, pf).onay           # ters dönüş = artıran
+    ters = m.onayla(_e(-0.5, fiyat=60_000.0, emir="c"), PIY, pf)                    # ters dönüş: açılış kısmı bantta
+    assert ters.onay and ters.risk_azaltan and ters.miktar == pytest.approx(-0.2)    # kalır, kapatma kısmı geçer
 
 
 def test_emir_hizi_siniri():
@@ -205,3 +206,51 @@ def test_arastirma_modu_acil_olay_ama_kalici_degil():
 
 def test_canli_varsayilan_kalici():
     assert PortfoyIzleyici().acil_kalici is True
+
+
+# --- 2026-10-18 denetimi: NaN, eksik fiyat, ters dönüş, sınıfsız pozisyon ---
+@pytest.mark.parametrize("oz", [float("nan"), float("inf"), 0.0, -5.0])
+def test_gecersiz_ozkaynak_risk_artirmaz(oz):
+    k = RiskMotoru().onayla(_e(0.1), PIY, Portfoy(ozkaynak=oz, fiyatlar={"BINANCE:BTCUSDT": 50_000.0}))
+    assert not k.onay and any("özkaynak" in g for g in k.gerekceler)
+
+
+@pytest.mark.parametrize("miktar", [float("nan"), float("inf"), float("-inf")])
+def test_gecersiz_miktar_reddedilir(miktar):
+    k = RiskMotoru().onayla(_e(miktar), PIY, _pf())
+    assert not k.onay and k.miktar == 0.0
+
+
+def test_eksik_ya_da_nan_fiyatli_pozisyon_kaldiraci_delemez():
+    m = RiskMotoru(RiskAyar(kaldirac=1.0, enstruman_tavani=1.0, sinif_tavani=3.0, azami_emir_orani=1.0))
+    for fiyat in ({"BINANCE:BTCUSDT": 50_000.0}, {"BINANCE:BTCUSDT": 50_000.0, "X": float("nan")}):
+        pf = _pf(poz={"X": 10.0}, fiyat=fiyat, sinif={"X": "fx"})
+        k = m.onayla(_e(0.1, emir=str(len(fiyat))), PIY, pf)
+        assert not k.onay and any("portföy fiyatı" in g for g in k.gerekceler)
+
+
+def test_ters_donus_kapatmasi_frende_ve_acilde_gecer():
+    for durum in (Durum.FREN_GUNLUK, Durum.ACIL_DURDURMA):
+        k = RiskMotoru().onayla(_e(-0.5000001), PIY, _pf(poz={"BINANCE:BTCUSDT": 0.5}, durum=durum))
+        assert k.onay and k.risk_azaltan and k.miktar == pytest.approx(-0.5)
+
+
+def test_ters_donus_tavani_kapanmis_pozisyona_gore():
+    # 0,8 BTC uzun (40 bin$) → 1,6 BTC kısa istenir; enstrüman tavanı %50 = 50 bin$: kapatma 0,8 + açılış en çok 1,0
+    m = RiskMotoru(RiskAyar(enstruman_tavani=0.5, azami_emir_orani=1.0))
+    k = m.onayla(_e(-2.4), PIY, _pf(poz={"BINANCE:BTCUSDT": 0.8}))
+    assert k.onay and not k.risk_azaltan and k.miktar == pytest.approx(-1.8)
+
+
+def test_sinifi_bilinmeyen_pozisyon_sinif_tavanina_sayilir():
+    m = RiskMotoru(RiskAyar(kaldirac=3.0, enstruman_tavani=1.0, sinif_tavani=1.0, azami_emir_orani=1.0))
+    pf = _pf(poz={"Y": 1.8}, fiyat={"BINANCE:BTCUSDT": 50_000.0, "Y": 50_000.0}, sinif={})   # 90 bin$, sınıf yok
+    k = m.onayla(_e(1.0), PIY, pf)
+    assert k.onay and k.miktar == pytest.approx(0.2)        # 100 bin × 1,0 − 90 bin = 10 bin$
+
+
+def test_izleyici_nan_ozkaynakta_freni_kapatmaz():
+    iz = PortfoyIzleyici(baslangic_ozkaynak=100.0, baslangic_ms=T0)
+    assert iz.guncelle(float("nan"), T0 + 3_600_000) == Durum.FREN_GUNLUK
+    assert iz.tepe == 100.0                                   # referans bozulmadı
+    assert iz.guncelle(70.0, T0 + 2 * 3_600_000) == Durum.ACIL_DURDURMA

@@ -19,6 +19,10 @@ class YokHatasi(Exception):
     """Kaynakta dosya yok (404) — hata değil, bilgi."""
 
 
+class KaliciHata(RuntimeError):
+    """Yeniden denemekle düzelmeyecek istemci hatası (400/401/403/…): hemen yükselir, ~2 dk geri çekilme harcanmaz."""
+
+
 class NazikIstemci:
     def __init__(self, ad: str, aralik_sn: float = 0.0, deneme: int = 6, geri_cekilme_sn: float = 2.0,
                  zaman_asimi: float = 60.0, basliklar: dict | None = None, baglanti: int | None = None) -> None:
@@ -54,15 +58,23 @@ class NazikIstemci:
                 r = self._c.request(yontem, url, **kw)
                 if r.status_code == 404:
                     raise YokHatasi(url)
-                if r.status_code in (429, 500, 502, 503, 504):
+                if r.status_code in (408, 429, 500, 502, 503, 504):
                     raise httpx.HTTPStatusError(f"{r.status_code}", request=r.request, response=r)
+                if 400 <= r.status_code < 500:
+                    raise KaliciHata(f"{self.ad}: {r.status_code} {r.text[:200]}")
                 r.raise_for_status()
                 return r.content
-            except YokHatasi:
+            except (YokHatasi, KaliciHata):
                 raise
             except (httpx.HTTPError, OSError) as e:
                 son_hata = e
                 bekle = self.geri * (2**i)
+                yanit = getattr(e, "response", None)
+                if yanit is not None and yanit.status_code == 429:   # sunucunun istediği bekleme (en çok 2 dk)
+                    try:
+                        bekle = max(bekle, min(float(yanit.headers.get("Retry-After", 0)), 120.0))
+                    except ValueError:
+                        pass
                 self._log.warning("http_yeniden_dene", url=url, deneme=i + 1, hata=str(e)[:120], bekle_sn=bekle)
                 time.sleep(bekle)
         raise RuntimeError(f"{self.ad}: {url} {self.deneme} denemede alınamadı: {son_hata}")

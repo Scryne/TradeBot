@@ -237,7 +237,8 @@ def taraf_matrisi(g: GrupVerisi, modeller: list[MaliyetModeli], ek_bps: np.ndarr
     for j, mm in enumerate(modeller):
         ys = np.full(n, mm.yari_spread_bps)
         if mm.spread_veriden and g.yari_spread_bps is not None:
-            ys = np.where(np.isfinite(g.yari_spread_bps[:, j]), g.yari_spread_bps[:, j], mm.yari_spread_bps)
+            v = g.yari_spread_bps[:, j]   # 0 ya da eksik spread kotasyon yokluğudur: varsayılan (aleyhte, kural 4)
+            ys = np.where(np.isfinite(v) & (v > 0), v, mm.yari_spread_bps)
         out[:, j] = mm.ucret_bps * (1 + mm.ucret_vergisi) + ys + mm.kayma_bps
     if ek_bps is not None:
         out += ek_bps
@@ -289,8 +290,11 @@ def calistir_panel(g: GrupVerisi, hedef: np.ndarray, taraf: np.ndarray, modeller
     n, k = p.shape
     if n < 3 or hedef.shape != (n, k):
         raise ValueError("hedef [n, k] ve n ≥ 3 olmalı")
+    if (p[np.isfinite(p)] <= 0).any():   # 0 fiyat sonsuz getiri üretir (nan_to_num onu 1e308'e çevirirdi)
+        raise ValueError("yürütme fiyatı pozitif olmalı")
     with np.errstate(invalid="ignore", divide="ignore"):
-        r = np.nan_to_num(p[1:] / p[:-1] - 1.0)
+        r = p[1:] / p[:-1] - 1.0
+    r = np.where(np.isfinite(r), r, 0.0)   # ilk gerçek bardan önceki NaN: getiri 0
     h_all = np.vstack([np.zeros((1, k)), np.nan_to_num(hedef[:-1])])  # bar i'de tutulacak = hedef[i-1]
     sure = np.diff(g.t).astype(float)
     fin_uzun = np.array([m.finansman_yillik for m in modeller])

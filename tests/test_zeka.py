@@ -172,7 +172,7 @@ def test_yukseltme_429_bekler_ve_tekrar_dener(m):
                                                "not_about_asset": 0.25}, None, True, True, "belirsiz"),
     ("positive_or_neutral", 0.45, {"positive_or_neutral": 0.45, "not_about_asset": 0.4, "token_delist": 0.15},
      None, False, False, "belirsiz"),
-    (None, 0.0, {}, None, True, False, "belirsiz"),  # Jev hatası, yükseltme de yok: olasılık yok → veto yok, uyarı var
+    (None, 0.0, {}, None, True, True, "belirsiz"),  # bilgi yok, yükseltme de yok: belirsizlikte riski azalt → veto
 ])
 def test_a1_karar(secim, guven, p, yuk, denendi, veto, on_ek):
     v, neden = a1.karar(secim, guven, p, yuk, denendi)
@@ -183,7 +183,7 @@ def test_a1_adaylar():
     bazlar = {"ICX", "SCRT", "STORJ", "BTC", "ETH", "BNB"}
     assert a1.adaylar("Binance Will Delist ICX, SCRT, STORJ on 2026-09-03",
                       "ICX/USDT, SCRT/BTC and STORJ/USDT will be removed. BNB fees. ICX again. Ice", bazlar) == \
-        ["ICX", "SCRT", "STORJ", "BTC", "BNB"]  # BTC "SCRT/BTC" çiftinde geçiyor: aday; etkiyi Jev ayırır
+        ["ICX", "STORJ", "SCRT", "BTC", "BNB"]  # önce USDT çiftiyle geçenler; BTC "SCRT/BTC"de geçiyor: etkiyi Jev ayırır
 
 
 # ------------------------------------------------------------------ servis uçtan uca + point-in-time veto
@@ -460,3 +460,15 @@ def test_a1_celiski_yukseltme_yoksa_veto_kalir(m, ayar):
     with m.connect() as b:
         u = b.execute(select(olay.c.ayrinti).where(olay.c.tur == "uyari")).scalar()
     assert u["celiski"] == "metinde varlik/USDT yok"
+
+
+def test_a1_tek_harfli_taban_yalniz_cift_ya_da_parantezde():
+    bazlar = {"W", "A", "BTC"}
+    assert a1.adaylar("Binance Will Delist W", "W/USDT and A pair. Wormhole (W).", bazlar) == ["W"]
+
+
+def test_a1_uzun_duyuruda_varlik_kesite_girer():
+    govde = "x" * 6000 + " ZZZ/USDT will be removed " + "y" * 1000
+    k = a1.kesit(govde, "ZZZ")
+    assert "ZZZ/USDT" in k and len(k) < 4500
+    assert a1.kesit("kısa metin ZZZ", "ZZZ") == "kısa metin ZZZ"

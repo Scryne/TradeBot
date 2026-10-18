@@ -141,6 +141,7 @@ class Beyin:
             (_log.error if kor[0] else _log.warning)("habere_kor" if kor[0] else "habere_kor_bitti", neden=kor[1])
         self.kor = kor
         self._olaylari_uygula()
+        self._duzlestir_hemen(kapanis_ms)
         self._dagitim_guncelle(kapanis_ms)
         for kol in self.kollar:
             zd_ms = ZAMAN_DILIMI_MS[kol.zd]
@@ -179,12 +180,27 @@ class Beyin:
             elif o.kol in self.durum and o.tur == "devam":
                 self.durdurulan.discard(o.kol)
                 self.duzlesecek.discard(o.kol)
+                for anahtar in [x for x in self.ardisik_ret if x[0] == o.kol]:   # eski ret sayacı tek retle yeniden
+                    del self.ardisik_ret[anahtar]                                # durdurmasın
                 _log.warning("kol_elle_devam", kol=o.kol)
             d = self.durum.get(o.kol)
             iz = d.izleyici if d is not None else None
             if o.tur == "acil_kaldir" and iz is not None and iz.durum == Durum.ACIL_DURDURMA:
                 iz.acil_durdurma_kaldir(o.ayrinti["onaylayan"], o.ayrinti["gerekce"])
                 _log.warning("acil_durdurma_kaldirildi", kol=o.kol, onaylayan=o.ayrinti["onaylayan"])
+
+    def _duzlestir_hemen(self, kapanis_ms: int) -> None:
+        """Elle durdurulan kol kendi zaman dilimi sınırını beklemeden düzleşir (1d kolda 23 saate kadar gecikme vardı;
+        kural 7: riski azaltan her şey hemen). Sınırdaki kol normal kararla (hedef 0) zaten düzleşir."""
+        for kol in self.kollar:
+            d = self.durum[kol.ad]
+            if kol.ad not in self.duzlesecek or not d.adet or kapanis_ms % ZAMAN_DILIMI_MS[kol.zd] == 0:
+                continue
+            for kim, q in list(d.adet.items()):
+                if q:
+                    self.emir_ver(kol, None, kim, -q, self.son_fiyat.get(kim, 0.0) or 1.0, kapanis_ms - SAAT_MS,
+                                  Durum.NORMAL, set(), "durdur")
+            _log.warning("durdurulan_kol_duzlestirildi", kol=kol.ad)
 
     def _dagitim_guncelle(self, kapanis_ms: int) -> None:
         """Hafta döndüyse (ya da açılışta) dağıtımı defterden okur ya da hesaplayıp yazar. Hata: katsayılar sıfır
@@ -199,7 +215,8 @@ class Beyin:
             _log.info("dagitim", hafta_ms=hafta, kaldirac=round(self.dagitim["kaldirac"], 4),
                       golge=round(self.dagitim["kaldirac_golge"], 4), uygun=len(self.dagitim["uygun"]))
         except Exception as e:  # noqa: BLE001
-            self.dagitim = {"hafta_ms": hafta, "kollar": {}, "kaldirac": 0.0, "hata": str(e)[:300]}
+            # hafta_ms None: hata o hafta için kalıcı olmasın, sonraki kapanışta yeniden denenir (bu arada portföy düz)
+            self.dagitim = {"hafta_ms": None, "kollar": {}, "kaldirac": 0.0, "hata": str(e)[:300]}
             _log.error("dagitim_hatasi_portfoy_duz", hata=f"{type(e).__name__}: {e}"[:300])
 
     def _kol_karar(self, kol: PaperKol, vetolu: set[str], gecikmeli: bool, sinir_ms: int, kor: bool = False) -> None:
@@ -374,7 +391,12 @@ class Tetik(Strategy):
 
     def _dene(self, kapanis_ms: int, gecikmeli: bool = False, deneme: int = 0) -> None:
         self._bekleyen = kapanis_ms
-        if self.beyin.saat_kapandi(kapanis_ms, gecikmeli):
+        try:
+            tamam = self.beyin.saat_kapandi(kapanis_ms, gecikmeli)
+        except Exception as e:  # noqa: BLE001 — REST/DB hatası kapanışı kaybettirmesin: yeniden denenir
+            _log.error("kapanis_hatasi", kapanis_ms=kapanis_ms, deneme=deneme, hata=f"{type(e).__name__}: {e}"[:200])
+            tamam = False
+        if tamam:
             self._bekleyen = None
             self.clock.set_time_alert(f"mutabakat-{kapanis_ms}", self.clock.utc_now() + dt.timedelta(minutes=5),
                                       lambda _e: self.beyin.mutabakat())
@@ -438,9 +460,16 @@ class KolStratejisi(Strategy):
         ucret = event.commission.as_double()
         if event.commission.currency.code != "USDT":  # taban para biriminde kesilen komisyon → USDT
             ucret *= px
-        self.beyin.defter.olay_yaz(eid, self.kol.ad, "dolum" if tur != "toparlanma" else "toparlanma", kim, q, px, ucret,
-                                   event.ts_event // 1_000_000, {"komisyon_para": event.commission.currency.code})
+        # Önce Nautilus'un gerçeği: defter yazımı düşerse bellek defterle aynı kalır ve mutabakat farkı görüp kolu
+        # durdurur (eskiden ikisi birden atlanıyor, fark hiç görünmüyordu; 2026-10-18 denetimi).
         self._poz[kim] = self._poz.get(kim, 0.0) + q
+        try:
+            self.beyin.defter.olay_yaz(eid, self.kol.ad, "dolum" if tur != "toparlanma" else "toparlanma", kim, q, px,
+                                       ucret, event.ts_event // 1_000_000, {"komisyon_para": event.commission.currency.code})
+        except Exception as e:  # noqa: BLE001
+            _log.error("dolum_deftere_yazilamadi", kol=self.kol.ad, enstruman=kim, miktar=q, fiyat=px,
+                       hata=f"{type(e).__name__}: {e}"[:200])
+            return
         self.beyin.dolum(self.kol.ad, kim, q, px, ucret, tur)
 
     def _ret(self, event, tur: str) -> None:

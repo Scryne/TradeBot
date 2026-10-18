@@ -9,7 +9,7 @@ from __future__ import annotations
 import io
 import re
 import zipfile
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 import polars as pl
@@ -102,22 +102,26 @@ class Binance:
         yeni, parcalar = 0, []
         adaylar = self.aylik_dosyalar(sembol, zd)
         if gunluk:
-            bugun = date.today()
+            bugun = datetime.now(UTC).date()   # UTC: arşivin günleri UTC
             adaylar += [f"data/spot/daily/klines/{sembol}/{zd}/{sembol}-{zd}-{bugun.year}-{bugun.month:02d}-{g:02d}.zip"
                         for g in range(1, bugun.day)]
-        for anahtar_s3 in adaylar:
-            mantiksal = "spot/klines/" + anahtar_s3.split("/klines/", 1)[1].removesuffix(".zip")
-            if self.ham.var_mi("binance", mantiksal):
-                continue
-            try:
-                icerik, saglama = self._indir_dogrula(anahtar_s3)
-            except YokHatasi:
-                continue  # günlük dosya henüz yayınlanmamış ya da sembol işlemde değil
-            self.ham.kaydet("binance", mantiksal, icerik, "zip", beklenen_sha=saglama)
-            parcalar.append(kline_zip_oku(icerik))
-            yeni += 1
-        if parcalar:
-            self.bar.yaz(kimlik, zd, pl.concat(parcalar))
+        try:
+            for anahtar_s3 in adaylar:
+                mantiksal = "spot/klines/" + anahtar_s3.split("/klines/", 1)[1].removesuffix(".zip")
+                if self.ham.var_mi("binance", mantiksal):
+                    continue
+                try:
+                    icerik, saglama = self._indir_dogrula(anahtar_s3)
+                except YokHatasi:
+                    continue  # günlük dosya henüz yayınlanmamış ya da sembol işlemde değil
+                self.ham.kaydet("binance", mantiksal, icerik, "zip", beklenen_sha=saglama)
+                parcalar.append(kline_zip_oku(icerik))
+                yeni += 1
+        finally:
+            # Hama kaydedilen her dosya bara da işlenir: sonraki dosyanın hatası öncekileri kaybettirmesin (sonraki koşu
+            # hamda var diye atlar; 2026-10-18 denetimi). Dukascopy'deki kalıpla aynı.
+            if parcalar:
+                self.bar.yaz(kimlik, zd, pl.concat(parcalar))
         df = self.bar.oku(kimlik, zd)
         return {"kimlik": kimlik, "zd": zd, "yeni_dosya": yeni, "bar": len(df),
                 "ilk_ms": int(df["acilis_ms"][0]) if len(df) else None, "son_ms": int(df["acilis_ms"][-1]) if len(df) else None}
@@ -125,14 +129,20 @@ class Binance:
     def funding(self, sembol: str) -> dict:
         kimlik = f"BINANCE-UM:{sembol}"
         yeni, parcalar = 0, []
-        for anahtar_s3 in self.aylik_dosyalar(sembol, "", "futures/um/monthly/fundingRate"):
-            mantiksal = "um/funding/" + anahtar_s3.rsplit("/", 1)[1].removesuffix(".zip")
-            if self.ham.var_mi("binance", mantiksal):
-                continue
-            icerik, saglama = self._indir_dogrula(anahtar_s3)
-            self.ham.kaydet("binance", mantiksal, icerik, "zip", beklenen_sha=saglama)
-            parcalar.append(funding_zip_oku(icerik))
-            yeni += 1
+        try:
+            for anahtar_s3 in self.aylik_dosyalar(sembol, "", "futures/um/monthly/fundingRate"):
+                mantiksal = "um/funding/" + anahtar_s3.rsplit("/", 1)[1].removesuffix(".zip")
+                if self.ham.var_mi("binance", mantiksal):
+                    continue
+                icerik, saglama = self._indir_dogrula(anahtar_s3)
+                self.ham.kaydet("binance", mantiksal, icerik, "zip", beklenen_sha=saglama)
+                parcalar.append(funding_zip_oku(icerik))
+                yeni += 1
+        finally:
+            self._funding_yaz(sembol, parcalar)
+        return {"kimlik": kimlik, "yeni_dosya": yeni}
+
+    def _funding_yaz(self, sembol: str, parcalar: list) -> None:
         if parcalar:
             yol = self.bar.kok.parent / "funding" / f"{sembol}.parquet"
             yol.parent.mkdir(parents=True, exist_ok=True)
@@ -140,7 +150,6 @@ class Binance:
             if yol.exists():
                 df = pl.concat([pl.read_parquet(yol), df])
             df.unique("zaman_ms", keep="last").sort("zaman_ms").write_parquet(yol)
-        return {"kimlik": kimlik, "yeni_dosya": yeni}
 
     def durumlar(self) -> dict[str, str]:
         """exchangeInfo: sembol → durum (TRADING, BREAK …). Listede olmayan = tamamen kaldırılmış."""

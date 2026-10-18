@@ -55,7 +55,10 @@ def degerlendir(paper_gunluk: dict[int, float], bt_gunluk: dict[int, float], bt_
     ph = [math.expm1(x) for x in haftalik(paper_gunluk).values()]
     ortak = sorted(set(paper_gunluk) & set(bt_gunluk))
     fark = np.array([paper_gunluk[g] - bt_gunluk[g] for g in ortak])
-    te = float(fark.std(ddof=1) * math.sqrt(dg.YIL_GUN)) if len(fark) > 1 else float("inf")
+    # RMS: sabit günlük sapma da takip hatasıdır (std onu sıfırlardı). Ortak gün, paper günlerinin %80'inden azsa ölçüm
+    # yok sayılır (iki ortak günle geçilmesin; 2026-10-18 denetimi).
+    yeterli = len(fark) > 1 and len(fark) >= 0.8 * len(paper_gunluk)
+    te = float(np.sqrt(np.mean(fark ** 2)) * math.sqrt(dg.YIL_GUN)) if yeterli else float("inf")
     bh = np.array(bt_haftalik_tum)
     t = (float((np.mean(ph) - bh.mean()) / (bh.std(ddof=1) / math.sqrt(len(ph))))
          if len(ph) and len(bh) > 1 and bh.std(ddof=1) > 0 else float("-inf"))

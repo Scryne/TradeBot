@@ -73,9 +73,13 @@ class JevIstemci:
         return Yargi(int(yid), cevap or {}, model, hata)
 
 
-def donmus(motor: Engine, sorular: dict, state: dict, saglayici: str = "jev") -> dict | None:
-    """Backtest için: bu soru + girdi için kayıtlı EN ESKİ başarılı cevap (canlı çağrı yok, kural 8)."""
+def donmus(motor: Engine, sorular: dict, state: dict, saglayici: str = "jev", model: str | None = None) -> dict | None:
+    """Backtest için: bu soru + girdi (+ verilirse model sürümü) için kayıtlı EN ESKİ başarılı cevap (canlı çağrı yok,
+    kural 8: dondurma anahtarı model sürümü + soru hash'i + girdi hash'i)."""
+    q = select(jev_yargi.c.cevap).where(
+        jev_yargi.c.soru_sha == soru_sha(sorular), jev_yargi.c.girdi_sha == kanonik_sha(state),
+        jev_yargi.c.saglayici == saglayici, jev_yargi.c.hata.is_(None))
+    if model is not None:
+        q = q.where(jev_yargi.c.model_istenen == model)
     with motor.connect() as b:
-        return b.execute(select(jev_yargi.c.cevap).where(
-            jev_yargi.c.soru_sha == soru_sha(sorular), jev_yargi.c.girdi_sha == kanonik_sha(state),
-            jev_yargi.c.saglayici == saglayici, jev_yargi.c.hata.is_(None)).order_by(jev_yargi.c.id)).scalar()
+        return b.execute(q.order_by(jev_yargi.c.id)).scalar()

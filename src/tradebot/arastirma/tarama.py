@@ -51,8 +51,10 @@ def bar_yil(zd: str, takvim_adi: str) -> float:
     """Yılda bar sayısı (oynaklık yıllıklandırma): 7/24 takvim süre, borsa ~252 seans, FX ~260 gün."""
     if takvim_adi == "kripto_7x24":
         return 365.25 * 86_400_000 / ZAMAN_DILIMI_MS[zd]
-    gun_yil = 260.0 if takvim_adi == "fx_24x5" else 252.0
-    return gun_yil * max(1.0, 86_400_000 / ZAMAN_DILIMI_MS[zd]) if zd != "1d" else gun_yil
+    if takvim_adi == "fx_24x5":
+        return 260.0 * max(1.0, 86_400_000 / ZAMAN_DILIMI_MS[zd])
+    # borsa: gün içi barlar yalnız seansta (~6,5 saat), 24 saat değil
+    return 252.0 * max(1.0, 6.5 * 3_600_000 / ZAMAN_DILIMI_MS[zd]) if zd != "1d" else 252.0
 
 
 def tara(defter: Defter, depo: BarDepo, plan: str, strateji: str, kimlik: str, piyasa: str, sinif: str, zd: str,

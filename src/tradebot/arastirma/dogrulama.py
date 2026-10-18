@@ -97,7 +97,9 @@ def walk_forward(t: np.ndarray, kosular: dict[str, dict], is_ms: int, oos_ms: in
         parca = kosular[en_iyi]["net"][oos_m].copy()
         if onceki is not None and onceki != en_iyi and len(parca):
             i0 = int(np.flatnonzero(oos_m)[0])
-            parca[0] -= abs(kosular[en_iyi]["pozisyon"][i0] - kosular[onceki]["pozisyon"][i0]) * taraf_maliyet
+            # Geçişte eski varyant tamamen kapanır, yeni açılır (üst sınır, aleyhte; kural 4): `pozisyon` panelde brüt
+            # maruziyettir ve fark almak yön/sepet değişimini sıfır maliyetli sayardı (2026-10-18 denetimi).
+            parca[0] -= (abs(kosular[en_iyi]["pozisyon"][i0]) + abs(kosular[onceki]["pozisyon"][i0])) * taraf_maliyet
         oos_net.append(parca)
         secimler.append({"oos_bas": p.oos_bas, "secilen": en_iyi, "is_puan": puan(t[is_m], kosular[en_iyi]["net"][is_m])})
         onceki = en_iyi

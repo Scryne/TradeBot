@@ -46,13 +46,17 @@ def calistir(t: np.ndarray, fiyat: np.ndarray, sinyal: np.ndarray, mm: MaliyetMo
     if n < 3 or len(sinyal) != n or len(t) != n:
         raise ValueError("fiyat, sinyal ve t aynı uzunlukta ve ≥ 3 olmalı")
     fiyat = np.asarray(fiyat, dtype=float)
+    if not (np.isfinite(fiyat).all() and (fiyat > 0).all()):   # NaN/0 fiyat getiriyi sessizce bozar (denetim 10-18)
+        raise ValueError("fiyat sonlu ve pozitif olmalı")
     hedef = np.r_[0.0, np.asarray(sinyal, dtype=float)[:-1]]  # bar i'de tutulacak = sinyal[i-1]
     r = fiyat[1:] / fiyat[:-1] - 1.0                           # bar i getirisi, i = 0..n-2
     ys = np.full(n - 1, mm.yari_spread_bps) if (yari_spread_bps is None or not mm.spread_veriden) \
-        else np.nan_to_num(np.asarray(yari_spread_bps, dtype=float)[:-1], nan=mm.yari_spread_bps)
+        else np.asarray(yari_spread_bps, dtype=float)[:-1]
+    ys = np.where(np.isfinite(ys) & (ys > 0), ys, mm.yari_spread_bps)   # 0/eksik spread: varsayılan (aleyhte)
     taraf = (mm.ucret_bps * (1 + mm.ucret_vergisi) + ys + mm.kayma_bps) / 1e4
     sure = np.diff(np.asarray(t, dtype=np.int64)) if bar_ms is None else np.full(n - 1, bar_ms)
     fin_oran = mm.finansman_yillik * sure / YIL_MS
+    fin_kisa = (mm.finansman_yillik + mm.aciga_satis_yillik) * sure / YIL_MS   # kısa: ödünç maliyeti de (panel ile aynı)
     w, devir = np.empty(n - 1), np.empty(n - 1)
     islem, finansman, net = np.empty(n - 1), np.empty(n - 1), np.empty(n - 1)
     kaymis, oz, onceki_h = 0.0, 1.0, 0.0
@@ -64,8 +68,8 @@ def calistir(t: np.ndarray, fiyat: np.ndarray, sinyal: np.ndarray, mm: MaliyetMo
             durumlar[i] = ("normal", "fren_gunluk", "fren_haftalik", "acil_durdurma").index(d.value)
             if d.value == "acil_durdurma":
                 h = 0.0  # canlı: kalıcı; araştırma (acil_kalici=False): yalnız o bar, sonra fren gibi devam
-            elif d.value != "normal" and abs(h) > abs(kaymis):
-                h = kaymis  # fren: yeni risk yok
+            elif d.value != "normal":  # fren: yeni risk yok — küçülebilir, büyüyemez, TERS DÖNEMEZ (panel ile aynı)
+                h = float(np.sign(h) * min(abs(h), abs(kaymis))) if np.sign(h) == np.sign(kaymis) else 0.0
         degisti = i == 0 or h != onceki_h  # etkin hedef değişti mi (sinyal ya da fren)
         onceki_h = h
         if degisti or abs(h - kaymis) > bant:
@@ -73,7 +77,7 @@ def calistir(t: np.ndarray, fiyat: np.ndarray, sinyal: np.ndarray, mm: MaliyetMo
         else:
             w[i], devir[i] = kaymis, 0.0
         islem[i] = devir[i] * taraf[i]
-        finansman[i] = abs(w[i]) * fin_oran[i]
+        finansman[i] = abs(w[i]) * (fin_oran[i] if w[i] >= 0 else fin_kisa[i])
         net[i] = w[i] * r[i] - islem[i] - finansman[i]
         # bar sonunda pozisyon değeri w·(1+r), özkaynak (1+net): maliyet özkaynağı düşürdüğü için paydada
         kaymis = w[i] * (1.0 + r[i]) / (1.0 + net[i]) if abs(1.0 + net[i]) > 1e-12 else 0.0

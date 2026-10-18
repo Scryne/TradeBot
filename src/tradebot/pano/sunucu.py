@@ -43,7 +43,8 @@ class SaglikOnbellek:
             self.sonuc = {"hazir": True, "zaman_ms": int(time.time() * 1000), "kontroller": sonuclar}
         except Exception as e:  # noqa: BLE001
             self.sonuc = {"hazir": True, "zaman_ms": int(time.time() * 1000),
-                          "kontroller": [{"ad": "saglik", "durum": "HATA", "ayrinti": f"{type(e).__name__}: {e}"[:200]}]}
+                          "kontroller": [{"ad": "saglik", "durum": "HATA", "ayrinti": f"{type(e).__name__}"}]}   # metin
+            # (bağlantı adresi, kullanıcı adı) panoya gitmez; ayrıntı log'da
         finally:
             self.zaman = time.monotonic()
             with self._kilit:

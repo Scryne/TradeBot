@@ -559,7 +559,7 @@ class DovizDugumu:
         r = self.risk.onayla(EmirIstegi(kim, SINIF, q, u, self.kol.ad, simdi, eid_ist),
                              Piyasa(u, tik_ms, SAAT_MS, True), pf)
         onay_lot = _adima(p.para_lot(r.miktar, orta), self.ay.lot_adimi, asagi=True) if r.onay else 0.0
-        if r.onay and r.risk_azaltan:
+        if r.onay and r.risk_azaltan and r.miktar == q:   # tam azaltan: lot olduğu gibi (ters dönüşte onaylanan miktar)
             onay_lot = lot
         risk = {"onay": r.onay, "gerekceler": list(r.gerekceler), "risk_azaltan": r.risk_azaltan, "lot": lot,
                 "onay_lot": onay_lot}

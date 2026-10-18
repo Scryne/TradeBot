@@ -15,7 +15,7 @@ from collections.abc import Callable
 from datetime import UTC, datetime
 
 from tradebot.ayar import Ayarlar
-from tradebot.kayit import log
+from tradebot.kayit import log, metin_maskele
 
 ISARET = {"KRITIK": "🔴", "UYARI": "🟠", "BILGI": "🟢"}
 _SINIR = 4000   # Telegram mesaj sınırı 4096
@@ -36,6 +36,8 @@ class Bildirici:
         self._gonderici = gonderici or self._telegram
         self._saat = saat or (lambda: datetime.now(UTC))
         self.bekleyen: list[tuple[str, str]] = []   # sessiz saatte biriken (seviye, metin); yeniden başlatmada kaybolur
+        sirlar = a.sir_degerleri()
+        self._maskele = lambda m: metin_maskele(m, sirlar)   # metne gömülü sır (istisna metnindeki URL vb.) gitmesin
 
     @property
     def etkin(self) -> bool:
@@ -47,17 +49,22 @@ class Bildirici:
     def gonder(self, seviye: str, metin: str, anahtar: str | None = None) -> bool:
         """Döndürür: gönderildi mi. Susturulan, bekletilen ya da tanımsız kanal: False (yine loglanır)."""
         simdi = time.monotonic()
-        if anahtar is not None:
-            if simdi - self._son.get(anahtar, -1e18) < self.sessiz_sn:
-                return False
-            self._son[anahtar] = simdi
+        if anahtar is not None and simdi - self._son.get(anahtar, -1e18) < self.sessiz_sn:
+            return False
+        metin = self._maskele(metin)
         bekle = self.etkin and seviye != "KRITIK" and self._sessiz()
         _log.warning("bildirim", seviye=seviye, metin=metin[:500],
                      kanal="bekliyor" if bekle else ("telegram" if self.etkin else "yok"))
         if bekle:
             self.bekleyen.append((seviye, metin))
+            if anahtar is not None:
+                self._son[anahtar] = simdi
             return False
-        return self.etkin and self._yolla(f"{ISARET.get(seviye, '')} TradeBot · {seviye}\n{metin}")
+        gitti = self.etkin and self._yolla(f"{ISARET.get(seviye, '')} TradeBot · {seviye}\n{metin}")
+        # Susturma yalnız gerçekten gidenden sonra: gönderilemeyen KRİTİK alarm bir saat bastırılmasın (2026-10-18).
+        if anahtar is not None and gitti:
+            self._son[anahtar] = simdi
+        return gitti
 
     def bosalt(self) -> int:
         """Sessiz saat bittiyse biriken bildirimleri gruplayıp gönderir. Döndürür: gönderilen bildirim sayısı."""
@@ -66,14 +73,19 @@ class Bildirici:
         bekleyen, self.bekleyen = self.bekleyen, []
         baslik = f"🌙 TradeBot · gece biriken {len(bekleyen)} bildirim"
         parcalar = [f"{ISARET.get(s, '')} {m}" for s, m in bekleyen]
-        mesaj, n = baslik, 0
+        mesajlar, mesaj = [], baslik
         for p in parcalar:          # sınırı aşarsa birden çok mesaj
             if len(mesaj) + len(p) + 2 > _SINIR and mesaj != baslik:
-                n += self._yolla(mesaj)
+                mesajlar.append(mesaj)
                 mesaj = baslik + " (devam)"
             mesaj += "\n\n" + p
-        n += self._yolla(mesaj)
-        return len(bekleyen) if n else 0
+        mesajlar.append(mesaj)
+        if not self._yolla(mesajlar[0]):   # kanal yoksa biriken uyarılar kaybolmasın: sonraki turda yeniden denenir
+            self.bekleyen = bekleyen + self.bekleyen
+            return 0
+        for m in mesajlar[1:]:
+            self._yolla(m)
+        return len(bekleyen)
 
     def _yolla(self, metin: str) -> bool:
         try:

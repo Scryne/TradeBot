@@ -101,6 +101,17 @@ def dis_kimlik(k: str) -> str:
     return k if len(k) <= 128 else "sha1:" + hashlib.sha1(k.encode()).hexdigest()
 
 
+def ayni_alan(link: str, besleme: str) -> bool:
+    """Bağlantı https/http ve beslemenin kayıtlı alan adında mı (alt alan dahil: www.ecb.europa.eu ~ ecb.europa.eu)."""
+    from urllib.parse import urlparse
+
+    a, b = urlparse(link), urlparse(besleme)
+    if a.scheme not in ("http", "https") or not a.hostname or not b.hostname:
+        return False
+    kok = ".".join(b.hostname.split(".")[-2:])
+    return a.hostname == b.hostname or a.hostname.endswith("." + kok) or a.hostname == kok
+
+
 class RssToplayici:
     KAYNAK = "rss"
 
@@ -127,7 +138,12 @@ class RssToplayici:
             anahtar = hashlib.sha1(dk.encode()).hexdigest()
             _, sha, _ = self.ham.kaydet(ham_kaynak, anahtar, o["ham"], "xml")
             govde = o["govde"]
-            if a.get("sayfa") and o["link"]:
+            yabanci = bool(o["link"]) and not ayni_alan(o["link"], a["url"])
+            if a.get("sayfa") and yabanci:
+                # Bozulmuş besleme konteynerden iç adreslere (postgres, host.docker.internal) istek attırmasın: sayfa
+                # indirilmez, öğe beslemedeki metniyle kaydedilir
+                _log.warning("yabanci_link", kaynak=kaynak, link=o["link"][:200])
+            if a.get("sayfa") and o["link"] and not yabanci:
                 try:
                     sayfa = self.http.al(o["link"])
                 except Exception as e:  # noqa: BLE001 — öğe sonraki turda yeniden denenir

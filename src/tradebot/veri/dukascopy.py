@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import lzma
 import time
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import numpy as np
@@ -30,6 +30,14 @@ from tradebot.veri.depo import BarDepo, HamDepo
 from tradebot.veri.http import NazikIstemci, YokHatasi
 from tradebot.veri.takvim import ms, takvim
 
+
+def bugun_utc(gecikme_gun: int = 0) -> date:
+    """UTC bugünü (host yerel saati UTC+3: yerel tarih Dukascopy'nin UTC dönemlerinden önde olabilir). `gecikme_gun`:
+    "tamamlanmış" sayılmak için dönemin bitişinden sonra beklenen süre (yayın gecikmesi; yarım dosya kalıcı olmasın)."""
+    return (datetime.now(UTC) - timedelta(days=gecikme_gun)).date()
+
+
+YAYIN_GECIKMESI_GUN = 2
 URL = "https://datafeed.dukascopy.com/datafeed/{s}/{yol}"
 _log = log("veri.dukascopy")
 
@@ -102,7 +110,7 @@ class Dukascopy:
         return self._ham_onbellek[on_ek].get(anahtar)
 
     def saatlik_ay(self, e: en.Enstruman, y: int, a: int, taraf: str) -> tuple[pl.DataFrame, bool]:
-        bugun = date.today()
+        bugun = bugun_utc(YAYIN_GECIKMESI_GUN)
         tamamlanmis = (y, a) < (bugun.year, bugun.month)
         anahtar = f"{e.sembol}/{taraf}/1h/{y}-{a:02d}"
         icerik, yeni = self._dosya(e.sembol, f"{y}/{a - 1:02d}/{taraf}_candles_hour_1.bi5", anahtar, tamamlanmis)
@@ -110,14 +118,15 @@ class Dukascopy:
 
     def gunluk(self, e: en.Enstruman, bas: str, bitis_zamani: float) -> dict:
         """BID günlük mumlar, yıl başına bir dosya. Barlar "1d"'ye yazılır (saatlikten türetmeye göre önceliklidir)."""
-        bugun = date.today()
+        bugun = bugun_utc()
+        tamam_yil = bugun_utc(YAYIN_GECIKMESI_GUN).year
         parca, yeni = [], 0
         try:
             for y in range(int(bas[:4]), bugun.year + 1):
                 anahtar = f"{e.sembol}/BID/1d/{y}"
                 if time.monotonic() > bitis_zamani and self._ham_yol(anahtar) is None:
                     break
-                icerik, indi = self._dosya(e.sembol, f"{y}/BID_candles_day_1.bi5", anahtar, y < bugun.year)
+                icerik, indi = self._dosya(e.sembol, f"{y}/BID_candles_day_1.bi5", anahtar, y < tamam_yil)
                 yeni += indi
                 parca.append(bi5_coz(icerik, ms(datetime(y, 1, 1, tzinfo=UTC)), olcek(e.sembol, e.sinif)))
         finally:
@@ -126,7 +135,7 @@ class Dukascopy:
         return {"kimlik": e.kimlik, "yeni_dosya": yeni}
 
     def dakikalik_gun(self, e: en.Enstruman, g: date) -> tuple[pl.DataFrame, bool]:
-        tamamlanmis = g < date.today()
+        tamamlanmis = g < bugun_utc(YAYIN_GECIKMESI_GUN)
         anahtar = f"{e.sembol}/BID/1m/{g.isoformat()}"
         icerik, yeni = self._dosya(e.sembol, f"{g.year}/{g.month - 1:02d}/{g.day:02d}/BID_candles_min_1.bi5", anahtar,
                                    tamamlanmis)
@@ -134,7 +143,7 @@ class Dukascopy:
 
     def saatlik(self, e: en.Enstruman, bas: str, ask_yil: int, bitis_zamani: float) -> dict:
         """BID tam geçmiş + ASK son `ask_yil` yıl. `bitis_zamani` (monotonic) aşılınca bırakır, sonra devam eder."""
-        bugun = date.today()
+        bugun = bugun_utc()
         bid, ask, yeni = [], [], 0
         ask_bas = f"{bugun.year - ask_yil}-{bugun.month:02d}"
         try:
@@ -174,7 +183,7 @@ class Dukascopy:
         self.bar.yaz(e.kimlik, "1h", j.drop("a_o", "a_c", "spread_yeni"), birlestir=False)
 
     def dakikalik(self, e: en.Enstruman, yil: int, bitis_zamani: float) -> dict:
-        bugun = date.today()
+        bugun = bugun_utc()
         gunler = pl.date_range(date(bugun.year - yil, bugun.month, 1), bugun, eager=True).to_list()
         parca, yeni, basarisiz = [], 0, []
         try:

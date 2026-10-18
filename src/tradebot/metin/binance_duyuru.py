@@ -62,8 +62,10 @@ class BinanceDuyuru:
 
     def liste(self, katalog: int, sayfa: int = 1) -> list[dict]:
         d = json.loads(self.http.al(LISTE, {"type": 1, "catalogId": katalog, "pageNo": sayfa, "pageSize": 20}))
-        cats = d.get("data", {}).get("catalogs") or []
-        return cats[0].get("articles", []) if cats else []
+        cats = (d.get("data") or {}).get("catalogs")
+        if not cats:   # API biçimi değişti ya da boş yanıt: başarı sayılırsa A1 sessizce durur, nabız kör demezdi
+            raise RuntimeError(f"Binance duyuru listesi boş/biçim dışı (katalog {katalog})")
+        return cats[0].get("articles", [])
 
     def bilinen(self, kodlar: list[str]) -> set[str]:
         if not kodlar:

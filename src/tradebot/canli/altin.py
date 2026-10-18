@@ -386,7 +386,9 @@ class AltinDugumu:
             simdi = int(self.saat() * 1000)
             r = self.risk.onayla(EmirIstegi(self.ay.kimlik, SINIF, q, orta, self.kol.ad, simdi, eid),
                                  Piyasa(orta, tik_ms, SAAT_MS, True), pf)
-            onay_lot = lot if (r.onay and r.risk_azaltan) else (
+            # Tam azaltan emirde lot olduğu gibi (yuvarlama kapanışı bozmasın); ters dönüşte motor yalnız kapatma
+            # kısmını onaylayabilir: o zaman onaylanan miktar esastır.
+            onay_lot = lot if (r.onay and r.risk_azaltan and r.miktar == q) else (
                 _adima(r.miktar / self.ay.ons_lot, 0.01) if r.onay else 0.0)
             risk = {"onay": r.onay, "gerekceler": list(r.gerekceler), "risk_azaltan": r.risk_azaltan, "lot": lot,
                     "onay_lot": onay_lot}

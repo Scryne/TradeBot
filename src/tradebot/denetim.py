@@ -54,7 +54,8 @@ def dogrula(motor: Engine) -> tuple[bool, int | None, int]:
     with motor.connect() as b:
         n = b.execute(select(func.count()).select_from(denetim_izi)).scalar() or 0
         for r in b.execute(select(denetim_izi).order_by(denetim_izi.c.id)):
-            zaman = r.zaman if r.zaman.tzinfo else r.zaman.replace(tzinfo=UTC)  # SQLite tz'yi düşürür
+            # SQLite tz'yi düşürür; PostgreSQL oturum saat dilimi UTC değilse +03:00 gibi döner: kayıt UTC ile hash'lendi
+            zaman = (r.zaman if r.zaman.tzinfo else r.zaman.replace(tzinfo=UTC)).astimezone(UTC)
             beklenen = _hash(onceki, _kanonik(zaman, r.bilesen, r.olay, r.veri))
             if r.onceki_hash != onceki or r.hash != beklenen:
                 return False, r.id, n

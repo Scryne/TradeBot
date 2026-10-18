@@ -93,6 +93,20 @@ def normalize(df: pl.DataFrame, takvim_adi: str) -> tuple[pl.DataFrame, dict]:
                 "sicrama_atildi": int((sic & ~at).sum())}
 
 
+def olcek_kaydi(eski: pl.DataFrame | None, yeni: pl.DataFrame, tolerans: float = 1e-6) -> bool:
+    """Örtüşen günlerde kapanış ya da `adj_close` farklı mı (kaynak geçmişi yeniden ölçeklemiş)."""
+    if eski is None or eski.is_empty() or yeni.is_empty():
+        return False
+    k = [c for c in ("close", "adj_close") if c in eski.columns and c in yeni.columns]
+    j = eski.select("acilis_ms", *k).join(yeni.select("acilis_ms", *k), on="acilis_ms", suffix="_y")
+    for c in k:
+        a, b = j[c].to_numpy().astype(float), j[f"{c}_y"].to_numpy().astype(float)
+        ok = np.isfinite(a) & np.isfinite(b) & (a != 0)
+        if ok.any() and (np.abs(b[ok] / a[ok] - 1) > tolerans).any():
+            return True
+    return False
+
+
 def tamamlanmamis_at(df: pl.DataFrame, takvim_adi: str, simdi_ms: int, tampon_ms: int = 15 * 60_000) -> pl.DataFrame:
     """Seansı henüz kapanmamış günün barını atar."""
     if df.is_empty():
@@ -112,10 +126,10 @@ class Yahoo:
         self.evren = evren or en.evren_yukle()
         self.http = NazikIstemci("yahoo", aralik_sn=0.5, basliklar={"User-Agent": "Mozilla/5.0"})
 
-    def _bilinen_bolunmeler(self, kimlik: str) -> set[int]:
+    def _bilinen_olaylar(self, kimlik: str) -> set[tuple[int, str]]:
         with self.motor.connect() as b:
-            return set(b.execute(select(kurumsal_islem.c.tarih_ms).where(
-                kurumsal_islem.c.kimlik == kimlik, kurumsal_islem.c.tur == "bolunme")).scalars())
+            return {(int(t), str(tur)) for t, tur in b.execute(select(kurumsal_islem.c.tarih_ms, kurumsal_islem.c.tur)
+                                                               .where(kurumsal_islem.c.kimlik == kimlik)).all()}
 
     def _olay_yaz(self, kimlik: str, olaylar: list[dict], ham_sha: str) -> int:
         if not olaylar:
@@ -134,16 +148,23 @@ class Yahoo:
     def gunluk(self, e: en.Enstruman, baslangic: str, tam: bool = False) -> dict:
         kimlik, ks = e.kimlik, e.meta["kaynak_sembol"]
         simdi = int(time.time() * 1000)
-        ilk_kez = not self.bar.yol(kimlik, "1d").exists()
-        tam = tam or ilk_kez
-        bas = int(datetime.fromisoformat(baslangic).replace(tzinfo=UTC).timestamp() * 1000) if tam \
-            else simdi - ARTIMLI_GUN * 86_400_000
+        mevcut = self.bar.oku(kimlik, "1d") if self.bar.yol(kimlik, "1d").exists() else None
+        tam = tam or mevcut is None or mevcut.is_empty()
+        # Artımlı pencere en geç son kayıtlı bardan 10 gün önce başlar: servis 40 günden uzun durursa delik kalmasın.
+        if tam:
+            bas = int(datetime.fromisoformat(baslangic).replace(tzinfo=UTC).timestamp() * 1000)
+        else:
+            bas = min(simdi - ARTIMLI_GUN * 86_400_000, int(mevcut["acilis_ms"][-1]) - 10 * 86_400_000)
         ham = self._cek(ks, bas, simdi)
         df, olaylar = yanit_coz(ham)
-        yeni_bolunme = {o["tarih_ms"] for o in olaylar if o["tur"] == "bolunme"} - self._bilinen_bolunmeler(kimlik)
-        if yeni_bolunme and not tam:  # geçmiş geriye dönük değişti → tüm seriyi yeniden indir
-            _log.info("yeni_bolunme_tam_yenileme", kimlik=kimlik, tarihler=sorted(yeni_bolunme))
-            return self.gunluk(e, baslangic, tam=True)
+        if not tam:
+            # Yahoo bölünmede OHLC'yi, temettüde `adj_close`'u TÜM geçmiş için yeniden ölçekler. Artımlı birleştirme eski
+            # satırları eski ölçekte bırakır ve sınırda sahte getiri doğar (2026-10-18 denetimi): yeni olay ya da
+            # örtüşen günlerde ölçek farkı görülürse seri baştan indirilir (hamdan yeniden üretilebilirlik, kural 9).
+            yeni_olay = {(o["tarih_ms"], o["tur"]) for o in olaylar} - self._bilinen_olaylar(kimlik)
+            if yeni_olay or olcek_kaydi(mevcut, df):
+                _log.info("yahoo_tam_yenileme", kimlik=kimlik, olay=sorted(yeni_olay)[:5])
+                return self.gunluk(e, baslangic, tam=True)
         _, sha, _ = self.ham.kaydet("yahoo", f"chart/{ks}/1d/{datetime.now(UTC):%Y-%m-%d}{'-tam' if tam else ''}", ham, "json")
         df = tamamlanmamis_at(df, e.takvim, simdi)
         df, duzeltme = normalize(df, e.takvim)
@@ -170,7 +191,7 @@ class Yahoo:
             except Exception as ex:
                 _log.error("sembol_hatasi", kimlik=e.kimlik, hata=str(ex)[:200])
                 continue
-            en.sinir_guncelle(self.motor, e.kimlik, r["ilk_ms"], r["son_ms"])
+            en.sinir_guncelle(self.motor, e.kimlik, r["ilk_ms"], r["son_ms"], "aktif")   # geçici 404 kalıcı olmasın
             sonuc.append(r)
         return sonuc
 

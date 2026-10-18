@@ -65,19 +65,42 @@ ACILIYET = Score(
 SORULAR = {"etki": ETKI, "aciliyet": ACILIYET}
 AZAMI_ADAY = 40
 _TOKEN = re.compile(r"(?<![A-Za-z0-9])[A-Z0-9]{2,15}(?![A-Za-z0-9])")
+# Tek harfli tabanlar (W, S, A, T…) düz metinde sıradan harflerle karışır: yalnız çift ya da parantez içinde aday olur
+_TEK = re.compile(r"(?<![A-Za-z0-9])([A-Z])(?=\s*/\s*USDT|USDT(?![A-Za-z])|\))")
+_CIFT = re.compile(r"(?<![A-Za-z0-9])([A-Z0-9]{1,15})\s*/?\s*USDT(?![A-Za-z])")
+METIN_SINIRI = 4000
 
 
 def adaylar(baslik: str, govde: str, bazlar: set[str]) -> list[str]:
-    """Metinde büyük harfle geçen ve evrendeki bir USDT çiftinin tabanı olan semboller (geçiş sırasıyla, tekil)."""
+    """Metinde büyük harfle geçen ve evrendeki bir USDT çiftinin tabanı olan semboller (tekil). `AZAMI_ADAY` kesmesi
+    sıraya bağlı olduğundan önce metinde açıkça USDT çiftiyle geçenler gelir: toplu delist duyurusunda her duyuruda geçen
+    BTC/ETH/BNB kotayı doldurup asıl hedefleri dışarıda bırakmasın (2026-10-18 denetimi)."""
+    metin = f"{baslik}\n{govde}"
+    ciftli = [t for t in _CIFT.findall(metin) if t in bazlar]
+    duz = [t for t in _TOKEN.findall(metin) + _TEK.findall(metin) if t in bazlar]
     gorulen: list[str] = []
-    for t in _TOKEN.findall(f"{baslik}\n{govde}"):
-        if t in bazlar and t not in gorulen:
+    for t in ciftli + duz:
+        if t not in gorulen:
             gorulen.append(t)
     return gorulen[:AZAMI_ADAY]
 
 
+def kesit(govde: str, varlik: str, sinir: int = METIN_SINIRI) -> str:
+    """Modele giden metin. Uzun duyuruda varlık sınırdan sonra geçiyorsa geçtiği yerin çevresi de eklenir: aday tam
+    metinden bulunuyor, model yalnız ilk 4000 karakteri görseydi "not_about_asset" deyip vetoyu kaçırırdı."""
+    if len(govde) <= sinir:
+        return govde
+    bas = govde[: sinir - 1200]
+    if re.search(rf"(?<![A-Za-z0-9]){re.escape(varlik)}(?![A-Za-z0-9])", bas):
+        return govde[:sinir]
+    m = re.search(rf"(?<![A-Za-z0-9]){re.escape(varlik)}(?![A-Za-z0-9])", govde)
+    if m is None:
+        return govde[:sinir]
+    return bas + "\n…\n" + govde[max(0, m.start() - 500): m.start() + 600]
+
+
 def state(baslik: str, govde: str, varlik: str) -> dict:
-    return {"duyuru": {"baslik": baslik, "metin": govde[:4000]}, "varlik": varlik}
+    return {"duyuru": {"baslik": baslik, "metin": kesit(govde, varlik)}, "varlik": varlik}
 
 
 def karar(secim: str | None, guven: float, olasiliklar: dict, yukseltme: str | None, yukseltme_denendi: bool,

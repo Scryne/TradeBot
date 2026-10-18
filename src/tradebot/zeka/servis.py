@@ -51,7 +51,7 @@ def ayar_oku(yol: Path = AYAR_YOLU) -> dict:
 class Zeka:
     def __init__(self, motor: Engine, jev: JevIstemci, yukseltme: Yukseltme, toplayicilar: list, ayar: dict) -> None:
         self.motor, self.jev, self.yuk, self.toplayicilar, self.ayar = motor, jev, yukseltme, toplayicilar, ayar
-        self._onlem: set[tuple[int, str]] = set()   # önlem vetosu yazılmış (metin, enstrüman): turda tekrar yazılmaz
+        self._onlem: dict[tuple[int, str], int] = {}   # (metin, enstrüman) → önlem vetosunun bitişi (ms)
 
     def _sorulmus(self, rol, metin_id: int) -> set[str]:
         with self.motor.connect() as b:
@@ -89,12 +89,15 @@ class Zeka:
             yuk, yuk_model = (None, None)
             if y.hata or guven_k < esik:
                 yuk, yuk_model = self.yuk.sec(rol.ROL, hedef, rol.ETKI.model_dump(mode="json"), st, "etki")
-            if y.hata and yuk is None:   # model yok: önlem vetosu (canlı) + alarm; metin sonraki turda yeniden sorulur
-                if canli and (m.id, kimlik) not in self._onlem:
-                    self._onlem.add((m.id, kimlik))
-                    olaylar.append(olay.yaz(self.motor, "veto", kimlik, gecerli,
+            if y.hata and yuk is None:   # model yok: önlem vetosu + alarm; metin sonraki turda yeniden sorulur
+                # Kesintide birikmiş kuyruğun arkasında kalan yeni duyuru 10 dk'lık canlı pencereyi kaçırabilir: önlem
+                # penceresi yayından itibaren ONLEM_VETO_MS. Model hâlâ yoksa süresi dolan önlem yenilenir (2026-10-18).
+                onlem_bit = self._onlem.get((m.id, kimlik), 0)
+                if simdi_ms - m.yayin_ms < ONLEM_VETO_MS and simdi_ms >= onlem_bit:
+                    self._onlem[(m.id, kimlik)] = simdi_ms + ONLEM_VETO_MS
+                    olaylar.append(olay.yaz(self.motor, "veto", kimlik, simdi_ms,
                                             f"{rol.ONEK} önlem: model yanıt vermedi: {m.baslik[:200]}", rol.ROL, m.id,
-                                            y.id, gecerli + ONLEM_VETO_MS,
+                                            y.id, simdi_ms + ONLEM_VETO_MS,
                                             {"onlem": True, "jev_hata": y.hata[:200], "baslik": m.baslik[:200]}))
                     _log.error("model_yok_onlem_veto", rol=rol.ROL, enstruman=kimlik, metin_id=m.id, hata=y.hata[:200])
                 elif not canli:

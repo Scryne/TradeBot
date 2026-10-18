@@ -82,3 +82,43 @@ def test_normalize_imkansiz_sicra_don_atilir():
     out, d = normalize(df, "XIST")
     assert d["sicrama_atildi"] == 1 and int(t[20]) not in out["acilis_ms"].to_list() and len(out) == n - 1
 
+
+
+def test_artimli_guncelleme_temettu_olceklemesinde_tam_yenilenir(tmp_path):
+    """2026-10-18 denetimi: yeni temettü tüm geçmişin adj_close'unu ölçekler; artımlı birleştirme sahte sıçrama bırakırdı."""
+    import time
+
+    from sqlalchemy import create_engine
+
+    from tradebot.db import metadata
+    from tradebot.veri import enstruman as en
+    from tradebot.veri.yahoo import Yahoo, olcek_kaydi
+
+    m = create_engine(f"sqlite:///{tmp_path / 'y.db'}")
+    metadata.create_all(m)
+    y = Yahoo(tmp_path, m, evren={"abd_etf": {"baslangic": "2020-01-01"}})
+    e = en.Enstruman("ARCA", "XYZ", "etf", "XNYS", "USD", "yahoo", {"kaynak_sembol": "XYZ"})
+    gun = 86_400
+    bugun = int(time.time()) // gun * gun
+    ts = [bugun - (20 - i) * gun + 14 * 3600 for i in range(15)]
+    kap = [100.0 + i for i in range(15)]
+    cagri = []
+
+    def cek(sembol, bas_ms, bit_ms, adj):
+        cagri.append(bas_ms)
+        return json.dumps({"chart": {"error": None, "result": [{
+            "timestamp": ts, "indicators": {"quote": [{"open": kap, "high": kap, "low": kap, "close": kap,
+                                                       "volume": [100] * 15}], "adjclose": [{"adjclose": adj}]},
+            "events": {}}]}}).encode()
+
+    y._cek = lambda s, b, t: cek(s, b, t, kap)
+    y.gunluk(e, "2020-01-01")
+    assert len(cagri) == 1
+    olcekli = [k * 0.98 for k in kap]                 # yeni temettü: geçmişin tamamı %2 aşağı ölçeklendi
+    y._cek = lambda s, b, t: cek(s, b, t, olcekli)
+    r = y.gunluk(e, "2020-01-01")
+    assert r["tam"] is True and len(cagri) == 3       # artımlı deneme + tam yenileme
+    df = y.bar.oku(e.kimlik, "1d")
+    oran = (df["adj_close"] / df["close"]).to_list()
+    assert len(df) > 5 and all(abs(x - 0.98) < 1e-12 for x in oran)   # bütün seri tek ölçekte
+    assert not olcek_kaydi(y.bar.oku(e.kimlik, "1d"), y.bar.oku(e.kimlik, "1d"))

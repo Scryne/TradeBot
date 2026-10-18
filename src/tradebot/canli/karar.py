@@ -127,10 +127,18 @@ def karar_ver(kol: PaperKol, h: tv.HazirGrup, d: KolDurum, vetolu: set[str], hed
     fiyat = g.kapanis[-1].copy()
     fsoz = dict(zip(ks, fiyat, strict=True))
     oz = d.isaretle(fsoz)
-    kaymis = np.array([d.adet.get(k, 0.0) * fsoz[k] / oz if oz > 0 else 0.0 for k in ks])
+    gecerli = bool(np.isfinite(oz) and oz > 0 and np.isfinite(fiyat).all())
+    kaymis = np.array([d.adet.get(k, 0.0) * fsoz[k] / oz if gecerli else 0.0 for k in ks])
     durum = Durum.NORMAL.value
     if d.izleyici is not None:
         durum = d.izleyici.guncelle(oz / kol.baslangic_ozkaynak, t_islem).value
+    if not gecerli:
+        # Özkaynak ≤ 0 ya da fiyat NaN: ağırlık tanımsız, (yeni − kaymış) × özkaynak kapatma emri üretmezdi (2026-10-18
+        # denetimi). Belirsizlikte riski azalt: bütün pozisyonlar adetle kapatılır, karar acil durdurma olarak yazılır.
+        sifir = np.zeros(len(ks))
+        miktar = {k: -float(d.adet[k]) for k in ks if d.adet.get(k)}
+        return Karar(kol.ad, int(g.t[-1]), tuple(ks), sifir, sifir, kaymis, sifir, np.array([k in miktar for k in ks]),
+                     fiyat, Durum.ACIL_DURDURMA.value, (), miktar, False)
     veto = np.array([kol.jev and k in vetolu for k in ks])
     hedef = hedef_son(h, kol) if hedef is None else np.asarray(hedef, dtype=float)
     kor = habere_kor and kol.jev

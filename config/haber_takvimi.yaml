@@ -5081,6 +5081,9 @@ olaylar:
 - olay: ISSIZLIK
   tarih: '20261022'
   utc_ms: 1792672200000
+- olay: FOMC
+  tarih: '20261028'
+  utc_ms: 1793210400000
 - olay: ISSIZLIK
   tarih: '20261029'
   utc_ms: 1793277000000
@@ -5105,6 +5108,9 @@ olaylar:
 - olay: NFP
   tarih: '20261204'
   utc_ms: 1796391000000
+- olay: FOMC
+  tarih: '20261209'
+  utc_ms: 1796842800000
 - olay: ISSIZLIK
   tarih: '20261210'
   utc_ms: 1796909400000
@@ -5126,6 +5132,9 @@ olaylar:
 - olay: ISSIZLIK
   tarih: '20270121'
   utc_ms: 1800538200000
+- olay: FOMC
+  tarih: '20270127'
+  utc_ms: 1801076400000
 - olay: ISSIZLIK
   tarih: '20270128'
   utc_ms: 1801143000000
@@ -5147,6 +5156,9 @@ olaylar:
 - olay: ISSIZLIK
   tarih: '20270311'
   utc_ms: 1804771800000
+- olay: FOMC
+  tarih: '20270317'
+  utc_ms: 1805306400000
 - olay: ISSIZLIK
   tarih: '20270318'
   utc_ms: 1805373000000
@@ -5165,6 +5177,9 @@ olaylar:
 - olay: ISSIZLIK
   tarih: '20270422'
   utc_ms: 1808397000000
+- olay: FOMC
+  tarih: '20270428'
+  utc_ms: 1808935200000
 - olay: ISSIZLIK
   tarih: '20270429'
   utc_ms: 1809001800000
@@ -5183,6 +5198,9 @@ olaylar:
 - olay: ISSIZLIK
   tarih: '20270603'
   utc_ms: 1812025800000
+- olay: FOMC
+  tarih: '20270609'
+  utc_ms: 1812564000000
 - olay: ISSIZLIK
   tarih: '20270610'
   utc_ms: 1812630600000
@@ -5204,6 +5222,9 @@ olaylar:
 - olay: ISSIZLIK
   tarih: '20270722'
   utc_ms: 1816259400000
+- olay: FOMC
+  tarih: '20270728'
+  utc_ms: 1816797600000
 - olay: ISSIZLIK
   tarih: '20270729'
   utc_ms: 1816864200000
@@ -5225,6 +5246,9 @@ olaylar:
 - olay: ISSIZLIK
   tarih: '20270909'
   utc_ms: 1820493000000
+- olay: FOMC
+  tarih: '20270915'
+  utc_ms: 1821031200000
 - olay: ISSIZLIK
   tarih: '20270916'
   utc_ms: 1821097800000
@@ -5243,6 +5267,9 @@ olaylar:
 - olay: ISSIZLIK
   tarih: '20271021'
   utc_ms: 1824121800000
+- olay: FOMC
+  tarih: '20271027'
+  utc_ms: 1824660000000
 - olay: ISSIZLIK
   tarih: '20271028'
   utc_ms: 1824726600000
@@ -5261,6 +5288,9 @@ olaylar:
 - olay: ISSIZLIK
   tarih: '20271202'
   utc_ms: 1827754200000
+- olay: FOMC
+  tarih: '20271208'
+  utc_ms: 1828292400000
 - olay: ISSIZLIK
   tarih: '20271209'
   utc_ms: 1828359000000

@@ -44,6 +44,13 @@ def sir_maskeleyici(sirlar: list[str]):
     return isleyici
 
 
+def metin_maskele(metin: str, sirlar: list[str]) -> str:
+    """Serbest metindeki sır değerlerini maskeler (Telegram, pano gibi log dışı kanallar için)."""
+    for s in sorted({s for s in sirlar if s and len(s) >= 4}, key=len, reverse=True):
+        metin = metin.replace(s, MASKE)
+    return metin
+
+
 def surec_adi(argv: list[str] | None = None) -> str:
     """Log dosyasının adı: komutun ilk iki alt komutu (`tradebot paper calis` → paper-calis)."""
     argv = sys.argv[1:] if argv is None else argv

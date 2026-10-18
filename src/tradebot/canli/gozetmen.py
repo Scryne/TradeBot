@@ -44,6 +44,7 @@ ONAY_TUR = 3
 ISINMA_SN = 15 * 60
 UCRET = 0.001      # Binance spot VIP0 taker (maliyet modeli BINANCE)
 KAYMA = 0.0002     # 2 bps aleyhte (maliyet modeli BINANCE)
+UCRET_VADELI = 0.0005   # Binance USDⓈ-M taker (gerçek kol kapatması; komisyon 0 yazılırsa kâr şişerdi, kural 4)
 _log = log("gozetmen")
 
 FiyatAl = Callable[[list[str]], dict[str, tuple[float, float]]]   # kimlikler → {kimlik: (bid, ask)}
@@ -139,9 +140,12 @@ class Gozetmen:
         self.ardisik += 1
         if self.saat() - self.baslangic < self.isinma_sn or self.ardisik < self.onay_tur:
             return {"durum": "donma_suphesi", "yas_dk": yas_dk, "tur": self.ardisik}
-        with self.motor.connect() as b:   # bu donmada zaten durdurulmuş kollar (tekrar yazılmaz)
-            durmus = {r[0] for r in b.execute(select(paper_kol_olay.c.kol).where(
-                paper_kol_olay.c.tur == "durdur", paper_kol_olay.c.zaman_ms > int(son)))}
+        with self.motor.connect() as b:   # bu donmada GÖZETMENİN zaten durdurduğu kollar (tekrar yazılmaz)
+            # Başka nedenle (ardışık ret, mutabakat, Telegram) durmuş kol yine gözetmen olayı alır: pozisyonu defterde
+            # kapatılıyorsa düğüm uyanınca belleğini defterden yenilemeli (yalnız NEDEN olayı bunu tetikler).
+            durmus = {r[0] for r in b.execute(select(paper_kol_olay.c.kol, paper_kol_olay.c.ayrinti).where(
+                paper_kol_olay.c.tur == "durdur", paper_kol_olay.c.zaman_ms > int(son)))
+                if (r[1] or {}).get("neden") == NEDEN}
         durdurulacak = [k for k in kollar if k not in durmus]
         if self.dugum == GERCEK_DUGUM:
             if self.binance is None:   # deftere sahte kapanış yazılmaz: gerçek pozisyon borsada kalırdı
@@ -212,9 +216,11 @@ class Gozetmen:
                     istenen=r["adet"], onaylanan=r["adet"], karar_fiyati=r["fiyat"], gonderim_fiyati=r["fiyat"],
                     zaman_ms=simdi_ms, tur="gozetmen",
                     risk={"onay": True, "gerekceler": [NEDEN], "risk_azaltan": True})).inserted_primary_key[0]
+                ucret = abs(r["adet"]) * r["fiyat"] * UCRET_VADELI   # borsanın gerçek komisyonu bilinmeden aleyhte tahmin
                 b.execute(insert(paper_emir_olay).values(
-                    emir_id=eid, kol=kol, tur="dolum", enstruman=kim, miktar=r["adet"], fiyat=r["fiyat"], ucret=0.0,
-                    zaman_ms=simdi_ms, ayrinti={"gozetmen": True, "borsa_emir": r.get("emir_id"), "son_isaret_ms": son}))
+                    emir_id=eid, kol=kol, tur="dolum", enstruman=kim, miktar=r["adet"], fiyat=r["fiyat"], ucret=ucret,
+                    zaman_ms=simdi_ms, ayrinti={"gozetmen": True, "borsa_emir": r.get("emir_id"), "son_isaret_ms": son,
+                                                "ucret_tahmini": True}))
                 kapatilan[kim] = {"adet": r["adet"], "fiyat": r["fiyat"]}
         for k in durdurulacak:
             self._olay(k, simdi_ms, {"neden": NEDEN, "son_isaret_ms": son, "kapatilan_binance": kapatilan})

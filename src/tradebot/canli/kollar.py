@@ -57,6 +57,9 @@ def kollar(d: dict | None = None) -> list[PaperKol]:
     ag = d.get("agresif")
     if ag:
         b = d["boyutlar"][ag["boyut"]]
+        kaldirac_dogrula(b["kaldirac"])
+        if not 0 < float(ag["kelly_carpani"]) <= 10:   # hedef çarpanı; brüt yine risk motorunda ≤ 3x
+            raise ValueError(f"kelly_carpani {ag['kelly_carpani']}: (0, 10] aralığında olmalı")
         ayar = Ayar(hedef_vol=b["hedef_vol"], kaldirac=b["kaldirac"], vol_pencere_gun=b["vol_pencere_gun"],
                     frenler=bool(d.get("frenler", True)), bant=b["bant"], jev_veto=False)
         bilinen = {k.ad for k in out}
@@ -69,6 +72,7 @@ def kollar(d: dict | None = None) -> list[PaperKol]:
     pf = d.get("portfoy")
     if pf:
         b = d["boyutlar"][pf["boyut"]]
+        kaldirac_dogrula(b["kaldirac"])
         ayar = Ayar(hedef_vol=b["hedef_vol"], kaldirac=b["kaldirac"], vol_pencere_gun=b["vol_pencere_gun"],
                     frenler=bool(d.get("frenler", True)), bant=b["bant"], jev_veto=True)
         kaynak = {k.ad: k for k in out}

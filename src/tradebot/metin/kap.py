@@ -154,7 +154,19 @@ class KapBildirim:
         return [i for _, i in sorted(yeni)]
 
     def canli(self, ayar: dict) -> list[int]:
-        """Servis turu: Türkiye saatine göre bugün (gece yarısından sonraki ilk 15 dk dün de)."""
+        """Servis turu: Türkiye saatine göre bugün (gece yarısından sonraki ilk 15 dk dün de) ve servis kapalıyken kaçan
+        günler: son kayıtlı bildirimin gününden bugüne, en çok 7 gün (2026-10-18 denetimi: birkaç günlük kesintide o
+        günlerin bildirimleri canlıda hiç çekilmiyordu)."""
+        from sqlalchemy import func
+
         simdi = datetime.now(TR)
-        gunler = sorted({simdi.date(), (simdi - timedelta(minutes=15)).date()})
-        return self.topla(gunler)
+        gunler = {simdi.date(), (simdi - timedelta(minutes=15)).date()}
+        with self.motor.connect() as b:
+            son = b.execute(select(func.max(metin.c.yayin_ms)).where(metin.c.kaynak == KAYNAK)).scalar()
+        if son is not None:
+            g = datetime.fromtimestamp(int(son) / 1000, TR).date()
+            g = max(g, simdi.date() - timedelta(days=7))
+            while g < simdi.date():
+                gunler.add(g)
+                g += timedelta(days=1)
+        return self.topla(sorted(gunler))

@@ -160,17 +160,23 @@ class Bot:
         return [a for a, x in self.ad.items() if x.strateji == k.strateji and x.zd == k.zd] or [kol]
 
     def _onayla(self) -> str:
-        b, self.bekleyen = self.bekleyen, None
+        b = self.bekleyen
         if b is None or time.monotonic() - b.zaman > ONAY_SN:
+            self.bekleyen = None
             return "Onay bekleyen bir işlem yok (ya da süresi doldu)."
         from tradebot import denetim
         from tradebot.canli.defter import PaperDefter
 
         df = PaperDefter(self.m, "telegram")
         tur = "devam" if b.eylem == "devam" else "durdur"
-        for k in b.kollar:
-            df.kol_olay_yaz(k, tur, {"neden": "telegram", "eylem": b.eylem})
-        denetim.kaydet(self.m, "telegram", f"kol_{tur}", {"kollar": b.kollar, "eylem": b.eylem})
+        try:
+            for k in b.kollar:
+                df.kol_olay_yaz(k, tur, {"neden": "telegram", "eylem": b.eylem})
+            denetim.kaydet(self.m, "telegram", f"kol_{tur}", {"kollar": b.kollar, "eylem": b.eylem})
+        except Exception as e:  # noqa: BLE001 — onay düşmesin: kullanıcı aynı onayı yeniden verebilir
+            _log.error("telegram_onay_yazilamadi", hata=f"{type(e).__name__}: {e}"[:200])
+            return f"Yazılamadı ({type(e).__name__}); onay hâlâ bekliyor, 'evet' ile yeniden dene."
+        self.bekleyen = None
         _log.warning("telegram_eylem", eylem=b.eylem, kollar=b.kollar)
         return (f"Tamam: {len(b.kollar)} kol için '{tur}' yazıldı. Paper düğümü bir sonraki saat kapanışında uygular "
                 f"(durdurulan kol yalnız riski azaltan emir verir).")
@@ -310,8 +316,11 @@ def calistir() -> None:
                 offset = u["update_id"] + 1
                 msg = u.get("message") or {}
                 sohbet = str((msg.get("chat") or {}).get("id"))
-                if sohbet != str(a.telegram_sohbet):
-                    _log.warning("telegram_yabanci_sohbet", sohbet=sohbet)
+                gonderen = str((msg.get("from") or {}).get("id"))
+                # Yalnız Scryne'ın ÖZEL sohbeti: kimlik bir gruba ayarlanırsa gruptaki herkes /devam + evet yazabilirdi
+                # (riski artıran onay). Özel sohbette gönderen = sohbet.
+                if sohbet != str(a.telegram_sohbet) or gonderen != sohbet:
+                    _log.warning("telegram_yabanci_sohbet", sohbet=sohbet, gonderen=gonderen)
                     continue
                 tg.gonder(sohbet, bot.isle(msg.get("text") or ""))
         except Exception as e:  # noqa: BLE001 — ağ hatası servisi durdurmaz
