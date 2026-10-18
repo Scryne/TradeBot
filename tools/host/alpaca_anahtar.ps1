@@ -4,7 +4,8 @@
 # Host'a SSH'ın standart girdisiyle gider, host'taki .env'de eski TRADEBOT_ALPACA_* satırlarının yerine yazılır.
 # Yalnız PAPER anahtarı (app.alpaca.markets → Paper Trading → API Keys): kod yalnız paper-api.alpaca.markets'e bağlanır.
 # Sonra: `docker compose run --rm saglik tradebot paper alpaca-kontrol` ile salt okuma doğrulaması (emir göndermez) ve
-# `docker compose restart nasdaq` (düğüm açılışta anahtarı görürse Alpaca paper'a geçer).
+# `docker compose up -d --no-deps --force-recreate nasdaq nasdaq-gun-ici` (restart .env'i yeniden okumaz; düğüm açılışta
+# anahtarı görürse Alpaca paper'a geçer).
 param([string]$Hedef = 'tradebot-host')
 $ErrorActionPreference = 'Stop'
 
