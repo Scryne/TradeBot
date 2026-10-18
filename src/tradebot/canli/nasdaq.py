@@ -53,7 +53,9 @@ SINIF = "hisse"
 GUN_MS = 86_400_000
 SAAT_MS = 3_600_000
 DAKIKA_MS = 60_000
-KARAR_GECIKME_MS = 25 * DAKIKA_MS    # Yahoo günlük barı kapanış + 15 dk'da tamam sayılır (yahoo.tamamlanmamis_at)
+# Karar kapanıştan 45 dk sonra: Yahoo günlük barı kapanış + 15 dk'da tamam sayılır (yahoo.tamamlanmamis_at); Alpaca ücretsiz
+# planı son 15 dk'nın SIP verisini vermez (alpaca_veri: şimdi − 20 dk) ve geç basılan kapanış işlemleri otursun.
+KARAR_GECIKME_MS = 45 * DAKIKA_MS
 ACILIS_BEKLE_MS = 3 * DAKIKA_MS      # iç yürütme: açılış fiyatı ilk dakika barından (biraz bekle)
 GONDER_MS = 1 * DAKIKA_MS            # Alpaca: açılıştan sonra emir gönderimi
 ADET_ADIMI = 0.0001                  # kesirli hisse (Alpaca 9 haneye kadar; 4 hane yeter)
@@ -595,7 +597,17 @@ def calistir(sure_sn: float | None = None, dongu_sn: float = 60.0) -> None:
         h = alp.hesap()
         _log.info("alpaca_hesap", durum=h.get("status"), ozkaynak=h.get("equity"), para=h.get("currency"))
     http = NazikIstemci("yahoo_canli", aralik_sn=0.3, basliklar={"User-Agent": "Mozilla/5.0"}, deneme=3)
-    kaynak = Kaynak(lambda: nqv.guncelle(a, m, yalniz_guncel=True), http.al, alp)
+    alpaca_depolu = any(k.grup.get("depo") == "alpaca" for k in ay.kollar)
+
+    def guncelle() -> dict:
+        out = nqv.guncelle(a, m, yalniz_guncel=True)
+        if alpaca_depolu:   # kolun veri kaynağı Alpaca (dalga 19b): bugünkü üyelerin Alpaca günlük barları
+            from tradebot.veri import alpaca_veri
+
+            out["alpaca"] = alpaca_veri.guncelle(a, m, yalniz_guncel=True, gun_ici=False)
+        return out
+
+    kaynak = Kaynak(guncelle, http.al, alp)
     dugum = NasdaqDugumu(defter, ay, kaynak, BarDepo(a.veri_dizini), lambda: {k["kimlik"]: k for k in en.hepsi(m)}, alp,
                          nabiz_dizini=a.veri_dizini)
     dugum.ac()

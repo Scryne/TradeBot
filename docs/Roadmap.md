@@ -607,4 +607,7 @@ kapısı DSR yolu (d13 DSR 0,98); 26 haftalık PSR şartı kalktı. Sonrası Scr
 - **Sınırlar (bilinen):** ücretsiz kaynakta 271 tarihî üyenin 74'ünün fiyatı yok (hayatta kalma yanlılığı; dalga 19 en
   fazla B). Alpaca 2016+ verisiyle (kapanan semboller dahil) yeniden ölçüm ve gün içi kolun QQQ dakikalığıyla doğrulanması
   anahtar gelince. A3 SEC 8-K Jev rolü (risk azaltan veto) sonraki adım.
-- **Notlar:**
+- **Notlar:** 2026-10-18: Alpaca paper anahtarı geldi (iki düğüm Alpaca modunda). Alpaca verisiyle (kapanan üyeler
+  dahil, kapsam ~%100) dalga 19b aynı kararı verdi: esit_agirlik B, kolu d19b (Alpaca veri + yürütme) oldu; dalga 20b
+  (QQQ 30 dk, özgün son yarım saat) KALDI. A3 SEC 8-K Jev vetosu canlıda (spike 09: 23/23), Jev'li ikiz kol iç
+  simülasyonda. Kalan: 4 hafta kesintisiz paper ve Alpaca dolum/mutabakatının uçtan uca gözlemi.

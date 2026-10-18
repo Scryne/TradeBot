@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-10-18
 type: turnuva-plani
-durum: ön kayıt (koşudan önce commit edildi)
+durum: sonuçlandı — B (esit_agirlik), diğerleri KALDI (2026-10-18)
 ---
 # Turnuva — Dalga 19b: dalga 19'un ızgarası, Alpaca verisiyle (ön kayıt)
 
@@ -38,3 +38,28 @@ Aileler dalga 19 ile ortaktır: her varyant yeni denemedir, DSR bütün denemele
 - 19b'de hiçbir aile geçmezse: Scryne'ın yön kararı gereği bir günlük kol yine çalışır; walk-forward OOS Sharpe'ı en
   yüksek varyant "gözlem kolu" etiketiyle (d19b) paper'a girer, d19 kolu durdurulur.
 - Gerçek para kapısı değişmez; sonuca bakıp ızgara değiştirilmez.
+
+## Sonuç (2026-10-18, koşu `dalga19b`, ön kayıt 0385fd1)
+
+**Dalga 19 ile aynı karar: `esit_agirlik` B, diğer üç aile KALDI.** Veri kapsamı: 2016'dan sonraki 217 üyelik
+döneminin hepsinin Alpaca'da verisi var (eksik 0; Yahoo'da 271'in 74'ü yoktu). Verisi olan üye-gün oranı 2017–2025'te
+%99,8–100 (2016 %76: ısınma, ilk 60 gün). Yani bu sonuç hayatta kalma yanlılığının ürünü değildir. Dönem 2016-01 →
+2025-12; kör 2026-01 → 10-16.
+
+| Strateji | En iyi varyant | Yıllık | Sharpe | Düşüş | En kötü hafta | OOS yıllık | DSR (deneme) | Kör 2026 | Karar |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| esit_agirlik | filtre 200 | +%8,6 | 0,71 | −%17 | −%6,9 | +%7,2 | 0,01 (681) | +%13,1 | **B** |
+| hisse_momentum | 126 gün, ilk 10 | +%16,4 | 0,88 | −%25 | −%11,1 | +%10,8 | 0,67 (58) | +%33,2 | KALDI (en kötü hafta, 1 acil) |
+| dusuk_oynaklik | 60 gün, ilk 20 | +%8,6 | 0,70 | −%27 | −%9,0 | +%7,2 | 0,97 (8) | +%7,9 | KALDI (1 acil durdurma) |
+| kisa_donus | 10 gün, trend yok | +%9,9 | 0,59 | −%30 | −%9,5 | +%12,4 | 0,18 (88) | −%7,1 | KALDI (2 acil) |
+
+Kıyas (bilgi): evren eşit ağırlıklı al-tut +%10,6/yıl, Sharpe 0,70, düşüş −%27 (kör +%18,1); QQQ +%19,8/yıl, Sharpe
+0,97, düşüş −%37 (kör +%22,1).
+
+- 2016–2025'te QQQ'yu (birkaç mega şirketin yükselişi) hiçbir eşit ağırlıklı kural geçmiyor; esit_agirlik al-tutun
+  getirisinin ~%80'ini, düşüşün ~%60'ıyla veriyor. DSR ~0: A olamaz, gerçek para kapısı kapalı.
+- Düşük oynaklık DSR 0,97 ile A'ya en yakın aileydi, ama 2020 Mart'ında acil durdurma (−%25 tepe) eşiğine değdi; tam
+  dönem kapısı acil durdurma tetikleyen stratejiyi kabul etmiyor. Momentum en kötü haftada (−%11,1) kaldı.
+
+**Paper (ön kayıt gereği):** `d19` kolu durduruldu (henüz pozisyonu yoktu), yerine `d19b:esit_agirlik@nasdaq100@1d`
+(Alpaca verisi + Alpaca paper) ve A3 vetolu ikizi `d19b:esit_agirlik@nasdaq100@1d+jev` (iç simülasyon).

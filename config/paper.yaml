@@ -160,16 +160,23 @@ akis:
   magic: 911
   baslangic_ozkaynak: 10000
 
-# Nasdaq günlük kolu (dalga 19 B; docs/turnuva/Dalga-19-Nasdaq.md). Ayrı düğüm (canli/nasdaq.py, compose `nasdaq`):
-# kapanış + 25 dk karar (backtest zinciri: PIT Nasdaq-100 üyeliği + dönem kapsamı), ertesi açılışta dolum (Alpaca paper
-# anahtarı varsa Alpaca, yoksa iç simülasyon). Grup ve boyut dalga dosyasıyla birebir (kol tanımı değişirse yeni kol adı).
+# Nasdaq günlük kolları. Ayrı düğüm (canli/nasdaq.py, compose `nasdaq`): kapanış + 45 dk karar (backtest zinciri: PIT
+# Nasdaq-100 üyeliği + dönem kapsamı), ertesi açılışta dolum (Alpaca paper; kol satırında `yurutme: ic` iç simülasyon).
+# Grup ve boyut dalga dosyasıyla birebir (kol tanımı değişirse yeni kol adı).
+# 2026-10-18: dalga 19b (Alpaca verisi, kapanan üyeler dahil) esit_agirlik'i yine B buldu → ön kayıt gereği d19 kolu
+# (Yahoo verisi) durduruldu, yerine aynı varyantın Alpaca verili d19b kolu ve A3 (SEC 8-K) vetolu ikizi
+# (docs/turnuva/Dalga-19b-Nasdaq-Alpaca.md, docs/spikes/09-a3-sec.md). İkiz iç simülasyonda: Alpaca hesabında çift
+# pozisyon olmasın; Jev'in katkısı ikizle karşılaştırılarak ölçülür.
 nasdaq:
   yurutme: otomatik
   baslangic_ozkaynak: 100000
   boyut: {hedef_vol: 0.20, kaldirac: 1.0, vol_pencere_gun: 60, bant: 0.25}
   grup: {dinamik: nasdaq, uyelik: nasdaq100, kapsam_tolerans_gun: 10, asgari_gecmis_gun: 60, yon: long}
   kollar:
-    - {ad: "d19:esit_agirlik@nasdaq100@1d", strateji: esit_agirlik, parametre: {filtre_gun: 200, aylik: true}, sinif: B}
+    - {ad: "d19b:esit_agirlik@nasdaq100@1d", strateji: esit_agirlik, parametre: {filtre_gun: 200, aylik: true}, sinif: B,
+       grup: {depo: alpaca}}
+    - {ad: "d19b:esit_agirlik@nasdaq100@1d+jev", strateji: esit_agirlik, parametre: {filtre_gun: 200, aylik: true},
+       sinif: B, grup: {depo: alpaca}, jev: true, yurutme: ic}
 
 # Nasdaq gün içi kolu (dalga 20 KALDI; ön kayıt gereği en iyi varyant GÖZLEM kolu; docs/turnuva/Dalga-20-Gun-Ici.md).
 # Ayrı düğüm (canli/nasdaq_gun_ici.py, compose `nasdaq-gun-ici`): QQQ, 14:00 NY'de r1 > 0 ise uzun, 15:59 NY'de kapanır.

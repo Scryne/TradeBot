@@ -20,7 +20,7 @@ def _ms(s: str) -> int:
     return int(datetime.fromisoformat(s).replace(tzinfo=UTC).timestamp() * 1000)
 
 
-CUMA_KARAR = _ms("2026-10-16T20:30:00")        # kapanış 20:00 UTC (EDT) + 30 dk
+CUMA_KARAR = _ms("2026-10-16T20:50:00")        # kapanış 20:00 UTC (EDT) + 50 dk (karar gecikmesi 45 dk)
 PZT_ACILIS = _ms("2026-10-19T13:30:00")
 
 
