@@ -121,7 +121,7 @@ def test_ic_yurutme_acilista_dolar_ve_isaret_yazar(ortam):
     assert "yurutme" not in d.tur()
     s["t"] = PZT_ACILIS + 4 * 60_000
     r = d.tur()
-    assert r["yurutme"]["dolum"] >= 1 and not d.bekleyenler()
+    assert r["yurutme"]["ic_dolum"] >= 1 and not d.bekleyenler()
     kol = d.ay.kollar[0]
     durum = d.defter.durum(kol)
     brut = sum(abs(q) * float(ortam[1].oku(k, "1d")["close"][-1]) for k, q in durum.adet.items())
@@ -155,10 +155,10 @@ def test_alpaca_acilistan_sonra_gonderir_dolumu_yazar_mutabakat_tamam(ortam):
     assert not alp.emirler
     s["t"] = PZT_ACILIS + 90_000
     r = d.tur()
-    assert r["yurutme"]["gonderilen"] >= 1 and all(e["zaman"] == "day" for e in alp.emirler.values())
+    assert r["yurutme"]["alpaca_gonderilen"] >= 1 and all(e["zaman"] == "day" for e in alp.emirler.values())
     s["t"] += 60_000
     r = d.tur()
-    assert r["yurutme"]["dolum"] >= 1 and not d.bekleyenler()
+    assert r["yurutme"]["alpaca_dolum"] >= 1 and not d.bekleyenler()
     s["t"] = _ms("2026-10-19T15:00:10")
     r = d.tur()
     assert r["isaret"]["mutabakat"] == {"tamam": True}
@@ -226,3 +226,29 @@ def test_gozetmen_nasdaq_donmasinda_yalniz_kendi_sembollerini_kapatir(ortam):
     r = g.kontrol()
     assert r["durum"] == "donma" and sorted(alp.kapanan) == sorted(k.split(":")[1] for k in acik)
     assert not net_pozisyonlar(ortam[0]).get(kol)
+
+
+def test_jev_ikizi_ic_simulasyonda_vetolu_hisseyi_almaz_mutabakata_girmez(ortam):
+    from tradebot.zeka import olay
+
+    m, depo, kayit = ortam
+    y = _yapi({}, "alpaca")
+    y["nasdaq"]["kollar"].append({**y["nasdaq"]["kollar"][0], "ad": "d19:hisse_momentum@nasdaq100@1d+jev", "jev": True,
+                                  "yurutme": "ic"})
+    ay = nd.ayarlar(y)
+    alp = SahteAlpaca()
+    s = {"t": CUMA_KARAR}
+    d = nd.NasdaqDugumu(PaperDefter(m, "test"), ay, SahteKaynak(depo), depo, lambda: kayit, alp,
+                        saat=lambda: s["t"] / 1000)
+    d.ac()
+    assert d.kol_modu(ay.kollar[0].ad) == "alpaca" and d.kol_modu(ay.kollar[1].ad) == "ic"
+    for j in range(10):                                   # her hisseye veto: Jev'li ikiz hiç almamalı
+        olay.yaz(m, "veto", f"NASDAQ:S{j}", CUMA_KARAR - 3_600_000, "test", "A3_sec")
+    r = d.tur()["karar"]
+    assert r[ay.kollar[0].ad]["onay"] >= 1 and r[ay.kollar[1].ad]["onay"] == 0
+    s["t"] = PZT_ACILIS + 90_000
+    d.tur()
+    s["t"] += 60_000
+    d.tur()
+    s["t"] = _ms("2026-10-19T15:00:10")
+    assert d.tur()["isaret"]["mutabakat"] == {"tamam": True}

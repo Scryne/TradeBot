@@ -132,7 +132,7 @@ services:
 
   zeka:
     <<: *ortak
-    profiles: ["eski"]   # A1 Binance / A2 KAP: kripto ve BIST kolları içindi (2026-10-18'den beri emekli)
+    # 2026-10-18'den beri yalnız A3 (SEC 8-K → Nasdaq vetosu); A1/A2 kaynakları config/zeka.yaml'da kapalı
     # Zekâ katmanı (Faz 6): Binance duyuruları → Jev (A1) → veto/uyarı olayları. Her 60 sn bir tur.
     command: ["tradebot", "zeka", "calis"]
     depends_on:

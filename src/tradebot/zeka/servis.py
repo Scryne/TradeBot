@@ -31,6 +31,7 @@ from tradebot.metin.rss import RssToplayici
 from tradebot.veri.depo import HamDepo
 from tradebot.zeka import a1_binance as a1
 from tradebot.zeka import a2_kap as a2
+from tradebot.zeka import a3_sec as a3
 from tradebot.zeka import olay
 from tradebot.zeka.jev import JevIstemci
 from tradebot.zeka.karar import karar
@@ -39,7 +40,7 @@ from tradebot.zeka.yukseltme import Yukseltme
 AYAR_YOLU = Path(__file__).resolve().parents[3] / "config" / "zeka.yaml"
 CANLI_PENCERE_MS = 10 * 60_000
 ONLEM_VETO_MS = 6 * 3_600_000
-ROLLER = {a1.KAYNAK: a1, a2.KAYNAK: a2}
+ROLLER = {a1.KAYNAK: a1, a2.KAYNAK: a2, a3.KAYNAK: a3}
 ROL_ADI = {r.ROL: r for r in ROLLER.values()}
 _log = log("zeka.servis")
 
@@ -232,7 +233,10 @@ class Zeka:
 
 def toplayicilar(motor: Engine, a, ayar: dict) -> list:
     ham = HamDepo(a.veri_dizini, motor)
+    from tradebot.metin.sec import Sec8K
+
     hepsi = {a1.KAYNAK: lambda: BinanceDuyuru(ham, motor), a2.KAYNAK: lambda: KapBildirim(ham, motor),
+             a3.KAYNAK: lambda: Sec8K(ham, motor),
              "rss": lambda: RssToplayici(ham, motor, list(ayar.get("rss") or []))}
     return [hepsi[k]() for k in (ayar.get("kaynaklar") or list(hepsi))]
 

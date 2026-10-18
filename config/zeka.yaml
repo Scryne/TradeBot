@@ -10,7 +10,17 @@ yukseltme:
   # belirsiz 60'ta 4 kaçırılan veto (kaçırma, yanlış alarmdan pahalı).
   modeller: [nvidia/nemotron-3-ultra-550b-a55b, z-ai/glm-5.3]
   zaman_asimi_sn: 180          # ücretsiz katmanda p90 64 sn ölçüldü
-kaynaklar: [binance_duyuru, kap, rss]  # servis turunda toplanan kaynaklar (rol: A1, A2; rss rolsüz)
+# Servis turunda toplanan kaynaklar. 2026-10-18 Nasdaq dönüşü: yalnız SEC 8-K (A3); Binance (A1), KAP (A2) ve RSS
+# kripto/BIST kolları içindi (emekli). Geri açmak için listeye eklenir.
+kaynaklar: [sec_8k]
+sec:
+  sira: 10                         # turda başvuru listesi yoklanan şirket (~10 dk'da bütün Nasdaq-100)
+  # Veto süreleri (gün; boş = kalıcı). Riski azaltan yönde başlangıç değerleri; Jev'li/Jev'siz kol karşılaştırmasıyla
+  # ölçülür. Değişiklik = yeni deneme. Spike 09 (docs/spikes/09-a3-sec.md): 23/23 doğru, yanlış veto 0.
+  veto_gun:
+    being_acquired: 180
+    accounting_problem: 30
+    serious_negative: 10
 binance:
   kataloglar: [161, 157, 49, 48]   # delist, bakım, haber, listeleme
 kap:
@@ -20,6 +30,7 @@ kap:
     pazar_tedbiri: 30
     olumsuz_esasli: 20
 tarama:                            # servis turunda kaynak başına taranan son metin sayısı
+  sec_8k: 100
   binance_duyuru: 200
   kap: 600                         # ~290 bildirim/gün
 # RSS/Atom: geçmişi yok, yalnız son 15–35 öğe → erken toplanır (C özellikleri için birikir). Rol yok.

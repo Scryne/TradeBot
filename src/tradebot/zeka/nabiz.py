@@ -41,16 +41,16 @@ def oku(veri_dizini: Path) -> dict | None:
         return None
 
 
-def kor_mu(veri_dizini: Path, simdi_ms: int, esik_ms: int = ESIK_MS) -> tuple[bool, str]:
-    """(kör mü, neden)."""
+def kor_mu(veri_dizini: Path, simdi_ms: int, esik_ms: int = ESIK_MS, kaynak: str = A1_KAYNAGI) -> tuple[bool, str]:
+    """(kör mü, neden). `kaynak`: düğümün dayandığı rolün kaynağı (kripto A1: Binance duyuruları; Nasdaq A3: sec_8k)."""
     n = oku(veri_dizini)
     if n is None:
         return True, "nabız yok"
     try:
         if simdi_ms - int(n.get("zaman_ms") or 0) > esik_ms:
             return True, "zekâ servisi tur atmıyor"
-        if simdi_ms - int((n.get("son_basari") or {}).get(A1_KAYNAGI) or 0) > esik_ms:
-            return True, "Binance duyuruları çekilemiyor"
+        if simdi_ms - int((n.get("son_basari") or {}).get(kaynak) or 0) > esik_ms:
+            return True, f"{kaynak} çekilemiyor"
         hata, basari = n.get("jev_son_hata_ms"), n.get("jev_son_basari_ms")
         if hata is not None and hata > (basari or 0):
             return True, "son Jev çağrısı hatalı"

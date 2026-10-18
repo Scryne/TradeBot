@@ -47,7 +47,8 @@ def test_nabiz_kor_durumlari(tmp_path):
     assert nabiz.kor_mu(tmp_path, SIMDI + DK) == (False, "")
     assert nabiz.kor_mu(tmp_path, SIMDI + 20 * DK)[0]                        # servis tur atmıyor
     nabiz.yaz(tmp_path, SIMDI + 20 * DK, {"kap"}, SIMDI, None)             # Binance 20 dk'dır çekilemiyor
-    assert nabiz.kor_mu(tmp_path, SIMDI + 20 * DK) == (True, "Binance duyuruları çekilemiyor")
+    assert nabiz.kor_mu(tmp_path, SIMDI + 20 * DK) == (True, "binance_duyuru çekilemiyor")
+    assert not nabiz.kor_mu(tmp_path, SIMDI + 20 * DK, kaynak="kap")[0]       # düğümün kendi kaynağı tazeyse kör değil
     nabiz.yaz(tmp_path, SIMDI + 21 * DK, {"binance_duyuru"}, SIMDI, SIMDI + 21 * DK)   # son Jev çağrısı hatalı
     assert nabiz.kor_mu(tmp_path, SIMDI + 21 * DK) == (True, "son Jev çağrısı hatalı")
     nabiz.yaz(tmp_path, SIMDI + 22 * DK, {"binance_duyuru"}, SIMDI + 22 * DK, SIMDI + 21 * DK)

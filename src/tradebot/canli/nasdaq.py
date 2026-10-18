@@ -30,7 +30,7 @@ import math
 import time
 import uuid
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 from sqlalchemy import select
@@ -74,6 +74,7 @@ class NasdaqAyarlari:
     yurutme: str                     # "alpaca" | "ic" | "otomatik" (anahtar varsa alpaca)
     risk: RiskAyar
     maliyet: MaliyetModeli
+    kol_yurutme: dict = field(default_factory=dict)   # kol adı → yürütme (kol satırında `yurutme` verildiyse)
 
 
 def ayarlar(d: dict | None = None) -> NasdaqAyarlari | None:
@@ -86,18 +87,25 @@ def ayarlar(d: dict | None = None) -> NasdaqAyarlari | None:
     kaldirac = kaldirac_dogrula(float(bo["kaldirac"]))
     if kaldirac > 1.0:
         raise ValueError("Nasdaq nakit kolu: brüt ≤ 1x (kaldıraç yok)")
-    grup = dict(b["grup"]) | {"dugum": DUGUM, "hesap": "Alpaca paper" if b.get("yurutme") != "ic" else "iç simülasyon"}
-    kollar = []
+    kollar, kol_yurutme = [], {}
     for k in b["kollar"]:
         if k["strateji"] not in STRATEJILER:
             raise ValueError(f"bilinmeyen strateji: {k['strateji']}")
+        yur = k.get("yurutme", b.get("yurutme", "otomatik"))
+        # Grup tanımı kolun kimliğidir (defter tanımı): `depo` (veri kaynağı) ve hesap kol başına
+        grup = dict(b["grup"]) | dict(k.get("grup") or {}) | {
+            "dugum": DUGUM, "hesap": "Alpaca paper" if yur != "ic" else "iç simülasyon"}
+        # `jev: true`: A3 (SEC 8-K) vetolu ikiz; zekâ servisi kör ise yeni giriş yarım boyut (Final Doküman, katman 5)
         ayar = Ayar(hedef_vol=float(bo["hedef_vol"]), kaldirac=kaldirac, vol_pencere_gun=int(bo["vol_pencere_gun"]),
-                    frenler=bool(d.get("frenler", True)), bant=float(bo["bant"]))
+                    frenler=bool(d.get("frenler", True)), bant=float(bo["bant"]), jev_veto=bool(k.get("jev", False)))
         kollar.append(PaperKol(k["ad"], k["strateji"], b.get("grup_adi", "nasdaq100"), grup, "1d", ayar,
                                dict(k["parametre"]), k.get("sinif", "B"), float(b.get("baslangic_ozkaynak", 100_000))))
+        if "yurutme" in k:
+            kol_yurutme[k["ad"]] = yur
     if len({k.ad for k in kollar}) != len(kollar):
         raise ValueError("kol adları tekil olmalı")
-    return NasdaqAyarlari(tuple(kollar), b.get("yurutme", "otomatik"), RiskAyar(kaldirac=kaldirac), model("NASDAQ", SINIF))
+    return NasdaqAyarlari(tuple(kollar), b.get("yurutme", "otomatik"), RiskAyar(kaldirac=kaldirac), model("NASDAQ", SINIF),
+                          kol_yurutme)
 
 
 def sembol(kimlik: str) -> str:
@@ -204,8 +212,9 @@ def _adima(q: float) -> float:
 
 class NasdaqDugumu:
     def __init__(self, defter: PaperDefter, ay: NasdaqAyarlari, kaynak: Kaynak, depo, kayit_al: Callable[[], dict],
-                 alpaca=None, saat: Callable[[], float] = time.time) -> None:
+                 alpaca=None, saat: Callable[[], float] = time.time, nabiz_dizini=None) -> None:
         self.defter, self.ay, self.kaynak, self.depo, self.kayit_al = defter, ay, kaynak, depo, kayit_al
+        self.nabiz_dizini = nabiz_dizini   # zekâ nabzı (Jev'li kolun "habere kör" modu); None: kontrol yok
         self.m: Engine = defter.motor
         self.alpaca = alpaca if ay.yurutme in ("alpaca", "otomatik") else None
         if ay.yurutme == "alpaca" and self.alpaca is None:
@@ -219,6 +228,9 @@ class NasdaqDugumu:
     @property
     def mod(self) -> str:
         return "alpaca" if self.alpaca is not None else "ic"
+
+    def kol_modu(self, kol: str) -> str:
+        return "ic" if self.alpaca is None or self.ay.kol_yurutme.get(kol) == "ic" else "alpaca"
 
     def ac(self) -> None:
         for k in self.ay.kollar:
@@ -313,7 +325,16 @@ class NasdaqDugumu:
         d = self.defter.durum(kol)
         kapali, duzles = self._durduruldu(kol.ad)
         hedef = np.zeros(len(h.g.kimlikler)) if duzles else None
-        k = kr.karar_ver(kol, h, d, set(), hedef)
+        vetolu, kor = set(), False
+        if kol.jev:   # A3 vetoları (yalnız riski azaltır) ve zekâ servisinin nabzı
+            from tradebot.zeka import nabiz
+            from tradebot.zeka.olay import aktif_vetolar
+
+            simdi = int(self.saat() * 1000)
+            vetolu = aktif_vetolar(self.m, simdi)
+            if self.nabiz_dizini is not None:
+                kor = nabiz.kor_mu(self.nabiz_dizini, simdi, kaynak="sec_8k")[0]
+        k = kr.karar_ver(kol, h, d, vetolu, hedef, habere_kor=kor)
         kid = self.defter.karar_yaz(k, h.g.veri_hash)
         fiyat = {kim: float(f) for kim, f in zip(k.kimlikler, k.fiyat, strict=True)}
         planlar = []
@@ -362,9 +383,14 @@ class NasdaqDugumu:
         bek = self.bekleyenler()
         if not bek:
             return {}
-        if self.mod == "alpaca":
-            return self._alpaca_yurut(bek, simdi, bugun, acik)
-        return self._ic_yurut(bek, simdi, bugun, acik)
+        alp = [b for b in bek if self.kol_modu(b.kol) == "alpaca"]
+        ic = [b for b in bek if self.kol_modu(b.kol) == "ic"]
+        out = {}
+        if alp:
+            out |= {f"alpaca_{k}": v for k, v in self._alpaca_yurut(alp, simdi, bugun, acik).items()}
+        if ic:
+            out |= {f"ic_{k}": v for k, v in self._ic_yurut(ic, simdi, bugun, acik).items()}
+        return out
 
     def _ic_yurut(self, bek: list[Bekleyen], simdi: int, bugun: Seans | None, acik: bool) -> dict:
         """Karar emirleri: kararın ertesi seansının açılış fiyatından. Seans içinde verilen kapatma emirleri (elle
@@ -518,16 +544,18 @@ class NasdaqDugumu:
             return {"hata": f"{type(e).__name__}: {e}"[:120]}
         defter: dict[str, float] = {}
         for kol in self.ay.kollar:
+            if self.kol_modu(kol.ad) != "alpaca":   # iç simülasyondaki kolun pozisyonu aracı kurumda yoktur
+                continue
             for k, q in self.defter.durum(kol).adet.items():
                 defter[sembol(k)] = defter.get(sembol(k), 0.0) + q
-        bekleyen = {sembol(b.kimlik) for b in self.bekleyenler()}   # yolda olan emir geçici farktır
+        bekleyen = {sembol(b.kimlik) for b in self.bekleyenler() if self.kol_modu(b.kol) == "alpaca"}   # yolda olan emir
         fark = {s: {"defter": round(defter.get(s, 0.0), 6), "alpaca": alp.get(s, 0.0)}
                 for s in sorted(set(defter) | set(alp))
                 if abs(defter.get(s, 0.0) - alp.get(s, 0.0)) > 1e-6 and s not in bekleyen}
         if fark:
             _log.error("nasdaq_mutabakat_farki", fark=fark)
             for kol in self.ay.kollar:
-                if not self._durduruldu(kol.ad)[0]:
+                if self.kol_modu(kol.ad) == "alpaca" and not self._durduruldu(kol.ad)[0]:
                     self.defter.kol_olay_yaz(kol.ad, "durdur", {"neden": "mutabakat", "fark": fark})
         return {"fark": fark} if fark else {"tamam": True}
 
@@ -568,9 +596,10 @@ def calistir(sure_sn: float | None = None, dongu_sn: float = 60.0) -> None:
         _log.info("alpaca_hesap", durum=h.get("status"), ozkaynak=h.get("equity"), para=h.get("currency"))
     http = NazikIstemci("yahoo_canli", aralik_sn=0.3, basliklar={"User-Agent": "Mozilla/5.0"}, deneme=3)
     kaynak = Kaynak(lambda: nqv.guncelle(a, m, yalniz_guncel=True), http.al, alp)
-    dugum = NasdaqDugumu(defter, ay, kaynak, BarDepo(a.veri_dizini), lambda: {k["kimlik"]: k for k in en.hepsi(m)}, alp)
+    dugum = NasdaqDugumu(defter, ay, kaynak, BarDepo(a.veri_dizini), lambda: {k["kimlik"]: k for k in en.hepsi(m)}, alp,
+                         nabiz_dizini=a.veri_dizini)
     dugum.ac()
-    _log.info("nasdaq_basladi", kollar=[k.ad for k in ay.kollar], yurutme=dugum.mod)
+    _log.info("nasdaq_basladi", kollar={k.ad: dugum.kol_modu(k.ad) for k in ay.kollar}, yurutme=dugum.mod)
     bas = time.monotonic()
     while sure_sn is None or time.monotonic() - bas < sure_sn:
         try:
