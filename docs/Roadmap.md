@@ -1,7 +1,7 @@
 ---
 proje: TradeBot
 created: 2026-09-24
-updated: 2026-10-18
+updated: 2026-10-19
 type: roadmap
 status: aktif (sürüm 2 — kurumsal, çok piyasalı)
 ---
@@ -21,12 +21,12 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 3 | Araştırma motoru | ✅ Tamamlandı | Saf karar çekirdeği; piyasa başına maliyet modelleri; vektörel tarama; walk-forward + plato + DSR; deneme defteri; vektörel ↔ Nautilus parity testi geçiyor |
 | 4 | Risk motoru ve boyutlandırma | ✅ Tamamlandı | 5 katman kodlu ve testli; 3x tavan ve ≥ 5x imkânsızlığı testli; yarım Kelly; frenler, acil durdurma, onaylı yeniden başlatma |
 | 5 | Turnuva — backtest dalgası 1 | ✅ Tamamlandı | 7 aile × ilk dalga piyasalar huni aşama 0–3'ten geçti; puan tablosu; paper'a girecek kollar yazılı ölçütle seçildi |
-| 6 | Zekâ katmanı (Jev) | ⏳ Bekliyor | Toplayıcılar (Binance, KAP, RSS, Fed/ECB/TCMB); Jev servisi + NVIDIA yükseltme; A1, A2 canlı; B1 çapraz kontrolü; yargılar dondurulabiliyor; C1–C2 ölçüldü (A4, A5, D3, B2, B4 girdilerinin doğduğu faza taşındı, 2026-09-27) |
+| 6 | Zekâ katmanı (Jev) | ⛔ Askıda | Toplayıcılar (Binance, KAP, RSS, Fed/ECB/TCMB); Jev servisi + NVIDIA yükseltme; A1, A2 canlı; B1 çapraz kontrolü; yargılar dondurulabiliyor; C1–C2 ölçüldü (A4, A5, D3, B2, B4 girdilerinin doğduğu faza taşındı, 2026-09-27) |
 | 7 | Paper canlı — kripto + ABD ETF | ✅ Tamamlandı | Nautilus düğümleri paper'da 7/24; sermaye dağıtıcı; Jev'li/Jev'siz kollar; agresif gözlem kolu; mutabakat ve toparlanma testli |
-| 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | ⏳ Bekliyor | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
+| 8 | Özel bağlantılar — MT5 (FX/emtia/endeks) + BIST | ⛔ Askıda | MT5 demo köprüsü ve BIST (gecikmeli) paper bağlantısı çalışıyor; bu piyasaların kolları paper turnuvasında |
 | 9 | Operasyon: gözetmen, Telegram, raporlar | ✅ Tamamlandı | Bağımsız gözetmen motor donmasını yakalıyor (tatbikatla); Telegram 3 seviye; günlük özet + haftalık turnuva raporu; log triyajı; yedek |
 | 10 | Web pano | 🔄 Devam Ediyor | DESIGN.md dolu; PnL, pozisyon, turnuva tablosu, veto geçmişi, sağlık; Tailscale üzerinden telefondan erişim |
-| 11 | Paper turnuvası — 12 hafta | 🔄 Devam Ediyor | 12 hafta kesintisiz paper; kademeli sermaye çalıştı; hangi kolların kapıyı geçtiği ve Jev katkısı raporlandı; maliyet varsayımları ölçüldü |
+| 11 | Paper turnuvası — 12 hafta | ⛔ Askıda | 12 hafta kesintisiz paper; kademeli sermaye çalıştı; hangi kolların kapıyı geçtiği ve Jev katkısı raporlandı; maliyet varsayımları ölçüldü |
 | 12 | Gerçek para (koşullu) | ⏳ Bekliyor | Kanıt kapısı (DSR ≥ 0,95 ya da paper PSR(0) ≥ 0,95; mikro pilot yalnız Scryne'ın açık kararıyla) + aracı kurum/borsa + anahtar (çekim kapalı, IP kısıtlı) + vergi netliği; sabit tavanlı mikro sermaye; ilk emir Scryne onayıyla |
 | 13 | Sonraki dalgalar (koşullu) | ⏳ Bekliyor | Ölçüm fırsat gösterirse: ABD tek hisseleri (ücretli veri), CME vadelileri (Databento), VİOP; her biri ayrı kararla |
 | 14 | Nasdaq dönüşü — ABD hisse paper (günlük + gün içi) | 🔄 Devam Ediyor | PIT Nasdaq-100 evreni + Yahoo verisi host'ta güncel; dalga 19 (günlük) ve 20 (gün içi) sonuçlandı ve belgelendi; Nasdaq günlük ve gün içi paper düğümleri host'ta 7/24 (kalp atışı, gözetmen, Telegram, pano); Alpaca paper anahtarı gelince emir yolu Alpaca'da uçtan uca doğrulandı; 4 hafta kesintisiz paper |
@@ -36,6 +36,10 @@ günlük + gün içi, host'ta 7/24 paper):** 10-09 dondurması kalktı. Önce ta
 ters dönüşte kapatma reddi, Yahoo temettü ölçek kayması, gece işinde ve düğümlerde sessiz arızalar, log yapılandırması
 olmayan düğüm süreçleri; ayrıntı commit 83e701d). Kripto/forex kolları emekli (compose `eski` profili; durdurulmuş ve düz
 düğüm alarm üretmez). Yeni yol Faz 14.
+**Durum işaretleri (2026-10-19):** kripto/forex yoluna bağlı fazlar ⛔ Askıda: Faz 6 (kalan B1 BIST/KAP işi; A3 SEC 8-K
+Faz 14'te canlıya girdi), Faz 8 (MT5/BIST) ve Faz 11 (kripto paper turnuvası; kolları 10-09'da durdu, Nasdaq'ın paper süresi
+Faz 14'ün bitti kriterinde). Yeniden açılmaları Scryne'ın kararıyla olur. Faz 10 (pano) Nasdaq kollarını genel paper
+tablolarından gösteriyor; kalan tek parça telefondan erişim.
 
 **Yön değişikliği (2026-10-05, Scryne):** "sürekli işlem açıp kapatan", "forex trade bot üstünde ilerliycez", "tüm
 kolları kapat", "haberlere göre işlem açan bot mu yaparsın, ne yaparsan yap", "tek amacım 1 haftada maximum para".
