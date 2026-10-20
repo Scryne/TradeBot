@@ -376,7 +376,7 @@ class NasdaqDugumu:
                                          Piyasa(f, bar_ms, BAYAT_BIRIM_MS, True, ADET_ADIMI), pf)
             onay = (q if (r.risk_azaltan and r.miktar == q) else _adima(r.miktar)) if r.onay else 0.0
             risk = {"onay": r.onay, "gerekceler": list(r.gerekceler), "risk_azaltan": r.risk_azaltan}
-            eid = self.defter.emir_yaz(kol.ad, karar_id, istemci, kim, q, onay, f, tur, risk)
+            eid = self.defter.emir_yaz(kol.ad, karar_id, istemci, kim, q, onay, f, tur, risk, zaman_ms=simdi)
             if not onay:
                 self.defter.olay_yaz(eid, kol.ad, "ret", kim, 0.0, None, 0.0, simdi,
                                      {"gerekceler": list(r.gerekceler) or ["adet adımının altı"]})

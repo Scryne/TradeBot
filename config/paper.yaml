@@ -188,11 +188,14 @@ nasdaq:
 
 # Nasdaq gün içi kolu (dalga 20 KALDI; ön kayıt gereği en iyi varyant GÖZLEM kolu; docs/turnuva/Dalga-20-Gun-Ici.md).
 # Ayrı düğüm (canli/nasdaq_gun_ici.py, compose `nasdaq-gun-ici`): QQQ, 14:00 NY'de r1 > 0 ise uzun, 15:59 NY'de kapanır.
+# 2026-10-20: iç simülasyona alındı. d20 aynı Alpaca paper hesabında QQQ tuttu; günlük düğümün mutabakatı bunu fark
+# sayıp d19b'nin yeni riskini durdurdu (19 Ekim kararının 70 emri reddedildi). Tek hesap tek düğümündür: d20 durduruldu
+# (pozisyonsuz), yerine aynı tanımın iç simülasyonlu `+ic` kolu.
 nasdaq_gun_ici:
-  ad: "d20:gun_ici_ivme@qqq@1h"
+  ad: "d20:gun_ici_ivme@qqq@1h+ic"
   strateji: gun_ici_ivme
   parametre: {tutma: 2, kisa: false}
   sinif: gozlem
   boyut: {hedef_vol: 0.25, kaldirac: 1.0, vol_pencere_gun: 60}
-  yurutme: otomatik
+  yurutme: ic
   baslangic_ozkaynak: 100000

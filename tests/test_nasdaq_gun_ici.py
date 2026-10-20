@@ -37,6 +37,24 @@ def _yapi():
         "baslangic_ozkaynak": 100_000}}
 
 
+def test_alpaca_hesabi_gunluk_kollarla_paylasilmaz():
+    gunluk = {"yurutme": "otomatik", "kollar": [{"ad": "a"}, {"ad": "b", "yurutme": "ic"}]}
+    y = _yapi() | {"nasdaq": gunluk}
+    for yur in ("alpaca", "otomatik"):
+        y["nasdaq_gun_ici"] = _yapi()["nasdaq_gun_ici"] | {"yurutme": yur}
+        with pytest.raises(ValueError, match="paylaşamaz"):
+            gi.ayarlar(y)
+    y["nasdaq_gun_ici"]["yurutme"] = "ic"
+    assert gi.ayarlar(y).yurutme == "ic"
+    y["nasdaq"] = {"yurutme": "otomatik", "kollar": [{"ad": "b", "yurutme": "ic"}]}   # günlükte Alpaca kolu yok
+    y["nasdaq_gun_ici"]["yurutme"] = "alpaca"
+    assert gi.ayarlar(y).yurutme == "alpaca"
+
+
+def test_canli_ayar_tek_hesap_kuralina_uyar():
+    assert gi.ayarlar().yurutme == "ic"
+
+
 class SahteKaynak:
     """Önceki gün 16:00 NY kapanışı 100; bugün 10:00 NY 101 (r1 > 0); fiyat dakika başı sabit artar."""
 

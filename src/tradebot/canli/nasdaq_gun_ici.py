@@ -10,7 +10,8 @@ Akış (yalnız XNYS seansında işlem; gece pozisyon yok):
   (16:00 kapanışında normal seans biter; Alpaca'da seans sonrası yalnız limit emir). Seans 16:00'dan önce bitiyorsa (yarım
   gün) kol o gün işlem yapmaz: backtest'te de XNYS maskesi pozisyonu kapatır.
 - **Yürütme:** Alpaca PAPER (anahtar varsa) piyasa `day` emri, dolum Alpaca'dan + `EK_KAYMA` aleyhte; yoksa iç simülasyon
-  (Yahoo son fiyatı ± maliyet modeli `ABD:qqq_gun_ici`, taraf başı 2 bps).
+  (Yahoo son fiyatı ± maliyet modeli `ABD:qqq_gun_ici`, taraf başı 2 bps). Günlük düğümün Alpaca'ya giden kolu varken
+  Alpaca yasak (tek hesap, mutabakat çakışması); ayrı hesap gelirse ayrı anahtarla açılır.
 - **İşaret** (saat başı; kalp atışı), elle/acil durdurmada hemen kapatma (kural 7), risk motoru (kural 5).
 """
 from __future__ import annotations
@@ -69,6 +70,12 @@ def ayarlar(d: dict | None = None) -> GunIciAyarlari | None:
     kaldirac = kaldirac_dogrula(float(bo["kaldirac"]))
     if kaldirac > 1.0:
         raise ValueError("gün içi nakit kolu: brüt ≤ 1x")
+    # Tek Alpaca paper hesabı: günlük düğümün mutabakatı yalnız kendi kollarını sayar, burada tutulan QQQ'yu fark görüp
+    # günlük kolları durdurur (2026-10-19). Günlük düğümde Alpaca'ya giden kol varken bu kol iç simülasyonda olmalı.
+    gunluk = d.get("nasdaq") or {}
+    if b.get("yurutme", "otomatik") != "ic" and any(
+            k.get("yurutme", gunluk.get("yurutme", "otomatik")) != "ic" for k in gunluk.get("kollar") or []):
+        raise ValueError("gün içi kolu Alpaca hesabını günlük kollarla paylaşamaz: `yurutme: ic` gerekir")
     ayar = Ayar(hedef_vol=float(bo["hedef_vol"]), kaldirac=kaldirac, vol_pencere_gun=int(bo["vol_pencere_gun"]),
                 frenler=bool(d.get("frenler", True)), bant=0.0)
     grup = {"dugum": DUGUM, "yon": "long_short" if b["parametre"].get("kisa") else "long", "kimlikler": [KIMLIK],
@@ -230,7 +237,8 @@ class GunIciDugumu:
                              Piyasa(fiyat, simdi - simdi % SAAT_MS - SAAT_MS, SAAT_MS, True, ADET_ADIMI), pf)
         onay = (q if r.risk_azaltan and r.miktar == q else r.miktar) if r.onay else 0.0
         eid = self.defter.emir_yaz(self.kol.ad, karar_id, istemci, KIMLIK, q, onay, fiyat, tur,
-                                   {"onay": r.onay, "gerekceler": list(r.gerekceler), "risk_azaltan": r.risk_azaltan})
+                                   {"onay": r.onay, "gerekceler": list(r.gerekceler), "risk_azaltan": r.risk_azaltan},
+                                   zaman_ms=simdi)
         if not onay:
             self.defter.olay_yaz(eid, self.kol.ad, "ret", KIMLIK, 0.0, None, 0.0, simdi,
                                  {"gerekceler": list(r.gerekceler)})

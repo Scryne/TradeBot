@@ -103,12 +103,13 @@ class PaperDefter:
 
     def emir_yaz(self, kol: str, karar_id: int | None, istemci_emir_id: str, enstruman: str, istenen: float,
                  onaylanan: float, karar_fiyati: float, tur: str, risk: dict,
-                 gonderim_fiyati: float | None = None) -> int:
+                 gonderim_fiyati: float | None = None, zaman_ms: int | None = None) -> int:
+        """`zaman_ms`: düğümün saati (verilmezse duvar saati). Yürütme emrin zamanını seans açılışıyla kıyaslar."""
         with self.motor.begin() as b:
             return int(b.execute(insert(paper_emir).values(
                 kol=kol, karar_id=karar_id, istemci_emir_id=istemci_emir_id, enstruman=enstruman, istenen=istenen,
                 onaylanan=onaylanan, karar_fiyati=karar_fiyati, gonderim_fiyati=gonderim_fiyati,
-                zaman_ms=int(time.time() * 1000), tur=tur, risk=risk)).inserted_primary_key[0])
+                zaman_ms=zaman_ms or int(time.time() * 1000), tur=tur, risk=risk)).inserted_primary_key[0])
 
     def emir(self, istemci_emir_id: str):
         with self.motor.connect() as b:
