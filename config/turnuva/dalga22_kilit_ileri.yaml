@@ -1,0 +1,25 @@
+# Turnuva dalga 22 — kilit açılımı kolunun İLERİ testi: ÖN KAYIT (koşudan önce commit edilir). Gerekçe:
+# docs/turnuva/Dalga-22-Kilit-Ileri.md. Kural dalga 13'ün A kolunun (canlı d13) BİREBİR aynısı; ızgara tek nokta. Yeni
+# olan yalnız veri: DefiLlama takvimi ve Binance perp mumları 2026-10-24'te yeniden indirilir (data/ileri/kilit/), dönem
+# kuralın dondurulduğu 2026-10-01'den sonrasını da kapsar. "Kör" dilim = dondurmadan sonraki haftalar (örneklem dışı).
+# Aile kilit_kisa: DSR önceki bütün kilit denemeleriyle (dalga 6, 6b, 13, 18) sayılır (kural 10).
+
+dalga: 22
+plan:
+  kimlik: 2026-10-24-d22-kilit-ileri
+  aile: kilit_kisa
+  hipotez: >-
+    Dalga 13'te seçilip 2026-10-01'de dondurulan kural (insider/özel satış cliff açılımı ≥ azami arzın %0,5'i; açılımdan
+    7 gün önce token perp kısa + aynı nominalde BTC perp uzun, açılım günü kapanış; olay başına nominal %5) dondurmadan
+    sonra gerçekleşen olaylarda da maliyet sonrası pozitif olay başına getiri verir. Sıfır hipotezi: dondurma sonrası
+    olay başına ortalama ≤ 0.
+
+olay: { kategoriler: [insiders, privateSale], asgari_oran: 0.005 }
+notional: 0.05
+maliyet: { ucret: 0.0005, kayma_token: 0.001, kayma_btc: 0.0001 }
+tavan: { azami_brut: 1.0, azami_btc: 0.5 }
+donem: { bas: "2021-01-01", is_bitis: "2026-10-01", bit: "2026-10-24" }
+izgara: { giris: [-7], cikis: [0], asgari_oran: [0.005] }
+onceki_dalgalar: [dalga6, dalga6b, dalga13, dalga18]
+olcut: { dsr_a: 0.95, yil_pozitif: 0.60, stres_maliyet: 2.0, en_kotu_hafta: -0.10, en_kotu_dusus: -0.30,
+         oos_asgari_yillik: 0.0 }
