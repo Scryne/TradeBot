@@ -192,7 +192,8 @@ services:
 
   kilit:
     <<: *ortak
-    profiles: ["eski"]   # 2026-10-09 dondurma, 2026-10-18 Nasdaq dönüşü: emekli (kollar durdurulmuş, pozisyon yok)
+    # 2026-10-24: yeniden açık. Dalga 22 ileri testi (dondurma sonrası 17 olay, ort. +%4,0) kuralı çürütmedi; ileri kanıt
+    # biriktirmek için paper (Scryne: "amacım para kazanmak", tüm yetki). Gerçek kol ayrı: `kilit-gercek` (profil gercek).
     # Dalga 6b kilit açılımı kolu (canli/kilit.py): Nautilus dışı ayrı süreç. Günde bir karar 00:05 UTC (DefiLlama takvimi
     # ham depoya, Binance USDT-M perp kotasyonu, risk motoru), saatte bir işaret + funding. Kalp atışı ayrı izlenir
     # (gözetmen `kilit` düğümü). Defter emirden önce yazılır; yeniden başlatmada eksik emirler tamamlanır.

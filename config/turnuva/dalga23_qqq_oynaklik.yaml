@@ -1,0 +1,22 @@
+# Turnuva dalga 23 — QQQ oynaklık zamanlaması, 1999 → 2026: ÖN KAYIT (koşudan önce commit edilir). Gerekçe ve ölçüt:
+# docs/turnuva/Dalga-23-QQQ-Oynaklik.md. Kod: src/tradebot/arastirma/endeks_oynaklik.py. 8 deneme, yeni aile.
+
+dalga: 23
+plan:
+  kimlik: 2026-10-24-d23-qqq-oynaklik
+  aile: oynaklik_zamanlama
+  hipotez: >-
+    QQQ'yu gerçekleşen oynaklığın tersiyle ölçeklemek (w = min(tavan, hedef / σ̂), kapanışta karar, sonraki açılışta dolum,
+    boşta SHY, ödünç faiz + %1,5) 1999–2026'da QQQ al-tutla aynı ya da daha yüksek bileşik getiriyi daha küçük en kötü
+    düşüşle verir; 2x tavanla al-tutu iki yarıda da geçer. Sıfır hipotezi: geçmez.
+kimlik: ARCA:QQQ
+nakit: ARCA:SHY
+bas: "1999-03-10"
+bit: "2026-10-24"
+yari_bolum: "2013-01-01"
+maliyet: { ucret_bps: 1.0, yari_spread_bps: 1.0, kayma_bps: 1.0 }
+borc: { ek: 0.015, sabit: 0.07 }        # ödünç yıllık = OECD ABD 3 ay (2 ay gecikmeli) + ek; veri yoksa sabit
+izgara: { hedef_vol: [0.15, 0.20], pencere_gun: [20, 60], tavan: [1.0, 2.0] }
+walk_forward: { is_yil: 3, oos_yil: 1 }
+olcut: { dsr_a: 0.95, oos_asgari_yillik: 0.045, yil_pozitif: 0.60, en_kotu_hafta: -0.10, acil: -0.25,
+         para_oran: 0.90, risk_oran: 0.60 }

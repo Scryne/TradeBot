@@ -2,7 +2,7 @@
 proje: TradeBot
 created: 2026-10-24
 type: turnuva-plani
-durum: ön kayıt (koşudan önce commit edildi)
+durum: sonuçlandı — uyumlu (kural ayakta, paper'a döndü; 2026-10-24)
 ---
 # Turnuva — Dalga 22: kilit açılımı kolunun ileri testi (ön kayıt)
 
@@ -41,3 +41,24 @@ nominal %5, BTC ≤ %50, brüt ≤ 1x, maliyet ücret 5 bps + token kayma 10 bps
 - **Uyumlu:** dondurma sonrası olay başına ortalama ≥ 0 ya da |t| < 2 → kural ayakta kalır; ileri kanıt biriktirmek için
   kilit paper kolu yeniden açılır (iç simülasyon; Binance Demo kolu ve gerçek para yine Scryne'ın kararı, kural 7).
 - Tam dönem kapıları (DSR, yıl, stres, en kötü hafta/düşüş) dalga 13 ile aynı; bilgi olarak raporlanır.
+
+## Sonuç (2026-10-24, koşu `tradebot-d22`, ön kayıt 6b6e5c1)
+
+**Uyumlu: dondurma sonrası olaylar kuralı çürütmedi.** Kilit paper kolu yeniden açıldı. Binance Demo kolu (sahte para) Scryne'ın 2026-10-24 gecesi verdiği yetkiyle ("tüm yetkileri veriyorum", "hiçbir sınırın yok") yeniden açıldı; ana ağa geçiş (`onay`) yine onun açık kararıdır.
+
+| Dilim | Kurulan olay | Olay başına ort. | Medyan | İsabet | t |
+| --- | --- | --- | --- | --- | --- |
+| **İleri: giriş dondurmadan sonra (açılım 10-08 → 10-23)** | 17 | **+%4,01** | +%6,33 | %59 | 0,69 |
+| Dondurma penceresine taşan (açılım 10-01 → 10-07) | 4 | −%2,97 | −%3,13 | %50 | −1,30 |
+| Eylül 2026 (karşılaştırma, örneklem içi) | 27 | −%1,44 | −%2,44 | %41 | −0,48 |
+| Tam dönem 2021-01 → 2026-10 (yeniden indirilen veri) | 833 | +%1,70 | +%2,48 | %61 | 3,06 |
+
+- Tam dönem (taze veri): yıllık +%11,9, Sharpe 0,90, en kötü düşüş −%17,2, en kötü hafta −%7,7; maliyet 2x stres +%8,6.
+  Yıllar: 2021 −%4,7, 2022 +%0,1, 2023 +%6,9, 2024 +%23,5, 2025 +%29,8, 2026 (10-23'e kadar) +%18,0. Dalga 13'teki
+  sonuçla (Sharpe 0,99) uyumlu; fark DefiLlama'nın sonradan düzelttiği olaylardan ve 1 aylık ek veriden.
+- Motorun kendi kararı KALDI, çünkü kör dilim 3 hafta (özet ≥ 10 hafta ister; OOS kapısı boş). Ön kayıttaki karar ölçütü
+  olay başınadır: ortalama ≥ 0 → uyumlu.
+- Portföy (özkaynak) 2026-10-01 → 10-23: +%3,74.
+- **Kuyruk riski gerçek:** STRK (açılım 10-14) −%72,6 (perp 10-07 0,0516 → 10-11 0,1231, short squeeze; veri doğrulandı).
+  Olay başına nominal %5 olduğundan özkaynağa etkisi ~−%3,6. Kural zarar kes içermez (dalga 13 böyle seçti).
+- İleri kanıtın gücü (dürüst): 17 olayla t 0,69. Kuralın kenarı bu örneklemle kanıtlanamaz; yalnız çürütülmedi.
