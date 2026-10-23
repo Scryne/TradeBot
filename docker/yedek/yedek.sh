@@ -8,6 +8,10 @@ SAKLA="${SAKLA:-14}"
 D=/yedek
 
 yedekle() {
+    # Host açılışında Docker konteynerleri depends_on sırası gözetmeden kaldırır: postgres hazır olmadan pg_dump denenirse
+    # her açılışta sahte KRİTİK alarm gider (2026-10-22/23). En çok 5 dk beklenir; hâlâ hazır değilse gerçek hata yazılır.
+    i=0
+    until pg_isready -q || [ "$i" -ge 60 ]; do i=$((i + 1)); sleep 5; done
     f="$D/tradebot-$(date -u +%Y%m%dT%H%MZ).dump"
     if pg_dump -Fc -f "$f.tmp" && pg_restore --list "$f.tmp" > /dev/null; then
         mv "$f.tmp" "$f"

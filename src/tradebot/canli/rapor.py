@@ -84,7 +84,10 @@ def _kol_ozet(kol: str, bilgi: dict, isaret: list[tuple[int, float]], hafta_ms: 
             "ozkaynak": oz_son, "karar": len(kararlar), "islem": len(dolumlar), "ciro": ciro / oz_bas if oz_bas else 0.0,
             "yurutme_bps": yur_bps, "gecikme_bps": gec_bps,
             "fren": sum(k["durum"] != "normal" for k in kararlar), "veto": sum(bool(k["veto"]) for k in kararlar),
-            "olay": [o["tur"] for o in olaylar]}
+            "olay": [o["tur"] for o in olaylar],
+            # Dönemde işareti var mı: emekli kolların düğümü çalışmaz (2026-10-18'den beri kripto/forex), Telegram
+            # özetleri onları göstermez; markdown rapor tam kayıttır.
+            "canli": any(t >= hafta_ms for t, _ in isaret)}
 
 
 KANIT_ASGARI_HAFTA = 26     # PSR kısa örneklemde şansla geçebilir: en az yarım yıl paper (2026-09-29, Scryne:
@@ -200,17 +203,26 @@ def markdown(r: dict) -> str:
     return "\n".join(s) + "\n"
 
 
+def _isaretsiz(r: dict) -> str:
+    n = sum(not k["canli"] and not k["kol"].endswith("+jev") for k in r["kollar"])
+    return f"(+{n} kol dönemde işaret yazmadı: düğümü kapalı, gösterilmedi)" if n else ""
+
+
 def telegram_ozeti(r: dict) -> str:
     satir = [f"Paper haftası {r['hafta']}"]
-    for k in r["kollar"]:
+    canli = [k for k in r["kollar"] if k["canli"]]
+    for k in canli:
         if k["kol"].endswith("+jev"):
             continue
         satir.append(f"{k['kol'].split('@')[0]}@{k['kol'].rsplit('@', 1)[-1]}: {_yuzde(k['hafta'])} "
                      f"(toplam {_yuzde(k['toplam'])}, DD {_yuzde(k['en_kotu_dusus'], 1)})")
+    if _isaretsiz(r):
+        satir.append(_isaretsiz(r))
     olay = [f"{k['kol']}: {', '.join(k['olay'])}" for k in r["kollar"] if k["olay"]]
     if olay:
         satir += ["Olaylar:"] + olay
-    kanit = [k for k in r.get("kanit", []) if k["hafta"] >= 2]
+    adlar = {k["kol"] for k in canli}
+    kanit = [k for k in r.get("kanit", []) if k["hafta"] >= 2 and k["kol"] in adlar]
     if kanit:
         satir.append("Gerçek para kapısı (PSR ≥ 0,95, ≥ 26 hafta):")
         satir += [f"{k['kol'].split('@')[0]}: {k['hafta']} hf, PSR {'—' if k['psr'] is None else format(k['psr'], '.2f')}"
@@ -265,11 +277,13 @@ def gunluk_ozet(motor: Engine, simdi_ms: int, saglik_satiri: str = "") -> str:
         satir.append(saglik_satiri)
     satir.append("Kollar (24 saat · başlangıçtan):")
     for k in r["kollar"]:
-        if k["kol"].endswith("+jev"):
+        if k["kol"].endswith("+jev") or not k["canli"]:
             continue
         j = ad.get(k["kol"] + "+jev")
         ab = f" · Jev farkı {_yuzde(j['hafta'] - k['hafta'])}" if j and abs(j["hafta"] - k["hafta"]) > 1e-9 else ""
         satir.append(f"• {k['kol']}: {_yuzde(k['hafta'])} · {_yuzde(k['toplam'])}{ab}")
+    if _isaretsiz(r):
+        satir.append(_isaretsiz(r))
     islem = sum(k["islem"] for k in r["kollar"])
     fren = sum(k["fren"] for k in r["kollar"])
     olaylar = [f"{k['kol']}: {', '.join(k['olay'])}" for k in r["kollar"] if k["olay"]]

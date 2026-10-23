@@ -93,12 +93,14 @@ def test_gunluk_ozet(tmp_path):
     df = PaperDefter(m, "t")
     a = dataclasses.replace(kol_yap(), ad="x@g@1h", baslangic_ozkaynak=100.0)
     j = dataclasses.replace(a, ad="x@g@1h+jev")
-    for k in (a, j):
+    eski = dataclasses.replace(a, ad="eski@g@1h")
+    for k in (a, j, eski):
         df.kol_ac(k, H - 7 * 86_400_000)
     simdi = H + 30 * SAAT
     for k, oz in ((a.ad, [100, 102, 101]), (j.ad, [100, 102, 103])):
         for t, o in zip([H - SAAT, H + 5 * SAAT, H + 29 * SAAT], oz, strict=True):   # ilki 24 saatten önce
             df.ozkaynak_yaz(k, t, KolDurum(ozkaynak=o, nakit=o), {})
+    df.ozkaynak_yaz(eski.ad, H - SAAT, KolDurum(ozkaynak=99, nakit=99), {})          # emekli: pencerede işaret yok
     denetim.kaydet(m, "veri", "gece_isi", {"binance": {"dosya": 3}, "yahoo": {"hata": "HTTPError: 503"}},
                    zaman=datetime.fromtimestamp((simdi - 3 * SAAT) / 1000, UTC))
     metin = rapor.gunluk_ozet(m, simdi, "Sağlık: hepsi OK")
@@ -106,6 +108,7 @@ def test_gunluk_ozet(tmp_path):
     assert "Sağlık: hepsi OK" in metin and "x@g@1h: -0.98% · +1.00%" in metin
     assert "Jev farkı +1.96%" in metin and "x@g@1h+jev:" not in metin         # Jev'li kopya yalnız fark olarak
     assert "HATALI adım: yahoo" in metin and "Jev: yeni olay yok" in metin
+    assert "eski@g@1h" not in metin and "+1 kol dönemde işaret yazmadı" in metin
     # zamanlama: sessiz saat bitmeden yok, bittikten sonra bir kez
     sabah = int(datetime(2026, 9, 28, 4, 59, tzinfo=UTC).timestamp() * 1000)
     assert gunluk_ozet_zamani(sabah, 5, tmp_path) is None
