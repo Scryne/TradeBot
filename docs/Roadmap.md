@@ -1,7 +1,7 @@
 ---
 proje: TradeBot
 created: 2026-09-24
-updated: 2026-10-23
+updated: 2026-10-24
 type: roadmap
 status: aktif (sürüm 2 — kurumsal, çok piyasalı)
 ---
@@ -640,3 +640,14 @@ kapısı DSR yolu (d13 DSR 0,98); 26 haftalık PSR şartı kalktı. Sonrası Scr
       fiyattan dolar; bu gecikme yürütme maliyetinde görünür.
     - **Jev ikizi:** d19b 20 Ekim dengelemesini kaçırdı (mutabakat durdurması), `+jev` ikizi yapmadı; ikiz farkı Jev
       katkısı sayılmaz. Karşılaştırma iki kolun da tam hedefte olduğu 21 Ekim açılışından itibaren okunur.
+  - **2026-10-24 gecesi (Scryne: "amacım para kazanmak", "herşeyi sana bırakıyorum", "hiçbir sınırın yok"):**
+    - Funding taşıması ölçüldü, deneme açılmadı: BTCUSDT yıllık funding 2024 %12,0 → 2025 %5,1 → 2026 (10'a kadar) %2,2,
+      taban oranda geçen süre %42 → %7 (işlem doydu); T-bill'in altında. Ay dönümü ve gece kayması dalga 11'de kalmıştı.
+    - **Dalga 22 (kilit ileri testi) uyumlu:** dondurma sonrası 17 olay, olay başına +%4,0 (t 0,69); tam dönem taze veriyle
+      +%11,9/yıl, Sharpe 0,90, t 3,06. Kilit paper (`d13`) ve Binance Demo (`d13…#gercek`) kolları yeniden açıldı (devam,
+      host `.env` COMPOSE_PROFILES=gercek, compose `kilit` eski profilden çıktı). Gerçek para (`onay`) Scryne'ın.
+    - **Dalga 23 (QQQ oynaklık zamanlaması, 1999–2026):** A yok. QQQ'nun kendi uzun dönemi +%10/yıl, −%83 düşüş;
+      oynaklıkla ölçeklemek Sharpe'ı 0,49 → ~0,68'e, düşüşü ~yarıya indirir, "fazla para" kanıtı zayıf (1/8, sınırda).
+      Hepsi 2001'de −%25'i aşar: canlı risk kurallarıyla uygun değil.
+    - **Bulgu:** kilit ↔ QQQ haftalık korelasyonu −0,26. %50 kilit + %50 oynaklık yönetimli QQQ (2021–2026, örneklem
+      içi) +%13,2/yıl, Sharpe 1,48, en kötü düşüş −%11,6 (QQQ +%15,3, 0,76, −%34,5). Sabah Scryne'la konuşulacak öneri.
