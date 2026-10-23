@@ -64,7 +64,7 @@ function Emekli({ kollar, onSec }: { kollar: Kol[]; onSec: (kol: string) => void
                   {k.jev && <span className="etiket text-ucuncul"> + Jev</span>}
                   <span className="etiket ml-2 text-ucuncul">{k.grup.replace(/_/g, ' ')}</span>
                 </span>
-                <span className={`veri shrink-0 text-govde-sm ${isaretRenk(k.toplam)}`}>{yuzde(k.toplam)}</span>
+                <span className={`veri whitespace-nowrap shrink-0 text-govde-sm ${isaretRenk(k.toplam)}`}>{yuzde(k.toplam)}</span>
               </button>
             </li>
           ))}
@@ -124,6 +124,7 @@ export function Kollar({ p, onSec }: { p: Pano; onSec: (kol: string) => void }) 
             {cs.map(({ taban: k, jev }) => {
               const q = k.kiyas
               const aralik = q ? `${gunTR(q.bas_ms)} açılış → ${gunTR(q.bit_ms)} kapanış` : 'henüz dolum ya da QQQ kapanışı yok'
+              const kisa = q ? `${gunTR(q.bas_ms)} → ${gunTR(q.bit_ms)}` : 'bekliyor'
               return (
                 <tr key={k.kol} className="group relative border-b border-cizgi transition-colors duration-200 hover:bg-yuzey">
                   <th scope="row" className="py-4 pr-4 align-middle font-normal">
@@ -133,7 +134,7 @@ export function Kollar({ p, onSec }: { p: Pano; onSec: (kol: string) => void }) 
                       className="block w-full text-left after:absolute after:inset-0 after:content-['']"
                     >
                       <span className="block text-birincil">{kolAdi(k)}</span>
-                      <span className="etiket mt-1 block text-ucuncul">kıyas {aralik}</span>
+                      <span className="etiket mt-1 block text-ucuncul" title={aralik}>kıyas {kisa}</span>
                     </button>
                     <div className="mt-3 lg:hidden">
                       <Cizgi a={k.seri} b={q?.seri} taban={k.baslangic_ozkaynak} gen={150} yuk={28} etiket={`${kolAdi(k)} getiri çizgisi`} />
@@ -147,22 +148,22 @@ export function Kollar({ p, onSec }: { p: Pano; onSec: (kol: string) => void }) 
                       etiket={`${kolAdi(k)}: ${yuzde(k.toplam)}${q ? `, QQQ al-tut ${yuzde(q.kiyas)}` : ''}`}
                     />
                   </td>
-                  <td className={`veri px-4 py-4 text-right text-govde ${isaretRenk(k.toplam)}`}>{yuzde(k.toplam)}</td>
-                  <td className={`veri hidden px-4 py-4 text-right text-govde-sm sm:table-cell ${q ? isaretRenk(q.kiyas) : 'text-ucuncul'}`}>
+                  <td className={`veri whitespace-nowrap px-4 py-4 text-right text-govde ${isaretRenk(k.toplam)}`}>{yuzde(k.toplam)}</td>
+                  <td className={`veri whitespace-nowrap hidden px-4 py-4 text-right text-govde-sm sm:table-cell ${q ? isaretRenk(q.kiyas) : 'text-ucuncul'}`}>
                     {yuzde(q?.kiyas)}
                   </td>
-                  <td className={`veri py-4 pl-4 text-right text-govde md:pr-4 ${q ? isaretRenk(q.fark) : 'text-ucuncul'}`} title={aralik}>
+                  <td className={`veri whitespace-nowrap py-4 pl-4 text-right text-govde md:pr-4 ${q ? isaretRenk(q.fark) : 'text-ucuncul'}`} title={aralik}>
                     {yuzde(q?.fark)}
                   </td>
-                  <td className={`veri hidden px-4 py-4 text-right text-govde-sm md:table-cell ${jev ? isaretRenk(jev.toplam) : 'text-ucuncul'}`}>
+                  <td className={`veri whitespace-nowrap hidden px-4 py-4 text-right text-govde-sm md:table-cell ${jev ? isaretRenk(jev.toplam) : 'text-ucuncul'}`}>
                     {jev ? yuzde(jev.toplam) : '—'}
                   </td>
-                  <td className="veri hidden px-4 py-4 text-right text-govde-sm text-ikincil xl:table-cell">{yuzde(k.en_kotu_dusus, 1)}</td>
-                  <td className="veri hidden px-4 py-4 text-right text-govde-sm text-ikincil xl:table-cell">{k.hisse}</td>
+                  <td className="veri whitespace-nowrap hidden px-4 py-4 text-right text-govde-sm text-ikincil xl:table-cell">{yuzde(k.en_kotu_dusus, 1)}</td>
+                  <td className="veri whitespace-nowrap hidden px-4 py-4 text-right text-govde-sm text-ikincil xl:table-cell">{k.hisse}</td>
                   <td className="hidden px-4 py-4 lg:table-cell">
                     <span className="flex items-center gap-3">
                       <MaruziyetCubugu x={k.maruziyet} etiket={`Maruziyet ${oran(k.maruziyet)}`} />
-                      <span className="veri text-govde-sm text-birincil">{oran(k.maruziyet)}</span>
+                      <span className="veri whitespace-nowrap text-govde-sm text-birincil">{oran(k.maruziyet)}</span>
                     </span>
                   </td>
                   <td className="hidden py-4 pl-4 text-right md:table-cell">

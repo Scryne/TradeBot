@@ -127,8 +127,8 @@ def _serit(motor: Engine, isaret: dict[str, list], kollar: list[str], simdi_ms: 
 
 
 def _olaylar(motor: Engine, simdi_ms: int, borsalar: set[str] | None = None) -> dict:
-    """Jev olayları. Etkin veto yalnız çalışan kolların borsalarında (`NASDAQ` gibi kimlik öneki; None: hepsi):
-    emekli rollerin (A1 Binance, A2 KAP) süresiz vetoları şeride ve sayaca girmesin."""
+    """Jev olayları. Etkin veto ve son vetolar/uyarılar yalnız çalışan kolların borsalarında (`NASDAQ` gibi kimlik
+    öneki; None: hepsi): emekli rollerin (A1 Binance, A2 KAP) kayıtları Nasdaq panosuna girmesin."""
     from datetime import UTC, datetime
 
     bas = datetime.fromtimestamp((simdi_ms - 7 * GUN_MS) / 1000, UTC)
@@ -153,7 +153,7 @@ def _olaylar(motor: Engine, simdi_ms: int, borsalar: set[str] | None = None) -> 
 
     gecikme = [float(r.gecikme_ms) for r in yargi if r.gecikme_ms is not None]
     return {"sayim_7g": [{"rol": r, "tur": t, "adet": int(n)} for r, t, n in sayim],
-            "son": [_satir(r) for r in liste],
+            "son": [_satir(r) for r in liste if borsalar is None or r.enstruman.split(":")[0] in borsalar],
             "aktif_veto": [_satir(r) for r in aktif if borsalar is None or r.enstruman.split(":")[0] in borsalar],
             "yargi_24s": {"adet": len(yargi), "hata": sum(1 for r in yargi if r.hata),
                           "nvidia": sum(1 for r in yargi if r.saglayici == "nvidia"),
@@ -246,8 +246,8 @@ def pano(motor: Engine, simdi_ms: int, veri_dizini: Path | None = None, kod_suru
                            "kiyas": q["kiyas"], "fark": q["fark"], "seri": [[t, v] for t, v in q["seri"]]}})
 
     son_isaret = max((v[-1][0] for v in isaret.values() if v), default=None)
-    son_karar_ms = max((k["son_karar_ms"] for k in kollar if k["son_karar_ms"]), default=None)
     calisan = [k for k in kollar if not k["durduruldu"]]     # elle durdurulan kollar sayılmaz, şeritte görünmez
+    son_karar_ms = max((k["son_karar_ms"] for k in calisan if k["son_karar_ms"]), default=None)
     tv = _turnuva(min((k["baslangic_ms"] for k in calisan), default=None), simdi_ms)
     portfoy_calisiyor = dagitim is not None and any(k["kol"] == dagitim.portfoy for k in calisan)
     durumlar = [k["durum"] for k in calisan if k["durum"]]

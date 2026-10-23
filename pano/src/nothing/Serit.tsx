@@ -27,7 +27,7 @@ export function Serit({ p, onSec }: { p: Pano; onSec: (kol: string) => void }) {
   const saatler = p.serit.saatler
   const hucreler = useMemo(() => new Map(p.serit.satirlar.map((s) => [s.kol, s.hucreler])), [p.serit])
   const satirlar: Satir[] = useMemo(() => {
-    const sira = satirSirasi(p.kollar)
+    const sira = satirSirasi(p.kollar.filter((k) => !k.durduruldu))   // durdurulan kollar şeritte yok (sunucu da onlara hücre vermez)
     const out: Satir[] = []
     for (const [i, kol] of sira.entries()) {
       const once = out.at(-1)
