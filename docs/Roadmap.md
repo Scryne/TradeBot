@@ -1,7 +1,7 @@
 ---
 proje: TradeBot
 created: 2026-09-24
-updated: 2026-10-19
+updated: 2026-10-23
 type: roadmap
 status: aktif (sürüm 2 — kurumsal, çok piyasalı)
 ---
@@ -29,7 +29,7 @@ Her faz bittiğinde "Notlar" satırı öğrenilenle doldurulur ve sonraki fazlar
 | 11 | Paper turnuvası — 12 hafta | ⛔ Askıda | 12 hafta kesintisiz paper; kademeli sermaye çalıştı; hangi kolların kapıyı geçtiği ve Jev katkısı raporlandı; maliyet varsayımları ölçüldü |
 | 12 | Gerçek para (koşullu) | ⏳ Bekliyor | Kanıt kapısı (DSR ≥ 0,95 ya da paper PSR(0) ≥ 0,95; mikro pilot yalnız Scryne'ın açık kararıyla) + aracı kurum/borsa + anahtar (çekim kapalı, IP kısıtlı) + vergi netliği; sabit tavanlı mikro sermaye; ilk emir Scryne onayıyla |
 | 13 | Sonraki dalgalar (koşullu) | ⏳ Bekliyor | Ölçüm fırsat gösterirse: ABD tek hisseleri (ücretli veri), CME vadelileri (Databento), VİOP; her biri ayrı kararla |
-| 14 | Nasdaq dönüşü — ABD hisse paper (günlük + gün içi) | 🔄 Devam Ediyor | PIT Nasdaq-100 evreni + Yahoo verisi host'ta güncel; dalga 19 (günlük) ve 20 (gün içi) sonuçlandı ve belgelendi; Nasdaq günlük ve gün içi paper düğümleri host'ta 7/24 (kalp atışı, gözetmen, Telegram, pano); Alpaca paper anahtarı gelince emir yolu Alpaca'da uçtan uca doğrulandı; 4 hafta kesintisiz paper |
+| 14 | Nasdaq dönüşü — ABD hisse paper (günlük + gün içi) | 🔄 Devam Ediyor | PIT Nasdaq-100 evreni + Yahoo verisi host'ta güncel; dalga 19 (günlük) ve 20 (gün içi) sonuçlandı ve belgelendi; Nasdaq günlük paper düğümü host'ta (kalp atışı, gözetmen, Telegram, pano); emir yolu Alpaca'da uçtan uca doğrulandı; 4 hafta (≈ 20 seans) karar kaçırmadan paper: her seansın kararı verildi (telafi dahil) ya da kaçışı kayıtlı ve ≤ 2, Alpaca dolum/mutabakat temiz; kollar QQQ al-tut kıyasıyla raporlandı (pano, Telegram, haftalık rapor) |
 
 **Nasdaq dönüşü (2026-10-18, Scryne: "nasdaq gibi borsalarda çalışan bir trade bot olucak", "her şeyi sana bırakıyorum";
 günlük + gün içi, host'ta 7/24 paper):** 10-09 dondurması kalktı. Önce tam denetim (risk motorunda NaN ile tavan delinmesi,
@@ -499,6 +499,12 @@ kapısı DSR yolu (d13 DSR 0,98); 26 haftalık PSR şartı kalktı. Sonrası Scr
     7 günlük çubuğu, DefiLlama ham takviminden 30 günlük açılımlar, karar günlüğü ve Demo retleri. Elle durdurulan
     kollar çalışan sayılmaz (kahraman 4 / 16 durduruldu, şeritte yok). 390 px'te Risk tablosu taşıyordu (kilit perp'leri
     sütun ekliyordu), giderildi. Görsel doğrulama 4 genişlikte temiz. Telefon erişimi hâlâ doğrulanmadı.
+  - 2026-10-23: Nasdaq'a göre yeniden düzenlendi. Kollar tablosu yalnız çalışan kolları QQQ al-tut kıyasıyla (kesikli
+    çizgi, QQQ getirisi, fark; sıralama farka göre) gösterir, emekli kollar katlanmış listede. Risk tablosu kol başına en
+    büyük pozisyon + hisse sayısı + brüt (eskiden enstrüman başına sütun: 100 hissede okunmuyordu). Cetvel Faz 14'ün
+    4 haftası (çalışan kolların açılışından). Kilit bölümü kolu yoksa gizli, eski dağıtıcı satırı yalnız portföy kolu
+    çalışıyorsa. Jev bölümü A3 SEC 8-K'yı tanıyor, etkin veto bütün enstrümanlarda; son vetolar 30 günle sınırlı (emekli
+    A1/A2 kayıtları düştü).
 
 ### Faz 11: Paper turnuvası — 12 hafta
 - **İşler:** Sistem kendi başına çalışır; haftalık raporlar okunur; arızalar düzeltilir; kademeli sermaye
@@ -616,3 +622,21 @@ kapısı DSR yolu (d13 DSR 0,98); 26 haftalık PSR şartı kalktı. Sonrası Scr
   (QQQ 30 dk, özgün son yarım saat) KALDI. A3 SEC 8-K Jev vetosu canlıda (spike 09: 23/23), Jev'li ikiz kol iç
   simülasyonda. Dalga 21 (oynaklık yönetimli, Scryne'ın kararıyla): düşük oynaklık A (DSR 0,97; çekinceler belgede),
   momentum B → iki yeni iç simülasyon kolu. Kalan: 4 hafta kesintisiz paper ve Alpaca dolum/mutabakatının gözlemi.
+  - **2026-10-23 (Scryne: "herşeyi sana bırakıyorum, en iyi halinle çalışmaya başla"):** tam analizden sonra kararlar:
+    - **Kıyas QQQ al-tut.** Backtest'te (2016–2025) hiçbir kol QQQ'yu getiride geçmedi (QQQ +%19,8/yıl, Sharpe 0,97;
+      en iyi kol momentum +%11,6, Sharpe 0,95; düşük oynaklık A +%7,2, Sharpe 0,71). DSR sıfıra karşı ölçüyor, QQQ'ya
+      karşı değil. Bu yüzden kollar paper'da da QQQ ile aynı aralıkta kıyaslanır (`rapor.kiyas`: QQQ kolun ilk dolum
+      seansının açılışında alınmış sayılır, iki taraf aynı kapanışa bakar, fiyat getirisi). Pano, günlük Telegram özeti
+      ve haftalık rapor farkı gösterir. Gerçek para sorusunun ölçütü bu farktır (bot QQQ'dan iyi değilse bot gerekmez).
+    - **Yön:** paper'da düşüşü sınırlı endeks alternatifi olarak sürer; yeni dalga açılmaz (deneme sayısı DSR'ı zaten
+      yükseltiyor). Değerlendirme Faz 14 süresi dolunca (≈ 2026-11-18): mekanik temiz mi, kollar QQQ'ya göre nerede.
+    - **Gün içi kol emekli:** `d20:gun_ici_ivme@qqq@1h+ic` (dalga 20 ve 20b KALDI, gözlem kolu) durduruldu (neden
+      `emekli`, düzken; son özkaynak 99.772,83), servis compose `eski` profilinde. 15:00–16:00 NY penceresi host'un akşam
+      kapanmalarıyla da çakışıyordu.
+    - **Bitti kriteri:** "4 hafta kesintisiz" yerine "karar kaçırmadan". Host gece kapanırsa kapanış kararı ertesi sabah
+      telafi edilir ve aynı sonucu verir (karar kapanmış barla, dolum açılışta). Host borsa açılışından (16:30 TR; 2 Kasım
+      sonrası 17:30) sonra açılırsa o günün kararı atlanır (`nasdaq_karar_kacirildi`), kol bir gün eski hedefte kalır.
+      Karar verilmiş ama emirleri açılışta gönderilememişse (host açılışta kapalı) emir seans içinde gider ve gerçek
+      fiyattan dolar; bu gecikme yürütme maliyetinde görünür.
+    - **Jev ikizi:** d19b 20 Ekim dengelemesini kaçırdı (mutabakat durdurması), `+jev` ikizi yapmadı; ikiz farkı Jev
+      katkısı sayılmaz. Karşılaştırma iki kolun da tam hedefte olduğu 21 Ekim açılışından itibaren okunur.

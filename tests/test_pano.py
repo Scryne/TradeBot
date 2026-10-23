@@ -30,7 +30,7 @@ def test_pano_ozeti_defterle_tutarli(ortam):
     m, d = ortam
     p = veri.pano(m, SIMDI, d, "test")
     assert p["durum"]["kol"] == 14 and not p["durum"]["bayat"]
-    assert p["turnuva"]["gun"] == 11 and p["turnuva"]["toplam_gun"] == 84
+    assert p["turnuva"]["gun"] == 11 and p["turnuva"]["toplam_gun"] == 28
     # şerit: her kol bir satır, 72 saat; maruziyet özkaynak işaretinden
     assert len(p["serit"]["saatler"]) == veri.SERIT_SAAT
     assert {s["kol"] for s in p["serit"]["satirlar"]} == {k["kol"] for k in p["kollar"]}

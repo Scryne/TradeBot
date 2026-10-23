@@ -36,10 +36,10 @@ from tradebot.risk.motor import RiskAyar
 
 SAAT_MS = 3_600_000
 GUN_MS = 24 * SAAT_MS
-TURNUVA_GUN = 84          # 12 hafta (Final Doküman: paper turnuvası)
+TURNUVA_GUN = 28          # Faz 14: 4 hafta karar kaçırmadan Nasdaq paper (2026-10-23; eski 12 haftalık turnuva emekli)
 SERIT_SAAT = 72
 BAYAT_MS = 2 * SAAT_MS    # son işaret bundan eskiyse pano "veri bayat" der (sağlık bekçisinin hata eşiği)
-PAPER_ENSTRUMANLARI = ("BINANCE:BTCUSDT", "BINANCE:ETHUSDT")
+OLAY_GUN = 30             # son vetolar/uyarılar listesi: emekli rollerin (A1 Binance, A2 KAP) eski kayıtları düşsün
 
 
 def kol_bilgi(kol: str) -> dict:
@@ -75,9 +75,8 @@ def _seyrelt(seri: list[tuple[int, float]], adim_ms: int) -> list[list[float]]:
     return s
 
 
-def _turnuva(motor: Engine, simdi_ms: int) -> dict:
-    with motor.connect() as b:
-        bas = b.execute(select(func.min(paper_kol.c.baslangic_ms))).scalar()
+def _turnuva(bas: int | None, simdi_ms: int) -> dict:
+    """Paper cetveli: çalışan (durdurulmamış) kolların en erken açılışından `TURNUVA_GUN` gün."""
     if bas is None:
         return {"bas_ms": None, "bit_ms": None, "gun": 0, "toplam_gun": TURNUVA_GUN}
     bas = int(bas)
@@ -127,17 +126,19 @@ def _serit(motor: Engine, isaret: dict[str, list], kollar: list[str], simdi_ms: 
     return {"saatler": saatler, "satirlar": satirlar}
 
 
-def _olaylar(motor: Engine, simdi_ms: int) -> dict:
+def _olaylar(motor: Engine, simdi_ms: int, borsalar: set[str] | None = None) -> dict:
+    """Jev olayları. Etkin veto yalnız çalışan kolların borsalarında (`NASDAQ` gibi kimlik öneki; None: hepsi):
+    emekli rollerin (A1 Binance, A2 KAP) süresiz vetoları şeride ve sayaca girmesin."""
     from datetime import UTC, datetime
 
     bas = datetime.fromtimestamp((simdi_ms - 7 * GUN_MS) / 1000, UTC)
     with motor.connect() as b:
         sayim = b.execute(select(olay.c.rol, olay.c.tur, func.count()).where(olay.c.zaman >= bas)
                           .group_by(olay.c.rol, olay.c.tur)).all()
-        liste = b.execute(select(olay).where(olay.c.tur.in_(("veto", "uyari")))
+        liste = b.execute(select(olay).where(olay.c.tur.in_(("veto", "uyari")),
+                                             olay.c.zaman >= datetime.fromtimestamp((simdi_ms - OLAY_GUN * GUN_MS) / 1000, UTC))
                           .order_by(olay.c.zaman.desc()).limit(30)).all()
-        aktif = b.execute(select(olay).where(olay.c.tur == "veto", olay.c.enstruman.in_(PAPER_ENSTRUMANLARI),
-                                             olay.c.gecerli_ms <= simdi_ms,
+        aktif = b.execute(select(olay).where(olay.c.tur == "veto", olay.c.gecerli_ms <= simdi_ms,
                                              (olay.c.bitis_ms.is_(None)) | (olay.c.bitis_ms > simdi_ms))).all()
         gun_once = datetime.fromtimestamp((simdi_ms - GUN_MS) / 1000, UTC)
         yargi = b.execute(select(jev_yargi.c.saglayici, jev_yargi.c.gecikme_ms, jev_yargi.c.hata)
@@ -152,7 +153,8 @@ def _olaylar(motor: Engine, simdi_ms: int) -> dict:
 
     gecikme = [float(r.gecikme_ms) for r in yargi if r.gecikme_ms is not None]
     return {"sayim_7g": [{"rol": r, "tur": t, "adet": int(n)} for r, t, n in sayim],
-            "son": [_satir(r) for r in liste], "aktif_veto": [_satir(r) for r in aktif],
+            "son": [_satir(r) for r in liste],
+            "aktif_veto": [_satir(r) for r in aktif if borsalar is None or r.enstruman.split(":")[0] in borsalar],
             "yargi_24s": {"adet": len(yargi), "hata": sum(1 for r in yargi if r.hata),
                           "nvidia": sum(1 for r in yargi if r.saglayici == "nvidia"),
                           "gecikme_medyan_ms": round(median(gecikme)) if gecikme else None}}
@@ -195,7 +197,6 @@ def _defter(motor: Engine, veri_dizini: Path | None) -> dict:
 
 def pano(motor: Engine, simdi_ms: int, veri_dizini: Path | None = None, kod_surumu: str = "") -> dict:
     """Ana sayfa verisi (tek istek). Sağlık ayrı uçtan gelir: ağ ölçümleri saniyeler sürer."""
-    tv = _turnuva(motor, simdi_ms)
     isaret = _isaretler(motor, simdi_ms)
     with motor.connect() as b:
         kayit = {r.kol: r for r in b.execute(select(paper_kol))}
@@ -213,8 +214,13 @@ def pano(motor: Engine, simdi_ms: int, veri_dizini: Path | None = None, kod_suru
         emir_ret = b.execute(select(func.count()).select_from(paper_emir)
                              .where(paper_emir.c.zaman_ms >= simdi_ms - GUN_MS, paper_emir.c.onaylanan == 0)).scalar()
 
-    bas = tv["bas_ms"] or simdi_ms
-    toplam = {k["kol"]: k for k in rapor.ozetle(rapor.topla(motor, bas, simdi_ms + 1))["kollar"]}
+    ilk = min((int(r.baslangic_ms) for r in kayit.values()), default=simdi_ms)
+    toplam = {k["kol"]: k for k in rapor.ozetle(rapor.topla(motor, ilk, simdi_ms + 1))["kollar"]}
+    kiyas = {}
+    if veri_dizini is not None:
+        from tradebot.veri.depo import BarDepo
+
+        kiyas = rapor.kiyaslar(motor, BarDepo(veri_dizini), simdi_ms + 1, isaret)
     gunluk = {k["kol"]: k for k in rapor.ozetle(rapor.topla(motor, simdi_ms - GUN_MS, simdi_ms + 1))["kollar"]}
 
     kollar = []
@@ -223,6 +229,7 @@ def pano(motor: Engine, simdi_ms: int, veri_dizini: Path | None = None, kod_suru
         seri = [(x[0], x[1]) for x in isaret.get(ad, [])]
         brut, oran = (_maruziyet(*isaret[ad][-1][1:]) if isaret.get(ad) else (0.0, {}))
         sk = son_karar.get(ad)
+        q = kiyas.get(ad)
         kollar.append({**kol_bilgi(ad), "sinif": r.sinif, "baslangic_ozkaynak": float(r.baslangic_ozkaynak),
                        "baslangic_ms": int(r.baslangic_ms), "ozkaynak": t.get("ozkaynak", float(r.baslangic_ozkaynak)),
                        "toplam": t.get("toplam", 0.0), "gun": g.get("hafta", 0.0), "en_kotu_dusus": t.get("en_kotu_dusus", 0.0),
@@ -231,11 +238,18 @@ def pano(motor: Engine, simdi_ms: int, veri_dizini: Path | None = None, kod_suru
                        "durum": sk.durum if sk else None, "son_karar_ms": int(sk.karar_ms) if sk else None,
                        "durduruldu": durduruldu(elle[ad]),
                        "maruziyet": round(brut, 4), "pozisyon": {k: round(v, 4) for k, v in oran.items()},
-                       "seri": _seyrelt(seri, 4 * SAAT_MS)})
+                       "hisse": sum(1 for v in oran.values() if v),
+                       "en_buyuk": max((abs(v) for v in oran.values()), default=0.0),
+                       "seri": _seyrelt(seri, 4 * SAAT_MS),
+                       "kiyas": None if q is None else {
+                           "kimlik": q["kimlik"], "bas_ms": q["bas_ms"], "bit_ms": q["bit_ms"], "kol": q["kol"],
+                           "kiyas": q["kiyas"], "fark": q["fark"], "seri": [[t, v] for t, v in q["seri"]]}})
 
     son_isaret = max((v[-1][0] for v in isaret.values() if v), default=None)
     son_karar_ms = max((k["son_karar_ms"] for k in kollar if k["son_karar_ms"]), default=None)
     calisan = [k for k in kollar if not k["durduruldu"]]     # elle durdurulan kollar sayılmaz, şeritte görünmez
+    tv = _turnuva(min((k["baslangic_ms"] for k in calisan), default=None), simdi_ms)
+    portfoy_calisiyor = dagitim is not None and any(k["kol"] == dagitim.portfoy for k in calisan)
     durumlar = [k["durum"] for k in calisan if k["durum"]]
     return {
         "simdi_ms": simdi_ms, "kod_surumu": kod_surumu, "turnuva": tv,
@@ -252,11 +266,11 @@ def pano(motor: Engine, simdi_ms: int, veri_dizini: Path | None = None, kod_suru
                   "kaldirac": KALDIRAC_TAVANI, "gunluk_fren": RiskAyar().gunluk_fren,
                   "haftalik_fren": RiskAyar().haftalik_fren, "acil_durdurma": RiskAyar().acil_durdurma},
         "kol_olaylari": [{"kol": r.kol, "zaman_ms": int(r.zaman_ms), "tur": r.tur} for r in kol_olay],
-        "dagitim": None if dagitim is None else {"portfoy": dagitim.portfoy, "hafta_ms": int(dagitim.hafta_ms),
+        "dagitim": None if not portfoy_calisiyor else {"portfoy": dagitim.portfoy, "hafta_ms": int(dagitim.hafta_ms),
                                                   "kaldirac": float(dagitim.kaldirac),
                                                   "kollar": (dagitim.ayrinti or {}).get("kollar", {})},
         "kilit": _kilit(motor, simdi_ms, kayit, isaret),
-        "olaylar": _olaylar(motor, simdi_ms),
+        "olaylar": _olaylar(motor, simdi_ms, {e.split(":")[0] for k in calisan for e in k["pozisyon"]}),
         "defter": _defter(motor, veri_dizini),
     }
 

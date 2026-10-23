@@ -1,6 +1,6 @@
 import { enstrumanAdi, kolAdi, oran, sayi, yuzde } from '@/lib/bicim'
 import { satirSirasi } from '@/lib/kol'
-import type { Pano } from '@/lib/tip'
+import type { Kol, Pano } from '@/lib/tip'
 
 import { StatSatiri } from './Ortak'
 
@@ -35,46 +35,49 @@ function PozisyonCubugu({ deger, tavan, etiket }: { deger: number; tavan: number
 
 export function Risk({ p }: { p: Pano }) {
   const t = p.tavan
-  // Kilit kollarının pozisyonları kendi bölümünde (olay başına); burada yalnız trend turnuvası
-  const kollar = satirSirasi(p.kollar.filter((k) => k.strateji !== 'kilit_kisa'))
-  const ens = [...new Set(kollar.flatMap((k) => Object.keys(k.pozisyon)))].sort()
-  const gosterilen = ens.length ? ens : ['BINANCE:BTCUSDT', 'BINANCE:ETHUSDT']
+  // Kilit kollarının pozisyonları kendi bölümünde (olay başına). Hisse kolları onlarca enstrüman tutar: satır başına
+  // en büyük pozisyon (enstrüman tavanına göre), hisse sayısı ve brüt. Durdurulan kollar Kollar bölümünde.
+  const kollar = satirSirasi(p.kollar.filter((k) => k.strateji !== 'kilit_kisa' && !k.durduruldu))
+  const enBuyuk = (k: Kol) => Object.entries(k.pozisyon).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))[0]
   return (
     <div>
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h3 className="etiket text-ikincil">Pozisyonlar ve tavanlar</h3>
-        <p className="etiket text-ucuncul">10 segment = tavan</p>
+        <p className="etiket text-ucuncul">en büyük pozisyon · 10 segment = tavan</p>
       </div>
-      <div className="mt-5 overflow-x-auto">
-      <table className="w-full">
+      <table className="mt-5 w-full">
         <thead>
           <tr className="etiket text-ucuncul">
             <th scope="col" className="pb-3 text-left font-normal">Kol</th>
-            {gosterilen.map((e) => (
-              <th key={e} scope="col" className="pb-3 pl-4 text-left font-normal">
-                {enstrumanAdi(e)}
-              </th>
-            ))}
+            <th scope="col" className="pb-3 pl-4 text-left font-normal">En büyük</th>
+            <th scope="col" className="pb-3 pl-4 text-right font-normal">Hisse</th>
             <th scope="col" className="pb-3 pl-4 text-right font-normal">Brüt</th>
           </tr>
         </thead>
         <tbody>
-          {kollar.map((k) => (
-            <tr key={k.kol} className="border-t border-cizgi">
-              <th scope="row" className="max-w-[10rem] truncate py-2.5 pr-2 text-left text-govde-sm font-normal text-ikincil">
-                {k.jev ? <span className="etiket pl-3 text-ucuncul">+ Jev</span> : kolAdi(k)}
-              </th>
-              {gosterilen.map((e) => (
-                <td key={e} className="w-[30%] py-2.5 pl-4">
-                  <PozisyonCubugu deger={k.pozisyon[e] ?? 0} tavan={t.enstruman} etiket={`${kolAdi(k)} ${enstrumanAdi(e)}`} />
+          {kollar.map((k) => {
+            const e = enBuyuk(k)
+            return (
+              <tr key={k.kol} className="border-t border-cizgi">
+                <th scope="row" className="max-w-[11rem] truncate py-2.5 pr-2 text-left text-govde-sm font-normal text-ikincil">
+                  {k.jev ? <span className="etiket pl-3 text-ucuncul">+ Jev</span> : kolAdi(k)}
+                </th>
+                <td className="w-[40%] py-2.5 pl-4">
+                  <PozisyonCubugu deger={e?.[1] ?? 0} tavan={t.enstruman} etiket={`${kolAdi(k)} ${e ? enstrumanAdi(e[0]) : 'pozisyon yok'}`} />
+                  <span className="etiket mt-1.5 block text-ucuncul">{e ? `${enstrumanAdi(e[0])} ${oran(Math.abs(e[1]), 1)}` : 'pozisyon yok'}</span>
                 </td>
-              ))}
-              <td className="veri py-2.5 pl-4 text-right text-govde-sm text-birincil">{oran(k.maruziyet)}</td>
+                <td className="veri py-2.5 pl-4 text-right text-govde-sm text-ikincil">{k.hisse}</td>
+                <td className="veri py-2.5 pl-4 text-right text-govde-sm text-birincil">{oran(k.maruziyet)}</td>
+              </tr>
+            )
+          })}
+          {!kollar.length && (
+            <tr className="border-t border-cizgi">
+              <td colSpan={4} className="py-2.5 text-govde-sm text-ikincil">Çalışan kol yok.</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
-      </div>
       <dl className="mt-10 grid gap-x-10 sm:grid-cols-2">
         <StatSatiri ad="Enstrüman tavanı" deger={oran(t.enstruman)} />
         <StatSatiri ad="Günlük fren" deger={yuzde(t.gunluk_fren, 0)} />

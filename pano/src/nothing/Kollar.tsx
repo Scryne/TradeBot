@@ -1,9 +1,9 @@
-import { bps, kolAdi, oran, yuzde } from '@/lib/bicim'
+import { gunTR, kolAdi, oran, yuzde } from '@/lib/bicim'
 import type { Kol, Pano, Seri } from '@/lib/tip'
 
 import { BolumBasi, DurumEtiketi, isaretRenk, MaruziyetCubugu } from './Ortak'
 
-/** Jev'li (düz, ekran) ve Jev'siz (kesikli, ikincil) getiri; alan dolgusu yok, sıfır çizgisi kesikli. */
+/** Kol (düz, ekran) ve kıyas (kesikli, ikincil: QQQ al-tut) getirisi; alan dolgusu yok, sıfır çizgisi kesikli. */
 function Cizgi({ a, b, taban, gen = 160, yuk = 32, etiket }: { a: Seri; b?: Seri; taban: number; gen?: number; yuk?: number; etiket: string }) {
   const s1 = a.map(([t, v]) => [t, v / taban - 1] as const)
   const s2 = (b ?? []).map(([t, v]) => [t, v / taban - 1] as const)
@@ -30,20 +30,54 @@ function Cizgi({ a, b, taban, gen = 160, yuk = 32, etiket }: { a: Seri; b?: Seri
 
 type Cift = { taban: Kol; jev?: Kol }
 
-function ciftler(kollar: Kol[]): { ciftler: Cift[]; tekler: Kol[] } {
+const fark = (c: Cift) => c.taban.kiyas?.fark ?? -Infinity
+
+function ciftler(kollar: Kol[]): Cift[] {
   const ad = new Map(kollar.map((k) => [k.kol, k]))
-  const c = kollar
-    .filter((k) => k.tur === 'kol' && !k.jev)
-    .sort((a, b) => (ad.get(b.kol + '+jev')?.toplam ?? b.toplam) - (ad.get(a.kol + '+jev')?.toplam ?? a.toplam))
-    .map((k) => ({ taban: k, jev: ad.get(k.kol + '+jev') }))
-  return { ciftler: c, tekler: kollar.filter((k) => k.tur !== 'kol') }
+  return kollar.filter((k) => k.tur === 'kol' && !k.jev).map((k) => ({ taban: k, jev: ad.get(k.kol + '+jev') }))
+}
+
+/** Emekli kollar (kripto/forex dönemi, gün içi gözlem kolu): son durumları, katlanmış. */
+function Emekli({ kollar, onSec }: { kollar: Kol[]; onSec: (kol: string) => void }) {
+  if (!kollar.length) return null
+  return (
+    <details className="group mt-10 border-t border-cizgi pt-4">
+      <summary className="etiket flex cursor-pointer list-none flex-wrap items-center gap-x-3 gap-y-1 text-ikincil hover:text-birincil">
+        <span aria-hidden className="inline-block transition-transform duration-200 group-open:rotate-90">
+          ›
+        </span>
+        Emekli kollar · {kollar.length}
+        <span className="text-ucuncul">durduruldu, son durumları</span>
+      </summary>
+      <ul className="mt-4 grid gap-x-10 sm:grid-cols-2 lg:grid-cols-3">
+        {[...kollar]
+          .sort((a, b) => a.kol.localeCompare(b.kol))
+          .map((k) => (
+            <li key={k.kol} className="border-t border-cizgi">
+              <button
+                type="button"
+                onClick={() => onSec(k.kol)}
+                className="flex w-full items-baseline justify-between gap-4 py-2.5 text-left transition-colors duration-200 hover:bg-yuzey"
+              >
+                <span className="min-w-0 truncate text-govde-sm text-ikincil">
+                  {kolAdi(k)}
+                  {k.jev && <span className="etiket text-ucuncul"> + Jev</span>}
+                  <span className="etiket ml-2 text-ucuncul">{k.grup.replace(/_/g, ' ')}</span>
+                </span>
+                <span className={`veri shrink-0 text-govde-sm ${isaretRenk(k.toplam)}`}>{yuzde(k.toplam)}</span>
+              </button>
+            </li>
+          ))}
+      </ul>
+    </details>
+  )
 }
 
 export function Kollar({ p, onSec }: { p: Pano; onSec: (kol: string) => void }) {
-  // Kilit kolları kendi bölümünde (Kilit.tsx); burada yalnız trend turnuvası
-  const trend = p.kollar.filter((k) => k.strateji !== 'kilit_kisa')
-  const { ciftler: cs, tekler } = ciftler(trend)
-  const durdu = trend.filter((k) => k.durduruldu).length
+  // Kilit kolları kendi bölümünde (Kilit.tsx); çalışan kollar QQQ kıyasıyla, emekliler katlanmış listede
+  const tum = p.kollar.filter((k) => k.strateji !== 'kilit_kisa')
+  const calisan = tum.filter((k) => !k.durduruldu)
+  const cs = ciftler(calisan).sort((a, b) => fark(b) - fark(a))
   return (
     <section aria-labelledby="kollar-baslik">
       <BolumBasi id="kollar-baslik" baslik="Kollar">
@@ -52,108 +86,96 @@ export function Kollar({ p, onSec }: { p: Pano; onSec: (kol: string) => void }) 
             <svg width="20" height="4" aria-hidden>
               <line x1="0" x2="20" y1="2" y2="2" stroke="var(--color-ekran)" strokeWidth="1.5" />
             </svg>
-            Jev'li
+            Kol
           </li>
           <li className="flex items-center gap-2">
             <svg width="20" height="4" aria-hidden>
               <line x1="0" x2="20" y1="2" y2="2" stroke="var(--color-ikincil)" strokeWidth="1" strokeDasharray="2 2" />
             </svg>
-            Jev'siz
+            QQQ al-tut
           </li>
         </ul>
       </BolumBasi>
-      <p className="mt-3 max-w-[62ch] text-govde-sm text-pretty text-ikincil">
-        Her strateji iki kopya koşuyor: biri Jev vetosuyla, biri vetosuz. Aradaki fark Jev'in değeri. Sıralama Jev'li kopyanın
-        başlangıçtan getirisine göre.
-        {durdu > 0 && (
-          <span className="text-birincil">
-            {' '}
-            {durdu === trend.length ? 'Bu kolların hepsi durduruldu;' : `${durdu} kol durduruldu;`} tablo son durumlarını gösteriyor.
-          </span>
-        )}
+      <p className="mt-3 max-w-[66ch] text-govde-sm text-pretty text-ikincil">
+        Her kol, aynı gün QQQ alıp beklemekle kıyaslanıyor: QQQ, kolun ilk dolumunun yapıldığı açılışta alınmış sayılır ve iki
+        taraf aynı kapanışa bakar. Backtest'te hiçbir kol QQQ'nun getirisini geçmedi; gerçek para kararı bu farka bakacak.
+        Sıralama farka göre.
       </p>
 
-      <table className="mt-8 w-full border-collapse text-left">
-        <thead>
-          <tr className="etiket border-b border-cizgi-belirgin text-ucuncul">
-            <th scope="col" className="py-3 pr-4 font-normal">Strateji</th>
-            <th scope="col" className="hidden px-4 py-3 font-normal lg:table-cell">Başlangıçtan</th>
-            <th scope="col" className="px-4 py-3 text-right font-normal">Jev'li</th>
-            <th scope="col" className="hidden px-4 py-3 text-right font-normal sm:table-cell">Jev'siz</th>
-            <th scope="col" className="hidden px-4 py-3 text-right font-normal md:table-cell">En kötü düşüş</th>
-            <th scope="col" className="hidden px-4 py-3 text-right font-normal xl:table-cell">Dolum</th>
-            <th scope="col" className="hidden px-4 py-3 text-right font-normal xl:table-cell">Yürütme</th>
-            <th scope="col" className="hidden px-4 py-3 font-normal md:table-cell">Maruziyet</th>
-            <th scope="col" className="hidden py-3 pl-4 text-right font-normal md:table-cell">Durum</th>
-          </tr>
-        </thead>
-        <tbody>
-          {cs.map(({ taban, jev }) => {
-            const k = jev ?? taban
-            return (
-              <tr key={taban.kol} className="group relative border-b border-cizgi transition-colors duration-200 hover:bg-yuzey">
-                <th scope="row" className="py-4 pr-4 align-middle font-normal">
-                  <button
-                    type="button"
-                    onClick={() => onSec(k.kol)}
-                    className="block w-full text-left after:absolute after:inset-0 after:content-['']"
-                  >
-                    <span className="block truncate text-birincil">{kolAdi(taban)}</span>
-                    <span className="etiket mt-1 block text-ucuncul">{taban.grup.replace(/_/g, ' ')}</span>
-                  </button>
-                  <div className="mt-3 lg:hidden">
-                    <Cizgi a={k.seri} b={jev ? taban.seri : undefined} taban={k.baslangic_ozkaynak} gen={200} yuk={28} etiket={`${kolAdi(taban)} getiri çizgisi`} />
-                  </div>
-                </th>
-                <td className="hidden px-4 py-4 lg:table-cell">
-                  <Cizgi a={k.seri} b={jev ? taban.seri : undefined} taban={k.baslangic_ozkaynak} etiket={`${kolAdi(taban)}: Jev'li ${yuzde(k.toplam)}, Jev'siz ${yuzde(taban.toplam)}`} />
-                </td>
-                <td className={`veri px-4 py-4 text-right text-govde ${isaretRenk(k.toplam)}`}>{yuzde(k.toplam)}</td>
-                <td className={`veri hidden px-4 py-4 text-right text-govde-sm sm:table-cell ${isaretRenk(taban.toplam)}`}>{yuzde(taban.toplam)}</td>
-                <td className="veri hidden px-4 py-4 text-right text-govde-sm text-ikincil md:table-cell">{yuzde(k.en_kotu_dusus, 1)}</td>
-                <td className="veri hidden px-4 py-4 text-right text-govde-sm text-ikincil xl:table-cell">{k.islem}</td>
-                <td className="veri hidden px-4 py-4 text-right text-govde-sm text-ikincil xl:table-cell">{bps(k.yurutme_bps)}</td>
-                <td className="hidden px-4 py-4 md:table-cell">
-                  <span className="flex items-center gap-3">
-                    <MaruziyetCubugu x={k.maruziyet} etiket={`Maruziyet ${oran(k.maruziyet)}`} />
-                    <span className="veri text-govde-sm text-birincil">{oran(k.maruziyet)}</span>
-                  </span>
-                </td>
-                <td className="hidden py-4 pl-4 text-right md:table-cell">
-                  <DurumEtiketi d={k.durum} durduruldu={k.durduruldu} />
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-
-      {tekler.length > 0 && (
-        <div className="mt-10 grid gap-4 md:grid-cols-2">
-          {tekler.map((k) => (
-            <button
-              key={k.kol}
-              type="button"
-              onClick={() => onSec(k.kol)}
-              className="kart flex items-center gap-6 p-panel text-left transition-colors duration-200 hover:bg-yuzey-ust"
-            >
-              <span className="min-w-0 flex-1">
-                <span className="etiket block text-ikincil">{k.tur === 'agresif' ? 'tam Kelly gözlem' : 'sermaye dağıtıcı'}</span>
-                <span className="mt-2 block text-birincil">{kolAdi(k)}</span>
-                <span className="mt-1 block text-govde-sm text-pretty text-ikincil">
-                  {k.tur === 'agresif'
-                    ? 'Kolların ortalaması uzunsa o enstrümanda yarım özkaynak. Dağıtıma girmez.'
-                    : 'Haftalık ERC × yarım Kelly. Sermaye yalnız A kollarına gider; şu an hepsi B.'}
-                </span>
-              </span>
-              <span className="text-right">
-                <span className={`veri block text-veri-lg leading-none ${isaretRenk(k.toplam)}`}>{yuzde(k.toplam)}</span>
-                <span className="etiket mt-2 block text-ucuncul">maruziyet {oran(k.maruziyet)}</span>
-              </span>
-            </button>
-          ))}
-        </div>
+      {cs.length === 0 ? (
+        <p className="mt-8 border-l-2 border-cizgi-belirgin py-1 pl-4 text-govde-sm text-ikincil">Çalışan kol yok.</p>
+      ) : (
+        <table className="mt-8 w-full border-collapse text-left">
+          <thead>
+            <tr className="etiket border-b border-cizgi-belirgin text-ucuncul">
+              <th scope="col" className="py-3 pr-4 font-normal">Strateji</th>
+              <th scope="col" className="hidden px-4 py-3 font-normal lg:table-cell">Başlangıçtan</th>
+              <th scope="col" className="px-4 py-3 text-right font-normal">Getiri</th>
+              <th scope="col" className="hidden px-4 py-3 text-right font-normal sm:table-cell">QQQ</th>
+              <th scope="col" className="py-3 pl-4 text-right font-normal md:pr-4">QQQ'ya göre</th>
+              <th scope="col" className="hidden px-4 py-3 text-right font-normal md:table-cell">Jev'li ikiz</th>
+              <th scope="col" className="hidden px-4 py-3 text-right font-normal xl:table-cell">En kötü düşüş</th>
+              <th scope="col" className="hidden px-4 py-3 text-right font-normal xl:table-cell">Hisse</th>
+              <th scope="col" className="hidden px-4 py-3 font-normal lg:table-cell">Maruziyet</th>
+              <th scope="col" className="hidden py-3 pl-4 text-right font-normal md:table-cell">Durum</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cs.map(({ taban: k, jev }) => {
+              const q = k.kiyas
+              const aralik = q ? `${gunTR(q.bas_ms)} açılış → ${gunTR(q.bit_ms)} kapanış` : 'henüz dolum ya da QQQ kapanışı yok'
+              return (
+                <tr key={k.kol} className="group relative border-b border-cizgi transition-colors duration-200 hover:bg-yuzey">
+                  <th scope="row" className="py-4 pr-4 align-middle font-normal">
+                    <button
+                      type="button"
+                      onClick={() => onSec(k.kol)}
+                      className="block w-full text-left after:absolute after:inset-0 after:content-['']"
+                    >
+                      <span className="block text-birincil">{kolAdi(k)}</span>
+                      <span className="etiket mt-1 block text-ucuncul">kıyas {aralik}</span>
+                    </button>
+                    <div className="mt-3 lg:hidden">
+                      <Cizgi a={k.seri} b={q?.seri} taban={k.baslangic_ozkaynak} gen={150} yuk={28} etiket={`${kolAdi(k)} getiri çizgisi`} />
+                    </div>
+                  </th>
+                  <td className="hidden px-4 py-4 lg:table-cell">
+                    <Cizgi
+                      a={k.seri}
+                      b={q?.seri}
+                      taban={k.baslangic_ozkaynak}
+                      etiket={`${kolAdi(k)}: ${yuzde(k.toplam)}${q ? `, QQQ al-tut ${yuzde(q.kiyas)}` : ''}`}
+                    />
+                  </td>
+                  <td className={`veri px-4 py-4 text-right text-govde ${isaretRenk(k.toplam)}`}>{yuzde(k.toplam)}</td>
+                  <td className={`veri hidden px-4 py-4 text-right text-govde-sm sm:table-cell ${q ? isaretRenk(q.kiyas) : 'text-ucuncul'}`}>
+                    {yuzde(q?.kiyas)}
+                  </td>
+                  <td className={`veri py-4 pl-4 text-right text-govde md:pr-4 ${q ? isaretRenk(q.fark) : 'text-ucuncul'}`} title={aralik}>
+                    {yuzde(q?.fark)}
+                  </td>
+                  <td className={`veri hidden px-4 py-4 text-right text-govde-sm md:table-cell ${jev ? isaretRenk(jev.toplam) : 'text-ucuncul'}`}>
+                    {jev ? yuzde(jev.toplam) : '—'}
+                  </td>
+                  <td className="veri hidden px-4 py-4 text-right text-govde-sm text-ikincil xl:table-cell">{yuzde(k.en_kotu_dusus, 1)}</td>
+                  <td className="veri hidden px-4 py-4 text-right text-govde-sm text-ikincil xl:table-cell">{k.hisse}</td>
+                  <td className="hidden px-4 py-4 lg:table-cell">
+                    <span className="flex items-center gap-3">
+                      <MaruziyetCubugu x={k.maruziyet} etiket={`Maruziyet ${oran(k.maruziyet)}`} />
+                      <span className="veri text-govde-sm text-birincil">{oran(k.maruziyet)}</span>
+                    </span>
+                  </td>
+                  <td className="hidden py-4 pl-4 text-right md:table-cell">
+                    <DurumEtiketi d={k.durum} durduruldu={k.durduruldu} />
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       )}
+
+      <Emekli kollar={tum.filter((k) => k.durduruldu)} onSec={onSec} />
     </section>
   )
 }

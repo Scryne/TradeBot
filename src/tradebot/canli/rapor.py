@@ -127,6 +127,65 @@ def kanit_kapisi(isaret: list[tuple[int, float]], bit_ms: int) -> dict:
             "gecti": bool(t >= KANIT_ASGARI_HAFTA and p == p and p >= KANIT_PSR)}
 
 
+KIYAS = "ARCA:QQQ"          # Nasdaq kollarının kıyası (2026-10-23): backtest'te hiçbir kol QQQ al-tutun getirisini geçmedi
+KIYASLI = "@nasdaq100@"     # (dalga 19b, 21); paper'da da aynı soru: kol, QQQ'yu alıp beklemekten iyi mi?
+SAAT_MS = 3_600_000
+
+
+def ilk_dolumlar(motor: Engine) -> dict[str, int]:
+    """Kol → ilk dolum zamanı (kıyasın başladığı seans)."""
+    from sqlalchemy import func
+
+    with motor.connect() as b:
+        return {k: int(t) for k, t in b.execute(
+            select(paper_emir_olay.c.kol, func.min(paper_emir_olay.c.zaman_ms))
+            .where(paper_emir_olay.c.tur == "dolum").group_by(paper_emir_olay.c.kol))}
+
+
+def kiyas(depo, isaret: list[tuple[int, float]], b0: float, ilk_dolum_ms: int | None, bit_ms: int,
+          kimlik: str = KIYAS) -> dict | None:
+    """Kol ↔ QQQ al-tut, aynı aralıkta. QQQ kolun ilk dolum seansının açılışında alınmış sayılır (kol da o açılışta
+    doldu); bitiş, `bit_ms`'ten önce kapanmış son QQQ seansı (depoya gece işi yazar). Kol tarafı o kapanıştaki ya da
+    hemen önceki özkaynak işareti: iki taraf aynı ana bakar, gecikmiş bar kıyası kaydırmaz. Fiyat getirisi: defter
+    temettü yazmaz, kıyas da yazmaz. `seri`: QQQ'nun kol özkaynağı cinsinden kapanış serisi (pano çizgisi)."""
+    from tradebot.veri.takvim import gun_basi, takvim
+
+    if ilk_dolum_ms is None or not isaret:
+        return None
+    gun0 = gun_basi(ilk_dolum_ms)
+    df = depo.oku(kimlik, "1d", gun0, bit_ms)
+    if not len(df) or int(df["acilis_ms"][0]) != gun0:
+        return None
+    kapanis = {gun_basi(o): c for o, c in takvim("XNYS").seanslar(gun0, bit_ms)}
+    acilis = float(df["open"][0])
+    seri = [(kapanis[int(t)], b0 * float(c) / acilis) for t, c in zip(df["acilis_ms"], df["close"], strict=True)
+            if int(t) in kapanis and kapanis[int(t)] <= bit_ms]
+    once = [o for t, o in isaret if seri and t <= seri[-1][0]]
+    if not seri or not once:
+        return None
+    k, q = once[-1] / b0 - 1, seri[-1][1] / b0 - 1
+    return {"kimlik": kimlik, "bas_ms": gun0, "bit_ms": seri[-1][0], "kol": k, "kiyas": q, "fark": k - q, "seri": seri}
+
+
+def kiyaslar(motor: Engine, depo, bit_ms: int, isaret: dict[str, list] | None = None) -> dict[str, dict]:
+    """Nasdaq kollarının QQQ kıyası (`kiyas`), kol adı → sonuç (verisi olmayan kol yok)."""
+    ilk = ilk_dolumlar(motor)
+    with motor.connect() as b:
+        kollar = {r.kol: float(r.baslangic_ozkaynak) for r in b.execute(select(paper_kol)) if KIYASLI in r.kol}
+        if isaret is None:
+            isaret = defaultdict(list)
+            for r in b.execute(select(paper_ozkaynak.c.kol, paper_ozkaynak.c.zaman_ms, paper_ozkaynak.c.ozkaynak)
+                               .where(paper_ozkaynak.c.kol.in_(list(kollar)), paper_ozkaynak.c.zaman_ms < bit_ms)
+                               .order_by(paper_ozkaynak.c.zaman_ms)):
+                isaret[r.kol].append((int(r.zaman_ms), float(r.ozkaynak)))
+    out = {}
+    for k, b0 in kollar.items():
+        x = kiyas(depo, [(t, o) for t, o, *_ in isaret.get(k, [])], b0, ilk.get(k), bit_ms)
+        if x is not None:
+            out[k] = x
+    return out
+
+
 def ozetle(v: dict) -> dict:
     """Ham kayıtlardan rapor (saf)."""
     h = v["hafta_ms"]
@@ -173,6 +232,15 @@ def markdown(r: dict) -> str:
               "| --- | --- | --- | --- |"]
         s += [f"| `{j['kol']}` | {_yuzde(j['hafta_fark'], 3)} | {_yuzde(j['toplam_fark'], 3)} | {j['veto']} |"
               for j in r["jev_ab"]]
+    if r.get("kiyas"):
+        s += ["", "## QQQ kıyası (al-tut, aynı aralık)", "",
+              "QQQ kolun ilk dolum seansının açılışında alınmış sayılır; iki taraf aynı kapanışa bakar (fiyat getirisi, "
+              "temettü yok). Gerçek para kararı bu farka bakar: bot QQQ'yu almaktan iyi değilse bot gerekmez.", "",
+              "| Kol | Aralık | Kol | QQQ | Fark |", "| --- | --- | --- | --- | --- |"]
+        for k, x in sorted(r["kiyas"].items()):
+            a = (f"{datetime.fromtimestamp(x['bas_ms'] / 1000, UTC).date()} → "
+                 f"{datetime.fromtimestamp(x['bit_ms'] / 1000, UTC).date()}")
+            s.append(f"| `{k}` | {a} | {_yuzde(x['kol'])} | {_yuzde(x['kiyas'])} | {_yuzde(x['fark'])} |")
     if r.get("kanit"):
         s += ["", "## Gerçek para kanıt kapısı", "",
               f"Kolun kendi paper haftalarında PSR(0) ≥ {KANIT_PSR} ve en az {KANIT_ASGARI_HAFTA} hafta. Tahmini hafta: "
@@ -218,6 +286,10 @@ def telegram_ozeti(r: dict) -> str:
                      f"(toplam {_yuzde(k['toplam'])}, DD {_yuzde(k['en_kotu_dusus'], 1)})")
     if _isaretsiz(r):
         satir.append(_isaretsiz(r))
+    if r.get("kiyas"):
+        satir.append("QQQ al-tut kıyası (ilk dolumdan beri):")
+        satir += [f"{k.split('@')[0]}: {_yuzde(x['kol'])} · QQQ {_yuzde(x['kiyas'])} · fark {_yuzde(x['fark'])}"
+                  for k, x in sorted(r["kiyas"].items()) if not k.endswith("+jev")]
     olay = [f"{k['kol']}: {', '.join(k['olay'])}" for k in r["kollar"] if k["olay"]]
     if olay:
         satir += ["Olaylar:"] + olay
@@ -241,7 +313,10 @@ def uret(motor: Engine, veri_dizini, hafta_ms: int) -> tuple[dict, str, object]:
     """Raporu üretir ve `data/rapor/paper-<hafta>.md` olarak yazar. Döndürür: (rapor, markdown, yol)."""
     from pathlib import Path
 
+    from tradebot.veri.depo import BarDepo
+
     r = ozetle(topla(motor, hafta_ms))
+    r["kiyas"] = kiyaslar(motor, BarDepo(veri_dizini), hafta_ms + dg.HAFTA_MS)
     md = markdown(r)
     yol = Path(veri_dizini) / "rapor" / f"paper-{r['hafta']}.md"
     yol.parent.mkdir(parents=True, exist_ok=True)
@@ -264,12 +339,18 @@ def bekleyen_hafta(veri_dizini, simdi_ms: int, ilk_ms: int | None, gecikme_ms: i
 GUN_MS = 86_400_000
 
 
-def gunluk_ozet(motor: Engine, simdi_ms: int, saglik_satiri: str = "") -> str:
+def gunluk_ozet(motor: Engine, simdi_ms: int, saglik_satiri: str = "", veri_dizini=None) -> str:
     """Günlük Telegram özeti (Faz 9): son 24 saat. Kol getirileri defterden (haftalık raporla aynı hesap), yeni Jev
-    olayları, gece işinin son sonucu. Jev'li kopyalar A/B farkı varsa gösterilir (yoksa kalabalık yapmaz)."""
+    olayları, gece işinin son sonucu. Jev'li kopyalar A/B farkı varsa gösterilir (yoksa kalabalık yapmaz). `veri_dizini`
+    verilirse Nasdaq kollarının QQQ farkı (ilk dolumdan beri, son kapanışta) satıra eklenir."""
     from tradebot.db import denetim_izi, olay
 
     r = ozetle(topla(motor, simdi_ms - GUN_MS, simdi_ms))
+    kys = {}
+    if veri_dizini is not None:
+        from tradebot.veri.depo import BarDepo
+
+        kys = kiyaslar(motor, BarDepo(veri_dizini), simdi_ms)
     ad = {k["kol"]: k for k in r["kollar"]}
     tarih = datetime.fromtimestamp(simdi_ms / 1000, UTC).date().isoformat()
     satir = [f"Günlük özet · {tarih}"]
@@ -281,6 +362,8 @@ def gunluk_ozet(motor: Engine, simdi_ms: int, saglik_satiri: str = "") -> str:
             continue
         j = ad.get(k["kol"] + "+jev")
         ab = f" · Jev farkı {_yuzde(j['hafta'] - k['hafta'])}" if j and abs(j["hafta"] - k["hafta"]) > 1e-9 else ""
+        q = kys.get(k["kol"])
+        ab += f" · QQQ'ya göre {_yuzde(q['fark'])}" if q else ""
         satir.append(f"• {k['kol']}: {_yuzde(k['hafta'])} · {_yuzde(k['toplam'])}{ab}")
     if _isaretsiz(r):
         satir.append(_isaretsiz(r))

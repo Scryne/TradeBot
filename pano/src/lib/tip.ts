@@ -30,7 +30,11 @@ export interface Kol {
   son_karar_ms: number | null
   maruziyet: number
   pozisyon: Record<string, number>
+  hisse: number
+  en_buyuk: number
   seri: Seri
+  /** QQQ al-tut, kolun ilk dolum seansının açılışından son kapanışa (Nasdaq kolları; veri yoksa null) */
+  kiyas: { kimlik: string; bas_ms: number; bit_ms: number; kol: number; kiyas: number; fark: number; seri: Seri } | null
 }
 
 export interface Hucre {

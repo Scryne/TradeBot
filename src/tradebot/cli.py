@@ -216,7 +216,7 @@ def _gunluk_ozet(a, bildirici, kayitci, izleyici) -> None:
     sorun = {ad: d for ad, d in izleyici.bildirilen.items() if d != "OK"}
     saglik_satiri = "Sağlık: " + (", ".join(f"{k} {v}" for k, v in sorted(sorun.items())) if sorun else "hepsi OK")
     try:
-        metin = rapor.gunluk_ozet(db_motor(a), simdi, saglik_satiri)
+        metin = rapor.gunluk_ozet(db_motor(a), simdi, saglik_satiri, a.veri_dizini)
     except Exception as e:  # noqa: BLE001 — özet hatası bekçiyi durdurmaz
         kayitci.error("gunluk_ozet_hatasi", hata=f"{type(e).__name__}: {e}"[:300])
         return

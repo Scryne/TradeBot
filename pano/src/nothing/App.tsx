@@ -43,9 +43,11 @@ export default function App() {
             <div className={`${KAP} belir`}>
               <Kahraman p={p} />
             </div>
-            <div className={KAP}>
-              <Kilit p={p} />
-            </div>
+            {p.kilit.kollar.length > 0 && (
+              <div className={KAP}>
+                <Kilit p={p} />
+              </div>
+            )}
             <div className={KAP}>
               <Serit p={p} onSec={setSecili} />
             </div>

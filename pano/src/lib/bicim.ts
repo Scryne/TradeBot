@@ -83,6 +83,10 @@ const STRATEJI: Record<string, string> = {
   mikro_ivme: 'Mikro ivme',
   fomc_dolar: 'FOMC dolar',
   doviz_tasima: 'Döviz taşıma',
+  esit_agirlik: 'Eşit ağırlık',
+  dusuk_oynaklik: 'Düşük oynaklık',
+  hisse_momentum: 'Momentum',
+  gun_ici_ivme: 'Gün içi ivme',
 }
 
 export const stratejiAdi = (s: string) => STRATEJI[s] ?? s
@@ -104,6 +108,10 @@ const KISA: Record<string, string> = {
   mikro_ivme: 'SKALP',
   fomc_dolar: 'FOMC',
   doviz_tasima: 'TAŞIMA',
+  esit_agirlik: 'EŞİT',
+  dusuk_oynaklik: 'DÜŞ.OYN',
+  hisse_momentum: 'MOM',
+  gun_ici_ivme: 'GÜN İÇİ',
 }
 
 /** Dar ekran için: "DON 4h D2" */

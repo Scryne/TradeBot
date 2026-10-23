@@ -172,6 +172,7 @@ services:
 
   nasdaq-gun-ici:
     <<: *ortak
+    profiles: ["eski"]   # 2026-10-23 emekli (dalga 20/20b KALDI; kol durduruldu, pozisyonsuz)
     # Nasdaq gün içi paper düğümü (canli/nasdaq_gun_ici.py; dalga 20, QQQ): saat başı karar (backtest fonksiyonu QQQ
     # dakikalıklarından kurulan saatlik barla), 15:59 NY'de çıkış, gece pozisyon yok. Kalp atışı ayrı (`nasdaq_gun_ici`).
     command: ["tradebot", "paper", "nasdaq-gun-ici"]

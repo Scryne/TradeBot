@@ -9,17 +9,17 @@ function durum(p: Pano): { cumle: string; ton: 'sakin' | 'dikkat' | 'alarm' } {
   return { cumle: 'Hepsi normal.', ton: 'sakin' }
 }
 
-/** 12 hafta × 7 gün nokta matrisi: geçen günler dolu, bugün çerçeveli, kalanlar sönük. */
+/** Faz 14 paper süresi (4 hafta × 7 gün) nokta matrisi: geçen günler dolu, bugün çerçeveli, kalanlar sönük. */
 function Cetvel({ p }: { p: Pano }) {
   const t = p.turnuva
   if (!t.bas_ms || !t.bit_ms)
-    return <p className="text-govde-sm text-ikincil">Turnuva başlamadı. Paper düğümü ilk kolu açınca cetvel burada görünür.</p>
+    return <p className="text-govde-sm text-ikincil">Çalışan kol yok. Paper düğümü bir kol açınca cetvel burada görünür.</p>
   const hafta = Math.ceil(t.toplam_gun / 7)
   const buHafta = Math.min(hafta, Math.floor((t.gun - 1) / 7) + 1)
   return (
     <div>
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="etiket text-ikincil">Paper turnuvası</h2>
+        <h2 className="etiket text-ikincil">Nasdaq paper</h2>
         <p className="etiket text-ucuncul">
           hafta {buHafta}/{hafta}
         </p>
@@ -30,9 +30,9 @@ function Cetvel({ p }: { p: Pano }) {
       </p>
       <div
         role="img"
-        aria-label={`Turnuvanın ${t.toplam_gun} gününden ${t.gun}. gün`}
-        className="mt-6 grid max-w-[300px] grid-flow-col gap-[7px]"
-        style={{ gridTemplateRows: 'repeat(7, minmax(0, 1fr))', gridTemplateColumns: `repeat(${hafta}, minmax(0, 1fr))` }}
+        aria-label={`Paper süresinin ${t.toplam_gun} gününden ${t.gun}. gün`}
+        className="mt-6 grid grid-flow-col gap-[7px]"
+        style={{ gridTemplateRows: 'repeat(7, minmax(0, 1fr))', gridTemplateColumns: `repeat(${hafta}, minmax(0, 1fr))`, maxWidth: hafta * 25 }}
       >
         {Array.from({ length: hafta * 7 }, (_, i) => {
           const g = i + 1
@@ -51,7 +51,7 @@ function Cetvel({ p }: { p: Pano }) {
           )
         })}
       </div>
-      <div className="etiket mt-4 flex max-w-[300px] justify-between text-ucuncul">
+      <div className="etiket mt-4 flex justify-between gap-4 text-ucuncul" style={{ maxWidth: Math.max(140, hafta * 25) }}>
         <span>{gunTR(t.bas_ms)}</span>
         <span>{gunTR(t.bit_ms)}</span>
       </div>

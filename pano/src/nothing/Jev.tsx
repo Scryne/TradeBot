@@ -1,7 +1,12 @@
 import { enstrumanAdi, gorece, oran, sayi, tarihSaatTR } from '@/lib/bicim'
 import type { Pano } from '@/lib/tip'
 
-const ROL: Record<string, string> = { A1_binance: 'Binance duyuruları', A2_kap: 'KAP bildirimleri', manuel: 'Elle' }
+const ROL: Record<string, string> = {
+  A1_binance: 'Binance duyuruları',
+  A2_kap: 'KAP bildirimleri',
+  A3_sec: 'SEC 8-K bildirimleri',
+  manuel: 'Elle',
+}
 const TUR: Record<string, string> = { veto: 'veto', uyari: 'uyarı', kurumsal: 'kurumsal işlem', kaldir: 'kaldırma' }
 
 export function Jev({ p }: { p: Pano }) {
@@ -23,7 +28,7 @@ export function Jev({ p }: { p: Pano }) {
             <p className="mt-2 text-govde-sm text-pretty text-ikincil">{o.aktif_veto[0].neden}</p>
           </>
         ) : (
-          <p className="etiket text-ikincil">[etkin veto yok] <span className="text-ucuncul">· BTC, ETH</span></p>
+          <p className="etiket text-ikincil">[etkin veto yok] <span className="text-ucuncul">· Nasdaq-100, SEC 8-K</span></p>
         )}
       </div>
 

@@ -137,3 +137,35 @@ def test_kanit_kapisi():
     zayif = [(t, 100.0 * (1 + 0.02 * ((i % 2) * 2 - 1))) for i, (t, _) in enumerate(isaret)]
     z = rapor.kanit_kapisi(zayif, H + 41 * hf)
     assert not z["gecti"] and (z["sr"] is None or z["sr"] <= 0.1)
+
+
+def test_qqq_kiyasi_ayni_kapanisa_bakar():
+    """Kıyas kolun ilk dolum seansının açılışından başlar; iki taraf bitişten önce kapanmış son seansa bakar."""
+    from datetime import UTC, datetime
+
+    import polars as pl
+
+    def ms(*a):
+        return int(datetime(*a, tzinfo=UTC).timestamp() * 1000)
+
+    class Depo:
+        def __init__(self, df):
+            self.df = df
+
+        def oku(self, kimlik, zd, bas, bit):
+            assert (kimlik, zd) == ("ARCA:QQQ", "1d")
+            return self.df.filter((pl.col("acilis_ms") >= bas) & (pl.col("acilis_ms") < bit))
+
+    df = pl.DataFrame({"acilis_ms": [ms(2026, 10, d) for d in (20, 21, 22)], "open": [100.0, 101.0, 103.0],
+                       "close": [101.0, 103.0, 99.0]})
+    isaret = [(ms(2026, 10, 20, 14), 100_000.0), (ms(2026, 10, 21, 20), 102_000.0), (ms(2026, 10, 22, 15), 101_500.0),
+              (ms(2026, 10, 22, 20), 100_500.0), (ms(2026, 10, 22, 23), 999_999.0)]   # kapanıştan sonraki işaret sayılmaz
+    ilk = ms(2026, 10, 20, 13, 31)
+    x = rapor.kiyas(Depo(df), isaret, 100_000.0, ilk, ms(2026, 10, 23, 12))
+    assert x["kiyas"] == pytest.approx(-0.01) and x["kol"] == pytest.approx(0.005) and x["fark"] == pytest.approx(0.015)
+    assert x["bit_ms"] == ms(2026, 10, 22, 20) and len(x["seri"]) == 3
+    # seans içinde: o günün barı henüz kapanmadı, bir önceki kapanışa bakılır (kol tarafı da)
+    y = rapor.kiyas(Depo(df), isaret, 100_000.0, ilk, ms(2026, 10, 22, 18))
+    assert y["kiyas"] == pytest.approx(0.03) and y["kol"] == pytest.approx(0.02)
+    assert rapor.kiyas(Depo(df), isaret, 100_000.0, None, ms(2026, 10, 23)) is None          # henüz dolum yok
+    assert rapor.kiyas(Depo(df.slice(1)), isaret, 100_000.0, ilk, ms(2026, 10, 23)) is None  # ilk seansın barı yok
