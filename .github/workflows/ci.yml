@@ -2,10 +2,13 @@
 # Testler ağa ve sırlara dokunmaz: veritabanı sqlite, MT5/Binance/OECD sahte. Sır gerekmez.
 name: CI
 
+# Yalnız doküman / not değişen commit'te CI koşmaz (özel repo Actions dakikası, 2026-10-26).
 on:
   push:
     branches: [main]
+    paths-ignore: ["**.md", "docs/**", ".claude/**"]
   pull_request:
+    paths-ignore: ["**.md", "docs/**", ".claude/**"]
 
 permissions:
   contents: read
